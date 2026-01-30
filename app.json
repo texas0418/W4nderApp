@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "TravelGenie",
-    "slug": "travelgenie-app",
+    "name": "W4nder",
+    "slug": "w4nder-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "travelgenie",
+    "scheme": "w4nder",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.travelgenie",
+      "bundleIdentifier": "com.yourcompany.w4nder",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to scan documents and take travel photos.",
         "NSPhotoLibraryUsageDescription": "This app accesses your photo library to select travel photos.",
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yourcompany.travelgenie"
+      "package": "com.yourcompany.w4nder"
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
@@ -37,7 +37,7 @@
       [
         "expo-router",
         {
-          "origin": "https://travelgenie.app/"
+          "origin": "https://w4nder.app/"
         }
       ],
       "expo-font",
@@ -45,19 +45,19 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow TravelGenie to access your camera."
+          "cameraPermission": "Allow W4nder to access your camera."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow TravelGenie to access your photos."
+          "photosPermission": "Allow W4nder to access your photos."
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Allow TravelGenie to use your location."
+          "locationWhenInUsePermission": "Allow W4nder to use your location."
         }
       ]
     ],
