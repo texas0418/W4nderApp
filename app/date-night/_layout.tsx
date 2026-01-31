@@ -7,6 +7,7 @@ export default function DateNightLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: colors.background },
+        animation: 'slide_from_right',
       }}
     >
       <Stack.Screen name="my-preferences" />
@@ -14,6 +15,8 @@ export default function DateNightLayout() {
       <Stack.Screen name="generate-plan" />
       <Stack.Screen name="edit-itinerary" />
       <Stack.Screen name="history" />
+      <Stack.Screen name="build-itinerary" />
+      <Stack.Screen name="calendar" />
     </Stack>
   );
 }

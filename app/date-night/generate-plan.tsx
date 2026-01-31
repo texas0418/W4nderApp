@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Pressable,
-  Alert,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -20,20 +20,30 @@ import {
   Clock,
   MapPin,
   ChevronRight,
-  Check,
   RefreshCw,
-  Heart,
-  Gift,
+  Eye,
+  EyeOff,
+  Check,
+  Home,
+  Map,
+  Plane,
+  Globe,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { useDateNight } from '@/contexts/DateNightContext';
-import { BudgetTier, DateSuggestion, ItineraryActivity } from '@/types/date-night';
+import { BudgetTier, DateSuggestion, TripScope } from '@/types/date-night';
 
-const budgetOptions: { value: BudgetTier; label: string; description: string }[] = [
-  { value: '$', label: '$', description: 'Under $50' },
-  { value: '$$', label: '$$', description: '$50-150' },
-  { value: '$$$', label: '$$$', description: '$150-300' },
-  { value: '$$$$', label: '$$$$', description: '$300+' },
+const budgetOptions: { value: BudgetTier; label: string; range: string }[] = [
+  { value: '$', label: '$', range: 'Under $50' },
+  { value: '$$', label: '$$', range: '$50-150' },
+  { value: '$$$', label: '$$$', range: '$150-300' },
+  { value: '$$$$', label: '$$$$', range: '$300+' },
+];
+
+const tripScopeOptions: { value: TripScope; label: string; icon: any; description: string }[] = [
+  { value: 'local', label: 'Local', icon: Home, description: 'Nearby in your city' },
+  { value: 'domestic', label: 'Domestic', icon: Map, description: 'Within the country' },
+  { value: 'international', label: 'International', icon: Plane, description: 'Abroad' },
 ];
 
 export default function GeneratePlanScreen() {
@@ -49,25 +59,31 @@ export default function GeneratePlanScreen() {
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedBudget, setSelectedBudget] = useState<BudgetTier>('$$');
+  const [selectedTripScope, setSelectedTripScope] = useState<TripScope>('local');
+  const [destination, setDestination] = useState('');
   const [isSurprise, setIsSurprise] = useState(false);
   const [selectedSuggestion, setSelectedSuggestion] = useState<DateSuggestion | null>(null);
   const [hasGenerated, setHasGenerated] = useState(false);
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    });
+  const generateDates = () => {
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      dates.push(date);
+    }
+    return dates;
+  };
+
+  const formatDateLabel = (date: Date, index: number) => {
+    if (index === 0) return 'Today';
+    if (index === 1) return 'Tomorrow';
+    return date.toLocaleDateString('en-US', { weekday: 'short' });
   };
 
   const handleGenerate = async () => {
-    if (!selectedPartner) {
-      Alert.alert('No Partner Selected', 'Please select a partner first.');
-      return;
-    }
-
-    await generateSuggestions(selectedPartner.id, selectedBudget, selectedDate.toISOString());
+    if (!selectedPartner) return;
+    await generateSuggestions(selectedPartner.id, selectedBudget, selectedDate.toISOString(), selectedTripScope);
     setHasGenerated(true);
     setSelectedSuggestion(null);
   };
@@ -76,20 +92,20 @@ export default function GeneratePlanScreen() {
     setSelectedSuggestion(suggestion);
   };
 
-  const handleCreateItinerary = () => {
+  const handleCustomize = () => {
     if (!selectedSuggestion || !selectedPartner) return;
-
-    const activities: ItineraryActivity[] = selectedSuggestion.activities.map((a, index) => ({
-      id: `activity-${index}`,
-      ...a,
-    }));
 
     const itinerary = createItinerary({
       name: selectedSuggestion.title,
       date: selectedDate.toISOString(),
       partnerId: selectedPartner.id,
       partnerName: selectedPartner.name,
-      activities,
+      tripScope: selectedTripScope,
+      destination: selectedTripScope !== 'local' ? (destination || selectedSuggestion.destination) : undefined,
+      activities: selectedSuggestion.activities.map((a, i) => ({
+        ...a,
+        id: `activity-${i}`,
+      })),
       totalEstimatedCost: selectedSuggestion.estimatedTotalCost,
       status: 'draft',
       isSurprise,
@@ -110,10 +126,7 @@ export default function GeneratePlanScreen() {
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <ArrowLeft size={22} color={colors.textLight} />
           </Pressable>
-          <View style={styles.headerContent}>
-            <Sparkles size={24} color={colors.textLight} />
-            <Text style={styles.headerTitle}>Plan a Date</Text>
-          </View>
+          <Text style={styles.headerTitle}>Plan Your Date</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -124,62 +137,132 @@ export default function GeneratePlanScreen() {
         >
           {/* Partner Info */}
           {selectedPartner && (
-            <View style={styles.partnerCard}>
+            <View style={styles.partnerBanner}>
               <View style={styles.partnerAvatar}>
-                <Text style={styles.avatarInitial}>
+                <Text style={styles.partnerInitial}>
                   {selectedPartner.name.charAt(0).toUpperCase()}
                 </Text>
               </View>
-              <View style={styles.partnerInfo}>
-                <Text style={styles.partnerLabel}>Planning with</Text>
-                <Text style={styles.partnerName}>{selectedPartner.name}</Text>
-              </View>
-              <Heart size={20} color={colors.secondary} fill={colors.secondary} />
+              <Text style={styles.partnerText}>
+                Planning a date with <Text style={styles.partnerName}>{selectedPartner.name}</Text>
+              </Text>
             </View>
           )}
+
+          {/* Trip Scope Selection */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Globe size={20} color={colors.secondary} />
+              <Text style={styles.sectionTitle}>Trip Type</Text>
+            </View>
+            <View style={styles.tripScopeContainer}>
+              {tripScopeOptions.map(option => {
+                const IconComponent = option.icon;
+                const isSelected = selectedTripScope === option.value;
+                return (
+                  <Pressable
+                    key={option.value}
+                    style={[
+                      styles.tripScopeOption,
+                      isSelected && styles.tripScopeOptionSelected,
+                    ]}
+                    onPress={() => setSelectedTripScope(option.value)}
+                  >
+                    <View style={[
+                      styles.tripScopeIcon,
+                      isSelected && styles.tripScopeIconSelected,
+                    ]}>
+                      <IconComponent 
+                        size={22} 
+                        color={isSelected ? colors.textLight : colors.secondary} 
+                      />
+                    </View>
+                    <Text style={[
+                      styles.tripScopeLabel,
+                      isSelected && styles.tripScopeLabelSelected,
+                    ]}>
+                      {option.label}
+                    </Text>
+                    <Text style={[
+                      styles.tripScopeDesc,
+                      isSelected && styles.tripScopeDescSelected,
+                    ]}>
+                      {option.description}
+                    </Text>
+                    {isSelected && (
+                      <View style={styles.tripScopeCheck}>
+                        <Check size={14} color={colors.textLight} />
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {/* Destination Input for non-local trips */}
+            {selectedTripScope !== 'local' && (
+              <View style={styles.destinationContainer}>
+                <Text style={styles.destinationLabel}>
+                  {selectedTripScope === 'domestic' ? 'City/Region' : 'Country/City'}
+                </Text>
+                <TextInput
+                  style={styles.destinationInput}
+                  value={destination}
+                  onChangeText={setDestination}
+                  placeholder={selectedTripScope === 'domestic' ? 'e.g., Napa Valley, Miami' : 'e.g., Paris, Tokyo'}
+                  placeholderTextColor={colors.textTertiary}
+                />
+              </View>
+            )}
+          </View>
 
           {/* Date Selection */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Calendar size={20} color={colors.primary} />
-              <Text style={styles.sectionTitle}>When</Text>
+              <Calendar size={20} color={colors.secondary} />
+              <Text style={styles.sectionTitle}>When?</Text>
             </View>
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.datesContainer}
             >
-              {[0, 1, 2, 3, 4, 5, 6].map(daysFromNow => {
-                const date = new Date();
-                date.setDate(date.getDate() + daysFromNow);
-                const isSelected = date.toDateString() === selectedDate.toDateString();
-                
-                return (
-                  <Pressable
-                    key={daysFromNow}
-                    style={[styles.dateCard, isSelected && styles.dateCardSelected]}
-                    onPress={() => setSelectedDate(date)}
-                  >
-                    <Text style={[styles.dayName, isSelected && styles.dateTextSelected]}>
-                      {daysFromNow === 0 ? 'Today' : daysFromNow === 1 ? 'Tomorrow' : 
-                        date.toLocaleDateString('en-US', { weekday: 'short' })}
-                    </Text>
-                    <Text style={[styles.dayNumber, isSelected && styles.dateTextSelected]}>
-                      {date.getDate()}
-                    </Text>
-                    <Text style={[styles.monthName, isSelected && styles.dateTextSelected]}>
-                      {date.toLocaleDateString('en-US', { month: 'short' })}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+              {generateDates().map((date, index) => (
+                <Pressable
+                  key={index}
+                  style={[
+                    styles.dateCard,
+                    selectedDate.toDateString() === date.toDateString() && styles.dateCardSelected,
+                  ]}
+                  onPress={() => setSelectedDate(date)}
+                >
+                  <Text style={[
+                    styles.dateDayName,
+                    selectedDate.toDateString() === date.toDateString() && styles.dateTextSelected,
+                  ]}>
+                    {formatDateLabel(date, index)}
+                  </Text>
+                  <Text style={[
+                    styles.dateDayNumber,
+                    selectedDate.toDateString() === date.toDateString() && styles.dateTextSelected,
+                  ]}>
+                    {date.getDate()}
+                  </Text>
+                  <Text style={[
+                    styles.dateMonth,
+                    selectedDate.toDateString() === date.toDateString() && styles.dateTextSelected,
+                  ]}>
+                    {date.toLocaleDateString('en-US', { month: 'short' })}
+                  </Text>
+                </Pressable>
+              ))}
             </ScrollView>
           </View>
 
           {/* Budget Selection */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <DollarSign size={20} color={colors.primary} />
+              <DollarSign size={20} color={colors.secondary} />
               <Text style={styles.sectionTitle}>Budget</Text>
             </View>
             <View style={styles.budgetContainer}>
@@ -187,22 +270,22 @@ export default function GeneratePlanScreen() {
                 <Pressable
                   key={option.value}
                   style={[
-                    styles.budgetOption,
-                    selectedBudget === option.value && styles.budgetOptionSelected,
+                    styles.budgetCard,
+                    selectedBudget === option.value && styles.budgetCardSelected,
                   ]}
                   onPress={() => setSelectedBudget(option.value)}
                 >
                   <Text style={[
                     styles.budgetLabel,
-                    selectedBudget === option.value && styles.budgetLabelSelected,
+                    selectedBudget === option.value && styles.budgetTextSelected,
                   ]}>
                     {option.label}
                   </Text>
                   <Text style={[
-                    styles.budgetDescription,
-                    selectedBudget === option.value && styles.budgetDescriptionSelected,
+                    styles.budgetRange,
+                    selectedBudget === option.value && styles.budgetRangeSelected,
                   ]}>
-                    {option.description}
+                    {option.range}
                   </Text>
                 </Pressable>
               ))}
@@ -211,150 +294,149 @@ export default function GeneratePlanScreen() {
 
           {/* Surprise Toggle */}
           <Pressable 
-            style={[styles.surpriseCard, isSurprise && styles.surpriseCardActive]}
+            style={styles.surpriseToggle}
             onPress={() => setIsSurprise(!isSurprise)}
           >
-            <View style={[styles.surpriseIcon, isSurprise && styles.surpriseIconActive]}>
-              <Gift size={24} color={isSurprise ? colors.textLight : colors.secondary} />
-            </View>
             <View style={styles.surpriseContent}>
-              <Text style={styles.surpriseTitle}>Surprise Date</Text>
-              <Text style={styles.surpriseDescription}>
-                Keep the details hidden from your partner
-              </Text>
+              {isSurprise ? (
+                <EyeOff size={24} color={colors.secondary} />
+              ) : (
+                <Eye size={24} color={colors.textSecondary} />
+              )}
+              <View style={styles.surpriseText}>
+                <Text style={styles.surpriseTitle}>Surprise Mode</Text>
+                <Text style={styles.surpriseDescription}>
+                  Keep the details hidden from your partner
+                </Text>
+              </View>
             </View>
-            <View style={[styles.checkbox, isSurprise && styles.checkboxActive]}>
-              {isSurprise && <Check size={14} color={colors.textLight} />}
+            <View style={[styles.toggle, isSurprise && styles.toggleActive]}>
+              <View style={[styles.toggleDot, isSurprise && styles.toggleDotActive]} />
             </View>
           </Pressable>
 
           {/* Generate Button */}
           <Pressable 
-            style={styles.generateButton}
+            style={[styles.generateButton, isGenerating && styles.generateButtonDisabled]}
             onPress={handleGenerate}
             disabled={isGenerating}
           >
-            <LinearGradient
-              colors={[colors.secondary, colors.secondaryDark]}
-              style={styles.generateGradient}
-            >
-              {isGenerating ? (
-                <ActivityIndicator color={colors.textLight} />
-              ) : (
-                <>
-                  <Sparkles size={22} color={colors.textLight} />
-                  <Text style={styles.generateButtonText}>
-                    {hasGenerated ? 'Regenerate Ideas' : 'Generate Date Ideas'}
-                  </Text>
-                </>
-              )}
-            </LinearGradient>
+            {isGenerating ? (
+              <ActivityIndicator color={colors.textLight} />
+            ) : (
+              <>
+                {hasGenerated ? (
+                  <RefreshCw size={20} color={colors.textLight} />
+                ) : (
+                  <Sparkles size={20} color={colors.textLight} />
+                )}
+                <Text style={styles.generateButtonText}>
+                  {hasGenerated ? 'Regenerate Ideas' : 'Generate Date Ideas'}
+                </Text>
+              </>
+            )}
           </Pressable>
 
           {/* Suggestions */}
-          {hasGenerated && !isGenerating && (
+          {hasGenerated && suggestions.length > 0 && (
             <View style={styles.suggestionsSection}>
-              <View style={styles.sectionHeader}>
-                <Sparkles size={20} color={colors.primary} />
-                <Text style={styles.sectionTitle}>AI Suggestions</Text>
-                <Pressable style={styles.refreshButton} onPress={handleGenerate}>
-                  <RefreshCw size={18} color={colors.primary} />
-                </Pressable>
-              </View>
-
-              {suggestions.length === 0 ? (
-                <View style={styles.noSuggestions}>
-                  <Text style={styles.noSuggestionsText}>
-                    No suggestions found for your criteria. Try adjusting your budget or preferences.
-                  </Text>
-                </View>
-              ) : (
-                suggestions.map(suggestion => (
-                  <Pressable
-                    key={suggestion.id}
-                    style={[
-                      styles.suggestionCard,
-                      selectedSuggestion?.id === suggestion.id && styles.suggestionCardSelected,
-                    ]}
-                    onPress={() => handleSelectSuggestion(suggestion)}
-                  >
-                    <Image
-                      source={{ uri: suggestion.imageUrl }}
-                      style={styles.suggestionImage}
-                      contentFit="cover"
-                    />
-                    <LinearGradient
-                      colors={['transparent', 'rgba(0,0,0,0.8)']}
-                      style={styles.suggestionGradient}
-                    />
-                    <View style={styles.suggestionContent}>
-                      <View style={styles.matchBadge}>
-                        <Text style={styles.matchText}>{suggestion.matchScore}% Match</Text>
+              <Text style={styles.suggestionsTitle}>
+                {selectedTripScope === 'local' ? 'Local Date Ideas' : 
+                 selectedTripScope === 'domestic' ? 'Domestic Getaway Ideas' : 
+                 'International Adventure Ideas'}
+              </Text>
+              {suggestions.map(suggestion => (
+                <Pressable
+                  key={suggestion.id}
+                  style={[
+                    styles.suggestionCard,
+                    selectedSuggestion?.id === suggestion.id && styles.suggestionCardSelected,
+                  ]}
+                  onPress={() => handleSelectSuggestion(suggestion)}
+                >
+                  <Image source={{ uri: suggestion.imageUrl }} style={styles.suggestionImage} />
+                  <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                    style={styles.suggestionGradient}
+                  />
+                  <View style={styles.suggestionBadge}>
+                    <Text style={styles.suggestionBadgeText}>{suggestion.matchScore}% Match</Text>
+                  </View>
+                  {suggestion.destination && (
+                    <View style={styles.destinationBadge}>
+                      <MapPin size={12} color={colors.textLight} />
+                      <Text style={styles.destinationBadgeText}>{suggestion.destination}</Text>
+                    </View>
+                  )}
+                  <View style={styles.suggestionContent}>
+                    <Text style={styles.suggestionTitle}>{suggestion.title}</Text>
+                    <Text style={styles.suggestionDescription} numberOfLines={2}>
+                      {suggestion.description}
+                    </Text>
+                    <View style={styles.suggestionMeta}>
+                      <View style={styles.metaItem}>
+                        <Clock size={14} color={colors.textLight} />
+                        <Text style={styles.metaText}>{suggestion.estimatedDuration}</Text>
                       </View>
-                      <Text style={styles.suggestionTitle}>{suggestion.title}</Text>
-                      <Text style={styles.suggestionDescription} numberOfLines={2}>
-                        {suggestion.description}
-                      </Text>
-                      <View style={styles.suggestionMeta}>
-                        <View style={styles.metaItem}>
-                          <Clock size={14} color={colors.textLight} />
-                          <Text style={styles.metaText}>{suggestion.estimatedDuration}</Text>
-                        </View>
-                        <View style={styles.metaItem}>
-                          <DollarSign size={14} color={colors.textLight} />
-                          <Text style={styles.metaText}>{suggestion.estimatedTotalCost}</Text>
-                        </View>
-                        <View style={styles.metaItem}>
-                          <MapPin size={14} color={colors.textLight} />
-                          <Text style={styles.metaText}>{suggestion.activities.length} stops</Text>
-                        </View>
+                      <View style={styles.metaItem}>
+                        <DollarSign size={14} color={colors.textLight} />
+                        <Text style={styles.metaText}>{suggestion.estimatedTotalCost}</Text>
+                      </View>
+                      <View style={styles.metaItem}>
+                        <MapPin size={14} color={colors.textLight} />
+                        <Text style={styles.metaText}>{suggestion.activities.length} stops</Text>
                       </View>
                     </View>
-                    {selectedSuggestion?.id === suggestion.id && (
-                      <View style={styles.selectedBadge}>
-                        <Check size={18} color={colors.textLight} />
-                      </View>
-                    )}
-                  </Pressable>
-                ))
-              )}
+                  </View>
+                  {selectedSuggestion?.id === suggestion.id && (
+                    <View style={styles.selectedOverlay}>
+                      <Check size={32} color={colors.textLight} />
+                    </View>
+                  )}
+                </Pressable>
+              ))}
             </View>
           )}
 
-          {/* Preview Activities */}
+          {hasGenerated && suggestions.length === 0 && (
+            <View style={styles.noSuggestionsContainer}>
+              <Text style={styles.noSuggestionsText}>
+                No suggestions found for your criteria. Try adjusting your budget or trip type.
+              </Text>
+            </View>
+          )}
+
+          {/* Selected Suggestion Preview */}
           {selectedSuggestion && (
             <View style={styles.previewSection}>
-              <Text style={styles.sectionTitle}>Itinerary Preview</Text>
-              {selectedSuggestion.activities.map((activity, index) => (
-                <View key={index} style={styles.activityPreview}>
-                  <View style={styles.activityTimeline}>
-                    <View style={styles.timelineDot} />
+              <Text style={styles.previewTitle}>Itinerary Preview</Text>
+              <View style={styles.timeline}>
+                {selectedSuggestion.activities.map((activity, index) => (
+                  <View key={index} style={styles.timelineItem}>
+                    <View style={styles.timelineDot}>
+                      <View style={styles.timelineDotInner} />
+                    </View>
                     {index < selectedSuggestion.activities.length - 1 && (
                       <View style={styles.timelineLine} />
                     )}
+                    <View style={styles.timelineContent}>
+                      <Text style={styles.timelineTime}>{activity.startTime}</Text>
+                      <Text style={styles.timelineName}>{activity.name}</Text>
+                      <Text style={styles.timelineLocation}>{activity.location.name}</Text>
+                    </View>
                   </View>
-                  <View style={styles.activityContent}>
-                    <Text style={styles.activityTime}>{activity.startTime}</Text>
-                    <Text style={styles.activityName}>{activity.name}</Text>
-                    <Text style={styles.activityLocation}>{activity.location.name}</Text>
-                  </View>
-                </View>
-              ))}
+                ))}
+              </View>
+
+              <Pressable style={styles.customizeButton} onPress={handleCustomize}>
+                <Text style={styles.customizeButtonText}>Customize This Date</Text>
+                <ChevronRight size={20} color={colors.textLight} />
+              </Pressable>
             </View>
           )}
 
           <View style={styles.bottomSpacer} />
         </ScrollView>
-
-        {/* Footer */}
-        {selectedSuggestion && (
-          <View style={styles.footer}>
-            <Pressable style={styles.createButton} onPress={handleCreateItinerary}>
-              <Text style={styles.createButtonText}>Customize This Date</Text>
-              <ChevronRight size={20} color={colors.textLight} />
-            </Pressable>
-          </View>
-        )}
       </SafeAreaView>
     </View>
   );
@@ -390,11 +472,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -414,39 +491,35 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingHorizontal: 20,
   },
-  partnerCard: {
+  partnerBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
     backgroundColor: colors.surface,
+    padding: 16,
     borderRadius: 16,
     marginBottom: 24,
     borderWidth: 1,
     borderColor: colors.borderLight,
   },
   partnerAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primaryLight,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitial: {
-    fontSize: 20,
+  partnerInitial: {
+    fontSize: 18,
     fontWeight: '600',
     color: colors.textLight,
   },
-  partnerInfo: {
-    flex: 1,
+  partnerText: {
     marginLeft: 12,
-  },
-  partnerLabel: {
-    fontSize: 12,
+    fontSize: 15,
     color: colors.textSecondary,
   },
   partnerName: {
-    fontSize: 17,
     fontWeight: '600',
     color: colors.text,
   },
@@ -463,17 +536,90 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.text,
-    flex: 1,
   },
-  refreshButton: {
-    padding: 4,
+  tripScopeContainer: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  tripScopeOption: {
+    flex: 1,
+    padding: 14,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  tripScopeOptionSelected: {
+    borderColor: colors.secondary,
+    backgroundColor: `${colors.secondary}08`,
+  },
+  tripScopeIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: `${colors.secondary}15`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  tripScopeIconSelected: {
+    backgroundColor: colors.secondary,
+  },
+  tripScopeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  tripScopeLabelSelected: {
+    color: colors.secondary,
+  },
+  tripScopeDesc: {
+    fontSize: 10,
+    color: colors.textTertiary,
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  tripScopeDescSelected: {
+    color: colors.secondary,
+  },
+  tripScopeCheck: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  destinationContainer: {
+    marginTop: 16,
+  },
+  destinationLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  destinationInput: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: colors.text,
   },
   datesContainer: {
     gap: 10,
   },
   dateCard: {
     width: 70,
-    paddingVertical: 12,
+    paddingVertical: 14,
     backgroundColor: colors.surface,
     borderRadius: 16,
     alignItems: 'center',
@@ -484,17 +630,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     borderColor: colors.secondary,
   },
-  dayName: {
+  dateDayName: {
     fontSize: 12,
     color: colors.textSecondary,
     marginBottom: 4,
   },
-  dayNumber: {
+  dateDayNumber: {
     fontSize: 22,
     fontWeight: '700',
     color: colors.text,
   },
-  monthName: {
+  dateMonth: {
     fontSize: 12,
     color: colors.textSecondary,
     marginTop: 2,
@@ -504,68 +650,59 @@ const styles = StyleSheet.create({
   },
   budgetContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
-  budgetOption: {
+  budgetCard: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 14,
     backgroundColor: colors.surface,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.border,
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.borderLight,
   },
-  budgetOptionSelected: {
+  budgetCardSelected: {
+    backgroundColor: colors.secondary,
     borderColor: colors.secondary,
-    backgroundColor: `${colors.secondary}10`,
   },
   budgetLabel: {
     fontSize: 18,
     fontWeight: '700',
     color: colors.text,
   },
-  budgetLabelSelected: {
-    color: colors.secondary,
-  },
-  budgetDescription: {
+  budgetRange: {
     fontSize: 10,
     color: colors.textSecondary,
     marginTop: 2,
   },
-  budgetDescriptionSelected: {
-    color: colors.secondary,
+  budgetTextSelected: {
+    color: colors.textLight,
   },
-  surpriseCard: {
+  budgetRangeSelected: {
+    color: colors.textLight,
+    opacity: 0.9,
+  },
+  surpriseToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    justifyContent: 'space-between',
     backgroundColor: colors.surface,
+    padding: 16,
     borderRadius: 16,
     marginBottom: 24,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.borderLight,
   },
-  surpriseCardActive: {
-    borderColor: colors.secondary,
-    backgroundColor: `${colors.secondary}08`,
-  },
-  surpriseIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: `${colors.secondary}15`,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  surpriseIconActive: {
-    backgroundColor: colors.secondary,
-  },
   surpriseContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  surpriseText: {
     flex: 1,
-    marginLeft: 12,
   },
   surpriseTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.text,
   },
@@ -574,30 +711,37 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 2,
   },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+  toggle: {
+    width: 50,
+    height: 30,
+    backgroundColor: colors.border,
+    borderRadius: 15,
+    padding: 2,
   },
-  checkboxActive: {
+  toggleActive: {
     backgroundColor: colors.secondary,
-    borderColor: colors.secondary,
+  },
+  toggleDot: {
+    width: 26,
+    height: 26,
+    backgroundColor: colors.surface,
+    borderRadius: 13,
+  },
+  toggleDotActive: {
+    transform: [{ translateX: 20 }],
   },
   generateButton: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginBottom: 24,
-  },
-  generateGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
+    backgroundColor: colors.secondary,
     paddingVertical: 16,
+    borderRadius: 16,
+    marginBottom: 24,
+  },
+  generateButtonDisabled: {
+    opacity: 0.7,
   },
   generateButtonText: {
     fontSize: 17,
@@ -607,22 +751,17 @@ const styles = StyleSheet.create({
   suggestionsSection: {
     marginBottom: 24,
   },
-  noSuggestions: {
-    padding: 24,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  noSuggestionsText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
+  suggestionsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 16,
   },
   suggestionCard: {
-    height: 200,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 16,
+    height: 220,
     position: 'relative',
   },
   suggestionCardSelected: {
@@ -636,6 +775,37 @@ const styles = StyleSheet.create({
   suggestionGradient: {
     ...StyleSheet.absoluteFillObject,
   },
+  suggestionBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  suggestionBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textLight,
+  },
+  destinationBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  destinationBadgeText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.textLight,
+  },
   suggestionContent: {
     position: 'absolute',
     bottom: 0,
@@ -643,34 +813,21 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 16,
   },
-  matchBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    backgroundColor: colors.success,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  matchText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textLight,
-  },
   suggestionTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: colors.textLight,
+    marginBottom: 4,
   },
   suggestionDescription: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textLight,
     opacity: 0.9,
-    marginTop: 4,
+    marginBottom: 12,
   },
   suggestionMeta: {
     flexDirection: 'row',
     gap: 16,
-    marginTop: 12,
   },
   metaItem: {
     flexDirection: 'row',
@@ -680,93 +837,100 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 13,
     color: colors.textLight,
-    fontWeight: '500',
   },
-  selectedBadge: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.secondary,
+  selectedOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(244, 132, 95, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  previewSection: {
+  noSuggestionsContainer: {
+    padding: 24,
     backgroundColor: colors.surface,
     borderRadius: 16,
-    padding: 16,
+    alignItems: 'center',
+  },
+  noSuggestionsText: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  previewSection: {
+    marginTop: 8,
     marginBottom: 24,
   },
-  activityPreview: {
-    flexDirection: 'row',
-    marginTop: 16,
+  previewTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 16,
   },
-  activityTimeline: {
-    alignItems: 'center',
-    width: 24,
+  timeline: {
+    marginBottom: 20,
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    minHeight: 60,
   },
   timelineDot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: `${colors.secondary}20`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  timelineDotInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
     backgroundColor: colors.secondary,
   },
   timelineLine: {
+    position: 'absolute',
+    left: 11,
+    top: 24,
+    bottom: 0,
     width: 2,
-    flex: 1,
     backgroundColor: colors.border,
-    marginTop: 4,
   },
-  activityContent: {
+  timelineContent: {
     flex: 1,
     marginLeft: 12,
     paddingBottom: 16,
   },
-  activityTime: {
+  timelineTime: {
     fontSize: 12,
     fontWeight: '600',
     color: colors.secondary,
   },
-  activityName: {
+  timelineName: {
     fontSize: 15,
     fontWeight: '600',
     color: colors.text,
     marginTop: 2,
   },
-  activityLocation: {
+  timelineLocation: {
     fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
   },
-  bottomSpacer: {
-    height: 120,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingBottom: 32,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-  },
-  createButton: {
+  customizeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 16,
   },
-  createButtonText: {
+  customizeButtonText: {
     fontSize: 17,
     fontWeight: '600',
     color: colors.textLight,
+  },
+  bottomSpacer: {
+    height: 40,
   },
 });

@@ -2,6 +2,8 @@
 
 export type BudgetTier = '$' | '$$' | '$$$' | '$$$$';
 
+export type TripScope = 'local' | 'domestic' | 'international';
+
 export type ActivityType = 
   | 'adventurous'
   | 'relaxed'
@@ -60,8 +62,8 @@ export interface PartnerProfile {
   id: string;
   name: string;
   avatar?: string;
-  isLinked: boolean; // true if linked account, false if manually created
-  linkedUserId?: string; // if linked to another user's account
+  isLinked: boolean;
+  linkedUserId?: string;
   preferences: DatePreferences;
   createdAt: string;
   updatedAt: string;
@@ -80,10 +82,12 @@ export interface ItineraryActivity {
   id: string;
   name: string;
   description: string;
-  type: ActivityType | 'dining' | 'drinks' | 'dessert' | 'transportation';
+  type: ActivityType | 'dining' | 'drinks' | 'dessert' | 'transportation' | 'accommodation';
   location: {
     name: string;
     address: string;
+    city?: string;
+    country?: string;
     coordinates?: {
       lat: number;
       lng: number;
@@ -104,6 +108,8 @@ export interface DateItinerary {
   date: string;
   partnerId: string;
   partnerName: string;
+  tripScope: TripScope;
+  destination?: string;
   activities: ItineraryActivity[];
   totalEstimatedCost: BudgetTier;
   status: 'draft' | 'planned' | 'completed' | 'cancelled';
@@ -117,15 +123,16 @@ export interface DateSuggestion {
   id: string;
   title: string;
   description: string;
+  tripScope: TripScope;
+  destination?: string;
   activities: Omit<ItineraryActivity, 'id'>[];
-  matchScore: number; // 0-100 based on preference matching
+  matchScore: number;
   estimatedTotalCost: BudgetTier;
   estimatedDuration: string;
   tags: string[];
   imageUrl: string;
 }
 
-// For partner linking
 export interface PartnerLinkRequest {
   id: string;
   fromUserId: string;

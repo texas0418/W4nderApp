@@ -4,6 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider, useApp } from "@/contexts/AppContext";
+import { DateNightProvider } from "@/contexts/DateNightContext";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import colors from "@/constants/colors";
 
@@ -73,6 +74,12 @@ function RootLayoutNav() {
         options={{ 
           headerShown: false,
           presentation: "modal",
+        }} 
+      />
+      <Stack.Screen 
+        name="date-night" 
+        options={{ 
+          headerShown: false,
         }} 
       />
       <Stack.Screen 
@@ -214,7 +221,9 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <AppProvider>
-          <RootLayoutNav />
+          <DateNightProvider>
+            <RootLayoutNav />
+          </DateNightProvider>
         </AppProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>

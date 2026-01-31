@@ -23,7 +23,8 @@ import {
   Settings,
   History,
   UserPlus,
-  Trash2,
+  PenTool,
+  CalendarDays,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { useDateNight } from '@/contexts/DateNightContext';
@@ -44,9 +45,14 @@ export default function DateNightScreen() {
     i.status === 'planned' && new Date(i.date) >= new Date()
   ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const pastItineraries = itineraries.filter(i => 
-    i.status === 'completed' || new Date(i.date) < new Date()
-  );
+  const completedItineraries = itineraries.filter(i => i.status === 'completed');
+
+  // Count dates this month
+  const datesThisMonth = itineraries.filter(i => {
+    const date = new Date(i.date);
+    const now = new Date();
+    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  }).length;
 
   const handleSelectPartner = (partner: PartnerProfile) => {
     setSelectedPartner(partner);
@@ -75,6 +81,10 @@ export default function DateNightScreen() {
     router.push('/date-night/generate-plan');
   };
 
+  const handleBuildFromScratch = () => {
+    router.push('/date-night/build-itinerary');
+  };
+
   const hasSetupPreferences = userProfile?.preferences.activityTypes.length > 0;
 
   return (
@@ -90,12 +100,20 @@ export default function DateNightScreen() {
               <Heart size={28} color={colors.textLight} fill={colors.textLight} />
               <Text style={styles.headerTitle}>Date Night</Text>
             </View>
-            <Pressable 
-              style={styles.settingsButton}
-              onPress={() => router.push('/date-night/my-preferences')}
-            >
-              <Settings size={22} color={colors.textLight} />
-            </Pressable>
+            <View style={styles.headerActions}>
+              <Pressable 
+                style={styles.headerButton}
+                onPress={() => router.push('/date-night/calendar')}
+              >
+                <CalendarDays size={22} color={colors.textLight} />
+              </Pressable>
+              <Pressable 
+                style={styles.headerButton}
+                onPress={() => router.push('/date-night/my-preferences')}
+              >
+                <Settings size={22} color={colors.textLight} />
+              </Pressable>
+            </View>
           </View>
           <Text style={styles.headerSubtitle}>
             Plan unforgettable moments together
@@ -107,7 +125,29 @@ export default function DateNightScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
         >
-          {/* Setup Banner - shown if preferences not set */}
+          {/* Stats Banner */}
+          <Pressable 
+            style={styles.statsBanner}
+            onPress={() => router.push('/date-night/calendar')}
+          >
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{upcomingItineraries.length}</Text>
+              <Text style={styles.statLabel}>Upcoming</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{datesThisMonth}</Text>
+              <Text style={styles.statLabel}>This Month</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{completedItineraries.length}</Text>
+              <Text style={styles.statLabel}>Completed</Text>
+            </View>
+            <ChevronRight size={20} color={colors.textTertiary} />
+          </Pressable>
+
+          {/* Setup Banner */}
           {!hasSetupPreferences && (
             <Pressable 
               style={styles.setupBanner}
@@ -194,24 +234,57 @@ export default function DateNightScreen() {
             )}
           </View>
 
-          {/* Quick Actions */}
+          {/* Plan a Date Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
-            <View style={styles.actionsGrid}>
-              <Pressable 
-                style={[styles.actionCard, styles.actionCardPrimary]}
-                onPress={handlePlanDate}
-              >
+            <Text style={styles.sectionTitleNoMargin}>Plan a Date</Text>
+            <View style={styles.planOptions}>
+              <Pressable style={styles.planCard} onPress={handlePlanDate}>
                 <LinearGradient
                   colors={[colors.secondary, colors.secondaryLight]}
-                  style={styles.actionGradient}
+                  style={styles.planGradient}
                 >
-                  <Sparkles size={28} color={colors.textLight} />
-                  <Text style={styles.actionTitle}>Plan a Date</Text>
-                  <Text style={styles.actionDescription}>
-                    Get AI-powered suggestions
+                  <View style={styles.planIconContainer}>
+                    <Sparkles size={32} color={colors.textLight} />
+                  </View>
+                  <Text style={styles.planTitle}>AI-Powered</Text>
+                  <Text style={styles.planDescription}>
+                    Get personalized suggestions based on your preferences
+                  </Text>
+                  <View style={styles.planBadge}>
+                    <Text style={styles.planBadgeText}>Recommended</Text>
+                  </View>
+                </LinearGradient>
+              </Pressable>
+
+              <Pressable style={styles.planCard} onPress={handleBuildFromScratch}>
+                <LinearGradient
+                  colors={[colors.primary, colors.primaryLight]}
+                  style={styles.planGradient}
+                >
+                  <View style={styles.planIconContainer}>
+                    <PenTool size={32} color={colors.textLight} />
+                  </View>
+                  <Text style={styles.planTitle}>Build from Scratch</Text>
+                  <Text style={styles.planDescription}>
+                    Full control to create your perfect date itinerary
                   </Text>
                 </LinearGradient>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Quick Actions */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitleNoMargin}>Quick Actions</Text>
+            <View style={styles.actionsRow}>
+              <Pressable 
+                style={styles.actionCard}
+                onPress={() => router.push('/date-night/calendar')}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: `${colors.secondary}15` }]}>
+                  <CalendarDays size={24} color={colors.secondary} />
+                </View>
+                <Text style={styles.actionTitle}>Calendar</Text>
               </Pressable>
 
               <Pressable 
@@ -221,7 +294,7 @@ export default function DateNightScreen() {
                 <View style={styles.actionIcon}>
                   <Settings size={24} color={colors.primary} />
                 </View>
-                <Text style={styles.actionTitleDark}>My Preferences</Text>
+                <Text style={styles.actionTitle}>Preferences</Text>
               </Pressable>
 
               <Pressable 
@@ -231,7 +304,7 @@ export default function DateNightScreen() {
                 <View style={styles.actionIcon}>
                   <History size={24} color={colors.primary} />
                 </View>
-                <Text style={styles.actionTitleDark}>Date History</Text>
+                <Text style={styles.actionTitle}>History</Text>
               </Pressable>
             </View>
           </View>
@@ -241,7 +314,7 @@ export default function DateNightScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Upcoming Dates</Text>
-                <Pressable onPress={() => router.push('/date-night/history')}>
+                <Pressable onPress={() => router.push('/date-night/calendar')}>
                   <Text style={styles.seeAllText}>See All</Text>
                 </Pressable>
               </View>
@@ -249,15 +322,15 @@ export default function DateNightScreen() {
                 <ItineraryCard 
                   key={itinerary.id} 
                   itinerary={itinerary}
-                  onPress={() => router.push(`/date-night/itinerary/${itinerary.id}`)}
+                  onPress={() => router.push(`/date-night/edit-itinerary?id=${itinerary.id}`)}
                 />
               ))}
             </View>
           )}
 
-          {/* Date Ideas Inspiration */}
+          {/* Date Inspiration */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Date Inspiration</Text>
+            <Text style={styles.sectionTitleNoMargin}>Date Inspiration</Text>
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
@@ -307,6 +380,16 @@ interface ItineraryCardProps {
 function ItineraryCard({ itinerary, onPress }: ItineraryCardProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    }
+    if (date.toDateString() === tomorrow.toDateString()) {
+      return 'Tomorrow';
+    }
     return date.toLocaleDateString('en-US', { 
       weekday: 'short', 
       month: 'short', 
@@ -314,8 +397,15 @@ function ItineraryCard({ itinerary, onPress }: ItineraryCardProps) {
     });
   };
 
+  const isToday = new Date(itinerary.date).toDateString() === new Date().toDateString();
+
   return (
-    <Pressable style={styles.itineraryCard} onPress={onPress}>
+    <Pressable style={[styles.itineraryCard, isToday && styles.itineraryCardToday]} onPress={onPress}>
+      {isToday && (
+        <View style={styles.todayBadge}>
+          <Text style={styles.todayBadgeText}>TODAY</Text>
+        </View>
+      )}
       <View style={styles.itineraryDate}>
         <Calendar size={16} color={colors.secondary} />
         <Text style={styles.itineraryDateText}>{formatDate(itinerary.date)}</Text>
@@ -332,6 +422,12 @@ function ItineraryCard({ itinerary, onPress }: ItineraryCardProps) {
             {itinerary.activities.length} activities
           </Text>
         </View>
+        {itinerary.destination && (
+          <View style={styles.itineraryMetaItem}>
+            <MapPin size={14} color={colors.textTertiary} />
+            <Text style={styles.itineraryMetaText}>{itinerary.destination}</Text>
+          </View>
+        )}
       </View>
       <ChevronRight size={20} color={colors.textTertiary} style={styles.itineraryChevron} />
     </Pressable>
@@ -400,7 +496,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textLight,
   },
-  settingsButton: {
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -423,6 +523,36 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingTop: 24,
+  },
+  statsBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    marginHorizontal: 20,
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: colors.borderLight,
   },
   setupBanner: {
     flexDirection: 'row',
@@ -468,6 +598,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  sectionTitleNoMargin: {
     fontSize: 18,
     fontWeight: '600',
     color: colors.text,
@@ -586,31 +721,69 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
   },
-  actionsGrid: {
+  planOptions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  planCard: {
+    flex: 1,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  planGradient: {
+    padding: 20,
+    alignItems: 'center',
+    minHeight: 180,
+  },
+  planIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  planTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textLight,
+    textAlign: 'center',
+  },
+  planDescription: {
+    fontSize: 12,
+    color: colors.textLight,
+    opacity: 0.9,
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 16,
+  },
+  planBadge: {
+    marginTop: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    borderRadius: 12,
+  },
+  planBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textLight,
+  },
+  actionsRow: {
+    flexDirection: 'row',
     paddingHorizontal: 20,
     gap: 12,
   },
   actionCard: {
     flex: 1,
-    minWidth: '45%',
     backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.borderLight,
-  },
-  actionCardPrimary: {
-    width: '100%',
-    flex: undefined,
-    padding: 0,
-    overflow: 'hidden',
-    borderWidth: 0,
-  },
-  actionGradient: {
-    padding: 20,
-    alignItems: 'center',
   },
   actionIcon: {
     width: 48,
@@ -619,22 +792,10 @@ const styles = StyleSheet.create({
     backgroundColor: `${colors.primary}10`,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   actionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.textLight,
-    marginTop: 12,
-  },
-  actionDescription: {
-    fontSize: 14,
-    color: colors.textLight,
-    opacity: 0.9,
-    marginTop: 4,
-  },
-  actionTitleDark: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: colors.text,
   },
@@ -646,6 +807,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: colors.borderLight,
+    position: 'relative',
+  },
+  itineraryCardToday: {
+    borderColor: colors.secondary,
+    borderWidth: 2,
+  },
+  todayBadge: {
+    position: 'absolute',
+    top: -10,
+    right: 16,
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  todayBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.textLight,
   },
   itineraryDate: {
     flexDirection: 'row',
@@ -666,7 +846,8 @@ const styles = StyleSheet.create({
   },
   itineraryMeta: {
     flexDirection: 'row',
-    gap: 16,
+    flexWrap: 'wrap',
+    gap: 12,
   },
   itineraryMetaItem: {
     flexDirection: 'row',
