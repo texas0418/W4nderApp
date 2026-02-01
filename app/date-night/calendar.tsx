@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -24,10 +24,10 @@ import {
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { useDateNight } from '@/contexts/DateNightContext';
-import { DateItinerary, ItineraryActivity } from '@/types/date-night';
+import { DateItinerary } from '@/types/date-night';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DAY_WIDTH = (SCREEN_WIDTH - 40 - 12) / 7; // 40 = horizontal padding, 12 = gaps
+const DAY_WIDTH = (SCREEN_WIDTH - 40 - 12) / 7;
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
@@ -48,6 +48,18 @@ export default function CalendarScreen() {
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+
+  // Define getItinerariesForDate BEFORE using it in useMemo
+  const getItinerariesForDate = useCallback((date: Date): DateItinerary[] => {
+    return itineraries.filter(itinerary => {
+      const itineraryDate = new Date(itinerary.date);
+      return (
+        itineraryDate.getFullYear() === date.getFullYear() &&
+        itineraryDate.getMonth() === date.getMonth() &&
+        itineraryDate.getDate() === date.getDate()
+      );
+    });
+  }, [itineraries]);
 
   // Generate calendar days for current month view
   const calendarDays = useMemo(() => {
@@ -89,7 +101,7 @@ export default function CalendarScreen() {
     }
     
     // Next month days (to complete the grid)
-    const remainingDays = 42 - days.length; // 6 rows × 7 days
+    const remainingDays = 42 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
       const date = new Date(year, month + 1, i);
       days.push({
@@ -101,23 +113,12 @@ export default function CalendarScreen() {
     }
     
     return days;
-  }, [currentDate, itineraries]);
-
-  const getItinerariesForDate = (date: Date): DateItinerary[] => {
-    return itineraries.filter(itinerary => {
-      const itineraryDate = new Date(itinerary.date);
-      return (
-        itineraryDate.getFullYear() === date.getFullYear() &&
-        itineraryDate.getMonth() === date.getMonth() &&
-        itineraryDate.getDate() === date.getDate()
-      );
-    });
-  };
+  }, [currentDate, getItinerariesForDate]);
 
   const selectedDateItineraries = useMemo(() => {
     if (!selectedDate) return [];
     return getItinerariesForDate(selectedDate);
-  }, [selectedDate, itineraries]);
+  }, [selectedDate, getItinerariesForDate]);
 
   const goToPreviousMonth = () => {
     setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -166,11 +167,11 @@ export default function CalendarScreen() {
     }
   };
 
-  const getStatusDotColor = (itineraries: DateItinerary[]) => {
-    if (itineraries.length === 0) return null;
-    const hasPlanned = itineraries.some(i => i.status === 'planned');
-    const hasCompleted = itineraries.some(i => i.status === 'completed');
-    const hasDraft = itineraries.some(i => i.status === 'draft');
+  const getStatusDotColor = (dayItineraries: DateItinerary[]) => {
+    if (dayItineraries.length === 0) return null;
+    const hasPlanned = dayItineraries.some(i => i.status === 'planned');
+    const hasCompleted = dayItineraries.some(i => i.status === 'completed');
+    const hasDraft = dayItineraries.some(i => i.status === 'draft');
     
     if (hasPlanned) return colors.secondary;
     if (hasCompleted) return colors.success;

@@ -16,7 +16,6 @@ export default function DateNightLayout() {
       <Stack.Screen name="edit-itinerary" />
       <Stack.Screen name="history" />
       <Stack.Screen name="build-itinerary" />
-      <Stack.Screen name="calendar" />
     </Stack>
   );
 }

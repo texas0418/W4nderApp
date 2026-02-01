@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,6 @@ import {
   History,
   UserPlus,
   PenTool,
-  CalendarDays,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { useDateNight } from '@/contexts/DateNightContext';
@@ -100,20 +99,12 @@ export default function DateNightScreen() {
               <Heart size={28} color={colors.textLight} fill={colors.textLight} />
               <Text style={styles.headerTitle}>Date Night</Text>
             </View>
-            <View style={styles.headerActions}>
-              <Pressable 
-                style={styles.headerButton}
-                onPress={() => router.push('/date-night/calendar')}
-              >
-                <CalendarDays size={22} color={colors.textLight} />
-              </Pressable>
-              <Pressable 
-                style={styles.headerButton}
-                onPress={() => router.push('/date-night/my-preferences')}
-              >
-                <Settings size={22} color={colors.textLight} />
-              </Pressable>
-            </View>
+            <Pressable 
+              style={styles.headerButton}
+              onPress={() => router.push('/date-night/my-preferences')}
+            >
+              <Settings size={22} color={colors.textLight} />
+            </Pressable>
           </View>
           <Text style={styles.headerSubtitle}>
             Plan unforgettable moments together
@@ -128,7 +119,7 @@ export default function DateNightScreen() {
           {/* Stats Banner */}
           <Pressable 
             style={styles.statsBanner}
-            onPress={() => router.push('/date-night/calendar')}
+            onPress={() => router.push('/(tabs)/calendar')}
           >
             <View style={styles.statItem}>
               <Text style={styles.statNumber}>{upcomingItineraries.length}</Text>
@@ -279,16 +270,6 @@ export default function DateNightScreen() {
             <View style={styles.actionsRow}>
               <Pressable 
                 style={styles.actionCard}
-                onPress={() => router.push('/date-night/calendar')}
-              >
-                <View style={[styles.actionIcon, { backgroundColor: `${colors.secondary}15` }]}>
-                  <CalendarDays size={24} color={colors.secondary} />
-                </View>
-                <Text style={styles.actionTitle}>Calendar</Text>
-              </Pressable>
-
-              <Pressable 
-                style={styles.actionCard}
                 onPress={() => router.push('/date-night/my-preferences')}
               >
                 <View style={styles.actionIcon}>
@@ -306,6 +287,16 @@ export default function DateNightScreen() {
                 </View>
                 <Text style={styles.actionTitle}>History</Text>
               </Pressable>
+
+              <Pressable 
+                style={styles.actionCard}
+                onPress={() => router.push('/date-night/add-partner')}
+              >
+                <View style={styles.actionIcon}>
+                  <UserPlus size={24} color={colors.primary} />
+                </View>
+                <Text style={styles.actionTitle}>Add Partner</Text>
+              </Pressable>
             </View>
           </View>
 
@@ -314,7 +305,7 @@ export default function DateNightScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Upcoming Dates</Text>
-                <Pressable onPress={() => router.push('/date-night/calendar')}>
+                <Pressable onPress={() => router.push('/(tabs)/calendar')}>
                   <Text style={styles.seeAllText}>See All</Text>
                 </Pressable>
               </View>
@@ -495,10 +486,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     color: colors.textLight,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 8,
   },
   headerButton: {
     width: 40,
