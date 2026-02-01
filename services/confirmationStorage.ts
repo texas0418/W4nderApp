@@ -3,7 +3,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
+import { Share, Platform } from 'react-native';
 import {
   Confirmation,
   ConfirmationType,
@@ -75,37 +75,10 @@ class ConfirmationStorageService {
       await this.updateConfirmationStatuses();
 
       this.isInitialized = true;
-      console.log(`Confirmation storage initialized: ${this.confirmations.size} confirmations, ${this.tickets.size} tickets`);
+      console.log(`Confirmation storage initialized with ${this.confirmations.size} confirmations`);
     } catch (error) {
       console.error('Failed to initialize confirmation storage:', error);
-    }
-  }
-
-  private async persist(): Promise<void> {
-    try {
-      const confirmations = Array.from(this.confirmations.values());
-      await AsyncStorage.setItem(STORAGE_KEYS.CONFIRMATIONS, JSON.stringify(confirmations));
-
-      const tickets = Array.from(this.tickets.values());
-      await AsyncStorage.setItem(STORAGE_KEYS.TICKETS, JSON.stringify(tickets));
-    } catch (error) {
-      console.error('Failed to persist confirmations:', error);
-    }
-  }
-
-  private async updateConfirmationStatuses(): Promise<void> {
-    let hasChanges = false;
-    
-    for (const [id, conf] of this.confirmations) {
-      if (conf.status === 'upcoming' && isConfirmationPast(conf)) {
-        conf.status = 'completed';
-        conf.updatedAt = new Date().toISOString();
-        hasChanges = true;
-      }
-    }
-    
-    if (hasChanges) {
-      await this.persist();
+      throw error;
     }
   }
 
@@ -113,69 +86,21 @@ class ConfirmationStorageService {
   // CRUD Operations
   // ============================================================================
 
-  async addConfirmation(
-    data: Omit<Confirmation, 'id' | 'createdAt' | 'updatedAt' | 'status'> & { 
-      status?: ConfirmationStatus 
-    }
-  ): Promise<Confirmation> {
+  async addConfirmation(data: Omit<Confirmation, 'id' | 'createdAt' | 'updatedAt'>): Promise<Confirmation> {
     await this.initialize();
 
-    const now = new Date().toISOString();
     const confirmation: Confirmation = {
       ...data,
       id: generateConfirmationId(),
-      status: data.status || 'upcoming',
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    this.confirmations.set(confirmation.id, confirmation);
-    await this.persist();
-    this.notifyListeners();
-
-    return confirmation;
-  }
-
-  async updateConfirmation(
-    id: string,
-    updates: Partial<Omit<Confirmation, 'id' | 'createdAt'>>
-  ): Promise<Confirmation | null> {
-    await this.initialize();
-
-    const confirmation = this.confirmations.get(id);
-    if (!confirmation) return null;
-
-    const updated: Confirmation = {
-      ...confirmation,
-      ...updates,
+      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    this.confirmations.set(id, updated);
-    await this.persist();
+    this.confirmations.set(confirmation.id, confirmation);
+    await this.saveConfirmations();
     this.notifyListeners();
 
-    return updated;
-  }
-
-  async deleteConfirmation(id: string): Promise<boolean> {
-    await this.initialize();
-
-    const confirmation = this.confirmations.get(id);
-    if (!confirmation) return false;
-
-    // Delete associated tickets
-    if (confirmation.tickets) {
-      for (const ticket of confirmation.tickets) {
-        await this.deleteTicket(ticket.id);
-      }
-    }
-
-    this.confirmations.delete(id);
-    await this.persist();
-    this.notifyListeners();
-
-    return true;
+    return confirmation;
   }
 
   async getConfirmation(id: string): Promise<Confirmation | null> {
@@ -193,63 +118,93 @@ class ConfirmationStorageService {
 
     // Apply filters
     if (filter) {
-      confirmations = this.applyFilter(confirmations, filter);
+      if (filter.type) {
+        confirmations = confirmations.filter(c => c.type === filter.type);
+      }
+      if (filter.status) {
+        confirmations = confirmations.filter(c => c.status === filter.status);
+      }
+      if (filter.tripId) {
+        confirmations = confirmations.filter(c => c.tripId === filter.tripId);
+      }
+      if (filter.dateRange) {
+        const { start, end } = filter.dateRange;
+        confirmations = confirmations.filter(c => {
+          const date = new Date(c.date);
+          return date >= new Date(start) && date <= new Date(end);
+        });
+      }
+      if (filter.search) {
+        const searchLower = filter.search.toLowerCase();
+        confirmations = confirmations.filter(c =>
+          c.title.toLowerCase().includes(searchLower) ||
+          c.provider?.toLowerCase().includes(searchLower) ||
+          c.confirmationNumber?.toLowerCase().includes(searchLower)
+        );
+      }
     }
 
     // Apply sorting
-    if (sort) {
-      confirmations = sortConfirmations(confirmations, sort);
-    } else {
-      // Default: sort by date ascending (upcoming first)
-      confirmations = sortConfirmations(confirmations, { field: 'date', direction: 'asc' });
+    return sortConfirmations(confirmations, sort);
+  }
+
+  async getUpcomingConfirmations(limit?: number): Promise<Confirmation[]> {
+    const all = await this.getAllConfirmations(
+      undefined,
+      { field: 'date', direction: 'asc' }
+    );
+
+    const upcoming = all.filter(c => !isConfirmationPast(c) && c.status !== 'cancelled');
+    return limit ? upcoming.slice(0, limit) : upcoming;
+  }
+
+  async updateConfirmation(id: string, updates: Partial<Confirmation>): Promise<Confirmation | null> {
+    await this.initialize();
+
+    const existing = this.confirmations.get(id);
+    if (!existing) return null;
+
+    const updated: Confirmation = {
+      ...existing,
+      ...updates,
+      id: existing.id,
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.confirmations.set(id, updated);
+    await this.saveConfirmations();
+    this.notifyListeners();
+
+    return updated;
+  }
+
+  async deleteConfirmation(id: string): Promise<boolean> {
+    await this.initialize();
+
+    const confirmation = this.confirmations.get(id);
+    if (!confirmation) return false;
+
+    // Delete associated tickets and their files
+    if (confirmation.tickets) {
+      for (const ticket of confirmation.tickets) {
+        await this.deleteTicketFiles(ticket);
+        this.tickets.delete(ticket.id);
+      }
     }
 
-    return confirmations;
-  }
+    this.confirmations.delete(id);
+    await this.saveConfirmations();
+    await this.saveTickets();
+    this.notifyListeners();
 
-  async getUpcomingConfirmations(): Promise<Confirmation[]> {
-    return this.getAllConfirmations(
-      { status: ['upcoming', 'active'] },
-      { field: 'date', direction: 'asc' }
-    );
-  }
-
-  async getPastConfirmations(): Promise<Confirmation[]> {
-    return this.getAllConfirmations(
-      { status: ['completed', 'cancelled', 'expired'] },
-      { field: 'date', direction: 'desc' }
-    );
-  }
-
-  async getConfirmationsByType(type: ConfirmationType): Promise<Confirmation[]> {
-    return this.getAllConfirmations(
-      { types: [type] },
-      { field: 'date', direction: 'asc' }
-    );
-  }
-
-  async getConfirmationsForDate(date: string): Promise<Confirmation[]> {
-    return this.getAllConfirmations(
-      { dateRange: { start: date, end: date } },
-      { field: 'date', direction: 'asc' }
-    );
-  }
-
-  async searchConfirmations(query: string): Promise<Confirmation[]> {
-    return this.getAllConfirmations(
-      { searchQuery: query },
-      { field: 'date', direction: 'asc' }
-    );
+    return true;
   }
 
   // ============================================================================
-  // Ticket Management
+  // Ticket Operations
   // ============================================================================
 
-  async addTicket(
-    confirmationId: string,
-    ticketData: Omit<Ticket, 'id' | 'createdAt' | 'isUsed'>
-  ): Promise<Ticket | null> {
+  async addTicket(confirmationId: string, ticketData: Omit<Ticket, 'id'>): Promise<Ticket | null> {
     await this.initialize();
 
     const confirmation = this.confirmations.get(confirmationId);
@@ -258,57 +213,43 @@ class ConfirmationStorageService {
     const ticket: Ticket = {
       ...ticketData,
       id: generateTicketId(),
-      isUsed: false,
-      createdAt: new Date().toISOString(),
     };
 
-    // Store ticket
+    // Update confirmation with new ticket
+    const tickets = confirmation.tickets || [];
+    tickets.push(ticket);
+
+    await this.updateConfirmation(confirmationId, { tickets });
+
+    // Store ticket separately for quick access
     this.tickets.set(ticket.id, ticket);
-
-    // Link to confirmation
-    if (!confirmation.tickets) {
-      confirmation.tickets = [];
-    }
-    confirmation.tickets.push(ticket);
-    confirmation.updatedAt = new Date().toISOString();
-
-    await this.persist();
-    this.notifyListeners();
+    await this.saveTickets();
 
     return ticket;
   }
 
-  async updateTicket(
-    ticketId: string,
-    updates: Partial<Omit<Ticket, 'id' | 'createdAt'>>
-  ): Promise<Ticket | null> {
+  async updateTicket(ticketId: string, updates: Partial<Ticket>): Promise<Ticket | null> {
     await this.initialize();
 
     const ticket = this.tickets.get(ticketId);
     if (!ticket) return null;
 
-    const updated: Ticket = {
-      ...ticket,
-      ...updates,
-    };
-
+    const updated: Ticket = { ...ticket, ...updates, id: ticket.id };
     this.tickets.set(ticketId, updated);
 
-    // Update in confirmation
-    for (const [, conf] of this.confirmations) {
+    // Update ticket in confirmation
+    for (const [confId, conf] of this.confirmations) {
       if (conf.tickets) {
-        const idx = conf.tickets.findIndex(t => t.id === ticketId);
-        if (idx !== -1) {
-          conf.tickets[idx] = updated;
-          conf.updatedAt = new Date().toISOString();
+        const ticketIndex = conf.tickets.findIndex(t => t.id === ticketId);
+        if (ticketIndex >= 0) {
+          conf.tickets[ticketIndex] = updated;
+          await this.saveConfirmations();
           break;
         }
       }
     }
 
-    await this.persist();
-    this.notifyListeners();
-
+    await this.saveTickets();
     return updated;
   }
 
@@ -318,107 +259,56 @@ class ConfirmationStorageService {
     const ticket = this.tickets.get(ticketId);
     if (!ticket) return false;
 
-    // Delete local file if exists
-    if (ticket.imageUri && ticket.imageUri.startsWith(TICKET_DIRECTORY)) {
-      try {
-        await FileSystem.deleteAsync(ticket.imageUri, { idempotent: true });
-      } catch (error) {
-        console.error('Failed to delete ticket file:', error);
-      }
-    }
+    await this.deleteTicketFiles(ticket);
 
-    if (ticket.pdfUri && ticket.pdfUri.startsWith(TICKET_DIRECTORY)) {
-      try {
-        await FileSystem.deleteAsync(ticket.pdfUri, { idempotent: true });
-      } catch (error) {
-        console.error('Failed to delete ticket PDF:', error);
+    // Remove from confirmation
+    for (const [confId, conf] of this.confirmations) {
+      if (conf.tickets) {
+        const ticketIndex = conf.tickets.findIndex(t => t.id === ticketId);
+        if (ticketIndex >= 0) {
+          conf.tickets.splice(ticketIndex, 1);
+          await this.saveConfirmations();
+          break;
+        }
       }
     }
 
     this.tickets.delete(ticketId);
-
-    // Remove from confirmation
-    for (const [, conf] of this.confirmations) {
-      if (conf.tickets) {
-        conf.tickets = conf.tickets.filter(t => t.id !== ticketId);
-        conf.updatedAt = new Date().toISOString();
-      }
-    }
-
-    await this.persist();
-    this.notifyListeners();
+    await this.saveTickets();
 
     return true;
   }
 
-  async markTicketAsUsed(ticketId: string): Promise<Ticket | null> {
-    return this.updateTicket(ticketId, {
-      isUsed: true,
-      usedAt: new Date().toISOString(),
-    });
-  }
-
-  // ============================================================================
-  // File Storage
-  // ============================================================================
-
-  async saveTicketImage(
-    ticketId: string,
-    imageUri: string
-  ): Promise<string | null> {
-    await this.initialize();
-
+  private async deleteTicketFiles(ticket: Ticket): Promise<void> {
     try {
-      const filename = `${ticketId}.png`;
-      const destUri = `${TICKET_DIRECTORY}${filename}`;
-
-      await FileSystem.copyAsync({
-        from: imageUri,
-        to: destUri,
-      });
-
-      await this.updateTicket(ticketId, { imageUri: destUri });
-
-      return destUri;
+      if (ticket.imageUri) {
+        const info = await FileSystem.getInfoAsync(ticket.imageUri);
+        if (info.exists) {
+          await FileSystem.deleteAsync(ticket.imageUri);
+        }
+      }
+      if (ticket.pdfUri) {
+        const info = await FileSystem.getInfoAsync(ticket.pdfUri);
+        if (info.exists) {
+          await FileSystem.deleteAsync(ticket.pdfUri);
+        }
+      }
     } catch (error) {
-      console.error('Failed to save ticket image:', error);
-      return null;
+      console.error('Failed to delete ticket files:', error);
     }
   }
 
-  async saveTicketPdf(
-    ticketId: string,
-    pdfUri: string
-  ): Promise<string | null> {
-    await this.initialize();
+  // ============================================================================
+  // QR Code Storage
+  // ============================================================================
 
+  async saveQRCode(ticketId: string, base64Data: string): Promise<string | null> {
     try {
-      const filename = `${ticketId}.pdf`;
-      const destUri = `${TICKET_DIRECTORY}${filename}`;
+      const ticket = this.tickets.get(ticketId);
+      if (!ticket) return null;
 
-      await FileSystem.copyAsync({
-        from: pdfUri,
-        to: destUri,
-      });
-
-      await this.updateTicket(ticketId, { pdfUri: destUri });
-
-      return destUri;
-    } catch (error) {
-      console.error('Failed to save ticket PDF:', error);
-      return null;
-    }
-  }
-
-  async saveQRCodeImage(
-    ticketId: string,
-    base64Data: string
-  ): Promise<string | null> {
-    await this.initialize();
-
-    try {
-      const filename = `${ticketId}_qr.png`;
-      const destUri = `${TICKET_DIRECTORY}${filename}`;
+      const fileName = `qr_${ticketId}_${Date.now()}.png`;
+      const destUri = TICKET_DIRECTORY + fileName;
 
       await FileSystem.writeAsStringAsync(destUri, base64Data, {
         encoding: FileSystem.EncodingType.Base64,
@@ -477,22 +367,12 @@ class ConfirmationStorageService {
     try {
       const shareText = this.formatConfirmationForShare(confirmation);
       
-      // If there's a ticket with a file, share that too
-      if (confirmation.tickets && confirmation.tickets.length > 0) {
-        const ticket = confirmation.tickets[0];
-        const fileUri = ticket.pdfUri || ticket.imageUri;
-        
-        if (fileUri && await Sharing.isAvailableAsync()) {
-          await Sharing.shareAsync(fileUri, {
-            mimeType: ticket.pdfUri ? 'application/pdf' : 'image/png',
-            dialogTitle: confirmation.title,
-          });
-          return true;
-        }
-      }
+      // Use React Native's built-in Share API
+      await Share.share({
+        message: shareText,
+        title: confirmation.title,
+      });
 
-      // Fall back to text share (would need to integrate with Share API)
-      console.log('Share text:', shareText);
       return true;
     } catch (error) {
       console.error('Failed to share confirmation:', error);
@@ -503,304 +383,104 @@ class ConfirmationStorageService {
   private formatConfirmationForShare(confirmation: Confirmation): string {
     const lines = [
       `📋 ${confirmation.title}`,
-      `📍 ${confirmation.location.name}`,
-      `📅 ${confirmation.displayDateTime}`,
-      `✅ Confirmation: ${confirmation.confirmationNumber}`,
+      '',
+      `📅 Date: ${new Date(confirmation.date).toLocaleDateString()}`,
     ];
 
-    if (confirmation.location.address) {
-      lines.push(`📌 ${confirmation.location.address}`);
+    if (confirmation.time) {
+      lines.push(`🕐 Time: ${confirmation.time}`);
     }
 
-    if (confirmation.contact?.phone) {
-      lines.push(`📞 ${confirmation.contact.phone}`);
+    if (confirmation.location) {
+      lines.push(`📍 Location: ${confirmation.location.name || confirmation.location.address}`);
+    }
+
+    if (confirmation.confirmationNumber) {
+      lines.push(`✅ Confirmation: ${confirmation.confirmationNumber}`);
+    }
+
+    if (confirmation.provider) {
+      lines.push(`🏢 Provider: ${confirmation.provider}`);
     }
 
     return lines.join('\n');
   }
 
   // ============================================================================
-  // Quick Add Methods (for integration with booking services)
+  // Status Updates
   // ============================================================================
 
-  async addRestaurantConfirmation(data: {
-    restaurantName: string;
-    confirmationNumber: string;
-    date: string;
-    time: string;
-    partySize: number;
-    address?: string;
-    phone?: string;
-    provider: string;
-    providerColor?: string;
-  }): Promise<Confirmation> {
-    return this.addConfirmation({
-      type: 'restaurant',
-      provider: data.provider,
-      providerColor: data.providerColor,
-      confirmationNumber: data.confirmationNumber,
-      title: data.restaurantName,
-      subtitle: `Table for ${data.partySize}`,
-      date: data.date,
-      startTime: data.time,
-      displayDateTime: this.formatDateTime(data.date, data.time),
-      location: {
-        name: data.restaurantName,
-        address: data.address,
-      },
-      contact: {
-        phone: data.phone,
-      },
-      source: 'auto',
-    });
-  }
+  private async updateConfirmationStatuses(): Promise<void> {
+    let hasUpdates = false;
 
-  async addActivityConfirmation(data: {
-    activityName: string;
-    confirmationNumber: string;
-    date: string;
-    time: string;
-    participants: number;
-    meetingPoint?: string;
-    address?: string;
-    phone?: string;
-    provider: string;
-    providerColor?: string;
-    voucherUrl?: string;
-    qrCode?: string;
-  }): Promise<Confirmation> {
-    const confirmation = await this.addConfirmation({
-      type: 'activity',
-      provider: data.provider,
-      providerColor: data.providerColor,
-      confirmationNumber: data.confirmationNumber,
-      title: data.activityName,
-      subtitle: `${data.participants} participant${data.participants > 1 ? 's' : ''}`,
-      date: data.date,
-      startTime: data.time,
-      displayDateTime: this.formatDateTime(data.date, data.time),
-      location: {
-        name: data.meetingPoint || data.activityName,
-        address: data.address,
-        meetingPoint: data.meetingPoint,
-      },
-      contact: {
-        phone: data.phone,
-      },
-      source: 'auto',
-    });
-
-    // Add QR code ticket if provided
-    if (data.qrCode) {
-      await this.addTicket(confirmation.id, {
-        type: 'qr_code',
-        label: 'Mobile Voucher',
-        code: data.qrCode,
-        codeFormat: 'qr',
-      });
+    for (const [id, confirmation] of this.confirmations) {
+      if (confirmation.status === 'confirmed' && isConfirmationPast(confirmation)) {
+        confirmation.status = 'completed';
+        confirmation.updatedAt = new Date().toISOString();
+        hasUpdates = true;
+      }
     }
 
-    return confirmation;
-  }
-
-  async addFlightConfirmation(data: {
-    airline: string;
-    flightNumber: string;
-    confirmationNumber: string;
-    departureDate: string;
-    departureTime: string;
-    departureAirport: string;
-    arrivalAirport: string;
-    passengers: number;
-    boardingPass?: string;
-  }): Promise<Confirmation> {
-    const confirmation = await this.addConfirmation({
-      type: 'flight',
-      provider: data.airline,
-      confirmationNumber: data.confirmationNumber,
-      title: `${data.airline} ${data.flightNumber}`,
-      subtitle: `${data.departureAirport} → ${data.arrivalAirport}`,
-      date: data.departureDate,
-      startTime: data.departureTime,
-      displayDateTime: this.formatDateTime(data.departureDate, data.departureTime),
-      location: {
-        name: data.departureAirport,
-      },
-      source: 'auto',
-    });
-
-    if (data.boardingPass) {
-      await this.addTicket(confirmation.id, {
-        type: 'barcode',
-        label: 'Boarding Pass',
-        code: data.boardingPass,
-        codeFormat: 'pdf417',
-      });
+    if (hasUpdates) {
+      await this.saveConfirmations();
     }
-
-    return confirmation;
-  }
-
-  async addHotelConfirmation(data: {
-    hotelName: string;
-    confirmationNumber: string;
-    checkInDate: string;
-    checkOutDate: string;
-    address?: string;
-    phone?: string;
-    provider?: string;
-  }): Promise<Confirmation> {
-    return this.addConfirmation({
-      type: 'hotel',
-      provider: data.provider || 'Direct',
-      confirmationNumber: data.confirmationNumber,
-      title: data.hotelName,
-      subtitle: `${this.formatDateRange(data.checkInDate, data.checkOutDate)}`,
-      date: data.checkInDate,
-      displayDateTime: `Check-in: ${this.formatDate(data.checkInDate)}`,
-      location: {
-        name: data.hotelName,
-        address: data.address,
-      },
-      contact: {
-        phone: data.phone,
-      },
-      source: 'auto',
-    });
   }
 
   // ============================================================================
-  // Helpers
+  // Persistence
   // ============================================================================
 
-  private applyFilter(
-    confirmations: Confirmation[],
-    filter: ConfirmationFilter
-  ): Confirmation[] {
-    return confirmations.filter(conf => {
-      // Filter by type
-      if (filter.types && filter.types.length > 0) {
-        if (!filter.types.includes(conf.type)) return false;
-      }
-
-      // Filter by status
-      if (filter.status && filter.status.length > 0) {
-        if (!filter.status.includes(conf.status)) return false;
-      }
-
-      // Filter by date range
-      if (filter.dateRange) {
-        const confDate = new Date(conf.date);
-        const start = new Date(filter.dateRange.start);
-        const end = new Date(filter.dateRange.end);
-        if (confDate < start || confDate > end) return false;
-      }
-
-      // Filter by provider
-      if (filter.provider) {
-        if (conf.provider.toLowerCase() !== filter.provider.toLowerCase()) return false;
-      }
-
-      // Filter by search query
-      if (filter.searchQuery) {
-        const query = filter.searchQuery.toLowerCase();
-        const searchableText = [
-          conf.title,
-          conf.subtitle,
-          conf.confirmationNumber,
-          conf.provider,
-          conf.location.name,
-          conf.location.address,
-        ].filter(Boolean).join(' ').toLowerCase();
-        
-        if (!searchableText.includes(query)) return false;
-      }
-
-      return true;
-    });
-  }
-
-  private formatDateTime(date: string, time?: string): string {
-    const d = new Date(date + 'T12:00:00');
-    const dateStr = d.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    });
-
-    if (time) {
-      const [hours, minutes] = time.split(':').map(Number);
-      const period = hours >= 12 ? 'PM' : 'AM';
-      const displayHours = hours % 12 || 12;
-      return `${dateStr} at ${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-    }
-
-    return dateStr;
-  }
-
-  private formatDate(date: string): string {
-    return new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  }
-
-  private formatDateRange(start: string, end: string): string {
-    const startDate = new Date(start + 'T12:00:00');
-    const endDate = new Date(end + 'T12:00:00');
-    
-    const startStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    
-    return `${startStr} - ${endStr}`;
-  }
-
-  // ============================================================================
-  // Subscription
-  // ============================================================================
-
-  subscribe(id: string, callback: (confirmations: Confirmation[]) => void) {
-    this.listeners.set(id, callback);
-    return () => this.listeners.delete(id);
-  }
-
-  private notifyListeners() {
+  private async saveConfirmations(): Promise<void> {
     const confirmations = Array.from(this.confirmations.values());
-    this.listeners.forEach(callback => callback(confirmations));
+    await AsyncStorage.setItem(STORAGE_KEYS.CONFIRMATIONS, JSON.stringify(confirmations));
+  }
+
+  private async saveTickets(): Promise<void> {
+    const tickets = Array.from(this.tickets.values());
+    await AsyncStorage.setItem(STORAGE_KEYS.TICKETS, JSON.stringify(tickets));
   }
 
   // ============================================================================
-  // Clear Data
+  // Subscriptions
+  // ============================================================================
+
+  subscribe(key: string, callback: (confirmations: Confirmation[]) => void): () => void {
+    this.listeners.set(key, callback);
+    return () => this.listeners.delete(key);
+  }
+
+  private notifyListeners(): void {
+    const confirmations = Array.from(this.confirmations.values());
+    for (const callback of this.listeners.values()) {
+      callback(confirmations);
+    }
+  }
+
+  // ============================================================================
+  // Cleanup
   // ============================================================================
 
   async clearAll(): Promise<void> {
     // Delete all ticket files
     try {
-      await FileSystem.deleteAsync(TICKET_DIRECTORY, { idempotent: true });
-      await FileSystem.makeDirectoryAsync(TICKET_DIRECTORY, { intermediates: true });
+      const dirInfo = await FileSystem.getInfoAsync(TICKET_DIRECTORY);
+      if (dirInfo.exists) {
+        await FileSystem.deleteAsync(TICKET_DIRECTORY, { idempotent: true });
+        await FileSystem.makeDirectoryAsync(TICKET_DIRECTORY, { intermediates: true });
+      }
     } catch (error) {
-      console.error('Failed to clear ticket files:', error);
+      console.error('Failed to clear ticket directory:', error);
     }
 
     this.confirmations.clear();
     this.tickets.clear();
-    await this.persist();
+
+    await AsyncStorage.removeItem(STORAGE_KEYS.CONFIRMATIONS);
+    await AsyncStorage.removeItem(STORAGE_KEYS.TICKETS);
+
     this.notifyListeners();
-  }
-
-  async clearPastConfirmations(): Promise<number> {
-    const pastConfirmations = await this.getPastConfirmations();
-    let count = 0;
-
-    for (const conf of pastConfirmations) {
-      await this.deleteConfirmation(conf.id);
-      count++;
-    }
-
-    return count;
   }
 }
 
-// Export singleton
+// Export singleton instance
 export const confirmationStorage = new ConfirmationStorageService();

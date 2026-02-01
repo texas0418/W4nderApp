@@ -11,6 +11,7 @@ import {
   Platform,
   Linking,
   Alert,
+  Share,
 } from 'react-native';
 import {
   X,
@@ -25,9 +26,7 @@ import {
   ExternalLink,
   Check,
 } from 'lucide-react-native';
-import * as Brightness from 'expo-brightness';
 import * as Clipboard from 'expo-clipboard';
-import * as Sharing from 'expo-sharing';
 import QRCode from 'react-native-qrcode-svg';
 import colors from '@/constants/colors';
 import { Confirmation, Ticket } from '@/types/confirmation';
@@ -48,49 +47,25 @@ export default function TicketViewer({
   initialTicketIndex = 0,
 }: TicketViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialTicketIndex);
-  const [originalBrightness, setOriginalBrightness] = useState<number | null>(null);
   const [isBrightnessMaxed, setIsBrightnessMaxed] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const tickets = confirmation.tickets || [];
   const currentTicket = tickets[currentIndex];
 
-  // Max brightness when viewing ticket
+  // Reset state when modal opens
   useEffect(() => {
-    if (visible && Platform.OS !== 'web') {
-      (async () => {
-        try {
-          const current = await Brightness.getBrightnessAsync();
-          setOriginalBrightness(current);
-        } catch (error) {
-          console.error('Failed to get brightness:', error);
-        }
-      })();
+    if (visible) {
+      setCurrentIndex(initialTicketIndex);
+      setIsBrightnessMaxed(false);
     }
+  }, [visible, initialTicketIndex]);
 
-    return () => {
-      if (originalBrightness !== null && Platform.OS !== 'web') {
-        Brightness.setBrightnessAsync(originalBrightness).catch(() => {});
-      }
-    };
-  }, [visible]);
-
-  const toggleBrightness = async () => {
-    if (Platform.OS === 'web') return;
-
-    try {
-      if (isBrightnessMaxed) {
-        if (originalBrightness !== null) {
-          await Brightness.setBrightnessAsync(originalBrightness);
-        }
-        setIsBrightnessMaxed(false);
-      } else {
-        await Brightness.setBrightnessAsync(1);
-        setIsBrightnessMaxed(true);
-      }
-    } catch (error) {
-      console.error('Failed to set brightness:', error);
-    }
+  // Brightness toggle is now just a visual indicator
+  // (actual brightness control removed to avoid native module requirement)
+  const toggleBrightness = () => {
+    setIsBrightnessMaxed(!isBrightnessMaxed);
+    // Note: For actual brightness control, install expo-brightness and rebuild native app
   };
 
   const handleCopyCode = async () => {
@@ -104,45 +79,65 @@ export default function TicketViewer({
   const handleShare = async () => {
     if (!currentTicket) return;
 
-    const fileUri = currentTicket.pdfUri || currentTicket.imageUri;
-    
-    if (fileUri && await Sharing.isAvailableAsync()) {
-      try {
-        await Sharing.shareAsync(fileUri, {
-          mimeType: currentTicket.pdfUri ? 'application/pdf' : 'image/png',
-          dialogTitle: confirmation.title,
-        });
-      } catch (error) {
-        console.error('Failed to share:', error);
-      }
+    try {
+      const shareContent: { message: string; title?: string; url?: string } = {
+        message: `${confirmation.title}\n\nDate: ${formatDate(confirmation.date)}${confirmation.time ? ` at ${confirmation.time}` : ''}\n${confirmation.location?.name || confirmation.location?.address || ''}\n\n${currentTicket.code ? `Code: ${currentTicket.code}` : ''}${confirmation.confirmationNumber ? `\nConfirmation: ${confirmation.confirmationNumber}` : ''}`,
+        title: confirmation.title,
+      };
+
+      await Share.share(shareContent);
+    } catch (error) {
+      console.error('Share error:', error);
     }
   };
 
   const handleOpenMaps = () => {
-    const { coordinates, address, name } = confirmation.location;
-    
-    if (coordinates) {
+    if (confirmation.location?.coordinates) {
+      const { lat, lng } = confirmation.location.coordinates;
       const url = Platform.select({
-        ios: `maps:?q=${name}&ll=${coordinates.lat},${coordinates.lng}`,
-        android: `geo:${coordinates.lat},${coordinates.lng}?q=${name}`,
-        default: `https://maps.google.com/?q=${coordinates.lat},${coordinates.lng}`,
+        ios: `maps:0,0?q=${lat},${lng}`,
+        android: `geo:${lat},${lng}?q=${lat},${lng}`,
+        default: `https://maps.google.com/?q=${lat},${lng}`,
       });
-      Linking.openURL(url);
-    } else if (address) {
-      const encodedAddress = encodeURIComponent(`${name}, ${address}`);
-      const url = Platform.select({
-        ios: `maps:?q=${encodedAddress}`,
-        android: `geo:0,0?q=${encodedAddress}`,
-        default: `https://maps.google.com/?q=${encodedAddress}`,
-      });
-      Linking.openURL(url);
+      Linking.openURL(url as string);
+    } else if (confirmation.location?.address) {
+      const encoded = encodeURIComponent(confirmation.location.address);
+      Linking.openURL(`https://maps.google.com/?q=${encoded}`);
     }
   };
 
-  const goToTicket = (index: number) => {
-    if (index >= 0 && index < tickets.length) {
-      setCurrentIndex(index);
+  const handleAddToWallet = () => {
+    if (currentTicket?.walletPassUri) {
+      Linking.openURL(currentTicket.walletPassUri);
+    } else {
+      Alert.alert('Wallet Pass', 'Wallet pass not available for this ticket.');
     }
+  };
+
+  const goToNext = () => {
+    if (currentIndex < tickets.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const goToPrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const formatTime = (timeStr: string) => {
+    return timeStr;
   };
 
   const renderTicketContent = () => {
@@ -155,26 +150,18 @@ export default function TicketViewer({
     }
 
     switch (currentTicket.type) {
-      case 'qr_code':
+      case 'qr':
         return (
           <View style={styles.qrContainer}>
             {currentTicket.code ? (
-              <View style={styles.qrWrapper}>
-                <QRCode
-                  value={currentTicket.code}
-                  size={SCREEN_WIDTH * 0.65}
-                  backgroundColor="white"
-                  color="black"
-                />
-              </View>
-            ) : currentTicket.imageUri ? (
-              <Image
-                source={{ uri: currentTicket.imageUri }}
-                style={styles.qrImage}
-                resizeMode="contain"
+              <QRCode
+                value={currentTicket.code}
+                size={200}
+                backgroundColor="white"
+                color="black"
               />
             ) : (
-              <Text style={styles.errorText}>QR code not available</Text>
+              <Text style={styles.errorText}>QR code data missing</Text>
             )}
           </View>
         );
@@ -193,7 +180,7 @@ export default function TicketViewer({
                 <Text style={styles.barcodeCodeText}>{currentTicket.code}</Text>
               </View>
             ) : (
-              <Text style={styles.errorText}>Barcode not available</Text>
+              <Text style={styles.errorText}>Barcode data missing</Text>
             )}
           </View>
         );
@@ -203,15 +190,9 @@ export default function TicketViewer({
           <View style={styles.pdfContainer}>
             <TouchableOpacity
               style={styles.pdfButton}
-              onPress={() => {
-                if (currentTicket.pdfUri) {
-                  Linking.openURL(currentTicket.pdfUri);
-                } else if (currentTicket.pdfUrl) {
-                  Linking.openURL(currentTicket.pdfUrl);
-                }
-              }}
+              onPress={() => currentTicket.pdfUri && Linking.openURL(currentTicket.pdfUri)}
             >
-              <Download size={24} color={colors.primary} />
+              <Download size={20} color={colors.primary} />
               <Text style={styles.pdfButtonText}>Open PDF Ticket</Text>
             </TouchableOpacity>
           </View>
@@ -222,14 +203,9 @@ export default function TicketViewer({
           <View style={styles.passbookContainer}>
             <TouchableOpacity
               style={styles.passbookButton}
-              onPress={() => {
-                if (currentTicket.passbookUrl) {
-                  Linking.openURL(currentTicket.passbookUrl);
-                }
-              }}
+              onPress={handleAddToWallet}
             >
-              <ExternalLink size={24} color="#fff" />
-              <Text style={styles.passbookButtonText}>Add to Wallet</Text>
+              <Text style={styles.passbookButtonText}>Add to Apple Wallet</Text>
             </TouchableOpacity>
           </View>
         );
@@ -237,97 +213,87 @@ export default function TicketViewer({
       case 'image':
         return (
           <View style={styles.imageContainer}>
-            {currentTicket.imageUri || currentTicket.imageUrl ? (
+            {currentTicket.imageUri && (
               <Image
-                source={{ uri: currentTicket.imageUri || currentTicket.imageUrl }}
+                source={{ uri: currentTicket.imageUri }}
                 style={styles.ticketImage}
                 resizeMode="contain"
               />
-            ) : (
-              <Text style={styles.errorText}>Image not available</Text>
             )}
           </View>
         );
 
       case 'text':
-        return (
-          <View style={styles.textContainer}>
-            <Text style={styles.textCode}>{currentTicket.code}</Text>
-          </View>
-        );
-
       default:
         return (
-          <View style={styles.noTicket}>
-            <Text style={styles.noTicketText}>Unknown ticket type</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.textCode}>{currentTicket.code || 'No code'}</Text>
           </View>
         );
     }
   };
 
+  if (!visible) return null;
+
   return (
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="fullScreen"
+      presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <X size={24} color={colors.text} />
           </TouchableOpacity>
-          
-          <Text style={styles.headerTitle}>
-            {tickets.length > 1 
-              ? `Ticket ${currentIndex + 1} of ${tickets.length}`
-              : 'Ticket'
-            }
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {confirmation.title}
           </Text>
-
           <View style={styles.headerActions}>
-            {Platform.OS !== 'web' && (
-              <TouchableOpacity onPress={toggleBrightness} style={styles.headerButton}>
-                <Sun 
-                  size={22} 
-                  color={isBrightnessMaxed ? colors.warning : colors.text} 
-                  fill={isBrightnessMaxed ? colors.warning : 'transparent'}
-                />
-              </TouchableOpacity>
-            )}
-            {(currentTicket?.pdfUri || currentTicket?.imageUri) && (
-              <TouchableOpacity onPress={handleShare} style={styles.headerButton}>
-                <Share2 size={22} color={colors.text} />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                isBrightnessMaxed && styles.actionButtonActive,
+              ]}
+              onPress={toggleBrightness}
+            >
+              <Sun
+                size={20}
+                color={isBrightnessMaxed ? colors.warning : colors.text}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+              <Share2 size={20} color={colors.text} />
+            </TouchableOpacity>
           </View>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.content}
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
         >
-          {/* Booking Info Card */}
-          <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>{confirmation.title}</Text>
-            
+          {/* Event Info */}
+          <View style={styles.eventInfo}>
             <View style={styles.infoRow}>
               <Clock size={16} color={colors.textSecondary} />
-              <Text style={styles.infoText}>{confirmation.displayDateTime}</Text>
+              <Text style={styles.infoText}>
+                {formatDate(confirmation.date)}
+                {confirmation.time && ` at ${formatTime(confirmation.time)}`}
+              </Text>
             </View>
 
             <TouchableOpacity style={styles.infoRow} onPress={handleOpenMaps}>
               <MapPin size={16} color={colors.textSecondary} />
-              <Text style={[styles.infoText, styles.infoLink]} numberOfLines={2}>
-                {confirmation.location.name}
-                {confirmation.location.address && `\n${confirmation.location.address}`}
+              <Text style={styles.infoText} numberOfLines={1}>
+                {confirmation.location?.name || confirmation.location?.address || 'Location TBD'}
               </Text>
               <ExternalLink size={14} color={colors.primary} />
             </TouchableOpacity>
 
-            {confirmation.location.meetingPoint && (
+            {confirmation.location?.meetingPoint && (
               <View style={styles.meetingPoint}>
                 <Text style={styles.meetingPointLabel}>Meeting Point</Text>
                 <Text style={styles.meetingPointText}>
@@ -374,7 +340,7 @@ export default function TicketViewer({
                     <Text style={styles.seatValue}>{currentTicket.seat}</Text>
                   </View>
                 )}
-                {currentTicket.gate && (
+                {currentTicket?.gate && (
                   <View style={styles.seatItem}>
                     <Text style={styles.seatLabel}>Gate</Text>
                     <Text style={styles.seatValue}>{currentTicket.gate}</Text>
@@ -406,57 +372,58 @@ export default function TicketViewer({
             )}
           </View>
 
-          {/* Confirmation number */}
-          <View style={styles.confirmationCard}>
-            <Text style={styles.confirmationLabel}>Confirmation Number</Text>
-            <Text style={styles.confirmationNumber}>
-              {confirmation.confirmationNumber}
-            </Text>
-          </View>
+          {/* Confirmation Number */}
+          {confirmation.confirmationNumber && (
+            <View style={styles.confirmationCard}>
+              <Text style={styles.confirmationLabel}>Confirmation Number</Text>
+              <Text style={styles.confirmationNumber}>
+                {confirmation.confirmationNumber}
+              </Text>
+            </View>
+          )}
 
           {/* Instructions */}
-          {confirmation.location.instructions && (
+          {confirmation.specialInstructions && (
             <View style={styles.instructionsCard}>
-              <Text style={styles.instructionsLabel}>Instructions</Text>
+              <Text style={styles.instructionsLabel}>Important Instructions</Text>
               <Text style={styles.instructionsText}>
-                {confirmation.location.instructions}
+                {confirmation.specialInstructions}
               </Text>
             </View>
           )}
         </ScrollView>
 
-        {/* Ticket Navigation */}
+        {/* Navigation for multiple tickets */}
         {tickets.length > 1 && (
           <View style={styles.navigation}>
             <TouchableOpacity
               style={[styles.navButton, currentIndex === 0 && styles.navButtonDisabled]}
-              onPress={() => goToTicket(currentIndex - 1)}
+              onPress={goToPrev}
               disabled={currentIndex === 0}
             >
-              <ChevronLeft size={24} color={currentIndex === 0 ? colors.textTertiary : colors.text} />
+              <ChevronLeft size={24} color={currentIndex === 0 ? colors.border : colors.text} />
             </TouchableOpacity>
 
             <View style={styles.navDots}>
               {tickets.map((_, index) => (
-                <TouchableOpacity
+                <View
                   key={index}
-                  style={[
-                    styles.navDot,
-                    index === currentIndex && styles.navDotActive,
-                  ]}
-                  onPress={() => goToTicket(index)}
+                  style={[styles.navDot, index === currentIndex && styles.navDotActive]}
                 />
               ))}
             </View>
 
             <TouchableOpacity
-              style={[styles.navButton, currentIndex === tickets.length - 1 && styles.navButtonDisabled]}
-              onPress={() => goToTicket(currentIndex + 1)}
+              style={[
+                styles.navButton,
+                currentIndex === tickets.length - 1 && styles.navButtonDisabled,
+              ]}
+              onPress={goToNext}
               disabled={currentIndex === tickets.length - 1}
             >
-              <ChevronRight 
-                size={24} 
-                color={currentIndex === tickets.length - 1 ? colors.textTertiary : colors.text} 
+              <ChevronRight
+                size={24}
+                color={currentIndex === tickets.length - 1 ? colors.border : colors.text}
               />
             </TouchableOpacity>
           </View>
@@ -476,70 +443,70 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 60 : 16,
+    paddingTop: Platform.OS === 'ios' ? 16 : 12,
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   closeButton: {
-    padding: 4,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
+    flex: 1,
     fontSize: 17,
     fontWeight: '600',
     color: colors.text,
+    textAlign: 'center',
+    marginHorizontal: 8,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 4,
   },
-  headerButton: {
-    padding: 4,
+  actionButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+  },
+  actionButtonActive: {
+    backgroundColor: `${colors.warning}20`,
   },
   content: {
     flex: 1,
   },
   contentContainer: {
     padding: 16,
-    paddingBottom: 32,
+    gap: 16,
   },
-  // Info card
-  infoCard: {
+  eventInfo: {
     backgroundColor: colors.surface,
     borderRadius: 14,
     padding: 16,
-    marginBottom: 16,
-  },
-  infoTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 12,
+    gap: 12,
   },
   infoRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: 10,
-    marginBottom: 8,
   },
   infoText: {
-    fontSize: 14,
-    color: colors.textSecondary,
     flex: 1,
-    lineHeight: 20,
-  },
-  infoLink: {
-    color: colors.primary,
+    fontSize: 14,
+    color: colors.text,
   },
   meetingPoint: {
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 8,
-    padding: 12,
     marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
   meetingPointLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
     color: colors.textTertiary,
     marginBottom: 4,
   },
@@ -547,18 +514,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text,
   },
-  // Ticket card
   ticketCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 14,
     padding: 20,
-    marginBottom: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   ticketLabel: {
     fontSize: 14,
@@ -566,19 +526,16 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: 16,
   },
-  // QR Code
+  // QR
   qrContainer: {
-    alignItems: 'center',
-    padding: 16,
-  },
-  qrWrapper: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-  },
-  qrImage: {
-    width: SCREEN_WIDTH * 0.65,
-    height: SCREEN_WIDTH * 0.65,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   // Barcode
   barcodeContainer: {
@@ -734,7 +691,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: 14,
     padding: 16,
-    marginBottom: 16,
     alignItems: 'center',
   },
   confirmationLabel: {
@@ -796,5 +752,8 @@ const styles = StyleSheet.create({
   navDotActive: {
     backgroundColor: colors.primary,
     width: 24,
+  },
+  backgroundSecondary: {
+    backgroundColor: colors.backgroundSecondary || colors.surface,
   },
 });
