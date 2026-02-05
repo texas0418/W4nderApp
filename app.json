@@ -71,7 +71,8 @@
           "locationAlwaysPermission": "W4nder uses your location in the background to provide timely travel alerts.",
           "locationWhenInUsePermission": "W4nder uses your location to provide directions and travel time estimates."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true
