@@ -26,9 +26,19 @@ interface AddAnniversaryScreenProps {
   };
 }
 
-const ANNIVERSARY_TYPES: { value: AnniversaryType; label: string; icon: string; description: string }[] = [
+const ANNIVERSARY_TYPES: {
+  value: AnniversaryType;
+  label: string;
+  icon: string;
+  description: string;
+}[] = [
   { value: 'wedding', label: 'Wedding', icon: '💒', description: 'Your wedding date' },
-  { value: 'relationship', label: 'Relationship', icon: '💑', description: 'When you became a couple' },
+  {
+    value: 'relationship',
+    label: 'Relationship',
+    icon: '💑',
+    description: 'When you became a couple',
+  },
   { value: 'engagement', label: 'Engagement', icon: '💍', description: 'The proposal date' },
   { value: 'first_date', label: 'First Date', icon: '☕', description: 'Your first date together' },
   { value: 'first_trip', label: 'First Trip', icon: '✈️', description: 'Your first trip together' },
@@ -44,7 +54,10 @@ const REMINDER_OPTIONS = [
   { days: 0, label: 'On the day' },
 ];
 
-export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({ navigation, route }) => {
+export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({
+  navigation,
+  route,
+}) => {
   const { createAnniversary, updateAnniversary, refresh } = useAnniversary();
   const editId = route?.params?.anniversaryId;
   const isEditing = !!editId;
@@ -85,9 +98,9 @@ export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({ navi
   };
 
   const toggleReminder = (days: number) => {
-    setSelectedReminders(prev => {
+    setSelectedReminders((prev) => {
       if (prev.includes(days)) {
-        return prev.filter(d => d !== days);
+        return prev.filter((d) => d !== days);
       }
       return [...prev, days].sort((a, b) => b - a);
     });
@@ -182,17 +195,11 @@ export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({ navi
               {ANNIVERSARY_TYPES.map((item) => (
                 <TouchableOpacity
                   key={item.value}
-                  style={[
-                    styles.typeCard,
-                    type === item.value && styles.typeCardSelected,
-                  ]}
+                  style={[styles.typeCard, type === item.value && styles.typeCardSelected]}
                   onPress={() => setType(item.value)}
                 >
                   <Text style={styles.typeIcon}>{item.icon}</Text>
-                  <Text style={[
-                    styles.typeLabel,
-                    type === item.value && styles.typeLabelSelected,
-                  ]}>
+                  <Text style={[styles.typeLabel, type === item.value && styles.typeLabelSelected]}>
                     {item.label}
                   </Text>
                 </TouchableOpacity>
@@ -216,14 +223,11 @@ export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({ navi
           {/* Date Selection */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Date</Text>
-            <TouchableOpacity
-              style={styles.dateButton}
-              onPress={() => setShowDatePicker(true)}
-            >
+            <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
               <Text style={styles.dateIcon}>📅</Text>
               <Text style={styles.dateText}>{formatDate(date)}</Text>
             </TouchableOpacity>
-            
+
             {showDatePicker && (
               <DateTimePicker
                 value={date}
@@ -252,9 +256,7 @@ export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({ navi
           {/* Reminders */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Reminders</Text>
-            <Text style={styles.sectionSubtitle}>
-              Get notified before your anniversary
-            </Text>
+            <Text style={styles.sectionSubtitle}>Get notified before your anniversary</Text>
             <View style={styles.reminderGrid}>
               {REMINDER_OPTIONS.map((item) => (
                 <TouchableOpacity
@@ -265,10 +267,12 @@ export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({ navi
                   ]}
                   onPress={() => toggleReminder(item.days)}
                 >
-                  <Text style={[
-                    styles.reminderText,
-                    selectedReminders.includes(item.days) && styles.reminderTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.reminderText,
+                      selectedReminders.includes(item.days) && styles.reminderTextSelected,
+                    ]}
+                  >
                     {item.label}
                   </Text>
                 </TouchableOpacity>
@@ -300,13 +304,11 @@ export const AddAnniversaryScreen: React.FC<AddAnniversaryScreenProps> = ({ navi
             <View style={styles.previewCard}>
               <View style={styles.previewHeader}>
                 <Text style={styles.previewIcon}>
-                  {ANNIVERSARY_TYPES.find(t => t.value === type)?.icon}
+                  {ANNIVERSARY_TYPES.find((t) => t.value === type)?.icon}
                 </Text>
                 <View style={styles.previewContent}>
                   <Text style={styles.previewName}>{name || 'Your Anniversary'}</Text>
-                  {partnerName && (
-                    <Text style={styles.previewPartner}>with {partnerName}</Text>
-                  )}
+                  {partnerName && <Text style={styles.previewPartner}>with {partnerName}</Text>}
                 </View>
               </View>
               <Text style={styles.previewDate}>{formatDate(date)}</Text>

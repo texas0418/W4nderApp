@@ -6,7 +6,7 @@
 // Connection Types
 // ============================================================================
 
-export type ConnectionStatus = 
+export type ConnectionStatus =
   | 'connecting'
   | 'connected'
   | 'disconnected'
@@ -25,23 +25,23 @@ export interface ConnectionInfo {
 export interface WebSocketConfig {
   // Server URL
   url: string;
-  
+
   // Authentication
   authToken?: string;
   userId?: string;
   deviceId?: string;
-  
+
   // Reconnection
   autoReconnect: boolean;
   reconnectInterval: number; // ms
   maxReconnectAttempts: number;
   reconnectBackoff: 'linear' | 'exponential';
-  
+
   // Heartbeat
   enableHeartbeat: boolean;
   heartbeatInterval: number; // ms
   heartbeatTimeout: number; // ms
-  
+
   // Debugging
   debug: boolean;
   logMessages: boolean;
@@ -73,20 +73,20 @@ export type MessageType =
   | 'auth'
   | 'auth_success'
   | 'auth_error'
-  
+
   // Subscriptions
   | 'subscribe'
   | 'unsubscribe'
   | 'subscribed'
   | 'unsubscribed'
-  
+
   // Itinerary updates
   | 'itinerary_updated'
   | 'itinerary_activity_added'
   | 'itinerary_activity_updated'
   | 'itinerary_activity_removed'
   | 'itinerary_activity_reordered'
-  
+
   // Partner updates
   | 'partner_joined'
   | 'partner_left'
@@ -95,7 +95,7 @@ export type MessageType =
   | 'partner_location'
   | 'partner_arrived'
   | 'partner_running_late'
-  
+
   // Sharing updates
   | 'share_created'
   | 'share_viewed'
@@ -104,32 +104,32 @@ export type MessageType =
   | 'share_revoked'
   | 'suggestion_received'
   | 'suggestion_responded'
-  
+
   // Trip updates
   | 'trip_updated'
   | 'trip_collaborator_joined'
   | 'trip_collaborator_left'
-  
+
   // Booking updates
   | 'booking_confirmed'
   | 'booking_updated'
   | 'booking_cancelled'
   | 'booking_reminder'
-  
+
   // Location updates
   | 'location_update'
   | 'geofence_enter'
   | 'geofence_exit'
-  
+
   // Notifications
   | 'notification'
   | 'notification_read'
-  
+
   // Presence
   | 'presence_update'
   | 'user_online'
   | 'user_offline'
-  
+
   // Errors
   | 'error';
 
@@ -353,12 +353,12 @@ export interface ErrorMessage extends BaseMessage {
 // ============================================================================
 
 export type ChannelType =
-  | 'user'           // Personal updates
-  | 'itinerary'      // Specific itinerary updates
-  | 'trip'           // Trip collaboration
-  | 'partner'        // Partner-specific updates
-  | 'booking'        // Booking status updates
-  | 'location'       // Location sharing
+  | 'user' // Personal updates
+  | 'itinerary' // Specific itinerary updates
+  | 'trip' // Trip collaboration
+  | 'partner' // Partner-specific updates
+  | 'booking' // Booking status updates
+  | 'location' // Location sharing
   | 'notifications'; // Push notification bridge
 
 export interface Channel {
@@ -380,11 +380,11 @@ export interface EventHandlers {
   onDisconnect?: (reason?: string) => void;
   onReconnecting?: (attempt: number) => void;
   onError?: (error: Error) => void;
-  
+
   // Authentication
   onAuthSuccess?: (sessionId: string) => void;
   onAuthError?: (error: { code: string; message: string }) => void;
-  
+
   // Generic message handler
   onMessage?: (message: BaseMessage) => void;
 }

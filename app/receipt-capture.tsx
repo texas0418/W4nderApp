@@ -82,10 +82,7 @@ const ReceiptCaptureScreen: React.FC<ReceiptCaptureScreenProps> = ({
   if (isProcessing) {
     return (
       <View style={styles.container}>
-        <LinearGradient
-          colors={['#667eea', '#764ba2']}
-          style={styles.processingContainer}
-        >
+        <LinearGradient colors={['#667eea', '#764ba2']} style={styles.processingContainer}>
           {capturedImageUri && (
             <Image
               source={{ uri: capturedImageUri }}
@@ -98,11 +95,9 @@ const ReceiptCaptureScreen: React.FC<ReceiptCaptureScreenProps> = ({
               <ActivityIndicator size="large" color="#667eea" />
               <Text style={styles.processingTitle}>Scanning Receipt</Text>
               <Text style={styles.processingMessage}>{getProgressMessage()}</Text>
-              
+
               <View style={styles.progressBar}>
-                <View
-                  style={[styles.progressFill, { width: `${getProgressPercent()}%` }]}
-                />
+                <View style={[styles.progressFill, { width: `${getProgressPercent()}%` }]} />
               </View>
               <Text style={styles.progressPercent}>{getProgressPercent()}%</Text>
             </View>
@@ -118,29 +113,20 @@ const ReceiptCaptureScreen: React.FC<ReceiptCaptureScreenProps> = ({
       <View style={styles.container}>
         <View style={styles.errorContainer}>
           {capturedImageUri && (
-            <Image
-              source={{ uri: capturedImageUri }}
-              style={styles.errorImage}
-            />
+            <Image source={{ uri: capturedImageUri }} style={styles.errorImage} />
           )}
           <View style={styles.errorCard}>
             <Text style={styles.errorIcon}>⚠️</Text>
             <Text style={styles.errorTitle}>Processing Failed</Text>
             <Text style={styles.errorMessage}>{processingError.message}</Text>
-            
+
             <View style={styles.errorActions}>
               {processingError.retryable && (
-                <TouchableOpacity
-                  style={styles.retryButton}
-                  onPress={handleRetry}
-                >
+                <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
                   <Text style={styles.retryButtonText}>Try Again</Text>
                 </TouchableOpacity>
               )}
-              <TouchableOpacity
-                style={styles.dismissButton}
-                onPress={handleDismissError}
-              >
+              <TouchableOpacity style={styles.dismissButton} onPress={handleDismissError}>
                 <Text style={styles.dismissButtonText}>Dismiss</Text>
               </TouchableOpacity>
             </View>
@@ -152,14 +138,8 @@ const ReceiptCaptureScreen: React.FC<ReceiptCaptureScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Scan Receipt</Text>
@@ -177,11 +157,10 @@ const ReceiptCaptureScreen: React.FC<ReceiptCaptureScreenProps> = ({
         {/* Instructions */}
         <View style={styles.instructionsCard}>
           <Text style={styles.instructionsIcon}>📸</Text>
-          <Text style={styles.instructionsTitle}>
-            Capture your receipt
-          </Text>
+          <Text style={styles.instructionsTitle}>Capture your receipt</Text>
           <Text style={styles.instructionsText}>
-            Take a clear photo of your receipt and we'll automatically extract the merchant, date, amount, and more.
+            Take a clear photo of your receipt and we'll automatically extract the merchant, date,
+            amount, and more.
           </Text>
         </View>
 
@@ -215,10 +194,7 @@ const ReceiptCaptureScreen: React.FC<ReceiptCaptureScreenProps> = ({
             <Text style={styles.captureButtonText}>Take Photo</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.galleryButton}
-            onPress={handlePickGallery}
-          >
+          <TouchableOpacity style={styles.galleryButton} onPress={handlePickGallery}>
             <Text style={styles.galleryButtonIcon}>🖼️</Text>
             <Text style={styles.galleryButtonText}>Choose from Gallery</Text>
           </TouchableOpacity>
@@ -231,7 +207,8 @@ const ReceiptCaptureScreen: React.FC<ReceiptCaptureScreenProps> = ({
             onPress={() => navigation?.navigate('ReceiptList')}
           >
             <Text style={styles.recentLinkText}>
-              📋 {pendingReceipts.length} receipt{pendingReceipts.length > 1 ? 's' : ''} pending review
+              📋 {pendingReceipts.length} receipt{pendingReceipts.length > 1 ? 's' : ''} pending
+              review
             </Text>
           </TouchableOpacity>
         )}

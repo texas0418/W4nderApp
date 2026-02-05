@@ -51,10 +51,7 @@ const PRICE_FILTERS: { value: PriceRange | 'all'; label: string }[] = [
   { value: '$$$$$', label: 'Ultra $$$$$' },
 ];
 
-export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
-  navigation,
-  route,
-}) => {
+export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({ navigation, route }) => {
   const { anniversaryId } = route.params;
   const { toggleSuggestionBookmark } = useAnniversary();
 
@@ -71,13 +68,13 @@ export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
     const ann = await anniversaryService.getAnniversaryById(anniversaryId);
     if (ann) {
       setAnniversary(ann);
-      
+
       const upcoming = await anniversaryService.getUpcomingAnniversaries(365);
-      const upcomingAnn = upcoming.find(u => u.anniversary.id === anniversaryId);
+      const upcomingAnn = upcoming.find((u) => u.anniversary.id === anniversaryId);
       if (upcomingAnn?.milestone) {
         setMilestone(upcomingAnn.milestone);
       }
-      
+
       const sugs = await anniversaryService.getSuggestionsForAnniversary(anniversaryId);
       setSuggestions(sugs);
     }
@@ -89,10 +86,8 @@ export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
 
   const handleToggleBookmark = async (suggestionId: string) => {
     await toggleSuggestionBookmark(suggestionId);
-    setSuggestions(prev =>
-      prev.map(s =>
-        s.id === suggestionId ? { ...s, isBookmarked: !s.isBookmarked } : s
-      )
+    setSuggestions((prev) =>
+      prev.map((s) => (s.id === suggestionId ? { ...s, isBookmarked: !s.isBookmarked } : s))
     );
   };
 
@@ -126,14 +121,14 @@ export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
     }
   };
 
-  const filteredSuggestions = suggestions.filter(s => {
+  const filteredSuggestions = suggestions.filter((s) => {
     if (selectedCategory !== 'all' && s.category !== selectedCategory) return false;
     if (selectedPrice !== 'all' && s.priceRange !== selectedPrice) return false;
     if (showBookmarked && !s.isBookmarked) return false;
     return true;
   });
 
-  const bookmarkedCount = suggestions.filter(s => s.isBookmarked).length;
+  const bookmarkedCount = suggestions.filter((s) => s.isBookmarked).length;
 
   const renderHeader = () => (
     <View>
@@ -178,34 +173,27 @@ export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
           {PRICE_FILTERS.map((item) => (
             <TouchableOpacity
               key={item.value}
-              style={[
-                styles.priceChip,
-                selectedPrice === item.value && styles.priceChipActive,
-              ]}
+              style={[styles.priceChip, selectedPrice === item.value && styles.priceChipActive]}
               onPress={() => setSelectedPrice(item.value)}
             >
-              <Text style={[
-                styles.priceChipText,
-                selectedPrice === item.value && styles.priceChipTextActive,
-              ]}>
+              <Text
+                style={[
+                  styles.priceChipText,
+                  selectedPrice === item.value && styles.priceChipTextActive,
+                ]}
+              >
                 {item.label}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
-        
+
         <TouchableOpacity
-          style={[
-            styles.bookmarkedToggle,
-            showBookmarked && styles.bookmarkedToggleActive,
-          ]}
+          style={[styles.bookmarkedToggle, showBookmarked && styles.bookmarkedToggleActive]}
           onPress={() => setShowBookmarked(!showBookmarked)}
         >
           <Text style={styles.bookmarkedIcon}>{showBookmarked ? '❤️' : '🤍'}</Text>
-          <Text style={[
-            styles.bookmarkedText,
-            showBookmarked && styles.bookmarkedTextActive,
-          ]}>
+          <Text style={[styles.bookmarkedText, showBookmarked && styles.bookmarkedTextActive]}>
             {bookmarkedCount}
           </Text>
         </TouchableOpacity>
@@ -224,9 +212,7 @@ export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyIcon}>🔍</Text>
       <Text style={styles.emptyTitle}>No ideas match your filters</Text>
-      <Text style={styles.emptySubtitle}>
-        Try adjusting your category or price filters
-      </Text>
+      <Text style={styles.emptySubtitle}>Try adjusting your category or price filters</Text>
       <TouchableOpacity
         style={styles.clearButton}
         onPress={() => {
@@ -281,27 +267,30 @@ export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
               <Text style={styles.modalClose}>Close</Text>
             </TouchableOpacity>
           </View>
-          
+
           {selectedSuggestion && (
             <ScrollView style={styles.modalContent}>
               <Text style={styles.modalIcon}>
-                {selectedSuggestion.category === 'restaurant' ? '🍽️' :
-                 selectedSuggestion.category === 'experience' ? '🎯' :
-                 selectedSuggestion.category === 'getaway' ? '🏝️' :
-                 selectedSuggestion.category === 'spa' ? '🧘' :
-                 selectedSuggestion.category === 'activity' ? '🎨' :
-                 selectedSuggestion.category === 'entertainment' ? '🎭' : '🎁'}
+                {selectedSuggestion.category === 'restaurant'
+                  ? '🍽️'
+                  : selectedSuggestion.category === 'experience'
+                    ? '🎯'
+                    : selectedSuggestion.category === 'getaway'
+                      ? '🏝️'
+                      : selectedSuggestion.category === 'spa'
+                        ? '🧘'
+                        : selectedSuggestion.category === 'activity'
+                          ? '🎨'
+                          : selectedSuggestion.category === 'entertainment'
+                            ? '🎭'
+                            : '🎁'}
               </Text>
               <Text style={styles.modalTitle}>{selectedSuggestion.title}</Text>
-              <Text style={styles.modalDescription}>
-                {selectedSuggestion.description}
-              </Text>
+              <Text style={styles.modalDescription}>{selectedSuggestion.description}</Text>
 
               <View style={styles.modalSection}>
                 <Text style={styles.modalSectionTitle}>Price Range</Text>
-                <Text style={styles.modalPrice}>
-                  {selectedSuggestion.priceRange}
-                </Text>
+                <Text style={styles.modalPrice}>{selectedSuggestion.priceRange}</Text>
               </View>
 
               <View style={styles.modalSection}>
@@ -317,15 +306,11 @@ export const SuggestionsScreen: React.FC<SuggestionsScreenProps> = ({
                   )}
                   <View style={styles.reasonItem}>
                     <Text style={styles.reasonIcon}>💝</Text>
-                    <Text style={styles.reasonText}>
-                      Creates lasting memories together
-                    </Text>
+                    <Text style={styles.reasonText}>Creates lasting memories together</Text>
                   </View>
                   <View style={styles.reasonItem}>
                     <Text style={styles.reasonIcon}>⭐</Text>
-                    <Text style={styles.reasonText}>
-                      Highly rated by other couples
-                    </Text>
+                    <Text style={styles.reasonText}>Highly rated by other couples</Text>
                   </View>
                 </View>
               </View>

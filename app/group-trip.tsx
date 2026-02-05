@@ -121,7 +121,14 @@ interface GroupExpense {
   description: string;
   amount: number;
   currency: string;
-  category: 'food' | 'transport' | 'accommodation' | 'activities' | 'shopping' | 'flights' | 'other';
+  category:
+    | 'food'
+    | 'transport'
+    | 'accommodation'
+    | 'activities'
+    | 'shopping'
+    | 'flights'
+    | 'other';
   paidById: string;
   paidByName: string;
   splitWith: string[];
@@ -270,7 +277,7 @@ const mockComments: Comment[] = [
     userId: '2',
     userName: 'Sarah',
     userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
-    text: 'Yes! I heard great things about it. Let\'s book for Day 2 dinner.',
+    text: "Yes! I heard great things about it. Let's book for Day 2 dinner.",
     timestamp: '2 hours ago',
   },
 ];
@@ -337,7 +344,7 @@ const mockVoteItems: VoteItem[] = [
   {
     id: '1',
     title: 'Visit the Louvre Museum',
-    description: 'Spend a full day exploring the world\'s largest art museum',
+    description: "Spend a full day exploring the world's largest art museum",
     category: 'activity',
     image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400',
     date: 'Day 2 - Morning',
@@ -359,9 +366,7 @@ const mockVoteItems: VoteItem[] = [
     image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400',
     date: 'Day 3 - Evening',
     location: 'Port de la Bourdonnais',
-    votes: [
-      { memberId: '2', memberName: 'Sarah', vote: 'yes' },
-    ],
+    votes: [{ memberId: '2', memberName: 'Sarah', vote: 'yes' }],
     deadline: 'Jan 26',
     status: 'active',
     createdBy: '2',
@@ -428,7 +433,9 @@ export default function GroupTripScreen() {
   const [selectedVoteItem, setSelectedVoteItem] = useState<VoteItem | null>(null);
   const [newVoteTitle, setNewVoteTitle] = useState('');
   const [newVoteDescription, setNewVoteDescription] = useState('');
-  const [newVoteCategory, setNewVoteCategory] = useState<'itinerary' | 'activity' | 'restaurant' | 'accommodation'>('activity');
+  const [newVoteCategory, setNewVoteCategory] = useState<
+    'itinerary' | 'activity' | 'restaurant' | 'accommodation'
+  >('activity');
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
   const [showSettlementsModal, setShowSettlementsModal] = useState(false);
   const [newExpenseDescription, setNewExpenseDescription] = useState('');
@@ -485,43 +492,35 @@ export default function GroupTripScreen() {
   };
 
   const handleUpdatePermission = (memberId: string, newRole: 'editor' | 'viewer') => {
-    setMembers(members.map(m => 
-      m.id === memberId ? { ...m, role: newRole } : m
-    ));
+    setMembers(members.map((m) => (m.id === memberId ? { ...m, role: newRole } : m)));
     setShowPermissionModal(false);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleRemoveMember = (memberId: string) => {
-    Alert.alert(
-      'Remove Member',
-      'Are you sure you want to remove this member from the trip?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
-          style: 'destructive',
-          onPress: () => {
-            setMembers(members.filter(m => m.id !== memberId));
-            setShowPermissionModal(false);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-          }
+    Alert.alert('Remove Member', 'Are you sure you want to remove this member from the trip?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => {
+          setMembers(members.filter((m) => m.id !== memberId));
+          setShowPermissionModal(false);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleToggleTask = (taskId: string) => {
-    setTasks(tasks.map(t => 
-      t.id === taskId ? { ...t, completed: !t.completed } : t
-    ));
+    setTasks(tasks.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t)));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return;
 
-    const assignee = members.find(m => m.id === newTaskAssignee);
+    const assignee = members.find((m) => m.id === newTaskAssignee);
     const newTask: TripTask = {
       id: `task-${Date.now()}`,
       title: newTaskTitle,
@@ -556,21 +555,23 @@ export default function GroupTripScreen() {
   };
 
   const handleVote = (itemId: string, vote: 'yes' | 'no' | 'maybe') => {
-    setVoteItems(voteItems.map(item => {
-      if (item.id === itemId) {
-        const existingVoteIndex = item.votes.findIndex(v => v.memberId === '1');
-        const newVotes = [...item.votes];
-        
-        if (existingVoteIndex >= 0) {
-          newVotes[existingVoteIndex] = { memberId: '1', memberName: 'You', vote };
-        } else {
-          newVotes.push({ memberId: '1', memberName: 'You', vote });
+    setVoteItems(
+      voteItems.map((item) => {
+        if (item.id === itemId) {
+          const existingVoteIndex = item.votes.findIndex((v) => v.memberId === '1');
+          const newVotes = [...item.votes];
+
+          if (existingVoteIndex >= 0) {
+            newVotes[existingVoteIndex] = { memberId: '1', memberName: 'You', vote };
+          } else {
+            newVotes.push({ memberId: '1', memberName: 'You', vote });
+          }
+
+          return { ...item, votes: newVotes };
         }
-        
-        return { ...item, votes: newVotes };
-      }
-      return item;
-    }));
+        return item;
+      })
+    );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
@@ -622,7 +623,7 @@ export default function GroupTripScreen() {
   const toggleSplitMember = (memberId: string) => {
     if (newExpenseSplitWith.includes(memberId)) {
       if (newExpenseSplitWith.length > 1) {
-        setNewExpenseSplitWith(newExpenseSplitWith.filter(id => id !== memberId));
+        setNewExpenseSplitWith(newExpenseSplitWith.filter((id) => id !== memberId));
       }
     } else {
       setNewExpenseSplitWith([...newExpenseSplitWith, memberId]);
@@ -632,18 +633,18 @@ export default function GroupTripScreen() {
 
   const calculateBalances = () => {
     const balances: { [key: string]: number } = {};
-    
-    acceptedMembers.forEach(member => {
+
+    acceptedMembers.forEach((member) => {
       balances[member.id] = 0;
     });
 
-    expenses.forEach(expense => {
+    expenses.forEach((expense) => {
       const splitCount = expense.splitWith.length;
       const sharePerPerson = expense.amount / splitCount;
 
       balances[expense.paidById] += expense.amount;
 
-      expense.splitWith.forEach(memberId => {
+      expense.splitWith.forEach((memberId) => {
         balances[memberId] -= sharePerPerson;
       });
     });
@@ -654,14 +655,14 @@ export default function GroupTripScreen() {
   const calculateSettlements = (): Settlement[] => {
     const balances = calculateBalances();
     const result: Settlement[] = [];
-    
+
     const debtors: { id: string; name: string; amount: number }[] = [];
     const creditors: { id: string; name: string; amount: number }[] = [];
 
     Object.entries(balances).forEach(([id, balance]) => {
-      const member = acceptedMembers.find(m => m.id === id);
+      const member = acceptedMembers.find((m) => m.id === id);
       if (!member) return;
-      
+
       if (balance < -0.01) {
         debtors.push({ id, name: member.name, amount: Math.abs(balance) });
       } else if (balance > 0.01) {
@@ -682,7 +683,7 @@ export default function GroupTripScreen() {
 
       if (amount > 0.01) {
         const existingSettlement = settlements.find(
-          s => s.fromId === debtor.id && s.toId === creditor.id
+          (s) => s.fromId === debtor.id && s.toId === creditor.id
         );
         result.push({
           fromId: debtor.id,
@@ -707,14 +708,14 @@ export default function GroupTripScreen() {
   const toggleSettlement = (fromId: string, toId: string) => {
     const updatedSettlements = [...settlements];
     const existingIndex = updatedSettlements.findIndex(
-      s => s.fromId === fromId && s.toId === toId
+      (s) => s.fromId === fromId && s.toId === toId
     );
 
     if (existingIndex >= 0) {
       updatedSettlements[existingIndex].settled = !updatedSettlements[existingIndex].settled;
     } else {
       const calculated = calculateSettlements();
-      const settlement = calculated.find(s => s.fromId === fromId && s.toId === toId);
+      const settlement = calculated.find((s) => s.fromId === fromId && s.toId === toId);
       if (settlement) {
         updatedSettlements.push({ ...settlement, settled: true });
       }
@@ -726,33 +727,49 @@ export default function GroupTripScreen() {
 
   const getExpenseCategoryIcon = (category: GroupExpense['category']) => {
     switch (category) {
-      case 'food': return Utensils;
-      case 'transport': return Car;
-      case 'accommodation': return Home;
-      case 'activities': return Sparkles;
-      case 'shopping': return ShoppingBag;
-      case 'flights': return Plane;
-      default: return Receipt;
+      case 'food':
+        return Utensils;
+      case 'transport':
+        return Car;
+      case 'accommodation':
+        return Home;
+      case 'activities':
+        return Sparkles;
+      case 'shopping':
+        return ShoppingBag;
+      case 'flights':
+        return Plane;
+      default:
+        return Receipt;
     }
   };
 
   const getExpenseCategoryColor = (category: GroupExpense['category']) => {
     switch (category) {
-      case 'food': return colors.warning;
-      case 'transport': return colors.primary;
-      case 'accommodation': return colors.secondary;
-      case 'activities': return colors.success;
-      case 'shopping': return '#E91E63';
-      case 'flights': return '#00BCD4';
-      default: return colors.textSecondary;
+      case 'food':
+        return colors.warning;
+      case 'transport':
+        return colors.primary;
+      case 'accommodation':
+        return colors.secondary;
+      case 'activities':
+        return colors.success;
+      case 'shopping':
+        return '#E91E63';
+      case 'flights':
+        return '#00BCD4';
+      default:
+        return colors.textSecondary;
     }
   };
 
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const myTotalPaid = expenses.filter(e => e.paidById === '1').reduce((sum, e) => sum + e.amount, 0);
+  const myTotalPaid = expenses
+    .filter((e) => e.paidById === '1')
+    .reduce((sum, e) => sum + e.amount, 0);
   const myShare = expenses.reduce((sum, e) => {
     if (e.splitWith.includes('1')) {
-      return sum + (e.amount / e.splitWith.length);
+      return sum + e.amount / e.splitWith.length;
     }
     return sum;
   }, 0);
@@ -760,34 +777,44 @@ export default function GroupTripScreen() {
 
   const getVoteCounts = (votes: VoteItem['votes']) => {
     return {
-      yes: votes.filter(v => v.vote === 'yes').length,
-      no: votes.filter(v => v.vote === 'no').length,
-      maybe: votes.filter(v => v.vote === 'maybe').length,
+      yes: votes.filter((v) => v.vote === 'yes').length,
+      no: votes.filter((v) => v.vote === 'no').length,
+      maybe: votes.filter((v) => v.vote === 'maybe').length,
     };
   };
 
   const getUserVote = (votes: VoteItem['votes']) => {
-    const userVote = votes.find(v => v.memberId === '1');
+    const userVote = votes.find((v) => v.memberId === '1');
     return userVote?.vote || null;
   };
 
   const getVoteCategoryIcon = (category: VoteItem['category']) => {
     switch (category) {
-      case 'itinerary': return Calendar;
-      case 'activity': return Sparkles;
-      case 'restaurant': return MapPin;
-      case 'accommodation': return MapPin;
-      default: return Sparkles;
+      case 'itinerary':
+        return Calendar;
+      case 'activity':
+        return Sparkles;
+      case 'restaurant':
+        return MapPin;
+      case 'accommodation':
+        return MapPin;
+      default:
+        return Sparkles;
     }
   };
 
   const getVoteCategoryColor = (category: VoteItem['category']) => {
     switch (category) {
-      case 'itinerary': return colors.primary;
-      case 'activity': return colors.secondary;
-      case 'restaurant': return colors.warning;
-      case 'accommodation': return colors.success;
-      default: return colors.primary;
+      case 'itinerary':
+        return colors.primary;
+      case 'activity':
+        return colors.secondary;
+      case 'restaurant':
+        return colors.warning;
+      case 'accommodation':
+        return colors.success;
+      default:
+        return colors.primary;
     }
   };
 
@@ -798,35 +825,48 @@ export default function GroupTripScreen() {
     });
   };
 
-  const acceptedMembers = members.filter(m => m.hasAccepted);
-  const pendingMembers = members.filter(m => !m.hasAccepted);
-  const completedTasks = tasks.filter(t => t.completed).length;
+  const acceptedMembers = members.filter((m) => m.hasAccepted);
+  const pendingMembers = members.filter((m) => !m.hasAccepted);
+  const completedTasks = tasks.filter((t) => t.completed).length;
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'organizer': return colors.warning;
-      case 'editor': return colors.primary;
-      case 'viewer': return colors.textSecondary;
-      default: return colors.textSecondary;
+      case 'organizer':
+        return colors.warning;
+      case 'editor':
+        return colors.primary;
+      case 'viewer':
+        return colors.textSecondary;
+      default:
+        return colors.textSecondary;
     }
   };
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'organizer': return 'Organizer';
-      case 'editor': return 'Can edit';
-      case 'viewer': return 'View only';
-      default: return role;
+      case 'organizer':
+        return 'Organizer';
+      case 'editor':
+        return 'Can edit';
+      case 'viewer':
+        return 'View only';
+      default:
+        return role;
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'booking': return colors.primary;
-      case 'planning': return colors.secondary;
-      case 'packing': return colors.warning;
-      case 'research': return colors.success;
-      default: return colors.textSecondary;
+      case 'booking':
+        return colors.primary;
+      case 'planning':
+        return colors.secondary;
+      case 'packing':
+        return colors.warning;
+      case 'research':
+        return colors.success;
+      default:
+        return colors.textSecondary;
     }
   };
 
@@ -838,14 +878,14 @@ export default function GroupTripScreen() {
             <View style={styles.onlineIndicator}>
               <View style={styles.onlineDot} />
               <Text style={styles.onlineText}>
-                {acceptedMembers.filter(m => m.isOnline).length} online now
+                {acceptedMembers.filter((m) => m.isOnline).length} online now
               </Text>
             </View>
 
             <View style={styles.membersList}>
-              {acceptedMembers.map(member => (
-                <Pressable 
-                  key={member.id} 
+              {acceptedMembers.map((member) => (
+                <Pressable
+                  key={member.id}
                   style={styles.memberCard}
                   onPress={() => {
                     if (member.role !== 'organizer') {
@@ -865,12 +905,15 @@ export default function GroupTripScreen() {
                   <View style={styles.memberInfo}>
                     <View style={styles.memberNameRow}>
                       <Text style={styles.memberName}>{member.name}</Text>
-                      {member.role === 'organizer' && (
-                        <Crown size={14} color={colors.warning} />
-                      )}
+                      {member.role === 'organizer' && <Crown size={14} color={colors.warning} />}
                     </View>
                     <View style={styles.memberMeta}>
-                      <View style={[styles.roleBadge, { backgroundColor: `${getRoleColor(member.role)}15` }]}>
+                      <View
+                        style={[
+                          styles.roleBadge,
+                          { backgroundColor: `${getRoleColor(member.role)}15` },
+                        ]}
+                      >
                         {member.role === 'editor' ? (
                           <Edit3 size={10} color={getRoleColor(member.role)} />
                         ) : member.role === 'viewer' ? (
@@ -896,7 +939,7 @@ export default function GroupTripScreen() {
               {pendingMembers.length > 0 && (
                 <>
                   <Text style={styles.pendingLabel}>Pending Invitations</Text>
-                  {pendingMembers.map(member => (
+                  {pendingMembers.map((member) => (
                     <View key={member.id} style={[styles.memberCard, styles.memberCardPending]}>
                       <Image
                         source={{ uri: member.avatar }}
@@ -906,7 +949,12 @@ export default function GroupTripScreen() {
                       <View style={styles.memberInfo}>
                         <Text style={styles.memberName}>{member.email}</Text>
                         <View style={styles.memberMeta}>
-                          <View style={[styles.roleBadge, { backgroundColor: `${getRoleColor(member.role)}15` }]}>
+                          <View
+                            style={[
+                              styles.roleBadge,
+                              { backgroundColor: `${getRoleColor(member.role)}15` },
+                            ]}
+                          >
                             {member.role === 'editor' ? (
                               <Edit3 size={10} color={getRoleColor(member.role)} />
                             ) : (
@@ -942,14 +990,11 @@ export default function GroupTripScreen() {
                       style={styles.activityAvatar}
                       contentFit="cover"
                     />
-                    {index < activities.length - 1 && (
-                      <View style={styles.activityLine} />
-                    )}
+                    {index < activities.length - 1 && <View style={styles.activityLine} />}
                   </View>
                   <View style={styles.activityContent}>
                     <Text style={styles.activityText}>
-                      <Text style={styles.activityUser}>{activity.userName}</Text>
-                      {' '}{activity.action}{' '}
+                      <Text style={styles.activityUser}>{activity.userName}</Text> {activity.action}{' '}
                       <Text style={styles.activityTarget}>{activity.target}</Text>
                     </Text>
                     <Text style={styles.activityTime}>{activity.timestamp}</Text>
@@ -967,7 +1012,7 @@ export default function GroupTripScreen() {
               <View>
                 <Text style={styles.votingTitle}>Group Decisions</Text>
                 <Text style={styles.votingSubtitle}>
-                  {voteItems.filter(v => v.status === 'active').length} active votes
+                  {voteItems.filter((v) => v.status === 'active').length} active votes
                 </Text>
               </View>
               <Pressable
@@ -980,7 +1025,7 @@ export default function GroupTripScreen() {
             </View>
 
             <View style={styles.votesList}>
-              {voteItems.map(item => {
+              {voteItems.map((item) => {
                 const counts = getVoteCounts(item.votes);
                 const userVote = getUserVote(item.votes);
                 const totalVotes = counts.yes + counts.no + counts.maybe;
@@ -990,7 +1035,10 @@ export default function GroupTripScreen() {
                 return (
                   <Pressable
                     key={item.id}
-                    style={[styles.voteCard, item.status === 'completed' && styles.voteCardCompleted]}
+                    style={[
+                      styles.voteCard,
+                      item.status === 'completed' && styles.voteCardCompleted,
+                    ]}
                     onPress={() => {
                       setSelectedVoteItem(item);
                       setShowVoteModal(true);
@@ -1005,7 +1053,12 @@ export default function GroupTripScreen() {
                     )}
                     <View style={styles.voteCardContent}>
                       <View style={styles.voteCardHeader}>
-                        <View style={[styles.voteCategoryBadge, { backgroundColor: `${categoryColor}15` }]}>
+                        <View
+                          style={[
+                            styles.voteCategoryBadge,
+                            { backgroundColor: `${categoryColor}15` },
+                          ]}
+                        >
                           <CategoryIcon size={12} color={categoryColor} />
                           <Text style={[styles.voteCategoryText, { color: categoryColor }]}>
                             {item.category}
@@ -1025,16 +1078,18 @@ export default function GroupTripScreen() {
                       </View>
 
                       <Text style={styles.voteItemTitle}>{item.title}</Text>
-                      {item.date && (
-                        <Text style={styles.voteItemDate}>{item.date}</Text>
-                      )}
+                      {item.date && <Text style={styles.voteItemDate}>{item.date}</Text>}
 
                       <View style={styles.voteProgress}>
                         <View style={styles.voteProgressBar}>
                           {totalVotes > 0 && (
                             <>
-                              <View style={[styles.voteProgressYes, { flex: counts.yes || 0.001 }]} />
-                              <View style={[styles.voteProgressMaybe, { flex: counts.maybe || 0.001 }]} />
+                              <View
+                                style={[styles.voteProgressYes, { flex: counts.yes || 0.001 }]}
+                              />
+                              <View
+                                style={[styles.voteProgressMaybe, { flex: counts.maybe || 0.001 }]}
+                              />
                               <View style={[styles.voteProgressNo, { flex: counts.no || 0.001 }]} />
                             </>
                           )}
@@ -1065,7 +1120,10 @@ export default function GroupTripScreen() {
                             ]}
                             onPress={() => handleVote(item.id, 'yes')}
                           >
-                            <ThumbsUp size={16} color={userVote === 'yes' ? colors.textLight : colors.success} />
+                            <ThumbsUp
+                              size={16}
+                              color={userVote === 'yes' ? colors.textLight : colors.success}
+                            />
                           </Pressable>
                           <Pressable
                             style={[
@@ -1075,7 +1133,10 @@ export default function GroupTripScreen() {
                             ]}
                             onPress={() => handleVote(item.id, 'maybe')}
                           >
-                            <HelpCircle size={16} color={userVote === 'maybe' ? colors.textLight : colors.warning} />
+                            <HelpCircle
+                              size={16}
+                              color={userVote === 'maybe' ? colors.textLight : colors.warning}
+                            />
                           </Pressable>
                           <Pressable
                             style={[
@@ -1085,7 +1146,10 @@ export default function GroupTripScreen() {
                             ]}
                             onPress={() => handleVote(item.id, 'no')}
                           >
-                            <ThumbsDown size={16} color={userVote === 'no' ? colors.textLight : colors.error} />
+                            <ThumbsDown
+                              size={16}
+                              color={userVote === 'no' ? colors.textLight : colors.error}
+                            />
                           </Pressable>
                         </View>
                       )}
@@ -1107,26 +1171,23 @@ export default function GroupTripScreen() {
                 </Text>
               </View>
               <View style={styles.taskProgressBar}>
-                <View 
+                <View
                   style={[
-                    styles.taskProgressFill, 
-                    { width: `${(completedTasks / tasks.length) * 100}%` }
-                  ]} 
+                    styles.taskProgressFill,
+                    { width: `${(completedTasks / tasks.length) * 100}%` },
+                  ]}
                 />
               </View>
             </View>
 
             <View style={styles.tasksList}>
-              {tasks.map(task => (
-                <Pressable 
-                  key={task.id} 
+              {tasks.map((task) => (
+                <Pressable
+                  key={task.id}
                   style={styles.taskCard}
                   onPress={() => handleToggleTask(task.id)}
                 >
-                  <Pressable 
-                    style={styles.taskCheck}
-                    onPress={() => handleToggleTask(task.id)}
-                  >
+                  <Pressable style={styles.taskCheck} onPress={() => handleToggleTask(task.id)}>
                     {task.completed ? (
                       <CheckCircle2 size={24} color={colors.success} />
                     ) : (
@@ -1134,15 +1195,19 @@ export default function GroupTripScreen() {
                     )}
                   </Pressable>
                   <View style={styles.taskInfo}>
-                    <Text style={[
-                      styles.taskTitle,
-                      task.completed && styles.taskTitleCompleted
-                    ]}>
+                    <Text style={[styles.taskTitle, task.completed && styles.taskTitleCompleted]}>
                       {task.title}
                     </Text>
                     <View style={styles.taskMeta}>
-                      <View style={[styles.categoryTag, { backgroundColor: `${getCategoryColor(task.category)}15` }]}>
-                        <Text style={[styles.categoryText, { color: getCategoryColor(task.category) }]}>
+                      <View
+                        style={[
+                          styles.categoryTag,
+                          { backgroundColor: `${getCategoryColor(task.category)}15` },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.categoryText, { color: getCategoryColor(task.category) }]}
+                        >
                           {task.category}
                         </Text>
                       </View>
@@ -1155,10 +1220,7 @@ export default function GroupTripScreen() {
               ))}
             </View>
 
-            <Pressable 
-              style={styles.addTaskButton}
-              onPress={() => setShowAddTaskModal(true)}
-            >
+            <Pressable style={styles.addTaskButton} onPress={() => setShowAddTaskModal(true)}>
               <ListTodo size={18} color={colors.primary} />
               <Text style={styles.addTaskText}>Add New Task</Text>
             </Pressable>
@@ -1184,10 +1246,12 @@ export default function GroupTripScreen() {
                 </View>
                 <View style={[styles.expenseSummarySmall, { flex: 1 }]}>
                   <Text style={styles.expenseSmallLabel}>Balance</Text>
-                  <Text style={[
-                    styles.expenseSmallAmount,
-                    { color: myBalance >= 0 ? colors.success : colors.error }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.expenseSmallAmount,
+                      { color: myBalance >= 0 ? colors.success : colors.error },
+                    ]}
+                  >
                     {myBalance >= 0 ? '+' : ''}€{myBalance.toFixed(2)}
                   </Text>
                 </View>
@@ -1202,24 +1266,21 @@ export default function GroupTripScreen() {
               <Text style={styles.settlementsButtonText}>View Settlements</Text>
               <View style={styles.settlementsBadge}>
                 <Text style={styles.settlementsBadgeText}>
-                  {calculateSettlements().filter(s => !s.settled).length} pending
+                  {calculateSettlements().filter((s) => !s.settled).length} pending
                 </Text>
               </View>
             </Pressable>
 
             <View style={styles.expensesHeader}>
               <Text style={styles.expensesTitle}>Recent Expenses</Text>
-              <Pressable
-                style={styles.addExpenseBtn}
-                onPress={() => setShowAddExpenseModal(true)}
-              >
+              <Pressable style={styles.addExpenseBtn} onPress={() => setShowAddExpenseModal(true)}>
                 <Plus size={16} color={colors.textLight} />
                 <Text style={styles.addExpenseBtnText}>Add</Text>
               </Pressable>
             </View>
 
             <View style={styles.expensesList}>
-              {expenses.map(expense => {
+              {expenses.map((expense) => {
                 const CategoryIcon = getExpenseCategoryIcon(expense.category);
                 const categoryColor = getExpenseCategoryColor(expense.category);
                 const splitCount = expense.splitWith.length;
@@ -1227,15 +1288,18 @@ export default function GroupTripScreen() {
 
                 return (
                   <View key={expense.id} style={styles.expenseCard}>
-                    <View style={[styles.expenseIconContainer, { backgroundColor: `${categoryColor}15` }]}>
+                    <View
+                      style={[
+                        styles.expenseIconContainer,
+                        { backgroundColor: `${categoryColor}15` },
+                      ]}
+                    >
                       <CategoryIcon size={20} color={categoryColor} />
                     </View>
                     <View style={styles.expenseInfo}>
                       <Text style={styles.expenseDescription}>{expense.description}</Text>
                       <View style={styles.expenseMeta}>
-                        <Text style={styles.expensePaidBy}>
-                          Paid by {expense.paidByName}
-                        </Text>
+                        <Text style={styles.expensePaidBy}>Paid by {expense.paidByName}</Text>
                         <Text style={styles.expenseDate}>{expense.date}</Text>
                       </View>
                       <View style={styles.expenseSplitInfo}>
@@ -1247,7 +1311,12 @@ export default function GroupTripScreen() {
                     </View>
                     <View style={styles.expenseAmountContainer}>
                       <Text style={styles.expenseAmount}>€{expense.amount.toFixed(2)}</Text>
-                      <View style={[styles.expenseCategoryTag, { backgroundColor: `${categoryColor}15` }]}>
+                      <View
+                        style={[
+                          styles.expenseCategoryTag,
+                          { backgroundColor: `${categoryColor}15` },
+                        ]}
+                      >
                         <Text style={[styles.expenseCategoryText, { color: categoryColor }]}>
                           {expense.category}
                         </Text>
@@ -1264,7 +1333,7 @@ export default function GroupTripScreen() {
         return (
           <View style={styles.tabContent}>
             <View style={styles.commentsList}>
-              {comments.map(comment => (
+              {comments.map((comment) => (
                 <View key={comment.id} style={styles.commentCard}>
                   <Image
                     source={{ uri: comment.userAvatar }}
@@ -1291,15 +1360,15 @@ export default function GroupTripScreen() {
                 onChangeText={setNewComment}
                 multiline
               />
-              <Pressable 
-                style={[
-                  styles.sendButton,
-                  !newComment.trim() && styles.sendButtonDisabled
-                ]}
+              <Pressable
+                style={[styles.sendButton, !newComment.trim() && styles.sendButtonDisabled]}
                 onPress={handleSendComment}
                 disabled={!newComment.trim()}
               >
-                <Send size={20} color={newComment.trim() ? colors.textLight : colors.textTertiary} />
+                <Send
+                  size={20}
+                  color={newComment.trim() ? colors.textLight : colors.textTertiary}
+                />
               </Pressable>
             </View>
           </View>
@@ -1309,20 +1378,14 @@ export default function GroupTripScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#1a5f4a', '#2d8a6e']}
-        style={styles.headerGradient}
-      />
+      <LinearGradient colors={['#1a5f4a', '#2d8a6e']} style={styles.headerGradient} />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <Pressable style={styles.backButton} onPress={() => router.back()}>
               <ArrowLeft size={22} color={colors.textLight} />
             </Pressable>
-            <Pressable 
-              style={styles.shareButton} 
-              onPress={() => setShowShareModal(true)}
-            >
+            <Pressable style={styles.shareButton} onPress={() => setShowShareModal(true)}>
               <Share2 size={20} color={colors.textLight} />
             </Pressable>
           </View>
@@ -1340,37 +1403,25 @@ export default function GroupTripScreen() {
 
         <View style={styles.content}>
           <View style={styles.quickActions}>
-            <Pressable 
-              style={styles.quickAction}
-              onPress={() => setShowInviteModal(true)}
-            >
+            <Pressable style={styles.quickAction} onPress={() => setShowInviteModal(true)}>
               <View style={[styles.quickActionIcon, { backgroundColor: `${colors.primary}15` }]}>
                 <UserPlus size={20} color={colors.primary} />
               </View>
               <Text style={styles.quickActionText}>Invite</Text>
             </Pressable>
-            <Pressable 
-              style={styles.quickAction}
-              onPress={() => setShowShareModal(true)}
-            >
+            <Pressable style={styles.quickAction} onPress={() => setShowShareModal(true)}>
               <View style={[styles.quickActionIcon, { backgroundColor: `${colors.secondary}15` }]}>
                 <Link size={20} color={colors.secondary} />
               </View>
               <Text style={styles.quickActionText}>Share Link</Text>
             </Pressable>
-            <Pressable 
-              style={styles.quickAction}
-              onPress={() => setActiveTab('voting')}
-            >
+            <Pressable style={styles.quickAction} onPress={() => setActiveTab('voting')}>
               <View style={[styles.quickActionIcon, { backgroundColor: `${colors.success}15` }]}>
                 <Vote size={20} color={colors.success} />
               </View>
               <Text style={styles.quickActionText}>Vote</Text>
             </Pressable>
-            <Pressable 
-              style={styles.quickAction}
-              onPress={() => setActiveTab('expenses')}
-            >
+            <Pressable style={styles.quickAction} onPress={() => setActiveTab('expenses')}>
               <View style={[styles.quickActionIcon, { backgroundColor: `${colors.warning}15` }]}>
                 <DollarSign size={20} color={colors.warning} />
               </View>
@@ -1378,44 +1429,73 @@ export default function GroupTripScreen() {
             </Pressable>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabBar} contentContainerStyle={styles.tabBarContent}>
-            {(['members', 'activity', 'tasks', 'voting', 'expenses', 'comments'] as TabType[]).map(tab => (
-              <Pressable
-                key={tab}
-                style={[styles.tab, activeTab === tab && styles.tabActive]}
-                onPress={() => setActiveTab(tab)}
-              >
-                {tab === 'members' && <Users size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />}
-                {tab === 'activity' && <Activity size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />}
-                {tab === 'tasks' && <ListTodo size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />}
-                {tab === 'voting' && <Vote size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />}
-                {tab === 'expenses' && <Receipt size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />}
-                {tab === 'comments' && <MessageCircle size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />}
-                <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </Text>
-              </Pressable>
-            ))}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.tabBar}
+            contentContainerStyle={styles.tabBarContent}
+          >
+            {(['members', 'activity', 'tasks', 'voting', 'expenses', 'comments'] as TabType[]).map(
+              (tab) => (
+                <Pressable
+                  key={tab}
+                  style={[styles.tab, activeTab === tab && styles.tabActive]}
+                  onPress={() => setActiveTab(tab)}
+                >
+                  {tab === 'members' && (
+                    <Users
+                      size={16}
+                      color={activeTab === tab ? colors.primary : colors.textSecondary}
+                    />
+                  )}
+                  {tab === 'activity' && (
+                    <Activity
+                      size={16}
+                      color={activeTab === tab ? colors.primary : colors.textSecondary}
+                    />
+                  )}
+                  {tab === 'tasks' && (
+                    <ListTodo
+                      size={16}
+                      color={activeTab === tab ? colors.primary : colors.textSecondary}
+                    />
+                  )}
+                  {tab === 'voting' && (
+                    <Vote
+                      size={16}
+                      color={activeTab === tab ? colors.primary : colors.textSecondary}
+                    />
+                  )}
+                  {tab === 'expenses' && (
+                    <Receipt
+                      size={16}
+                      color={activeTab === tab ? colors.primary : colors.textSecondary}
+                    />
+                  )}
+                  {tab === 'comments' && (
+                    <MessageCircle
+                      size={16}
+                      color={activeTab === tab ? colors.primary : colors.textSecondary}
+                    />
+                  )}
+                  <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </Text>
+                </Pressable>
+              )
+            )}
           </ScrollView>
 
-          <ScrollView 
-            style={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
             {renderTabContent()}
             <View style={styles.spacer} />
           </ScrollView>
         </View>
 
         <View style={styles.footer}>
-          <Pressable
-            style={styles.startButton}
-            onPress={handleStartPlanning}
-          >
+          <Pressable style={styles.startButton} onPress={handleStartPlanning}>
             <Sparkles size={20} color={colors.textLight} />
-            <Text style={styles.startButtonText}>
-              Continue Planning
-            </Text>
+            <Text style={styles.startButtonText}>Continue Planning</Text>
           </Pressable>
         </View>
 
@@ -1425,11 +1505,8 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowInviteModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowInviteModal(false)}
-          >
-            <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowInviteModal(false)}>
+            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Invite Member</Text>
                 <Pressable onPress={() => setShowInviteModal(false)}>
@@ -1459,21 +1536,22 @@ export default function GroupTripScreen() {
                   ]}
                   onPress={() => setInvitePermission('editor')}
                 >
-                  <Edit3 size={18} color={invitePermission === 'editor' ? colors.primary : colors.textSecondary} />
+                  <Edit3
+                    size={18}
+                    color={invitePermission === 'editor' ? colors.primary : colors.textSecondary}
+                  />
                   <View style={styles.permissionInfo}>
-                    <Text style={[
-                      styles.permissionTitle,
-                      invitePermission === 'editor' && styles.permissionTitleActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.permissionTitle,
+                        invitePermission === 'editor' && styles.permissionTitleActive,
+                      ]}
+                    >
                       Can Edit
                     </Text>
-                    <Text style={styles.permissionDesc}>
-                      Add activities, make bookings
-                    </Text>
+                    <Text style={styles.permissionDesc}>Add activities, make bookings</Text>
                   </View>
-                  {invitePermission === 'editor' && (
-                    <Check size={18} color={colors.primary} />
-                  )}
+                  {invitePermission === 'editor' && <Check size={18} color={colors.primary} />}
                 </Pressable>
 
                 <Pressable
@@ -1483,29 +1561,27 @@ export default function GroupTripScreen() {
                   ]}
                   onPress={() => setInvitePermission('viewer')}
                 >
-                  <Eye size={18} color={invitePermission === 'viewer' ? colors.primary : colors.textSecondary} />
+                  <Eye
+                    size={18}
+                    color={invitePermission === 'viewer' ? colors.primary : colors.textSecondary}
+                  />
                   <View style={styles.permissionInfo}>
-                    <Text style={[
-                      styles.permissionTitle,
-                      invitePermission === 'viewer' && styles.permissionTitleActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.permissionTitle,
+                        invitePermission === 'viewer' && styles.permissionTitleActive,
+                      ]}
+                    >
                       View Only
                     </Text>
-                    <Text style={styles.permissionDesc}>
-                      Can view itinerary, comment
-                    </Text>
+                    <Text style={styles.permissionDesc}>Can view itinerary, comment</Text>
                   </View>
-                  {invitePermission === 'viewer' && (
-                    <Check size={18} color={colors.primary} />
-                  )}
+                  {invitePermission === 'viewer' && <Check size={18} color={colors.primary} />}
                 </Pressable>
               </View>
 
               <Pressable
-                style={[
-                  styles.inviteButton,
-                  !inviteEmail && styles.inviteButtonDisabled,
-                ]}
+                style={[styles.inviteButton, !inviteEmail && styles.inviteButtonDisabled]}
                 onPress={handleInvite}
                 disabled={!inviteEmail}
               >
@@ -1521,11 +1597,8 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowShareModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowShareModal(false)}
-          >
-            <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowShareModal(false)}>
+            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Share Trip</Text>
                 <Pressable onPress={() => setShowShareModal(false)}>
@@ -1539,7 +1612,9 @@ export default function GroupTripScreen() {
                 </View>
                 <View style={styles.shareInfo}>
                   <Text style={styles.shareLabel}>Share Link</Text>
-                  <Text style={styles.shareValue} numberOfLines={1}>{shareLink}</Text>
+                  <Text style={styles.shareValue} numberOfLines={1}>
+                    {shareLink}
+                  </Text>
                 </View>
                 <Pressable style={styles.copyButton} onPress={handleCopyLink}>
                   <Copy size={18} color={colors.primary} />
@@ -1547,7 +1622,9 @@ export default function GroupTripScreen() {
               </View>
 
               <View style={styles.shareOption}>
-                <View style={[styles.shareIconContainer, { backgroundColor: `${colors.secondary}15` }]}>
+                <View
+                  style={[styles.shareIconContainer, { backgroundColor: `${colors.secondary}15` }]}
+                >
                   <MessageSquare size={22} color={colors.secondary} />
                 </View>
                 <View style={styles.shareInfo}>
@@ -1559,10 +1636,7 @@ export default function GroupTripScreen() {
                 </Pressable>
               </View>
 
-              <Pressable
-                style={styles.nativeShareButton}
-                onPress={handleNativeShare}
-              >
+              <Pressable style={styles.nativeShareButton} onPress={handleNativeShare}>
                 <Share2 size={20} color={colors.textLight} />
                 <Text style={styles.nativeShareText}>Share via...</Text>
               </Pressable>
@@ -1576,11 +1650,8 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowPermissionModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowPermissionModal(false)}
-          >
-            <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowPermissionModal(false)}>
+            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Member Settings</Text>
                 <Pressable onPress={() => setShowPermissionModal(false)}>
@@ -1611,12 +1682,19 @@ export default function GroupTripScreen() {
                       ]}
                       onPress={() => handleUpdatePermission(selectedMember.id, 'editor')}
                     >
-                      <Edit3 size={18} color={selectedMember.role === 'editor' ? colors.primary : colors.textSecondary} />
+                      <Edit3
+                        size={18}
+                        color={
+                          selectedMember.role === 'editor' ? colors.primary : colors.textSecondary
+                        }
+                      />
                       <View style={styles.permissionInfo}>
-                        <Text style={[
-                          styles.permissionTitle,
-                          selectedMember.role === 'editor' && styles.permissionTitleActive
-                        ]}>
+                        <Text
+                          style={[
+                            styles.permissionTitle,
+                            selectedMember.role === 'editor' && styles.permissionTitleActive,
+                          ]}
+                        >
                           Can Edit
                         </Text>
                       </View>
@@ -1632,12 +1710,19 @@ export default function GroupTripScreen() {
                       ]}
                       onPress={() => handleUpdatePermission(selectedMember.id, 'viewer')}
                     >
-                      <Eye size={18} color={selectedMember.role === 'viewer' ? colors.primary : colors.textSecondary} />
+                      <Eye
+                        size={18}
+                        color={
+                          selectedMember.role === 'viewer' ? colors.primary : colors.textSecondary
+                        }
+                      />
                       <View style={styles.permissionInfo}>
-                        <Text style={[
-                          styles.permissionTitle,
-                          selectedMember.role === 'viewer' && styles.permissionTitleActive
-                        ]}>
+                        <Text
+                          style={[
+                            styles.permissionTitle,
+                            selectedMember.role === 'viewer' && styles.permissionTitleActive,
+                          ]}
+                        >
                           View Only
                         </Text>
                       </View>
@@ -1666,11 +1751,8 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowAddTaskModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowAddTaskModal(false)}
-          >
-            <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowAddTaskModal(false)}>
+            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Add Task</Text>
                 <Pressable onPress={() => setShowAddTaskModal(false)}>
@@ -1690,8 +1772,12 @@ export default function GroupTripScreen() {
               </View>
 
               <Text style={styles.permissionLabel}>Assign To</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.assigneeList}>
-                {acceptedMembers.map(member => (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.assigneeList}
+              >
+                {acceptedMembers.map((member) => (
                   <Pressable
                     key={member.id}
                     style={[
@@ -1705,10 +1791,12 @@ export default function GroupTripScreen() {
                       style={styles.assigneeAvatar}
                       contentFit="cover"
                     />
-                    <Text style={[
-                      styles.assigneeName,
-                      newTaskAssignee === member.id && styles.assigneeNameActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.assigneeName,
+                        newTaskAssignee === member.id && styles.assigneeNameActive,
+                      ]}
+                    >
                       {member.name}
                     </Text>
                   </Pressable>
@@ -1716,10 +1804,7 @@ export default function GroupTripScreen() {
               </ScrollView>
 
               <Pressable
-                style={[
-                  styles.inviteButton,
-                  !newTaskTitle.trim() && styles.inviteButtonDisabled,
-                ]}
+                style={[styles.inviteButton, !newTaskTitle.trim() && styles.inviteButtonDisabled]}
                 onPress={handleAddTask}
                 disabled={!newTaskTitle.trim()}
               >
@@ -1735,202 +1820,300 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowVoteModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowVoteModal(false)}
-          >
-            <Pressable style={styles.voteModalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowVoteModal(false)}>
+            <Pressable style={styles.voteModalContent} onPress={(e) => e.stopPropagation()}>
               <ScrollView showsVerticalScrollIndicator={false}>
-              {selectedVoteItem && (
-                <>
-                  <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>Vote Details</Text>
-                    <Pressable onPress={() => setShowVoteModal(false)}>
-                      <X size={24} color={colors.text} />
-                    </Pressable>
-                  </View>
-
-                  {selectedVoteItem.image && (
-                    <Image
-                      source={{ uri: selectedVoteItem.image }}
-                      style={styles.voteModalImage}
-                      contentFit="cover"
-                    />
-                  )}
-
-                  <Text style={styles.voteModalTitle}>{selectedVoteItem.title}</Text>
-                  <Text style={styles.voteModalDescription}>{selectedVoteItem.description}</Text>
-
-                  {selectedVoteItem.location && (
-                    <View style={styles.voteModalInfo}>
-                      <MapPin size={14} color={colors.textSecondary} />
-                      <Text style={styles.voteModalInfoText}>{selectedVoteItem.location}</Text>
-                    </View>
-                  )}
-                  {selectedVoteItem.date && (
-                    <View style={styles.voteModalInfo}>
-                      <Calendar size={14} color={colors.textSecondary} />
-                      <Text style={styles.voteModalInfoText}>{selectedVoteItem.date}</Text>
-                    </View>
-                  )}
-
-                  <View style={styles.voteResultsSection}>
-                    <View style={styles.voteResultsHeader}>
-                      <BarChart3 size={18} color={colors.text} />
-                      <Text style={styles.voteResultsTitle}>Vote Results</Text>
+                {selectedVoteItem && (
+                  <>
+                    <View style={styles.modalHeader}>
+                      <Text style={styles.modalTitle}>Vote Details</Text>
+                      <Pressable onPress={() => setShowVoteModal(false)}>
+                        <X size={24} color={colors.text} />
+                      </Pressable>
                     </View>
 
-                    {(() => {
-                      const counts = getVoteCounts(selectedVoteItem.votes);
-                      const total = Math.max(counts.yes + counts.no + counts.maybe, 1);
-                      return (
-                        <View style={styles.voteResultsBars}>
-                          <View style={styles.voteResultRow}>
-                            <View style={styles.voteResultLabel}>
-                              <ThumbsUp size={14} color={colors.success} />
-                              <Text style={styles.voteResultLabelText}>Yes</Text>
-                            </View>
-                            <View style={styles.voteResultBarContainer}>
-                              <View style={[styles.voteResultBar, styles.voteResultBarYes, { width: `${(counts.yes / total) * 100}%` }]} />
-                            </View>
-                            <Text style={styles.voteResultCount}>{counts.yes}</Text>
-                          </View>
-                          <View style={styles.voteResultRow}>
-                            <View style={styles.voteResultLabel}>
-                              <HelpCircle size={14} color={colors.warning} />
-                              <Text style={styles.voteResultLabelText}>Maybe</Text>
-                            </View>
-                            <View style={styles.voteResultBarContainer}>
-                              <View style={[styles.voteResultBar, styles.voteResultBarMaybe, { width: `${(counts.maybe / total) * 100}%` }]} />
-                            </View>
-                            <Text style={styles.voteResultCount}>{counts.maybe}</Text>
-                          </View>
-                          <View style={styles.voteResultRow}>
-                            <View style={styles.voteResultLabel}>
-                              <ThumbsDown size={14} color={colors.error} />
-                              <Text style={styles.voteResultLabelText}>No</Text>
-                            </View>
-                            <View style={styles.voteResultBarContainer}>
-                              <View style={[styles.voteResultBar, styles.voteResultBarNo, { width: `${(counts.no / total) * 100}%` }]} />
-                            </View>
-                            <Text style={styles.voteResultCount}>{counts.no}</Text>
-                          </View>
-                        </View>
-                      );
-                    })()}
-                  </View>
-
-                  <View style={styles.votersSection}>
-                    <Text style={styles.votersSectionTitle}>Who Voted</Text>
-                    {selectedVoteItem.votes.map(vote => (
-                      <View key={vote.memberId} style={styles.voterRow}>
-                        <View style={styles.voterInfo}>
-                          <Image
-                            source={{ uri: members.find(m => m.id === vote.memberId)?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200' }}
-                            style={styles.voterAvatar}
-                            contentFit="cover"
-                          />
-                          <Text style={styles.voterName}>{vote.memberName}</Text>
-                        </View>
-                        <View style={[
-                          styles.voterBadge,
-                          vote.vote === 'yes' && styles.voterBadgeYes,
-                          vote.vote === 'maybe' && styles.voterBadgeMaybe,
-                          vote.vote === 'no' && styles.voterBadgeNo,
-                        ]}>
-                          {vote.vote === 'yes' && <ThumbsUp size={12} color={colors.success} />}
-                          {vote.vote === 'maybe' && <HelpCircle size={12} color={colors.warning} />}
-                          {vote.vote === 'no' && <ThumbsDown size={12} color={colors.error} />}
-                          <Text style={[
-                            styles.voterBadgeText,
-                            vote.vote === 'yes' && { color: colors.success },
-                            vote.vote === 'maybe' && { color: colors.warning },
-                            vote.vote === 'no' && { color: colors.error },
-                          ]}>
-                            {vote.vote.charAt(0).toUpperCase() + vote.vote.slice(1)}
-                          </Text>
-                        </View>
-                      </View>
-                    ))}
-                    {acceptedMembers.filter(m => !selectedVoteItem.votes.find(v => v.memberId === m.id)).length > 0 && (
-                      <Text style={styles.notVotedText}>
-                        {acceptedMembers.filter(m => !selectedVoteItem.votes.find(v => v.memberId === m.id)).length} member(s) have not voted yet
-                      </Text>
+                    {selectedVoteItem.image && (
+                      <Image
+                        source={{ uri: selectedVoteItem.image }}
+                        style={styles.voteModalImage}
+                        contentFit="cover"
+                      />
                     )}
-                  </View>
 
-                  {selectedVoteItem.status === 'active' && (
-                    <View style={styles.modalVoteButtons}>
-                      <Pressable
-                        style={[
-                          styles.modalVoteBtn,
-                          styles.modalVoteBtnYes,
-                          getUserVote(selectedVoteItem.votes) === 'yes' && styles.modalVoteBtnYesActive,
-                        ]}
-                        onPress={() => {
-                          handleVote(selectedVoteItem.id, 'yes');
-                          setSelectedVoteItem({
-                            ...selectedVoteItem,
-                            votes: selectedVoteItem.votes.some(v => v.memberId === '1')
-                              ? selectedVoteItem.votes.map(v => v.memberId === '1' ? { ...v, vote: 'yes' } : v)
-                              : [...selectedVoteItem.votes, { memberId: '1', memberName: 'You', vote: 'yes' }]
-                          });
-                        }}
-                      >
-                        <ThumbsUp size={20} color={getUserVote(selectedVoteItem.votes) === 'yes' ? colors.textLight : colors.success} />
-                        <Text style={[
-                          styles.modalVoteBtnText,
-                          { color: getUserVote(selectedVoteItem.votes) === 'yes' ? colors.textLight : colors.success }
-                        ]}>Yes</Text>
-                      </Pressable>
-                      <Pressable
-                        style={[
-                          styles.modalVoteBtn,
-                          styles.modalVoteBtnMaybe,
-                          getUserVote(selectedVoteItem.votes) === 'maybe' && styles.modalVoteBtnMaybeActive,
-                        ]}
-                        onPress={() => {
-                          handleVote(selectedVoteItem.id, 'maybe');
-                          setSelectedVoteItem({
-                            ...selectedVoteItem,
-                            votes: selectedVoteItem.votes.some(v => v.memberId === '1')
-                              ? selectedVoteItem.votes.map(v => v.memberId === '1' ? { ...v, vote: 'maybe' } : v)
-                              : [...selectedVoteItem.votes, { memberId: '1', memberName: 'You', vote: 'maybe' }]
-                          });
-                        }}
-                      >
-                        <HelpCircle size={20} color={getUserVote(selectedVoteItem.votes) === 'maybe' ? colors.textLight : colors.warning} />
-                        <Text style={[
-                          styles.modalVoteBtnText,
-                          { color: getUserVote(selectedVoteItem.votes) === 'maybe' ? colors.textLight : colors.warning }
-                        ]}>Maybe</Text>
-                      </Pressable>
-                      <Pressable
-                        style={[
-                          styles.modalVoteBtn,
-                          styles.modalVoteBtnNo,
-                          getUserVote(selectedVoteItem.votes) === 'no' && styles.modalVoteBtnNoActive,
-                        ]}
-                        onPress={() => {
-                          handleVote(selectedVoteItem.id, 'no');
-                          setSelectedVoteItem({
-                            ...selectedVoteItem,
-                            votes: selectedVoteItem.votes.some(v => v.memberId === '1')
-                              ? selectedVoteItem.votes.map(v => v.memberId === '1' ? { ...v, vote: 'no' } : v)
-                              : [...selectedVoteItem.votes, { memberId: '1', memberName: 'You', vote: 'no' }]
-                          });
-                        }}
-                      >
-                        <ThumbsDown size={20} color={getUserVote(selectedVoteItem.votes) === 'no' ? colors.textLight : colors.error} />
-                        <Text style={[
-                          styles.modalVoteBtnText,
-                          { color: getUserVote(selectedVoteItem.votes) === 'no' ? colors.textLight : colors.error }
-                        ]}>No</Text>
-                      </Pressable>
+                    <Text style={styles.voteModalTitle}>{selectedVoteItem.title}</Text>
+                    <Text style={styles.voteModalDescription}>{selectedVoteItem.description}</Text>
+
+                    {selectedVoteItem.location && (
+                      <View style={styles.voteModalInfo}>
+                        <MapPin size={14} color={colors.textSecondary} />
+                        <Text style={styles.voteModalInfoText}>{selectedVoteItem.location}</Text>
+                      </View>
+                    )}
+                    {selectedVoteItem.date && (
+                      <View style={styles.voteModalInfo}>
+                        <Calendar size={14} color={colors.textSecondary} />
+                        <Text style={styles.voteModalInfoText}>{selectedVoteItem.date}</Text>
+                      </View>
+                    )}
+
+                    <View style={styles.voteResultsSection}>
+                      <View style={styles.voteResultsHeader}>
+                        <BarChart3 size={18} color={colors.text} />
+                        <Text style={styles.voteResultsTitle}>Vote Results</Text>
+                      </View>
+
+                      {(() => {
+                        const counts = getVoteCounts(selectedVoteItem.votes);
+                        const total = Math.max(counts.yes + counts.no + counts.maybe, 1);
+                        return (
+                          <View style={styles.voteResultsBars}>
+                            <View style={styles.voteResultRow}>
+                              <View style={styles.voteResultLabel}>
+                                <ThumbsUp size={14} color={colors.success} />
+                                <Text style={styles.voteResultLabelText}>Yes</Text>
+                              </View>
+                              <View style={styles.voteResultBarContainer}>
+                                <View
+                                  style={[
+                                    styles.voteResultBar,
+                                    styles.voteResultBarYes,
+                                    { width: `${(counts.yes / total) * 100}%` },
+                                  ]}
+                                />
+                              </View>
+                              <Text style={styles.voteResultCount}>{counts.yes}</Text>
+                            </View>
+                            <View style={styles.voteResultRow}>
+                              <View style={styles.voteResultLabel}>
+                                <HelpCircle size={14} color={colors.warning} />
+                                <Text style={styles.voteResultLabelText}>Maybe</Text>
+                              </View>
+                              <View style={styles.voteResultBarContainer}>
+                                <View
+                                  style={[
+                                    styles.voteResultBar,
+                                    styles.voteResultBarMaybe,
+                                    { width: `${(counts.maybe / total) * 100}%` },
+                                  ]}
+                                />
+                              </View>
+                              <Text style={styles.voteResultCount}>{counts.maybe}</Text>
+                            </View>
+                            <View style={styles.voteResultRow}>
+                              <View style={styles.voteResultLabel}>
+                                <ThumbsDown size={14} color={colors.error} />
+                                <Text style={styles.voteResultLabelText}>No</Text>
+                              </View>
+                              <View style={styles.voteResultBarContainer}>
+                                <View
+                                  style={[
+                                    styles.voteResultBar,
+                                    styles.voteResultBarNo,
+                                    { width: `${(counts.no / total) * 100}%` },
+                                  ]}
+                                />
+                              </View>
+                              <Text style={styles.voteResultCount}>{counts.no}</Text>
+                            </View>
+                          </View>
+                        );
+                      })()}
                     </View>
-                  )}
-                </>
-              )}
+
+                    <View style={styles.votersSection}>
+                      <Text style={styles.votersSectionTitle}>Who Voted</Text>
+                      {selectedVoteItem.votes.map((vote) => (
+                        <View key={vote.memberId} style={styles.voterRow}>
+                          <View style={styles.voterInfo}>
+                            <Image
+                              source={{
+                                uri:
+                                  members.find((m) => m.id === vote.memberId)?.avatar ||
+                                  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200',
+                              }}
+                              style={styles.voterAvatar}
+                              contentFit="cover"
+                            />
+                            <Text style={styles.voterName}>{vote.memberName}</Text>
+                          </View>
+                          <View
+                            style={[
+                              styles.voterBadge,
+                              vote.vote === 'yes' && styles.voterBadgeYes,
+                              vote.vote === 'maybe' && styles.voterBadgeMaybe,
+                              vote.vote === 'no' && styles.voterBadgeNo,
+                            ]}
+                          >
+                            {vote.vote === 'yes' && <ThumbsUp size={12} color={colors.success} />}
+                            {vote.vote === 'maybe' && (
+                              <HelpCircle size={12} color={colors.warning} />
+                            )}
+                            {vote.vote === 'no' && <ThumbsDown size={12} color={colors.error} />}
+                            <Text
+                              style={[
+                                styles.voterBadgeText,
+                                vote.vote === 'yes' && { color: colors.success },
+                                vote.vote === 'maybe' && { color: colors.warning },
+                                vote.vote === 'no' && { color: colors.error },
+                              ]}
+                            >
+                              {vote.vote.charAt(0).toUpperCase() + vote.vote.slice(1)}
+                            </Text>
+                          </View>
+                        </View>
+                      ))}
+                      {acceptedMembers.filter(
+                        (m) => !selectedVoteItem.votes.find((v) => v.memberId === m.id)
+                      ).length > 0 && (
+                        <Text style={styles.notVotedText}>
+                          {
+                            acceptedMembers.filter(
+                              (m) => !selectedVoteItem.votes.find((v) => v.memberId === m.id)
+                            ).length
+                          }{' '}
+                          member(s) have not voted yet
+                        </Text>
+                      )}
+                    </View>
+
+                    {selectedVoteItem.status === 'active' && (
+                      <View style={styles.modalVoteButtons}>
+                        <Pressable
+                          style={[
+                            styles.modalVoteBtn,
+                            styles.modalVoteBtnYes,
+                            getUserVote(selectedVoteItem.votes) === 'yes' &&
+                              styles.modalVoteBtnYesActive,
+                          ]}
+                          onPress={() => {
+                            handleVote(selectedVoteItem.id, 'yes');
+                            setSelectedVoteItem({
+                              ...selectedVoteItem,
+                              votes: selectedVoteItem.votes.some((v) => v.memberId === '1')
+                                ? selectedVoteItem.votes.map((v) =>
+                                    v.memberId === '1' ? { ...v, vote: 'yes' } : v
+                                  )
+                                : [
+                                    ...selectedVoteItem.votes,
+                                    { memberId: '1', memberName: 'You', vote: 'yes' },
+                                  ],
+                            });
+                          }}
+                        >
+                          <ThumbsUp
+                            size={20}
+                            color={
+                              getUserVote(selectedVoteItem.votes) === 'yes'
+                                ? colors.textLight
+                                : colors.success
+                            }
+                          />
+                          <Text
+                            style={[
+                              styles.modalVoteBtnText,
+                              {
+                                color:
+                                  getUserVote(selectedVoteItem.votes) === 'yes'
+                                    ? colors.textLight
+                                    : colors.success,
+                              },
+                            ]}
+                          >
+                            Yes
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          style={[
+                            styles.modalVoteBtn,
+                            styles.modalVoteBtnMaybe,
+                            getUserVote(selectedVoteItem.votes) === 'maybe' &&
+                              styles.modalVoteBtnMaybeActive,
+                          ]}
+                          onPress={() => {
+                            handleVote(selectedVoteItem.id, 'maybe');
+                            setSelectedVoteItem({
+                              ...selectedVoteItem,
+                              votes: selectedVoteItem.votes.some((v) => v.memberId === '1')
+                                ? selectedVoteItem.votes.map((v) =>
+                                    v.memberId === '1' ? { ...v, vote: 'maybe' } : v
+                                  )
+                                : [
+                                    ...selectedVoteItem.votes,
+                                    { memberId: '1', memberName: 'You', vote: 'maybe' },
+                                  ],
+                            });
+                          }}
+                        >
+                          <HelpCircle
+                            size={20}
+                            color={
+                              getUserVote(selectedVoteItem.votes) === 'maybe'
+                                ? colors.textLight
+                                : colors.warning
+                            }
+                          />
+                          <Text
+                            style={[
+                              styles.modalVoteBtnText,
+                              {
+                                color:
+                                  getUserVote(selectedVoteItem.votes) === 'maybe'
+                                    ? colors.textLight
+                                    : colors.warning,
+                              },
+                            ]}
+                          >
+                            Maybe
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          style={[
+                            styles.modalVoteBtn,
+                            styles.modalVoteBtnNo,
+                            getUserVote(selectedVoteItem.votes) === 'no' &&
+                              styles.modalVoteBtnNoActive,
+                          ]}
+                          onPress={() => {
+                            handleVote(selectedVoteItem.id, 'no');
+                            setSelectedVoteItem({
+                              ...selectedVoteItem,
+                              votes: selectedVoteItem.votes.some((v) => v.memberId === '1')
+                                ? selectedVoteItem.votes.map((v) =>
+                                    v.memberId === '1' ? { ...v, vote: 'no' } : v
+                                  )
+                                : [
+                                    ...selectedVoteItem.votes,
+                                    { memberId: '1', memberName: 'You', vote: 'no' },
+                                  ],
+                            });
+                          }}
+                        >
+                          <ThumbsDown
+                            size={20}
+                            color={
+                              getUserVote(selectedVoteItem.votes) === 'no'
+                                ? colors.textLight
+                                : colors.error
+                            }
+                          />
+                          <Text
+                            style={[
+                              styles.modalVoteBtnText,
+                              {
+                                color:
+                                  getUserVote(selectedVoteItem.votes) === 'no'
+                                    ? colors.textLight
+                                    : colors.error,
+                              },
+                            ]}
+                          >
+                            No
+                          </Text>
+                        </Pressable>
+                      </View>
+                    )}
+                  </>
+                )}
               </ScrollView>
             </Pressable>
           </Pressable>
@@ -1942,11 +2125,8 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowCreateVoteModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowCreateVoteModal(false)}
-          >
-            <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowCreateVoteModal(false)}>
+            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Create New Vote</Text>
                 <Pressable onPress={() => setShowCreateVoteModal(false)}>
@@ -1965,7 +2145,9 @@ export default function GroupTripScreen() {
                 />
               </View>
 
-              <View style={[styles.inputContainer, { alignItems: 'flex-start', paddingVertical: 12 }]}>
+              <View
+                style={[styles.inputContainer, { alignItems: 'flex-start', paddingVertical: 12 }]}
+              >
                 <Edit3 size={20} color={colors.textTertiary} style={{ marginTop: 2 }} />
                 <TextInput
                   style={[styles.input, { minHeight: 60 }]}
@@ -1978,8 +2160,12 @@ export default function GroupTripScreen() {
               </View>
 
               <Text style={styles.permissionLabel}>Category</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryList}>
-                {(['activity', 'itinerary', 'restaurant', 'accommodation'] as const).map(cat => (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.categoryList}
+              >
+                {(['activity', 'itinerary', 'restaurant', 'accommodation'] as const).map((cat) => (
                   <Pressable
                     key={cat}
                     style={[
@@ -1988,10 +2174,12 @@ export default function GroupTripScreen() {
                     ]}
                     onPress={() => setNewVoteCategory(cat)}
                   >
-                    <Text style={[
-                      styles.categoryOptionText,
-                      newVoteCategory === cat && styles.categoryOptionTextActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.categoryOptionText,
+                        newVoteCategory === cat && styles.categoryOptionTextActive,
+                      ]}
+                    >
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
                     </Text>
                   </Pressable>
@@ -1999,10 +2187,7 @@ export default function GroupTripScreen() {
               </ScrollView>
 
               <Pressable
-                style={[
-                  styles.inviteButton,
-                  !newVoteTitle.trim() && styles.inviteButtonDisabled,
-                ]}
+                style={[styles.inviteButton, !newVoteTitle.trim() && styles.inviteButtonDisabled]}
                 onPress={handleCreateVote}
                 disabled={!newVoteTitle.trim()}
               >
@@ -2018,11 +2203,8 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowAddExpenseModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowAddExpenseModal(false)}
-          >
-            <Pressable style={styles.modalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowAddExpenseModal(false)}>
+            <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Add Expense</Text>
                 <Pressable onPress={() => setShowAddExpenseModal(false)}>
@@ -2054,8 +2236,22 @@ export default function GroupTripScreen() {
               </View>
 
               <Text style={styles.permissionLabel}>Category</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryList}>
-                {(['food', 'transport', 'accommodation', 'activities', 'shopping', 'flights', 'other'] as const).map(cat => {
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.categoryList}
+              >
+                {(
+                  [
+                    'food',
+                    'transport',
+                    'accommodation',
+                    'activities',
+                    'shopping',
+                    'flights',
+                    'other',
+                  ] as const
+                ).map((cat) => {
                   const CatIcon = getExpenseCategoryIcon(cat);
                   const catColor = getExpenseCategoryColor(cat);
                   return (
@@ -2063,15 +2259,23 @@ export default function GroupTripScreen() {
                       key={cat}
                       style={[
                         styles.expenseCategoryOption,
-                        newExpenseCategory === cat && { borderColor: catColor, backgroundColor: `${catColor}15` },
+                        newExpenseCategory === cat && {
+                          borderColor: catColor,
+                          backgroundColor: `${catColor}15`,
+                        },
                       ]}
                       onPress={() => setNewExpenseCategory(cat)}
                     >
-                      <CatIcon size={16} color={newExpenseCategory === cat ? catColor : colors.textSecondary} />
-                      <Text style={[
-                        styles.categoryOptionText,
-                        newExpenseCategory === cat && { color: catColor }
-                      ]}>
+                      <CatIcon
+                        size={16}
+                        color={newExpenseCategory === cat ? catColor : colors.textSecondary}
+                      />
+                      <Text
+                        style={[
+                          styles.categoryOptionText,
+                          newExpenseCategory === cat && { color: catColor },
+                        ]}
+                      >
                         {cat.charAt(0).toUpperCase() + cat.slice(1)}
                       </Text>
                     </Pressable>
@@ -2081,7 +2285,7 @@ export default function GroupTripScreen() {
 
               <Text style={styles.permissionLabel}>Split With</Text>
               <View style={styles.splitMembersList}>
-                {acceptedMembers.map(member => (
+                {acceptedMembers.map((member) => (
                   <Pressable
                     key={member.id}
                     style={[
@@ -2095,10 +2299,12 @@ export default function GroupTripScreen() {
                       style={styles.splitMemberAvatar}
                       contentFit="cover"
                     />
-                    <Text style={[
-                      styles.splitMemberName,
-                      newExpenseSplitWith.includes(member.id) && styles.splitMemberNameActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.splitMemberName,
+                        newExpenseSplitWith.includes(member.id) && styles.splitMemberNameActive,
+                      ]}
+                    >
                       {member.name}
                     </Text>
                     {newExpenseSplitWith.includes(member.id) && (
@@ -2111,7 +2317,8 @@ export default function GroupTripScreen() {
               {newExpenseSplitWith.length > 0 && newExpenseAmount && (
                 <View style={styles.splitPreview}>
                   <Text style={styles.splitPreviewText}>
-                    Each person pays: €{(parseFloat(newExpenseAmount || '0') / newExpenseSplitWith.length).toFixed(2)}
+                    Each person pays: €
+                    {(parseFloat(newExpenseAmount || '0') / newExpenseSplitWith.length).toFixed(2)}
                   </Text>
                 </View>
               )}
@@ -2119,7 +2326,8 @@ export default function GroupTripScreen() {
               <Pressable
                 style={[
                   styles.inviteButton,
-                  (!newExpenseDescription.trim() || !newExpenseAmount) && styles.inviteButtonDisabled,
+                  (!newExpenseDescription.trim() || !newExpenseAmount) &&
+                    styles.inviteButtonDisabled,
                 ]}
                 onPress={handleAddExpense}
                 disabled={!newExpenseDescription.trim() || !newExpenseAmount}
@@ -2136,11 +2344,8 @@ export default function GroupTripScreen() {
           animationType="slide"
           onRequestClose={() => setShowSettlementsModal(false)}
         >
-          <Pressable 
-            style={styles.modalOverlay}
-            onPress={() => setShowSettlementsModal(false)}
-          >
-            <Pressable style={styles.voteModalContent} onPress={e => e.stopPropagation()}>
+          <Pressable style={styles.modalOverlay} onPress={() => setShowSettlementsModal(false)}>
+            <Pressable style={styles.voteModalContent} onPress={(e) => e.stopPropagation()}>
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>Settlements</Text>
@@ -2158,7 +2363,7 @@ export default function GroupTripScreen() {
 
                 <View style={styles.balancesSection}>
                   <Text style={styles.balancesSectionTitle}>Member Balances</Text>
-                  {acceptedMembers.map(member => {
+                  {acceptedMembers.map((member) => {
                     const balances = calculateBalances();
                     const balance = balances[member.id] || 0;
                     return (
@@ -2171,10 +2376,12 @@ export default function GroupTripScreen() {
                           />
                           <Text style={styles.balanceName}>{member.name}</Text>
                         </View>
-                        <Text style={[
-                          styles.balanceAmount,
-                          { color: balance >= 0 ? colors.success : colors.error }
-                        ]}>
+                        <Text
+                          style={[
+                            styles.balanceAmount,
+                            { color: balance >= 0 ? colors.success : colors.error },
+                          ]}
+                        >
                           {balance >= 0 ? 'gets back' : 'owes'} €{Math.abs(balance).toFixed(2)}
                         </Text>
                       </View>
@@ -2191,25 +2398,32 @@ export default function GroupTripScreen() {
                     </View>
                   ) : (
                     calculateSettlements().map((settlement, index) => {
-                      const isSettled = settlements.find(
-                        s => s.fromId === settlement.fromId && s.toId === settlement.toId
-                      )?.settled || false;
+                      const isSettled =
+                        settlements.find(
+                          (s) => s.fromId === settlement.fromId && s.toId === settlement.toId
+                        )?.settled || false;
 
                       return (
-                        <View key={index} style={[
-                          styles.settlementRow,
-                          isSettled && styles.settlementRowSettled
-                        ]}>
+                        <View
+                          key={index}
+                          style={[styles.settlementRow, isSettled && styles.settlementRowSettled]}
+                        >
                           <View style={styles.settlementInfo}>
                             <View style={styles.settlementParties}>
                               <Image
-                                source={{ uri: acceptedMembers.find(m => m.id === settlement.fromId)?.avatar }}
+                                source={{
+                                  uri: acceptedMembers.find((m) => m.id === settlement.fromId)
+                                    ?.avatar,
+                                }}
                                 style={styles.settlementAvatar}
                                 contentFit="cover"
                               />
                               <ArrowRightLeft size={16} color={colors.textTertiary} />
                               <Image
-                                source={{ uri: acceptedMembers.find(m => m.id === settlement.toId)?.avatar }}
+                                source={{
+                                  uri: acceptedMembers.find((m) => m.id === settlement.toId)
+                                    ?.avatar,
+                                }}
                                 style={styles.settlementAvatar}
                                 contentFit="cover"
                               />
@@ -2220,14 +2434,13 @@ export default function GroupTripScreen() {
                                 {' pays '}
                                 <Text style={styles.settlementName}>{settlement.toName}</Text>
                               </Text>
-                              <Text style={styles.settlementAmount}>€{settlement.amount.toFixed(2)}</Text>
+                              <Text style={styles.settlementAmount}>
+                                €{settlement.amount.toFixed(2)}
+                              </Text>
                             </View>
                           </View>
                           <Pressable
-                            style={[
-                              styles.settleButton,
-                              isSettled && styles.settleButtonDone
-                            ]}
+                            style={[styles.settleButton, isSettled && styles.settleButtonDone]}
                             onPress={() => toggleSettlement(settlement.fromId, settlement.toId)}
                           >
                             {isSettled ? (

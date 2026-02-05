@@ -384,28 +384,44 @@ function generatePackingList(
 function getCategoryIcon(iconName: string, color: string) {
   const iconProps = { size: 20, color };
   switch (iconName) {
-    case 'file': return <FileText {...iconProps} />;
-    case 'shirt': return <Shirt {...iconProps} />;
-    case 'droplets': return <Droplets {...iconProps} />;
-    case 'laptop': return <Laptop {...iconProps} />;
-    case 'sun': return <Sun {...iconProps} />;
-    case 'tent': return <Tent {...iconProps} />;
-    case 'briefcase': return <Briefcase {...iconProps} />;
-    case 'dumbbell': return <Dumbbell {...iconProps} />;
-    case 'snowflake': return <Snowflake {...iconProps} />;
-    case 'heart': return <Heart {...iconProps} />;
-    default: return <Briefcase {...iconProps} />;
+    case 'file':
+      return <FileText {...iconProps} />;
+    case 'shirt':
+      return <Shirt {...iconProps} />;
+    case 'droplets':
+      return <Droplets {...iconProps} />;
+    case 'laptop':
+      return <Laptop {...iconProps} />;
+    case 'sun':
+      return <Sun {...iconProps} />;
+    case 'tent':
+      return <Tent {...iconProps} />;
+    case 'briefcase':
+      return <Briefcase {...iconProps} />;
+    case 'dumbbell':
+      return <Dumbbell {...iconProps} />;
+    case 'snowflake':
+      return <Snowflake {...iconProps} />;
+    case 'heart':
+      return <Heart {...iconProps} />;
+    default:
+      return <Briefcase {...iconProps} />;
   }
 }
 
 function getWeatherIcon(weather: WeatherType, size: number = 20) {
   const iconProps = { size, color: colors.textLight };
   switch (weather) {
-    case 'sunny': return <Sun {...iconProps} />;
-    case 'rainy': return <Umbrella {...iconProps} />;
-    case 'cold': return <Snowflake {...iconProps} />;
-    case 'mixed': return <Wind {...iconProps} />;
-    default: return <CloudSun {...iconProps} />;
+    case 'sunny':
+      return <Sun {...iconProps} />;
+    case 'rainy':
+      return <Umbrella {...iconProps} />;
+    case 'cold':
+      return <Snowflake {...iconProps} />;
+    case 'mixed':
+      return <Wind {...iconProps} />;
+    default:
+      return <CloudSun {...iconProps} />;
   }
 }
 
@@ -413,13 +429,13 @@ export default function PackingListScreen() {
   const router = useRouter();
   const [showGenerator, setShowGenerator] = useState(true);
   const [packingList, setPackingList] = useState<PackingList | null>(null);
-  
+
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedWeather, setSelectedWeather] = useState<WeatherType | null>(null);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
-  
+
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [addItemCategoryId, setAddItemCategoryId] = useState<string | null>(null);
   const [newItemName, setNewItemName] = useState('');
@@ -467,7 +483,8 @@ export default function PackingListScreen() {
       name: `${destination} Trip`,
       destination,
       startDate: startDate || new Date().toISOString().split('T')[0],
-      endDate: endDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      endDate:
+        endDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       weather: selectedWeather,
       activities: selectedActivities,
       categories,
@@ -478,81 +495,94 @@ export default function PackingListScreen() {
     setPackingList(newList);
     setShowGenerator(false);
     console.log('Generated packing list:', newList.name);
-  }, [destination, startDate, endDate, selectedWeather, selectedActivities, triggerHaptic, calculateTripDays]);
+  }, [
+    destination,
+    startDate,
+    endDate,
+    selectedWeather,
+    selectedActivities,
+    triggerHaptic,
+    calculateTripDays,
+  ]);
 
-  const toggleActivity = useCallback((activityId: string) => {
-    triggerHaptic();
-    setSelectedActivities(prev => 
-      prev.includes(activityId)
-        ? prev.filter(id => id !== activityId)
-        : [...prev, activityId]
-    );
-  }, [triggerHaptic]);
-
-  const toggleCategory = useCallback((categoryId: string) => {
-    if (!packingList) return;
-    triggerHaptic();
-    
-    setPackingList(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        categories: prev.categories.map(cat =>
-          cat.id === categoryId ? { ...cat, isExpanded: !cat.isExpanded } : cat
-        ),
-      };
-    });
-  }, [packingList, triggerHaptic]);
-
-  const toggleItem = useCallback((categoryId: string, itemId: string) => {
-    if (!packingList) return;
-    triggerHaptic();
-    
-    setPackingList(prev => {
-      if (!prev) return prev;
-      const newCategories = prev.categories.map(cat => {
-        if (cat.id === categoryId) {
-          return {
-            ...cat,
-            items: cat.items.map(item =>
-              item.id === itemId ? { ...item, isPacked: !item.isPacked } : item
-            ),
-          };
-        }
-        return cat;
-      });
-
-      const totalItems = newCategories.reduce((sum, cat) => sum + cat.items.length, 0);
-      const packedItems = newCategories.reduce(
-        (sum, cat) => sum + cat.items.filter(item => item.isPacked).length,
-        0
+  const toggleActivity = useCallback(
+    (activityId: string) => {
+      triggerHaptic();
+      setSelectedActivities((prev) =>
+        prev.includes(activityId) ? prev.filter((id) => id !== activityId) : [...prev, activityId]
       );
-      const progress = totalItems > 0 ? Math.round((packedItems / totalItems) * 100) : 0;
+    },
+    [triggerHaptic]
+  );
 
-      return { ...prev, categories: newCategories, progress };
-    });
-  }, [packingList, triggerHaptic]);
+  const toggleCategory = useCallback(
+    (categoryId: string) => {
+      if (!packingList) return;
+      triggerHaptic();
 
-  const deleteItem = useCallback((categoryId: string, itemId: string) => {
-    if (!packingList) return;
-    triggerHaptic();
-    
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to remove this item?',
-      [
+      setPackingList((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          categories: prev.categories.map((cat) =>
+            cat.id === categoryId ? { ...cat, isExpanded: !cat.isExpanded } : cat
+          ),
+        };
+      });
+    },
+    [packingList, triggerHaptic]
+  );
+
+  const toggleItem = useCallback(
+    (categoryId: string, itemId: string) => {
+      if (!packingList) return;
+      triggerHaptic();
+
+      setPackingList((prev) => {
+        if (!prev) return prev;
+        const newCategories = prev.categories.map((cat) => {
+          if (cat.id === categoryId) {
+            return {
+              ...cat,
+              items: cat.items.map((item) =>
+                item.id === itemId ? { ...item, isPacked: !item.isPacked } : item
+              ),
+            };
+          }
+          return cat;
+        });
+
+        const totalItems = newCategories.reduce((sum, cat) => sum + cat.items.length, 0);
+        const packedItems = newCategories.reduce(
+          (sum, cat) => sum + cat.items.filter((item) => item.isPacked).length,
+          0
+        );
+        const progress = totalItems > 0 ? Math.round((packedItems / totalItems) * 100) : 0;
+
+        return { ...prev, categories: newCategories, progress };
+      });
+    },
+    [packingList, triggerHaptic]
+  );
+
+  const deleteItem = useCallback(
+    (categoryId: string, itemId: string) => {
+      if (!packingList) return;
+      triggerHaptic();
+
+      Alert.alert('Delete Item', 'Are you sure you want to remove this item?', [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            setPackingList(prev => {
+            setPackingList((prev) => {
               if (!prev) return prev;
-              const newCategories = prev.categories.map(cat => {
+              const newCategories = prev.categories.map((cat) => {
                 if (cat.id === categoryId) {
                   return {
                     ...cat,
-                    items: cat.items.filter(item => item.id !== itemId),
+                    items: cat.items.filter((item) => item.id !== itemId),
                   };
                 }
                 return cat;
@@ -560,7 +590,7 @@ export default function PackingListScreen() {
 
               const totalItems = newCategories.reduce((sum, cat) => sum + cat.items.length, 0);
               const packedItems = newCategories.reduce(
-                (sum, cat) => sum + cat.items.filter(item => item.isPacked).length,
+                (sum, cat) => sum + cat.items.filter((item) => item.isPacked).length,
                 0
               );
               const progress = totalItems > 0 ? Math.round((packedItems / totalItems) * 100) : 0;
@@ -569,17 +599,21 @@ export default function PackingListScreen() {
             });
           },
         },
-      ]
-    );
-  }, [packingList, triggerHaptic]);
+      ]);
+    },
+    [packingList, triggerHaptic]
+  );
 
-  const openAddItemModal = useCallback((categoryId: string) => {
-    triggerHaptic();
-    setAddItemCategoryId(categoryId);
-    setNewItemName('');
-    setNewItemQuantity('1');
-    setShowAddItemModal(true);
-  }, [triggerHaptic]);
+  const openAddItemModal = useCallback(
+    (categoryId: string) => {
+      triggerHaptic();
+      setAddItemCategoryId(categoryId);
+      setNewItemName('');
+      setNewItemQuantity('1');
+      setShowAddItemModal(true);
+    },
+    [triggerHaptic]
+  );
 
   const addCustomItem = useCallback(() => {
     if (!packingList || !addItemCategoryId || !newItemName.trim()) return;
@@ -594,14 +628,12 @@ export default function PackingListScreen() {
       isCustom: true,
     };
 
-    setPackingList(prev => {
+    setPackingList((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        categories: prev.categories.map(cat =>
-          cat.id === addItemCategoryId
-            ? { ...cat, items: [...cat.items, newItem] }
-            : cat
+        categories: prev.categories.map((cat) =>
+          cat.id === addItemCategoryId ? { ...cat, items: [...cat.items, newItem] } : cat
         ),
       };
     });
@@ -612,30 +644,26 @@ export default function PackingListScreen() {
 
   const resetList = useCallback(() => {
     triggerHaptic();
-    Alert.alert(
-      'Reset Progress',
-      'This will uncheck all items. Are you sure?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset',
-          style: 'destructive',
-          onPress: () => {
-            setPackingList(prev => {
-              if (!prev) return prev;
-              return {
-                ...prev,
-                progress: 0,
-                categories: prev.categories.map(cat => ({
-                  ...cat,
-                  items: cat.items.map(item => ({ ...item, isPacked: false })),
-                })),
-              };
-            });
-          },
+    Alert.alert('Reset Progress', 'This will uncheck all items. Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Reset',
+        style: 'destructive',
+        onPress: () => {
+          setPackingList((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              progress: 0,
+              categories: prev.categories.map((cat) => ({
+                ...cat,
+                items: cat.items.map((item) => ({ ...item, isPacked: false })),
+              })),
+            };
+          });
         },
-      ]
-    );
+      },
+    ]);
   }, [triggerHaptic]);
 
   const startNewList = useCallback(() => {
@@ -651,10 +679,11 @@ export default function PackingListScreen() {
 
   const progress = packingList?.progress ?? 0;
   const totalItems = packingList?.categories.reduce((sum, cat) => sum + cat.items.length, 0) ?? 0;
-  const packedItems = packingList?.categories.reduce(
-    (sum, cat) => sum + cat.items.filter(item => item.isPacked).length,
-    0
-  ) ?? 0;
+  const packedItems =
+    packingList?.categories.reduce(
+      (sum, cat) => sum + cat.items.filter((item) => item.isPacked).length,
+      0
+    ) ?? 0;
 
   if (showGenerator) {
     return (
@@ -673,7 +702,7 @@ export default function PackingListScreen() {
             <View style={styles.headerRight} />
           </View>
 
-          <ScrollView 
+          <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.generatorContent}
             showsVerticalScrollIndicator={false}
@@ -736,7 +765,7 @@ export default function PackingListScreen() {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Expected Weather</Text>
                 <View style={styles.weatherGrid}>
-                  {WEATHER_OPTIONS.map(option => (
+                  {WEATHER_OPTIONS.map((option) => (
                     <Pressable
                       key={option.id}
                       style={[
@@ -748,20 +777,50 @@ export default function PackingListScreen() {
                         setSelectedWeather(option.id);
                       }}
                     >
-                      {option.id === 'sunny' && <Sun size={24} color={selectedWeather === option.id ? colors.textLight : colors.warning} />}
-                      {option.id === 'rainy' && <Umbrella size={24} color={selectedWeather === option.id ? colors.textLight : colors.primaryLight} />}
-                      {option.id === 'cold' && <Snowflake size={24} color={selectedWeather === option.id ? colors.textLight : colors.accentDark} />}
-                      {option.id === 'mixed' && <Wind size={24} color={selectedWeather === option.id ? colors.textLight : colors.textSecondary} />}
-                      <Text style={[
-                        styles.weatherName,
-                        selectedWeather === option.id && styles.weatherNameSelected,
-                      ]}>
+                      {option.id === 'sunny' && (
+                        <Sun
+                          size={24}
+                          color={selectedWeather === option.id ? colors.textLight : colors.warning}
+                        />
+                      )}
+                      {option.id === 'rainy' && (
+                        <Umbrella
+                          size={24}
+                          color={
+                            selectedWeather === option.id ? colors.textLight : colors.primaryLight
+                          }
+                        />
+                      )}
+                      {option.id === 'cold' && (
+                        <Snowflake
+                          size={24}
+                          color={
+                            selectedWeather === option.id ? colors.textLight : colors.accentDark
+                          }
+                        />
+                      )}
+                      {option.id === 'mixed' && (
+                        <Wind
+                          size={24}
+                          color={
+                            selectedWeather === option.id ? colors.textLight : colors.textSecondary
+                          }
+                        />
+                      )}
+                      <Text
+                        style={[
+                          styles.weatherName,
+                          selectedWeather === option.id && styles.weatherNameSelected,
+                        ]}
+                      >
                         {option.name}
                       </Text>
-                      <Text style={[
-                        styles.weatherTemp,
-                        selectedWeather === option.id && styles.weatherTempSelected,
-                      ]}>
+                      <Text
+                        style={[
+                          styles.weatherTemp,
+                          selectedWeather === option.id && styles.weatherTempSelected,
+                        ]}
+                      >
                         {option.temp}
                       </Text>
                     </Pressable>
@@ -773,7 +832,7 @@ export default function PackingListScreen() {
                 <Text style={styles.inputLabel}>Planned Activities</Text>
                 <Text style={styles.inputHint}>Select all that apply</Text>
                 <View style={styles.activitiesGrid}>
-                  {ACTIVITY_OPTIONS.map(activity => (
+                  {ACTIVITY_OPTIONS.map((activity) => (
                     <Pressable
                       key={activity.id}
                       style={[
@@ -783,10 +842,12 @@ export default function PackingListScreen() {
                       onPress={() => toggleActivity(activity.id)}
                     >
                       <Text style={styles.activityEmoji}>{activity.icon}</Text>
-                      <Text style={[
-                        styles.activityName,
-                        selectedActivities.includes(activity.id) && styles.activityNameSelected,
-                      ]}>
+                      <Text
+                        style={[
+                          styles.activityName,
+                          selectedActivities.includes(activity.id) && styles.activityNameSelected,
+                        ]}
+                      >
                         {activity.name}
                       </Text>
                     </Pressable>
@@ -828,9 +889,7 @@ export default function PackingListScreen() {
             <Text style={styles.headerTitle}>{packingList?.name}</Text>
             <View style={styles.headerMeta}>
               {getWeatherIcon(packingList?.weather || 'mixed', 14)}
-              <Text style={styles.headerMetaText}>
-                {packingList?.destination}
-              </Text>
+              <Text style={styles.headerMetaText}>{packingList?.destination}</Text>
             </View>
           </View>
           <Pressable style={styles.headerAction} onPress={startNewList}>
@@ -846,12 +905,12 @@ export default function PackingListScreen() {
             <Text style={styles.progressPercent}>{progress}%</Text>
           </View>
           <View style={styles.progressBar}>
-            <View 
+            <View
               style={[
-                styles.progressFill, 
+                styles.progressFill,
                 { width: `${progress}%` },
-                progress === 100 && styles.progressComplete
-              ]} 
+                progress === 100 && styles.progressComplete,
+              ]}
             />
           </View>
           {progress === 100 && (
@@ -873,17 +932,14 @@ export default function PackingListScreen() {
           </Pressable>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.listScrollView}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         >
-          {packingList?.categories.map(category => (
+          {packingList?.categories.map((category) => (
             <View key={category.id} style={styles.categoryCard}>
-              <Pressable 
-                style={styles.categoryHeader}
-                onPress={() => toggleCategory(category.id)}
-              >
+              <Pressable style={styles.categoryHeader} onPress={() => toggleCategory(category.id)}>
                 <View style={styles.categoryLeft}>
                   <View style={styles.categoryIcon}>
                     {getCategoryIcon(category.icon, colors.primary)}
@@ -891,12 +947,13 @@ export default function PackingListScreen() {
                   <View>
                     <Text style={styles.categoryName}>{category.name}</Text>
                     <Text style={styles.categoryCount}>
-                      {category.items.filter(i => i.isPacked).length}/{category.items.length} packed
+                      {category.items.filter((i) => i.isPacked).length}/{category.items.length}{' '}
+                      packed
                     </Text>
                   </View>
                 </View>
                 <View style={styles.categoryRight}>
-                  <Pressable 
+                  <Pressable
                     style={styles.addItemButton}
                     onPress={(e) => {
                       e.stopPropagation();
@@ -915,26 +972,20 @@ export default function PackingListScreen() {
 
               {category.isExpanded && (
                 <View style={styles.categoryItems}>
-                  {category.items.map(item => (
+                  {category.items.map((item) => (
                     <Pressable
                       key={item.id}
                       style={styles.itemRow}
                       onPress={() => toggleItem(category.id, item.id)}
                     >
                       <Pressable
-                        style={[
-                          styles.checkbox,
-                          item.isPacked && styles.checkboxChecked,
-                        ]}
+                        style={[styles.checkbox, item.isPacked && styles.checkboxChecked]}
                         onPress={() => toggleItem(category.id, item.id)}
                       >
                         {item.isPacked && <Check size={14} color={colors.textLight} />}
                       </Pressable>
                       <View style={styles.itemInfo}>
-                        <Text style={[
-                          styles.itemName,
-                          item.isPacked && styles.itemNamePacked,
-                        ]}>
+                        <Text style={[styles.itemName, item.isPacked && styles.itemNamePacked]}>
                           {item.name}
                         </Text>
                         {item.quantity > 1 && (
@@ -1004,10 +1055,7 @@ export default function PackingListScreen() {
             </View>
 
             <Pressable
-              style={[
-                styles.modalButton,
-                !newItemName.trim() && styles.modalButtonDisabled,
-              ]}
+              style={[styles.modalButton, !newItemName.trim() && styles.modalButtonDisabled]}
               onPress={addCustomItem}
               disabled={!newItemName.trim()}
             >

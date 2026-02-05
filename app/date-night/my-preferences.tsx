@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -115,7 +108,7 @@ export default function MyPreferencesScreen() {
 
   const toggleArrayItem = <T extends string>(array: T[], item: T): T[] => {
     if (array.includes(item)) {
-      return array.filter(i => i !== item);
+      return array.filter((i) => i !== item);
     }
     return [...array, item];
   };
@@ -147,7 +140,7 @@ export default function MyPreferencesScreen() {
           </Pressable>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
@@ -158,27 +151,29 @@ export default function MyPreferencesScreen() {
               <Activity size={20} color={colors.primary} />
               <Text style={styles.sectionTitle}>Activity Preferences</Text>
             </View>
-            <Text style={styles.sectionDescription}>
-              What types of activities do you enjoy?
-            </Text>
+            <Text style={styles.sectionDescription}>What types of activities do you enjoy?</Text>
             <View style={styles.chipsContainer}>
-              {activityOptions.map(option => (
+              {activityOptions.map((option) => (
                 <Pressable
                   key={option.value}
                   style={[
                     styles.chip,
                     preferences.activityTypes.includes(option.value) && styles.chipSelected,
                   ]}
-                  onPress={() => setPreferences(prev => ({
-                    ...prev,
-                    activityTypes: toggleArrayItem(prev.activityTypes, option.value),
-                  }))}
+                  onPress={() =>
+                    setPreferences((prev) => ({
+                      ...prev,
+                      activityTypes: toggleArrayItem(prev.activityTypes, option.value),
+                    }))
+                  }
                 >
                   <Text style={styles.chipEmoji}>{option.emoji}</Text>
-                  <Text style={[
-                    styles.chipText,
-                    preferences.activityTypes.includes(option.value) && styles.chipTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.chipText,
+                      preferences.activityTypes.includes(option.value) && styles.chipTextSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
                 </Pressable>
@@ -192,26 +187,28 @@ export default function MyPreferencesScreen() {
               <Utensils size={20} color={colors.primary} />
               <Text style={styles.sectionTitle}>Cuisine Preferences</Text>
             </View>
-            <Text style={styles.sectionDescription}>
-              What cuisines do you enjoy?
-            </Text>
+            <Text style={styles.sectionDescription}>What cuisines do you enjoy?</Text>
             <View style={styles.chipsContainer}>
-              {cuisineOptions.map(option => (
+              {cuisineOptions.map((option) => (
                 <Pressable
                   key={option.value}
                   style={[
                     styles.chipSmall,
                     preferences.cuisineTypes.includes(option.value) && styles.chipSelected,
                   ]}
-                  onPress={() => setPreferences(prev => ({
-                    ...prev,
-                    cuisineTypes: toggleArrayItem(prev.cuisineTypes, option.value),
-                  }))}
+                  onPress={() =>
+                    setPreferences((prev) => ({
+                      ...prev,
+                      cuisineTypes: toggleArrayItem(prev.cuisineTypes, option.value),
+                    }))
+                  }
                 >
-                  <Text style={[
-                    styles.chipText,
-                    preferences.cuisineTypes.includes(option.value) && styles.chipTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.chipText,
+                      preferences.cuisineTypes.includes(option.value) && styles.chipTextSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
                 </Pressable>
@@ -226,7 +223,7 @@ export default function MyPreferencesScreen() {
               <Text style={styles.sectionTitle}>Dietary Restrictions</Text>
             </View>
             <View style={styles.chipsContainer}>
-              {dietaryOptions.map(option => (
+              {dietaryOptions.map((option) => (
                 <Pressable
                   key={option.value}
                   style={[
@@ -235,25 +232,28 @@ export default function MyPreferencesScreen() {
                   ]}
                   onPress={() => {
                     if (option.value === 'none') {
-                      setPreferences(prev => ({
+                      setPreferences((prev) => ({
                         ...prev,
                         dietaryRestrictions: ['none'],
                       }));
                     } else {
-                      setPreferences(prev => ({
+                      setPreferences((prev) => ({
                         ...prev,
                         dietaryRestrictions: toggleArrayItem(
-                          prev.dietaryRestrictions.filter(d => d !== 'none'),
+                          prev.dietaryRestrictions.filter((d) => d !== 'none'),
                           option.value
                         ),
                       }));
                     }
                   }}
                 >
-                  <Text style={[
-                    styles.chipText,
-                    preferences.dietaryRestrictions.includes(option.value) && styles.chipTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.chipText,
+                      preferences.dietaryRestrictions.includes(option.value) &&
+                        styles.chipTextSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
                 </Pressable>
@@ -268,22 +268,28 @@ export default function MyPreferencesScreen() {
               <Text style={styles.sectionTitle}>Environment</Text>
             </View>
             <View style={styles.segmentedControl}>
-              {environmentOptions.map(option => (
+              {environmentOptions.map((option) => (
                 <Pressable
                   key={option.value}
                   style={[
                     styles.segmentButton,
-                    preferences.environmentPreference === option.value && styles.segmentButtonSelected,
+                    preferences.environmentPreference === option.value &&
+                      styles.segmentButtonSelected,
                   ]}
-                  onPress={() => setPreferences(prev => ({
-                    ...prev,
-                    environmentPreference: option.value,
-                  }))}
+                  onPress={() =>
+                    setPreferences((prev) => ({
+                      ...prev,
+                      environmentPreference: option.value,
+                    }))
+                  }
                 >
-                  <Text style={[
-                    styles.segmentText,
-                    preferences.environmentPreference === option.value && styles.segmentTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      preferences.environmentPreference === option.value &&
+                        styles.segmentTextSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
                 </Pressable>
@@ -298,22 +304,27 @@ export default function MyPreferencesScreen() {
               <Text style={styles.sectionTitle}>Preferred Time</Text>
             </View>
             <View style={styles.chipsContainer}>
-              {timeOptions.map(option => (
+              {timeOptions.map((option) => (
                 <Pressable
                   key={option.value}
                   style={[
                     styles.chipSmall,
                     preferences.preferredTimeOfDay.includes(option.value) && styles.chipSelected,
                   ]}
-                  onPress={() => setPreferences(prev => ({
-                    ...prev,
-                    preferredTimeOfDay: toggleArrayItem(prev.preferredTimeOfDay, option.value),
-                  }))}
+                  onPress={() =>
+                    setPreferences((prev) => ({
+                      ...prev,
+                      preferredTimeOfDay: toggleArrayItem(prev.preferredTimeOfDay, option.value),
+                    }))
+                  }
                 >
-                  <Text style={[
-                    styles.chipText,
-                    preferences.preferredTimeOfDay.includes(option.value) && styles.chipTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.chipText,
+                      preferences.preferredTimeOfDay.includes(option.value) &&
+                        styles.chipTextSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
                 </Pressable>
@@ -334,10 +345,12 @@ export default function MyPreferencesScreen() {
               maximumValue={50}
               step={5}
               value={preferences.maxTravelDistance}
-              onValueChange={(value) => setPreferences(prev => ({
-                ...prev,
-                maxTravelDistance: value,
-              }))}
+              onValueChange={(value) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  maxTravelDistance: value,
+                }))
+              }
               minimumTrackTintColor={colors.primary}
               maximumTrackTintColor={colors.border}
               thumbTintColor={colors.primary}
@@ -355,28 +368,34 @@ export default function MyPreferencesScreen() {
               <Text style={styles.sectionTitle}>Budget Preference</Text>
             </View>
             <View style={styles.budgetContainer}>
-              {budgetOptions.map(option => (
+              {budgetOptions.map((option) => (
                 <Pressable
                   key={option.value}
                   style={[
                     styles.budgetOption,
                     preferences.budgetTier === option.value && styles.budgetOptionSelected,
                   ]}
-                  onPress={() => setPreferences(prev => ({
-                    ...prev,
-                    budgetTier: option.value,
-                  }))}
+                  onPress={() =>
+                    setPreferences((prev) => ({
+                      ...prev,
+                      budgetTier: option.value,
+                    }))
+                  }
                 >
-                  <Text style={[
-                    styles.budgetLabel,
-                    preferences.budgetTier === option.value && styles.budgetLabelSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.budgetLabel,
+                      preferences.budgetTier === option.value && styles.budgetLabelSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
-                  <Text style={[
-                    styles.budgetDescription,
-                    preferences.budgetTier === option.value && styles.budgetDescriptionSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.budgetDescription,
+                      preferences.budgetTier === option.value && styles.budgetDescriptionSelected,
+                    ]}
+                  >
                     {option.description}
                   </Text>
                 </Pressable>

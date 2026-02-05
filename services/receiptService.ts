@@ -97,13 +97,13 @@ class ReceiptService {
 
   async getReceipt(id: string): Promise<Receipt | null> {
     const receipts = await this.getReceipts();
-    return receipts.find(r => r.id === id) || null;
+    return receipts.find((r) => r.id === id) || null;
   }
 
   async saveReceipt(receipt: Receipt): Promise<Receipt> {
     const receipts = await this.getReceipts();
-    const index = receipts.findIndex(r => r.id === receipt.id);
-    
+    const index = receipts.findIndex((r) => r.id === receipt.id);
+
     if (index >= 0) {
       receipts[index] = { ...receipt, updatedAt: new Date().toISOString() };
     } else {
@@ -112,14 +112,14 @@ class ReceiptService {
 
     // Trim to max receipts
     const trimmed = receipts.slice(0, this.settings.maxStoredReceipts);
-    
+
     await AsyncStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(trimmed));
     return receipt;
   }
 
   async deleteReceipt(id: string): Promise<boolean> {
     const receipts = await this.getReceipts();
-    const filtered = receipts.filter(r => r.id !== id);
+    const filtered = receipts.filter((r) => r.id !== id);
     await AsyncStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(filtered));
     return filtered.length !== receipts.length;
   }
@@ -128,16 +128,16 @@ class ReceiptService {
     const receipts = await this.getReceipts();
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.settings.autoDeleteAfterDays);
-    
-    const filtered = receipts.filter(r => 
-      r.status === 'imported' || new Date(r.createdAt) > cutoffDate
+
+    const filtered = receipts.filter(
+      (r) => r.status === 'imported' || new Date(r.createdAt) > cutoffDate
     );
-    
+
     const removed = receipts.length - filtered.length;
     if (removed > 0) {
       await AsyncStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(filtered));
     }
-    
+
     return removed;
   }
 
@@ -147,7 +147,7 @@ class ReceiptService {
 
   async processReceiptImage(imageUri: string, tripId?: string): Promise<Receipt> {
     const now = new Date().toISOString();
-    
+
     // Create initial receipt
     const receipt: Receipt = {
       id: `receipt_${Date.now()}`,
@@ -172,13 +172,13 @@ class ReceiptService {
     try {
       // Run OCR and extraction
       const extraction = await ocrService.processReceipt(imageUri);
-      
+
       receipt.extraction = extraction;
       receipt.status = 'reviewing';
-      
+
       // Build final data from extraction
       receipt.finalData = this.buildFinalData(extraction);
-      
+
       await this.saveReceipt(receipt);
       return receipt;
     } catch (error) {
@@ -203,21 +203,19 @@ class ReceiptService {
   private buildDescription(extraction: ReceiptExtractionResult): string {
     const merchant = extraction.merchant?.name;
     const itemCount = extraction.lineItems.length;
-    
+
     if (itemCount > 0 && itemCount <= 3) {
-      return extraction.lineItems.map(i => i.description).join(', ');
+      return extraction.lineItems.map((i) => i.description).join(', ');
     }
-    
+
     if (merchant) {
       return `Purchase at ${merchant}`;
     }
-    
+
     return 'Receipt purchase';
   }
 
-  private mapPaymentMethod(
-    type: string | undefined
-  ): 'cash' | 'card' | 'mobile' | 'other' {
+  private mapPaymentMethod(type: string | undefined): 'cash' | 'card' | 'mobile' | 'other' {
     if (type === 'cash' || type === 'card' || type === 'mobile') {
       return type;
     }
@@ -236,7 +234,7 @@ class ReceiptService {
     if (!receipt) return null;
 
     receipt.userCorrections = { ...receipt.userCorrections, ...corrections };
-    
+
     // Rebuild final data with corrections
     if (receipt.finalData) {
       receipt.finalData = {
@@ -301,7 +299,7 @@ class ReceiptService {
     receipt.status = 'imported';
     receipt.expenseId = expenseId;
     receipt.importedAt = new Date().toISOString();
-    
+
     await this.saveReceipt(receipt);
     return receipt;
   }
@@ -317,7 +315,7 @@ class ReceiptService {
     averageConfidence: number;
   }> {
     const receipts = await this.getReceipts();
-    
+
     const byStatus: Record<string, number> = {
       capturing: 0,
       processing: 0,
@@ -333,7 +331,7 @@ class ReceiptService {
 
     for (const receipt of receipts) {
       byStatus[receipt.status] = (byStatus[receipt.status] || 0) + 1;
-      
+
       if (receipt.extraction?.overallConfidence) {
         totalConfidence += receipt.extraction.overallConfidence;
         confidenceCount++;
@@ -354,19 +352,17 @@ class ReceiptService {
 
   async getReceiptsByStatus(status: ReceiptStatus): Promise<Receipt[]> {
     const receipts = await this.getReceipts();
-    return receipts.filter(r => r.status === status);
+    return receipts.filter((r) => r.status === status);
   }
 
   async getReceiptsByTrip(tripId: string): Promise<Receipt[]> {
     const receipts = await this.getReceipts();
-    return receipts.filter(r => r.tripId === tripId);
+    return receipts.filter((r) => r.tripId === tripId);
   }
 
   async getPendingReceipts(): Promise<Receipt[]> {
     const receipts = await this.getReceipts();
-    return receipts.filter(r => 
-      r.status === 'reviewing' || r.status === 'confirmed'
-    );
+    return receipts.filter((r) => r.status === 'reviewing' || r.status === 'confirmed');
   }
 }
 

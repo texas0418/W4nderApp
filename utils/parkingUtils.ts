@@ -41,10 +41,7 @@ export async function getCurrentLocation(): Promise<{ lat: number; lng: number }
   try {
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
-      Alert.alert(
-        'Location Required',
-        'Please enable location services to find parking near you.'
-      );
+      Alert.alert('Location Required', 'Please enable location services to find parking near you.');
       return null;
     }
 
@@ -70,25 +67,17 @@ export async function getCurrentLocation(): Promise<{ lat: number; lng: number }
  * Calculate distance between two coordinates (Haversine formula)
  * Returns distance in miles
  */
-export function calculateDistance(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
+export function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 3959; // Earth's radius in miles
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
-  
+
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
+
   return R * c;
 }
 
@@ -103,7 +92,7 @@ export function formatDistance(miles: number): string {
     return `${feet} ft`;
   }
   if (miles < 1) {
-    return `${(miles * 5280 / 100).toFixed(0)}00 ft`;
+    return `${((miles * 5280) / 100).toFixed(0)}00 ft`;
   }
   return `${miles.toFixed(1)} mi`;
 }
@@ -124,27 +113,21 @@ export function estimateWalkingTime(miles: number): number {
  * Search for nearby parking locations
  * In production, this would call a real API (Google Places, ParkWhiz, SpotHero, etc.)
  */
-export async function searchParking(
-  params: ParkingSearchParams
-): Promise<ParkingSearchResult> {
+export async function searchParking(params: ParkingSearchParams): Promise<ParkingSearchResult> {
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
   // Get mock parking data based on destination or generate
   let locations: ParkingLocation[];
-  
+
   if (params.destinationName) {
     locations = getParkingByDestination(params.destinationName);
   } else {
-    locations = generateMockParking(
-      params.coordinates.lat,
-      params.coordinates.lng,
-      15
-    );
+    locations = generateMockParking(params.coordinates.lat, params.coordinates.lng, 15);
   }
 
   // Calculate distances
-  locations = locations.map(loc => ({
+  locations = locations.map((loc) => ({
     ...loc,
     distance: calculateDistance(
       params.coordinates.lat,
@@ -155,7 +138,7 @@ export async function searchParking(
   }));
 
   // Add formatted distance and walking time
-  locations = locations.map(loc => ({
+  locations = locations.map((loc) => ({
     ...loc,
     distanceText: formatDistance(loc.distance!),
     walkingTime: estimateWalkingTime(loc.distance!),
@@ -168,9 +151,7 @@ export async function searchParking(
   locations = sortParkingLocations(locations, params.sortBy);
 
   // Filter by radius
-  locations = locations.filter(
-    loc => (loc.distance || 0) <= params.radiusMiles
-  );
+  locations = locations.filter((loc) => (loc.distance || 0) <= params.radiusMiles);
 
   return {
     locations,
@@ -192,47 +173,41 @@ function applyFilters(
 
   // Filter by type
   if (params.types && params.types.length > 0) {
-    filtered = filtered.filter(loc => params.types!.includes(loc.type));
+    filtered = filtered.filter((loc) => params.types!.includes(loc.type));
   }
 
   // Filter by max price
   if (params.maxPrice !== undefined) {
-    filtered = filtered.filter(
-      loc => (loc.pricing.hourlyRate || 0) <= params.maxPrice!
-    );
+    filtered = filtered.filter((loc) => (loc.pricing.hourlyRate || 0) <= params.maxPrice!);
   }
 
   // Filter by minimum available spaces
   if (params.minSpaces !== undefined) {
     filtered = filtered.filter(
-      loc =>
-        loc.availableSpaces === undefined ||
-        loc.availableSpaces >= params.minSpaces!
+      (loc) => loc.availableSpaces === undefined || loc.availableSpaces >= params.minSpaces!
     );
   }
 
   // Filter by features
   if (params.features && params.features.length > 0) {
-    filtered = filtered.filter(loc =>
-      params.features!.every(feature => loc.features.includes(feature))
+    filtered = filtered.filter((loc) =>
+      params.features!.every((feature) => loc.features.includes(feature))
     );
   }
 
   // Filter by vehicle type
   if (params.vehicleType) {
-    filtered = filtered.filter(loc =>
-      loc.vehicleTypes.includes(params.vehicleType!)
-    );
+    filtered = filtered.filter((loc) => loc.vehicleTypes.includes(params.vehicleType!));
   }
 
   // Filter by open status
   if (params.mustBeOpen) {
-    filtered = filtered.filter(loc => loc.isOpen);
+    filtered = filtered.filter((loc) => loc.isOpen);
   }
 
   // Filter by reservable
   if (params.reservableOnly) {
-    filtered = filtered.filter(loc => loc.canReserve);
+    filtered = filtered.filter((loc) => loc.canReserve);
   }
 
   return filtered;
@@ -250,17 +225,13 @@ function sortParkingLocations(
   switch (sortBy) {
     case 'distance':
       return sorted.sort((a, b) => (a.distance || 0) - (b.distance || 0));
-    
+
     case 'price_low':
-      return sorted.sort(
-        (a, b) => (a.pricing.hourlyRate || 0) - (b.pricing.hourlyRate || 0)
-      );
-    
+      return sorted.sort((a, b) => (a.pricing.hourlyRate || 0) - (b.pricing.hourlyRate || 0));
+
     case 'price_high':
-      return sorted.sort(
-        (a, b) => (b.pricing.hourlyRate || 0) - (a.pricing.hourlyRate || 0)
-      );
-    
+      return sorted.sort((a, b) => (b.pricing.hourlyRate || 0) - (a.pricing.hourlyRate || 0));
+
     case 'availability':
       const statusOrder: Record<AvailabilityStatus, number> = {
         available: 0,
@@ -269,13 +240,12 @@ function sortParkingLocations(
         full: 3,
       };
       return sorted.sort(
-        (a, b) =>
-          statusOrder[a.availabilityStatus] - statusOrder[b.availabilityStatus]
+        (a, b) => statusOrder[a.availabilityStatus] - statusOrder[b.availabilityStatus]
       );
-    
+
     case 'rating':
       return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    
+
     default:
       return sorted;
   }
@@ -362,7 +332,7 @@ export function openParkingDirections(
       : `google.navigation:q=${lat},${lng}`;
   }
 
-  Linking.canOpenURL(url).then(supported => {
+  Linking.canOpenURL(url).then((supported) => {
     if (supported) {
       Linking.openURL(url);
     } else {
@@ -385,7 +355,7 @@ export function openParkingReservation(parking: ParkingLocation): void {
   }
 
   if (parking.appDeepLink) {
-    Linking.canOpenURL(parking.appDeepLink).then(supported => {
+    Linking.canOpenURL(parking.appDeepLink).then((supported) => {
       if (supported) {
         Linking.openURL(parking.appDeepLink!);
       } else if (parking.website) {
@@ -404,7 +374,7 @@ export function openParkingReservation(parking: ParkingLocation): void {
       bestparking: 'https://bestparking.com',
       parkopedia: 'https://parkopedia.com',
     };
-    
+
     const url = providerUrls[parking.reservationProvider];
     if (url) {
       Linking.openURL(url);
@@ -444,7 +414,7 @@ export function getAvailabilityText(parking: ParkingLocation): string {
     }
     return `${parking.availableSpaces} spots`;
   }
-  
+
   switch (parking.availabilityStatus) {
     case 'available':
       return 'Available';
@@ -494,7 +464,7 @@ export function isParkingOpen(parking: ParkingLocation): boolean {
  */
 export function formatParkingHours(parking: ParkingLocation): string {
   if (parking.is24Hours) return 'Open 24 Hours';
-  
+
   const now = new Date();
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const dayName = days[now.getDay()] as keyof typeof parking.hours;
@@ -510,7 +480,9 @@ function formatTime(time24: string): string {
   const [hours, minutes] = time24.split(':').map(Number);
   const period = hours >= 12 ? 'PM' : 'AM';
   const hour12 = hours % 12 || 12;
-  return minutes === 0 ? `${hour12} ${period}` : `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
+  return minutes === 0
+    ? `${hour12} ${period}`
+    : `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
 }
 
 // ============================================================================
@@ -532,7 +504,7 @@ export function getKeyFeatures(parking: ParkingLocation): ParkingFeature[] {
   ];
 
   const keyFeatures: ParkingFeature[] = [];
-  
+
   for (const feature of priority) {
     if (parking.features.includes(feature)) {
       keyFeatures.push(feature);

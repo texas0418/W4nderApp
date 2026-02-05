@@ -26,13 +26,13 @@ export interface Restaurant {
     yelp?: string;
     google?: string;
   };
-  
+
   // Basic info
   name: string;
   description?: string;
   cuisineTypes: string[];
   priceRange: 1 | 2 | 3 | 4; // $ to $$$$
-  
+
   // Location
   address: string;
   city: string;
@@ -43,15 +43,15 @@ export interface Restaurant {
     lat: number;
     lng: number;
   };
-  
+
   // Contact
   phone?: string;
   website?: string;
-  
+
   // Media
   photos: string[];
   coverPhoto?: string;
-  
+
   // Ratings
   ratings: {
     opentable?: { score: number; reviewCount: number };
@@ -60,30 +60,30 @@ export interface Restaurant {
     yelp?: { score: number; reviewCount: number };
   };
   aggregateRating?: number;
-  
+
   // Features
   features: RestaurantFeature[];
   diningStyles: DiningStyle[];
   dressCode?: string;
-  
+
   // Hours
   hours: OperatingHours;
-  
+
   // Booking info
   acceptsReservations: boolean;
   reservationProviders: ReservationProvider[];
   walkInsOnly?: boolean;
   requiresCreditCard?: boolean;
   cancellationPolicy?: string;
-  
+
   // Tags for search
   tags: string[];
-  
+
   // Distance (populated during search)
   distance?: number; // miles from search location
 }
 
-export type RestaurantFeature = 
+export type RestaurantFeature =
   | 'outdoor_seating'
   | 'private_dining'
   | 'bar_seating'
@@ -106,7 +106,7 @@ export type RestaurantFeature =
   | 'vegan_options'
   | 'gluten_free_options';
 
-export type DiningStyle = 
+export type DiningStyle =
   | 'fine_dining'
   | 'casual_dining'
   | 'fast_casual'
@@ -157,26 +157,26 @@ export interface RestaurantSearchParams {
   city?: string;
   neighborhood?: string;
   radius?: number; // miles
-  
+
   // Date/Time
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   partySize: number;
-  
+
   // Filters
   cuisineTypes?: string[];
   priceRange?: (1 | 2 | 3 | 4)[];
   features?: RestaurantFeature[];
   diningStyles?: DiningStyle[];
   minRating?: number;
-  
+
   // Sorting
   sortBy?: 'relevance' | 'rating' | 'distance' | 'price_low' | 'price_high';
-  
+
   // Pagination
   page?: number;
   limit?: number;
-  
+
   // Provider preference
   preferredProviders?: ReservationProvider[];
 }
@@ -203,25 +203,25 @@ export interface TimeSlot {
   id: string;
   provider: ReservationProvider;
   restaurantId: string;
-  
+
   dateTime: Date;
   displayTime: string; // "7:00 PM"
-  
+
   partySize: number;
-  
+
   // Slot details
   type: 'standard' | 'bar' | 'outdoor' | 'counter' | 'private' | 'experience';
   typeName?: string; // "Patio Dining", "Chef's Counter"
-  
+
   // Pricing
   requiresDeposit: boolean;
   depositAmount?: number;
   pricePerPerson?: number; // For prix fixe or experiences
-  
+
   // Availability
   isAvailable: boolean;
   spotsLeft?: number;
-  
+
   // Booking token (used when confirming)
   bookingToken: string;
 }
@@ -234,26 +234,26 @@ export interface ReservationRequest {
   // Slot info
   timeSlot: TimeSlot;
   restaurantId: string;
-  
+
   // Guest info
   partySize: number;
   primaryGuest: GuestInfo;
   additionalGuests?: string[]; // Just names
-  
+
   // Preferences
   specialRequests?: string;
   occasion?: ReservationOccasion;
   seatingPreference?: 'indoor' | 'outdoor' | 'bar' | 'any';
   highchair?: boolean;
   wheelchair?: boolean;
-  
+
   // Contact
   phone: string;
   email: string;
-  
+
   // Payment (if required)
   paymentMethodId?: string;
-  
+
   // Opt-ins
   receiveUpdates: boolean;
   receiveMarketing: boolean;
@@ -266,7 +266,7 @@ export interface GuestInfo {
   phone: string;
 }
 
-export type ReservationOccasion = 
+export type ReservationOccasion =
   | 'date_night'
   | 'anniversary'
   | 'birthday'
@@ -280,65 +280,65 @@ export type ReservationOccasion =
 
 export interface Reservation {
   id: string;
-  
+
   // External IDs
   providerReservationId: string;
   provider: ReservationProvider;
-  
+
   // Status
   status: ReservationStatus;
-  
+
   // Restaurant
   restaurant: Restaurant;
-  
+
   // Details
   dateTime: Date;
   displayDate: string; // "Friday, February 14, 2025"
   displayTime: string; // "7:00 PM"
   partySize: number;
-  
+
   // Guest info
   guestName: string;
   guestEmail: string;
   guestPhone: string;
-  
+
   // Preferences
   specialRequests?: string;
   occasion?: ReservationOccasion;
   seatingPreference?: string;
-  
+
   // Confirmation
   confirmationNumber: string;
   confirmationUrl?: string;
-  
+
   // Payment
   depositPaid?: number;
   depositRefundable?: boolean;
-  
+
   // Timing
   createdAt: Date;
   modifiedAt?: Date;
   cancelledAt?: Date;
-  
+
   // Cancellation
   cancellationPolicy?: string;
   canCancel: boolean;
   canModify: boolean;
   cancelDeadline?: Date;
-  
+
   // Integration
   addedToItinerary?: boolean;
   itineraryId?: string;
 }
 
-export type ReservationStatus = 
-  | 'pending'      // Awaiting confirmation
-  | 'confirmed'    // Confirmed by restaurant
-  | 'seated'       // Guest has arrived
-  | 'completed'    // Dining completed
-  | 'cancelled'    // Cancelled by user
-  | 'no_show'      // Guest didn't show up
-  | 'expired';     // Reservation time passed
+export type ReservationStatus =
+  | 'pending' // Awaiting confirmation
+  | 'confirmed' // Confirmed by restaurant
+  | 'seated' // Guest has arrived
+  | 'completed' // Dining completed
+  | 'cancelled' // Cancelled by user
+  | 'no_show' // Guest didn't show up
+  | 'expired'; // Reservation time passed
 
 // ============================================================================
 // User Preferences & History
@@ -348,15 +348,15 @@ export interface DiningPreferences {
   // Favorites
   favoriteRestaurants: string[]; // Restaurant IDs
   favoriteCuisines: string[];
-  
+
   // Default settings
   defaultPartySize: number;
   defaultSeatingPreference: 'indoor' | 'outdoor' | 'bar' | 'any';
-  
+
   // Dietary
   dietaryRestrictions: string[];
   allergies: string[];
-  
+
   // Communication
   reminderTime: number; // Hours before reservation
   receiveRecommendations: boolean;
@@ -375,11 +375,35 @@ export interface DiningHistory {
 // ============================================================================
 
 export const CUISINE_TYPES = [
-  'American', 'Italian', 'Japanese', 'Chinese', 'Mexican', 'Thai',
-  'Indian', 'French', 'Mediterranean', 'Korean', 'Vietnamese', 'Spanish',
-  'Greek', 'Middle Eastern', 'Brazilian', 'Peruvian', 'Caribbean',
-  'Soul Food', 'Southern', 'BBQ', 'Seafood', 'Steakhouse', 'Sushi',
-  'Pizza', 'Tapas', 'Farm-to-Table', 'Vegetarian', 'Vegan', 'Fusion',
+  'American',
+  'Italian',
+  'Japanese',
+  'Chinese',
+  'Mexican',
+  'Thai',
+  'Indian',
+  'French',
+  'Mediterranean',
+  'Korean',
+  'Vietnamese',
+  'Spanish',
+  'Greek',
+  'Middle Eastern',
+  'Brazilian',
+  'Peruvian',
+  'Caribbean',
+  'Soul Food',
+  'Southern',
+  'BBQ',
+  'Seafood',
+  'Steakhouse',
+  'Sushi',
+  'Pizza',
+  'Tapas',
+  'Farm-to-Table',
+  'Vegetarian',
+  'Vegan',
+  'Fusion',
 ];
 
 export const OCCASION_LABELS: Record<ReservationOccasion, string> = {

@@ -102,7 +102,14 @@ const hotelPrograms: ProgramTemplate[] = [
     type: 'hotel',
     logo: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100',
     color: '#8B0051',
-    tiers: ['Member', 'Silver Elite', 'Gold Elite', 'Platinum Elite', 'Titanium Elite', 'Ambassador'],
+    tiers: [
+      'Member',
+      'Silver Elite',
+      'Gold Elite',
+      'Platinum Elite',
+      'Titanium Elite',
+      'Ambassador',
+    ],
   },
   {
     id: 'hilton-honors',
@@ -204,29 +211,28 @@ export default function LoyaltyProgramsScreen() {
     { id: 'creditCard', label: 'Cards', icon: CreditCard },
   ];
 
-  const filteredPrograms = activeTab === 'all'
-    ? connectedPrograms
-    : connectedPrograms.filter(p => p.type === activeTab);
+  const filteredPrograms =
+    activeTab === 'all' ? connectedPrograms : connectedPrograms.filter((p) => p.type === activeTab);
 
   const getAvailablePrograms = () => {
-    const connectedIds = connectedPrograms.map(p => p.id);
+    const connectedIds = connectedPrograms.map((p) => p.id);
     let programs: ProgramTemplate[] = [];
-    
+
     if (activeTab === 'all' || activeTab === 'airline') {
-      programs = [...programs, ...airlinePrograms.filter(p => !connectedIds.includes(p.id))];
+      programs = [...programs, ...airlinePrograms.filter((p) => !connectedIds.includes(p.id))];
     }
     if (activeTab === 'all' || activeTab === 'hotel') {
-      programs = [...programs, ...hotelPrograms.filter(p => !connectedIds.includes(p.id))];
+      programs = [...programs, ...hotelPrograms.filter((p) => !connectedIds.includes(p.id))];
     }
     if (activeTab === 'all' || activeTab === 'creditCard') {
-      programs = [...programs, ...creditCardPrograms.filter(p => !connectedIds.includes(p.id))];
+      programs = [...programs, ...creditCardPrograms.filter((p) => !connectedIds.includes(p.id))];
     }
-    
+
     return programs;
   };
 
   const getProgramTemplate = (id: string): ProgramTemplate | undefined => {
-    return [...airlinePrograms, ...hotelPrograms, ...creditCardPrograms].find(p => p.id === id);
+    return [...airlinePrograms, ...hotelPrograms, ...creditCardPrograms].find((p) => p.id === id);
   };
 
   const handleAddProgram = () => {
@@ -251,30 +257,26 @@ export default function LoyaltyProgramsScreen() {
     setMemberId('');
     setPoints('');
     setSelectedTier('');
-    
+
     Alert.alert('Success', `${selectedProgram.name} has been connected!`);
   };
 
   const handleRemoveProgram = (programId: string) => {
-    const program = connectedPrograms.find(p => p.id === programId);
-    Alert.alert(
-      'Remove Program',
-      `Are you sure you want to disconnect ${program?.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
-          style: 'destructive',
-          onPress: () => removeLoyaltyProgram(programId),
-        },
-      ]
-    );
+    const program = connectedPrograms.find((p) => p.id === programId);
+    Alert.alert('Remove Program', `Are you sure you want to disconnect ${program?.name}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => removeLoyaltyProgram(programId),
+      },
+    ]);
   };
 
   const handleSyncProgram = (programId: string) => {
     const randomPoints = Math.floor(Math.random() * 5000);
-    updateLoyaltyProgram(programId, { 
-      points: (connectedPrograms.find(p => p.id === programId)?.points || 0) + randomPoints 
+    updateLoyaltyProgram(programId, {
+      points: (connectedPrograms.find((p) => p.id === programId)?.points || 0) + randomPoints,
     });
     Alert.alert('Synced!', `Added ${randomPoints.toLocaleString()} points from recent activity`);
   };
@@ -287,19 +289,27 @@ export default function LoyaltyProgramsScreen() {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'airline': return Plane;
-      case 'hotel': return Building2;
-      case 'creditCard': return CreditCard;
-      default: return Star;
+      case 'airline':
+        return Plane;
+      case 'hotel':
+        return Building2;
+      case 'creditCard':
+        return CreditCard;
+      default:
+        return Star;
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'airline': return '#0EA5E9';
-      case 'hotel': return '#8B5CF6';
-      case 'creditCard': return '#10B981';
-      default: return colors.primary;
+      case 'airline':
+        return '#0EA5E9';
+      case 'hotel':
+        return '#8B5CF6';
+      case 'creditCard':
+        return '#10B981';
+      default:
+        return colors.primary;
     }
   };
 
@@ -334,10 +344,7 @@ export default function LoyaltyProgramsScreen() {
                 </View>
               </View>
             </View>
-            <Pressable 
-              style={styles.syncButton}
-              onPress={() => handleSyncProgram(program.id)}
-            >
+            <Pressable style={styles.syncButton} onPress={() => handleSyncProgram(program.id)}>
               <RefreshCw size={16} color={colors.textLight} />
             </Pressable>
           </View>
@@ -357,17 +364,16 @@ export default function LoyaltyProgramsScreen() {
           </View>
 
           <View style={styles.programActions}>
-            <Pressable 
+            <Pressable
               style={styles.actionButton}
-              onPress={() => Alert.alert('Coming Soon', 'View detailed rewards and redemption options')}
+              onPress={() =>
+                Alert.alert('Coming Soon', 'View detailed rewards and redemption options')
+              }
             >
               <Text style={styles.actionButtonText}>View Rewards</Text>
               <ChevronRight size={16} color={colors.textLight} />
             </Pressable>
-            <Pressable 
-              style={styles.removeButton}
-              onPress={() => handleRemoveProgram(program.id)}
-            >
+            <Pressable style={styles.removeButton} onPress={() => handleRemoveProgram(program.id)}>
               <Trash2 size={16} color="rgba(255,255,255,0.7)" />
             </Pressable>
           </View>
@@ -380,24 +386,22 @@ export default function LoyaltyProgramsScreen() {
     const TypeIcon = getTypeIcon(program.type);
 
     return (
-      <Pressable 
-        key={program.id} 
+      <Pressable
+        key={program.id}
         style={styles.availableCard}
         onPress={() => openAddModal(program)}
       >
         <View style={[styles.availableIconBg, { backgroundColor: `${program.color}15` }]}>
-          <Image
-            source={{ uri: program.logo }}
-            style={styles.availableLogo}
-            contentFit="cover"
-          />
+          <Image source={{ uri: program.logo }} style={styles.availableLogo} contentFit="cover" />
         </View>
         <View style={styles.availableInfo}>
           <Text style={styles.availableName}>{program.name}</Text>
           <View style={styles.availableTypeRow}>
             <TypeIcon size={12} color={colors.textTertiary} />
             <Text style={styles.availableType}>
-              {program.type === 'creditCard' ? 'Credit Card' : program.type.charAt(0).toUpperCase() + program.type.slice(1)}
+              {program.type === 'creditCard'
+                ? 'Credit Card'
+                : program.type.charAt(0).toUpperCase() + program.type.slice(1)}
             </Text>
           </View>
         </View>
@@ -450,23 +454,17 @@ export default function LoyaltyProgramsScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tabsContent}
           >
-            {tabs.map(tab => (
+            {tabs.map((tab) => (
               <Pressable
                 key={tab.id}
-                style={[
-                  styles.tab,
-                  activeTab === tab.id && styles.tabActive,
-                ]}
+                style={[styles.tab, activeTab === tab.id && styles.tabActive]}
                 onPress={() => setActiveTab(tab.id)}
               >
-                <tab.icon 
-                  size={16} 
-                  color={activeTab === tab.id ? colors.textLight : colors.textSecondary} 
+                <tab.icon
+                  size={16}
+                  color={activeTab === tab.id ? colors.textLight : colors.textSecondary}
                 />
-                <Text style={[
-                  styles.tabText,
-                  activeTab === tab.id && styles.tabTextActive,
-                ]}>
+                <Text style={[styles.tabText, activeTab === tab.id && styles.tabTextActive]}>
                   {tab.label}
                 </Text>
               </Pressable>
@@ -474,10 +472,7 @@ export default function LoyaltyProgramsScreen() {
           </ScrollView>
         </View>
 
-        <ScrollView 
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {filteredPrograms.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Connected Programs</Text>
@@ -507,10 +502,7 @@ export default function LoyaltyProgramsScreen() {
           <SafeAreaView style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Connect Program</Text>
-              <Pressable 
-                style={styles.modalCloseButton}
-                onPress={() => setShowAddModal(false)}
-              >
+              <Pressable style={styles.modalCloseButton} onPress={() => setShowAddModal(false)}>
                 <X size={22} color={colors.text} />
               </Pressable>
             </View>
@@ -518,7 +510,12 @@ export default function LoyaltyProgramsScreen() {
             {selectedProgram && (
               <ScrollView style={styles.modalContent}>
                 <View style={styles.modalProgramInfo}>
-                  <View style={[styles.modalProgramIcon, { backgroundColor: `${selectedProgram.color}15` }]}>
+                  <View
+                    style={[
+                      styles.modalProgramIcon,
+                      { backgroundColor: `${selectedProgram.color}15` },
+                    ]}
+                  >
                     <Image
                       source={{ uri: selectedProgram.logo }}
                       style={styles.modalProgramLogo}
@@ -555,27 +552,27 @@ export default function LoyaltyProgramsScreen() {
                 <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Current Tier Status</Text>
                   <View style={styles.tierOptions}>
-                    {selectedProgram.tiers.map(tier => (
+                    {selectedProgram.tiers.map((tier) => (
                       <Pressable
                         key={tier}
                         style={[
                           styles.tierOption,
                           selectedTier === tier && [
                             styles.tierOptionActive,
-                            { backgroundColor: selectedProgram.color }
+                            { backgroundColor: selectedProgram.color },
                           ],
                         ]}
                         onPress={() => setSelectedTier(tier)}
                       >
-                        <Text style={[
-                          styles.tierOptionText,
-                          selectedTier === tier && styles.tierOptionTextActive,
-                        ]}>
+                        <Text
+                          style={[
+                            styles.tierOptionText,
+                            selectedTier === tier && styles.tierOptionTextActive,
+                          ]}
+                        >
                           {tier}
                         </Text>
-                        {selectedTier === tier && (
-                          <Check size={14} color={colors.textLight} />
-                        )}
+                        {selectedTier === tier && <Check size={14} color={colors.textLight} />}
                       </Pressable>
                     ))}
                   </View>
@@ -584,11 +581,12 @@ export default function LoyaltyProgramsScreen() {
                 <View style={styles.infoBox}>
                   <Text style={styles.infoBoxTitle}>Secure Connection</Text>
                   <Text style={styles.infoBoxText}>
-                    Your credentials are encrypted and never stored. We only sync your points balance and tier status.
+                    Your credentials are encrypted and never stored. We only sync your points
+                    balance and tier status.
                   </Text>
                 </View>
 
-                <Pressable 
+                <Pressable
                   style={[styles.connectButton, { backgroundColor: selectedProgram.color }]}
                   onPress={handleAddProgram}
                 >

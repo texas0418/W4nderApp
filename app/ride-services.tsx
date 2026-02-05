@@ -9,7 +9,6 @@ import {
   Platform,
   Linking,
   Alert,
-
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -169,64 +168,66 @@ export default function RideServicesScreen() {
   const [selectedService, setSelectedService] = useState<RideService | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const openRideApp = useCallback(async (service: RideService, rideType?: string) => {
-    setIsLoading(true);
-    
-    try {
-      let deepLink = '';
-      let webFallback = '';
-      
-      if (service.id === 'uber') {
-        deepLink = `uber://?action=setPickup&pickup=my_location`;
-        if (destination) {
-          deepLink += `&dropoff[formatted_address]=${encodeURIComponent(destination)}`;
-        }
-        webFallback = `https://m.uber.com/ul/?action=setPickup&pickup=my_location${destination ? `&dropoff[formatted_address]=${encodeURIComponent(destination)}` : ''}`;
-      } else if (service.id === 'lyft') {
-        deepLink = `lyft://ridetype?id=${rideType || 'lyft'}`;
-        if (destination) {
-          deepLink += `&destination[address]=${encodeURIComponent(destination)}`;
-        }
-        webFallback = `https://www.lyft.com/ride?id=${rideType || 'lyft'}${destination ? `&destination=${encodeURIComponent(destination)}` : ''}`;
-      }
+  const openRideApp = useCallback(
+    async (service: RideService, rideType?: string) => {
+      setIsLoading(true);
 
-      if (Platform.OS === 'web') {
-        await Linking.openURL(webFallback);
-      } else {
-        const canOpen = await Linking.canOpenURL(service.deepLinkScheme);
-        
-        if (canOpen) {
-          await Linking.openURL(deepLink);
-        } else {
-          Alert.alert(
-            `${service.name} Not Installed`,
-            `Would you like to install ${service.name}?`,
-            [
-              { text: 'Cancel', style: 'cancel' },
-              {
-                text: 'Install',
-                onPress: () => {
-                  const storeUrl = Platform.OS === 'ios' 
-                    ? service.appStoreUrl 
-                    : service.playStoreUrl;
-                  Linking.openURL(storeUrl);
-                },
-              },
-              {
-                text: 'Open Web',
-                onPress: () => Linking.openURL(webFallback),
-              },
-            ]
-          );
+      try {
+        let deepLink = '';
+        let webFallback = '';
+
+        if (service.id === 'uber') {
+          deepLink = `uber://?action=setPickup&pickup=my_location`;
+          if (destination) {
+            deepLink += `&dropoff[formatted_address]=${encodeURIComponent(destination)}`;
+          }
+          webFallback = `https://m.uber.com/ul/?action=setPickup&pickup=my_location${destination ? `&dropoff[formatted_address]=${encodeURIComponent(destination)}` : ''}`;
+        } else if (service.id === 'lyft') {
+          deepLink = `lyft://ridetype?id=${rideType || 'lyft'}`;
+          if (destination) {
+            deepLink += `&destination[address]=${encodeURIComponent(destination)}`;
+          }
+          webFallback = `https://www.lyft.com/ride?id=${rideType || 'lyft'}${destination ? `&destination=${encodeURIComponent(destination)}` : ''}`;
         }
+
+        if (Platform.OS === 'web') {
+          await Linking.openURL(webFallback);
+        } else {
+          const canOpen = await Linking.canOpenURL(service.deepLinkScheme);
+
+          if (canOpen) {
+            await Linking.openURL(deepLink);
+          } else {
+            Alert.alert(
+              `${service.name} Not Installed`,
+              `Would you like to install ${service.name}?`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Install',
+                  onPress: () => {
+                    const storeUrl =
+                      Platform.OS === 'ios' ? service.appStoreUrl : service.playStoreUrl;
+                    Linking.openURL(storeUrl);
+                  },
+                },
+                {
+                  text: 'Open Web',
+                  onPress: () => Linking.openURL(webFallback),
+                },
+              ]
+            );
+          }
+        }
+      } catch (error) {
+        console.log('Error opening ride app:', error);
+        Alert.alert('Error', 'Failed to open the ride service. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.log('Error opening ride app:', error);
-      Alert.alert('Error', 'Failed to open the ride service. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [destination]);
+    },
+    [destination]
+  );
 
   const handleSelectService = (service: RideService) => {
     setSelectedService(selectedService?.id === service.id ? null : service);
@@ -240,7 +241,10 @@ export default function RideServicesScreen() {
     openRideApp(service, option.id);
   };
 
-  const handleRecentLocation = (location: typeof recentLocations[0], type: 'pickup' | 'destination') => {
+  const handleRecentLocation = (
+    location: (typeof recentLocations)[0],
+    type: 'pickup' | 'destination'
+  ) => {
     if (type === 'pickup') {
       setPickup(location.name);
     } else {
@@ -252,17 +256,14 @@ export default function RideServicesScreen() {
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Ride Services</Text>
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -298,7 +299,7 @@ export default function RideServicesScreen() {
             </View>
           </View>
 
-          {(!pickup && !destination) && (
+          {!pickup && !destination && (
             <View style={styles.recentSection}>
               <Text style={styles.sectionTitle}>Recent Locations</Text>
               {recentLocations.map((location) => (
@@ -322,7 +323,7 @@ export default function RideServicesScreen() {
 
           <View style={styles.servicesSection}>
             <Text style={styles.sectionTitle}>Choose Your Ride</Text>
-            
+
             {rideServices.map((service) => (
               <View key={service.id} style={styles.serviceCard}>
                 <TouchableOpacity
@@ -362,9 +363,7 @@ export default function RideServicesScreen() {
                         onPress={() => handleSelectRideOption(service, option)}
                         activeOpacity={0.7}
                       >
-                        <View style={styles.rideOptionIcon}>
-                          {option.icon}
-                        </View>
+                        <View style={styles.rideOptionIcon}>{option.icon}</View>
                         <View style={styles.rideOptionInfo}>
                           <Text style={styles.rideOptionName}>{option.name}</Text>
                           <Text style={styles.rideOptionDesc}>{option.description}</Text>
@@ -411,7 +410,8 @@ export default function RideServicesScreen() {
               <View style={styles.tipContent}>
                 <Text style={styles.tipTitle}>Confirm Pickup Location</Text>
                 <Text style={styles.tipText}>
-                  Make sure your GPS is enabled for accurate pickup. Verify the pin location before confirming.
+                  Make sure your GPS is enabled for accurate pickup. Verify the pin location before
+                  confirming.
                 </Text>
               </View>
             </View>

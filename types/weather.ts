@@ -109,35 +109,35 @@ export interface ActivityWeatherRequirements {
   maxTemp?: number;
   idealTempMin?: number;
   idealTempMax?: number;
-  
+
   // Weather conditions
   suitableConditions: WeatherConditionType[];
   unsuitableConditions: WeatherConditionType[];
   idealConditions?: WeatherConditionType[];
-  
+
   // Wind
   maxWindSpeed?: number;
-  
+
   // Rain/Precipitation
   maxPrecipitationChance?: number;
-  
+
   // UV
   maxUvIndex?: number;
-  
+
   // Visibility
   minVisibility?: number;
-  
+
   // Time of day preferences
   preferredTimeOfDay?: TimeOfDay[];
-  
+
   // Seasonal
   seasonalAvailability?: ('spring' | 'summer' | 'fall' | 'winter')[];
-  
+
   // Indoor/Outdoor
   isOutdoor: boolean;
   hasIndoorOption: boolean;
   coveredArea?: boolean; // Partially covered (like a covered terrace)
-  
+
   // Special requirements
   requiresDryGround?: boolean; // e.g., hiking trails
   requiresClearSkies?: boolean; // e.g., stargazing
@@ -196,7 +196,7 @@ export interface WeatherAwareActivity {
   description: string;
   category: ActivityCategory;
   image: string;
-  
+
   // Location
   location: {
     name: string;
@@ -204,24 +204,24 @@ export interface WeatherAwareActivity {
     coordinates: { lat: number; lng: number };
     indoor: boolean;
   };
-  
+
   // Timing
   duration: { value: number; unit: 'minutes' | 'hours' };
   availableTimeSlots: string[];
-  
+
   // Weather
   weatherRequirements: ActivityWeatherRequirements;
   currentSuitability?: WeatherSuitability;
-  
+
   // Pricing
   price: number;
   currency: string;
-  
+
   // Meta
   rating: number;
   reviewCount: number;
   tags: string[];
-  
+
   // Booking
   bookingRequired: boolean;
   provider?: string;
@@ -301,20 +301,20 @@ export interface SuggestedAction {
 
 export interface WeatherPreferences {
   temperatureUnit: 'celsius' | 'fahrenheit';
-  
+
   // Comfort thresholds
   heatSensitivity: 'low' | 'medium' | 'high'; // How much heat affects them
   coldSensitivity: 'low' | 'medium' | 'high';
   rainTolerance: 'low' | 'medium' | 'high'; // Willingness to do activities in rain
-  
+
   // Preferred conditions
   preferredTempRange: { min: number; max: number };
-  
+
   // Auto-adjustment settings
   autoSuggestAlternatives: boolean;
   showWeatherAlerts: boolean;
   notifyOnSignificantChange: boolean;
-  
+
   // Activity preferences in bad weather
   badWeatherPreference: 'indoor_alternatives' | 'reschedule' | 'proceed_anyway';
 }

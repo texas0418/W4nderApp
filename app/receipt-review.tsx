@@ -109,21 +109,17 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
       } else {
         // Mock import - in real app, call expense service
         expenseId = `exp_${Date.now()}`;
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
       await markAsImported(expenseId);
-      
-      Alert.alert(
-        'Receipt Imported',
-        'The receipt has been added to your expenses.',
-        [
-          { 
-            text: 'OK', 
-            onPress: () => navigation?.navigate('ExpenseTracker')
-          }
-        ]
-      );
+
+      Alert.alert('Receipt Imported', 'The receipt has been added to your expenses.', [
+        {
+          text: 'OK',
+          onPress: () => navigation?.navigate('ExpenseTracker'),
+        },
+      ]);
     } catch (error) {
       Alert.alert('Import Failed', 'Failed to import receipt to expenses.');
     } finally {
@@ -132,21 +128,17 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
   }, [getImportData, onImport, markAsImported, navigation]);
 
   const handleDiscard = useCallback(() => {
-    Alert.alert(
-      'Discard Receipt',
-      'Are you sure you want to discard this receipt?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Discard',
-          style: 'destructive',
-          onPress: async () => {
-            await discardReceipt();
-            navigation?.goBack();
-          },
+    Alert.alert('Discard Receipt', 'Are you sure you want to discard this receipt?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Discard',
+        style: 'destructive',
+        onPress: async () => {
+          await discardReceipt();
+          navigation?.goBack();
         },
-      ]
-    );
+      },
+    ]);
   }, [discardReceipt, navigation]);
 
   const getConfidenceColor = (confidence: number): string => {
@@ -156,7 +148,10 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
   };
 
   const getCategoryInfo = (categoryId: string) => {
-    return EXPENSE_CATEGORIES.find(c => c.id === categoryId) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+    return (
+      EXPENSE_CATEGORIES.find((c) => c.id === categoryId) ||
+      EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1]
+    );
   };
 
   const formatDate = (dateStr: string): string => {
@@ -187,30 +182,23 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Review Receipt</Text>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => setIsEditing(!isEditing)}
-        >
+        <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(!isEditing)}>
           <Text style={styles.editButtonText}>{isEditing ? 'Done' : 'Edit'}</Text>
         </TouchableOpacity>
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Receipt Image */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.imageContainer}
-          onPress={() => {/* Open full screen image viewer */}}
+          onPress={() => {
+            /* Open full screen image viewer */
+          }}
         >
           <Image
             source={{ uri: currentReceipt.image.uri }}
@@ -235,20 +223,24 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
         {/* Extracted Data */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Extracted Information</Text>
-          
+
           {/* Merchant */}
           <View style={styles.fieldContainer}>
             <View style={styles.fieldHeader}>
               <Text style={styles.fieldLabel}>Merchant</Text>
               {extraction?.merchant && (
-                <View style={[
-                  styles.confidenceBadge,
-                  { backgroundColor: getConfidenceColor(extraction.merchant.confidence) + '20' }
-                ]}>
-                  <Text style={[
-                    styles.confidenceText,
-                    { color: getConfidenceColor(extraction.merchant.confidence) }
-                  ]}>
+                <View
+                  style={[
+                    styles.confidenceBadge,
+                    { backgroundColor: getConfidenceColor(extraction.merchant.confidence) + '20' },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.confidenceText,
+                      { color: getConfidenceColor(extraction.merchant.confidence) },
+                    ]}
+                  >
                     {Math.round(extraction.merchant.confidence * 100)}%
                   </Text>
                 </View>
@@ -258,7 +250,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
               <TextInput
                 style={styles.input}
                 value={editedData.merchant}
-                onChangeText={(text) => setEditedData(prev => ({ ...prev, merchant: text }))}
+                onChangeText={(text) => setEditedData((prev) => ({ ...prev, merchant: text }))}
                 placeholder="Enter merchant name"
               />
             ) : (
@@ -271,14 +263,18 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
             <View style={styles.fieldHeader}>
               <Text style={styles.fieldLabel}>Date</Text>
               {extraction?.date && (
-                <View style={[
-                  styles.confidenceBadge,
-                  { backgroundColor: getConfidenceColor(extraction.date.confidence) + '20' }
-                ]}>
-                  <Text style={[
-                    styles.confidenceText,
-                    { color: getConfidenceColor(extraction.date.confidence) }
-                  ]}>
+                <View
+                  style={[
+                    styles.confidenceBadge,
+                    { backgroundColor: getConfidenceColor(extraction.date.confidence) + '20' },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.confidenceText,
+                      { color: getConfidenceColor(extraction.date.confidence) },
+                    ]}
+                  >
                     {Math.round(extraction.date.confidence * 100)}%
                   </Text>
                 </View>
@@ -288,7 +284,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
               <TextInput
                 style={styles.input}
                 value={editedData.date}
-                onChangeText={(text) => setEditedData(prev => ({ ...prev, date: text }))}
+                onChangeText={(text) => setEditedData((prev) => ({ ...prev, date: text }))}
                 placeholder="YYYY-MM-DD"
               />
             ) : (
@@ -303,14 +299,18 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
             <View style={styles.fieldHeader}>
               <Text style={styles.fieldLabel}>Total Amount</Text>
               {extraction?.total && (
-                <View style={[
-                  styles.confidenceBadge,
-                  { backgroundColor: getConfidenceColor(extraction.total.confidence) + '20' }
-                ]}>
-                  <Text style={[
-                    styles.confidenceText,
-                    { color: getConfidenceColor(extraction.total.confidence) }
-                  ]}>
+                <View
+                  style={[
+                    styles.confidenceBadge,
+                    { backgroundColor: getConfidenceColor(extraction.total.confidence) + '20' },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.confidenceText,
+                      { color: getConfidenceColor(extraction.total.confidence) },
+                    ]}
+                  >
                     {Math.round(extraction.total.confidence * 100)}%
                   </Text>
                 </View>
@@ -323,7 +323,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
                   onPress={() => {
                     const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
                     const idx = currencies.indexOf(editedData.currency);
-                    setEditedData(prev => ({
+                    setEditedData((prev) => ({
                       ...prev,
                       currency: currencies[(idx + 1) % currencies.length],
                     }));
@@ -334,7 +334,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
                 <TextInput
                   style={[styles.input, styles.amountInput]}
                   value={editedData.total}
-                  onChangeText={(text) => setEditedData(prev => ({ ...prev, total: text }))}
+                  onChangeText={(text) => setEditedData((prev) => ({ ...prev, total: text }))}
                   keyboardType="decimal-pad"
                   placeholder="0.00"
                 />
@@ -351,14 +351,21 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
             <View style={styles.fieldHeader}>
               <Text style={styles.fieldLabel}>Category</Text>
               {extraction?.suggestedCategory && (
-                <View style={[
-                  styles.confidenceBadge,
-                  { backgroundColor: getConfidenceColor(extraction.suggestedCategory.confidence) + '20' }
-                ]}>
-                  <Text style={[
-                    styles.confidenceText,
-                    { color: getConfidenceColor(extraction.suggestedCategory.confidence) }
-                  ]}>
+                <View
+                  style={[
+                    styles.confidenceBadge,
+                    {
+                      backgroundColor:
+                        getConfidenceColor(extraction.suggestedCategory.confidence) + '20',
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.confidenceText,
+                      { color: getConfidenceColor(extraction.suggestedCategory.confidence) },
+                    ]}
+                  >
                     {Math.round(extraction.suggestedCategory.confidence * 100)}%
                   </Text>
                 </View>
@@ -386,22 +393,24 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
             <Text style={styles.fieldLabel}>Payment Method</Text>
             {isEditing ? (
               <View style={styles.paymentOptions}>
-                {(['cash', 'card', 'mobile'] as const).map(method => (
+                {(['cash', 'card', 'mobile'] as const).map((method) => (
                   <TouchableOpacity
                     key={method}
                     style={[
                       styles.paymentOption,
                       editedData.paymentMethod === method && styles.paymentOptionActive,
                     ]}
-                    onPress={() => setEditedData(prev => ({ ...prev, paymentMethod: method }))}
+                    onPress={() => setEditedData((prev) => ({ ...prev, paymentMethod: method }))}
                   >
                     <Text style={styles.paymentOptionIcon}>
                       {method === 'cash' ? '💵' : method === 'card' ? '💳' : '📱'}
                     </Text>
-                    <Text style={[
-                      styles.paymentOptionText,
-                      editedData.paymentMethod === method && styles.paymentOptionTextActive,
-                    ]}>
+                    <Text
+                      style={[
+                        styles.paymentOptionText,
+                        editedData.paymentMethod === method && styles.paymentOptionTextActive,
+                      ]}
+                    >
                       {method.charAt(0).toUpperCase() + method.slice(1)}
                     </Text>
                   </TouchableOpacity>
@@ -410,12 +419,15 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
             ) : (
               <View style={styles.categoryDisplay}>
                 <Text style={styles.categoryIcon}>
-                  {finalData?.paymentMethod === 'cash' ? '💵' : 
-                   finalData?.paymentMethod === 'card' ? '💳' : '📱'}
+                  {finalData?.paymentMethod === 'cash'
+                    ? '💵'
+                    : finalData?.paymentMethod === 'card'
+                      ? '💳'
+                      : '📱'}
                 </Text>
                 <Text style={styles.categoryName}>
-                  {finalData?.paymentMethod?.charAt(0).toUpperCase() + 
-                   finalData?.paymentMethod?.slice(1)}
+                  {finalData?.paymentMethod?.charAt(0).toUpperCase() +
+                    finalData?.paymentMethod?.slice(1)}
                 </Text>
               </View>
             )}
@@ -428,7 +440,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
               <TextInput
                 style={[styles.input, styles.descriptionInput]}
                 value={editedData.description}
-                onChangeText={(text) => setEditedData(prev => ({ ...prev, description: text }))}
+                onChangeText={(text) => setEditedData((prev) => ({ ...prev, description: text }))}
                 placeholder="Enter description"
                 multiline
               />
@@ -441,18 +453,14 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
         {/* Line Items (if any) */}
         {extraction?.lineItems && extraction.lineItems.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Items ({extraction.lineItems.length})
-            </Text>
+            <Text style={styles.sectionTitle}>Items ({extraction.lineItems.length})</Text>
             <View style={styles.lineItemsCard}>
               {extraction.lineItems.map((item, idx) => (
                 <View key={idx} style={styles.lineItem}>
                   <Text style={styles.lineItemDesc} numberOfLines={1}>
                     {item.description}
                   </Text>
-                  <Text style={styles.lineItemPrice}>
-                    ${item.totalPrice.toFixed(2)}
-                  </Text>
+                  <Text style={styles.lineItemPrice}>${item.totalPrice.toFixed(2)}</Text>
                 </View>
               ))}
             </View>
@@ -465,11 +473,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
       {/* Action Buttons */}
       <View style={styles.footer}>
         {isEditing ? (
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={handleSaveEdits}
-            disabled={isSaving}
-          >
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveEdits} disabled={isSaving}>
             {isSaving ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -478,10 +482,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
           </TouchableOpacity>
         ) : (
           <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={styles.discardButton}
-              onPress={handleDiscard}
-            >
+            <TouchableOpacity style={styles.discardButton} onPress={handleDiscard}>
               <Text style={styles.discardButtonText}>Discard</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -510,7 +511,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.pickerList}>
-              {EXPENSE_CATEGORIES.map(cat => (
+              {EXPENSE_CATEGORIES.map((cat) => (
                 <TouchableOpacity
                   key={cat.id}
                   style={[
@@ -518,7 +519,7 @@ const ReceiptReviewScreen: React.FC<ReceiptReviewScreenProps> = ({
                     editedData.category === cat.id && styles.pickerOptionActive,
                   ]}
                   onPress={() => {
-                    setEditedData(prev => ({ ...prev, category: cat.id }));
+                    setEditedData((prev) => ({ ...prev, category: cat.id }));
                     setShowCategoryPicker(false);
                   }}
                 >

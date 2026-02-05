@@ -78,30 +78,30 @@ class PlacesService {
 
   async getPlace(id: string): Promise<FavoritePlace | null> {
     const places = await this.getPlaces();
-    return places.find(p => p.id === id) || null;
+    return places.find((p) => p.id === id) || null;
   }
 
   async savePlace(place: FavoritePlace): Promise<FavoritePlace> {
     const places = await this.getPlaces();
-    const index = places.findIndex(p => p.id === place.id);
-    
+    const index = places.findIndex((p) => p.id === place.id);
+
     const now = new Date().toISOString();
     const updated = { ...place, updatedAt: now };
-    
+
     if (index >= 0) {
       places[index] = updated;
     } else {
       updated.createdAt = now;
       places.unshift(updated);
     }
-    
+
     await AsyncStorage.setItem(STORAGE_KEYS.PLACES, JSON.stringify(places));
     return updated;
   }
 
   async addPlace(data: QuickAddPlace): Promise<FavoritePlace> {
     const now = new Date().toISOString();
-    
+
     const place: FavoritePlace = {
       id: `place_${Date.now()}`,
       name: data.name,
@@ -111,12 +111,16 @@ class PlacesService {
         longitude: data.location?.longitude || 0,
         ...data.location,
       },
-      photos: data.photoUri ? [{
-        id: `photo_${Date.now()}`,
-        uri: data.photoUri,
-        isMain: true,
-        takenAt: now,
-      }] : [],
+      photos: data.photoUri
+        ? [
+            {
+              id: `photo_${Date.now()}`,
+              uri: data.photoUri,
+              isMain: true,
+              takenAt: now,
+            },
+          ]
+        : [],
       rating: data.rating || 0,
       tags: [],
       recommendations: [],
@@ -131,12 +135,12 @@ class PlacesService {
     };
 
     await this.savePlace(place);
-    
+
     // Add to collection if specified
     if (data.collectionId) {
       await this.addPlaceToCollection(place.id, data.collectionId);
     }
-    
+
     return place;
   }
 
@@ -151,12 +155,12 @@ class PlacesService {
 
   async deletePlace(id: string): Promise<boolean> {
     const places = await this.getPlaces();
-    const filtered = places.filter(p => p.id !== id);
-    
+    const filtered = places.filter((p) => p.id !== id);
+
     if (filtered.length === places.length) return false;
-    
+
     await AsyncStorage.setItem(STORAGE_KEYS.PLACES, JSON.stringify(filtered));
-    
+
     // Remove from all collections
     const collections = await this.getCollections();
     for (const collection of collections) {
@@ -164,7 +168,7 @@ class PlacesService {
         await this.removePlaceFromCollection(id, collection.id);
       }
     }
-    
+
     return true;
   }
 
@@ -195,11 +199,15 @@ class PlacesService {
     return newVisit;
   }
 
-  async updateVisit(placeId: string, visitId: string, updates: Partial<PlaceVisit>): Promise<PlaceVisit | null> {
+  async updateVisit(
+    placeId: string,
+    visitId: string,
+    updates: Partial<PlaceVisit>
+  ): Promise<PlaceVisit | null> {
     const place = await this.getPlace(placeId);
     if (!place) return null;
 
-    const visitIndex = place.visits.findIndex(v => v.id === visitId);
+    const visitIndex = place.visits.findIndex((v) => v.id === visitId);
     if (visitIndex < 0) return null;
 
     const updatedVisit = { ...place.visits[visitIndex], ...updates };
@@ -214,14 +222,14 @@ class PlacesService {
     const place = await this.getPlace(placeId);
     if (!place) return false;
 
-    const visits = place.visits.filter(v => v.id !== visitId);
+    const visits = place.visits.filter((v) => v.id !== visitId);
     if (visits.length === place.visits.length) return false;
 
     // Recalculate first/last visited
-    const sortedVisits = [...visits].sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
+    const sortedVisits = [...visits].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
-    
+
     await this.updatePlace(placeId, {
       visits,
       visitCount: visits.length,
@@ -246,7 +254,7 @@ class PlacesService {
     };
 
     const photos = [...place.photos, newPhoto];
-    
+
     // Set as main if first photo
     if (photos.length === 1) {
       newPhoto.isMain = true;
@@ -264,7 +272,7 @@ class PlacesService {
     const place = await this.getPlace(placeId);
     if (!place) return false;
 
-    const photos = place.photos.filter(p => p.id !== photoId);
+    const photos = place.photos.filter((p) => p.id !== photoId);
     if (photos.length === place.photos.length) return false;
 
     // Update cover photo if needed
@@ -280,7 +288,7 @@ class PlacesService {
   async setCoverPhoto(placeId: string, photoId: string): Promise<boolean> {
     const place = await this.getPlace(placeId);
     if (!place) return false;
-    if (!place.photos.some(p => p.id === photoId)) return false;
+    if (!place.photos.some((p) => p.id === photoId)) return false;
 
     await this.updatePlace(placeId, { coverPhotoId: photoId });
     return true;
@@ -296,7 +304,7 @@ class PlacesService {
       if (!stored) {
         // Initialize with defaults
         const now = new Date().toISOString();
-        const defaults = DEFAULT_COLLECTIONS.map(c => ({
+        const defaults = DEFAULT_COLLECTIONS.map((c) => ({
           ...c,
           createdAt: now,
           updatedAt: now,
@@ -313,7 +321,7 @@ class PlacesService {
 
   async getCollection(id: string): Promise<PlaceCollection | null> {
     const collections = await this.getCollections();
-    return collections.find(c => c.id === id) || null;
+    return collections.find((c) => c.id === id) || null;
   }
 
   async createCollection(data: Partial<PlaceCollection>): Promise<PlaceCollection> {
@@ -339,9 +347,12 @@ class PlacesService {
     return collection;
   }
 
-  async updateCollection(id: string, updates: Partial<PlaceCollection>): Promise<PlaceCollection | null> {
+  async updateCollection(
+    id: string,
+    updates: Partial<PlaceCollection>
+  ): Promise<PlaceCollection | null> {
     const collections = await this.getCollections();
-    const index = collections.findIndex(c => c.id === id);
+    const index = collections.findIndex((c) => c.id === id);
     if (index < 0) return null;
 
     const updated = {
@@ -357,11 +368,11 @@ class PlacesService {
 
   async deleteCollection(id: string): Promise<boolean> {
     const collections = await this.getCollections();
-    const collection = collections.find(c => c.id === id);
-    
+    const collection = collections.find((c) => c.id === id);
+
     if (!collection || collection.isDefault) return false;
 
-    const filtered = collections.filter(c => c.id !== id);
+    const filtered = collections.filter((c) => c.id !== id);
     await AsyncStorage.setItem(STORAGE_KEYS.COLLECTIONS, JSON.stringify(filtered));
 
     // Remove collection from all places
@@ -369,7 +380,7 @@ class PlacesService {
     for (const place of places) {
       if (place.collectionIds.includes(id)) {
         await this.updatePlace(place.id, {
-          collectionIds: place.collectionIds.filter(cid => cid !== id),
+          collectionIds: place.collectionIds.filter((cid) => cid !== id),
         });
       }
     }
@@ -384,7 +395,7 @@ class PlacesService {
   async addPlaceToCollection(placeId: string, collectionId: string): Promise<boolean> {
     const place = await this.getPlace(placeId);
     const collection = await this.getCollection(collectionId);
-    
+
     if (!place || !collection) return false;
     if (collection.placeIds.includes(placeId)) return true;
 
@@ -405,19 +416,19 @@ class PlacesService {
   async removePlaceFromCollection(placeId: string, collectionId: string): Promise<boolean> {
     const place = await this.getPlace(placeId);
     const collection = await this.getCollection(collectionId);
-    
+
     if (!place || !collection) return false;
     if (!collection.placeIds.includes(placeId)) return true;
 
     // Update collection
     await this.updateCollection(collectionId, {
-      placeIds: collection.placeIds.filter(id => id !== placeId),
+      placeIds: collection.placeIds.filter((id) => id !== placeId),
       placeCount: Math.max(0, collection.placeCount - 1),
     });
 
     // Update place
     await this.updatePlace(placeId, {
-      collectionIds: place.collectionIds.filter(id => id !== collectionId),
+      collectionIds: place.collectionIds.filter((id) => id !== collectionId),
     });
 
     return true;
@@ -428,7 +439,7 @@ class PlacesService {
     if (!collection) return [];
 
     const places = await this.getPlaces();
-    return places.filter(p => collection.placeIds.includes(p.id));
+    return places.filter((p) => collection.placeIds.includes(p.id));
   }
 
   // ============================================================================
@@ -440,55 +451,62 @@ class PlacesService {
 
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase();
-      places = places.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.description?.toLowerCase().includes(query) ||
-        p.location.city?.toLowerCase().includes(query) ||
-        p.location.country?.toLowerCase().includes(query) ||
-        p.tags.some(t => t.toLowerCase().includes(query))
+      places = places.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.description?.toLowerCase().includes(query) ||
+          p.location.city?.toLowerCase().includes(query) ||
+          p.location.country?.toLowerCase().includes(query) ||
+          p.tags.some((t) => t.toLowerCase().includes(query))
       );
     }
 
     if (filters.categories?.length) {
-      places = places.filter(p => filters.categories!.includes(p.category));
+      places = places.filter((p) => filters.categories!.includes(p.category));
     }
 
     if (filters.priceLevel?.length) {
-      places = places.filter(p => p.priceLevel && filters.priceLevel!.includes(p.priceLevel));
+      places = places.filter((p) => p.priceLevel && filters.priceLevel!.includes(p.priceLevel));
     }
 
     if (filters.minRating) {
-      places = places.filter(p => p.rating >= filters.minRating!);
+      places = places.filter((p) => p.rating >= filters.minRating!);
     }
 
     if (filters.cities?.length) {
-      places = places.filter(p => p.location.city && filters.cities!.includes(p.location.city));
+      places = places.filter((p) => p.location.city && filters.cities!.includes(p.location.city));
     }
 
     if (filters.countries?.length) {
-      places = places.filter(p => p.location.country && filters.countries!.includes(p.location.country));
+      places = places.filter(
+        (p) => p.location.country && filters.countries!.includes(p.location.country)
+      );
     }
 
     if (filters.tags?.length) {
-      places = places.filter(p => filters.tags!.some(t => p.tags.includes(t)));
+      places = places.filter((p) => filters.tags!.some((t) => p.tags.includes(t)));
     }
 
     if (filters.hasPhotos) {
-      places = places.filter(p => p.photos.length > 0);
+      places = places.filter((p) => p.photos.length > 0);
     }
 
     if (filters.hasNotes) {
-      places = places.filter(p => p.notes && p.notes.trim().length > 0);
+      places = places.filter((p) => p.notes && p.notes.trim().length > 0);
     }
 
     if (filters.collectionId) {
-      places = places.filter(p => p.collectionIds.includes(filters.collectionId!));
+      places = places.filter((p) => p.collectionIds.includes(filters.collectionId!));
     }
 
     return places;
   }
 
-  sortPlaces(places: FavoritePlace[], sortBy: PlaceSortOption, userLocation?: PlaceLocation): FavoritePlace[] {
+  sortPlaces(
+    places: FavoritePlace[],
+    sortBy: PlaceSortOption,
+    userLocation?: PlaceLocation
+  ): FavoritePlace[] {
     const sorted = [...places];
 
     switch (sortBy) {
@@ -515,8 +533,8 @@ class PlacesService {
       case 'most_visited':
         return sorted.sort((a, b) => b.visitCount - a.visitCount);
       case 'recently_added':
-        return sorted.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return sorted.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
       case 'distance':
         if (!userLocation) return sorted;
@@ -537,7 +555,7 @@ class PlacesService {
   async findNearby(params: NearbySearchParams): Promise<FavoritePlace[]> {
     let places = await this.getPlaces();
 
-    places = places.filter(p => {
+    places = places.filter((p) => {
       const distance = this.calculateDistance(
         { latitude: params.latitude, longitude: params.longitude },
         p.location
@@ -546,7 +564,7 @@ class PlacesService {
     });
 
     if (params.categories?.length) {
-      places = places.filter(p => params.categories!.includes(p.category));
+      places = places.filter((p) => params.categories!.includes(p.category));
     }
 
     // Sort by distance
@@ -571,17 +589,18 @@ class PlacesService {
 
   private calculateDistance(from: Partial<PlaceLocation>, to: PlaceLocation): number {
     if (!from.latitude || !from.longitude) return Infinity;
-    
+
     const R = 6371; // Earth's radius in km
     const dLat = this.toRad(to.latitude - from.latitude);
     const dLon = this.toRad(to.longitude - from.longitude);
     const lat1 = this.toRad(from.latitude);
     const lat2 = this.toRad(to.latitude);
 
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    
+
     return R * c;
   }
 
@@ -601,7 +620,7 @@ class PlacesService {
     const byCountry: Record<string, number> = {};
     const byCity: Record<string, number> = {};
     const byRating: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    
+
     let totalRating = 0;
     let ratedCount = 0;
     let totalVisits = 0;
@@ -611,37 +630,38 @@ class PlacesService {
     for (const place of places) {
       // Category
       byCategory[place.category] = (byCategory[place.category] || 0) + 1;
-      
+
       // Country
       if (place.location.country) {
         byCountry[place.location.country] = (byCountry[place.location.country] || 0) + 1;
       }
-      
+
       // City
       if (place.location.city) {
         byCity[place.location.city] = (byCity[place.location.city] || 0) + 1;
       }
-      
+
       // Rating
       if (place.rating > 0) {
         byRating[Math.round(place.rating)] = (byRating[Math.round(place.rating)] || 0) + 1;
         totalRating += place.rating;
         ratedCount++;
       }
-      
+
       // Visits
       totalVisits += place.visitCount;
-      
+
       // Photos & notes
       if (place.photos.length > 0) placesWithPhotos++;
       if (place.notes?.trim()) placesWithNotes++;
     }
 
     const sortedByVisits = [...places].sort((a, b) => b.visitCount - a.visitCount);
-    const sortedByDate = [...places].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    const sortedByDate = [...places].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-    const sortedByRating = [...places].filter(p => p.rating > 0)
+    const sortedByRating = [...places]
+      .filter((p) => p.rating > 0)
       .sort((a, b) => b.rating - a.rating);
 
     return {
@@ -673,7 +693,7 @@ class PlacesService {
       version: '1.0',
       exportedAt: new Date().toISOString(),
       places,
-      collections: collections.filter(c => !c.isDefault),
+      collections: collections.filter((c) => !c.isDefault),
     };
   }
 
@@ -723,11 +743,11 @@ class PlacesService {
   async getAllTags(): Promise<string[]> {
     const places = await this.getPlaces();
     const tagSet = new Set<string>();
-    
+
     for (const place of places) {
-      place.tags.forEach(tag => tagSet.add(tag));
+      place.tags.forEach((tag) => tagSet.add(tag));
     }
-    
+
     return Array.from(tagSet).sort();
   }
 
@@ -747,7 +767,7 @@ class PlacesService {
     if (!place) return false;
 
     await this.updatePlace(placeId, {
-      tags: place.tags.filter(t => t !== tag),
+      tags: place.tags.filter((t) => t !== tag),
     });
     return true;
   }
@@ -764,7 +784,7 @@ class PlacesService {
     await this.updatePlace(placeId, { isFavorite });
 
     // Add/remove from favorites collection
-    const favCollection = (await this.getCollections()).find(c => c.id === 'favorites');
+    const favCollection = (await this.getCollections()).find((c) => c.id === 'favorites');
     if (favCollection) {
       if (isFavorite) {
         await this.addPlaceToCollection(placeId, 'favorites');

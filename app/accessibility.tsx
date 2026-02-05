@@ -79,13 +79,29 @@ const defaultSettings: AccessibilitySettings = {
 };
 
 const dietaryOptions = [
-  'Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Kosher', 'Halal', 
-  'Low-Sodium', 'Diabetic-Friendly', 'Nut-Free', 'Shellfish-Free'
+  'Vegetarian',
+  'Vegan',
+  'Gluten-Free',
+  'Dairy-Free',
+  'Kosher',
+  'Halal',
+  'Low-Sodium',
+  'Diabetic-Friendly',
+  'Nut-Free',
+  'Shellfish-Free',
 ];
 
 const allergyOptions = [
-  'Peanuts', 'Tree Nuts', 'Milk', 'Eggs', 'Wheat', 'Soy', 
-  'Fish', 'Shellfish', 'Sesame', 'Sulfites'
+  'Peanuts',
+  'Tree Nuts',
+  'Milk',
+  'Eggs',
+  'Wheat',
+  'Soy',
+  'Fish',
+  'Shellfish',
+  'Sesame',
+  'Sulfites',
 ];
 
 const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -98,69 +114,75 @@ export default function AccessibilityScreen() {
   const [newCondition, setNewCondition] = useState('');
   const [newMedication, setNewMedication] = useState('');
 
-  const updateSettings = useCallback(<K extends keyof AccessibilitySettings>(
-    category: K,
-    updates: Partial<AccessibilitySettings[K]>
-  ) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: { ...prev[category], ...updates },
-    }));
-  }, []);
+  const updateSettings = useCallback(
+    <K extends keyof AccessibilitySettings>(
+      category: K,
+      updates: Partial<AccessibilitySettings[K]>
+    ) => {
+      setSettings((prev) => ({
+        ...prev,
+        [category]: { ...prev[category], ...updates },
+      }));
+    },
+    []
+  );
 
   const toggleSection = useCallback((section: string) => {
-    setExpandedSection(prev => prev === section ? null : section);
+    setExpandedSection((prev) => (prev === section ? null : section));
   }, []);
 
-  const addToList = useCallback((
-    category: 'dietaryNeeds' | 'emergencyInfo',
-    field: string,
-    value: string
-  ) => {
-    if (!value.trim()) return;
-    
-    setSettings(prev => {
-      const categoryData = prev[category] as Record<string, unknown>;
-      const currentList = Array.isArray(categoryData[field]) ? categoryData[field] as string[] : [];
-      if (currentList.includes(value.trim())) return prev;
-      
-      return {
-        ...prev,
-        [category]: {
-          ...prev[category],
-          [field]: [...currentList, value.trim()],
-        },
-      };
-    });
-  }, []);
+  const addToList = useCallback(
+    (category: 'dietaryNeeds' | 'emergencyInfo', field: string, value: string) => {
+      if (!value.trim()) return;
 
-  const removeFromList = useCallback((
-    category: 'dietaryNeeds' | 'emergencyInfo',
-    field: string,
-    value: string
-  ) => {
-    setSettings(prev => {
-      const categoryData = prev[category] as Record<string, unknown>;
-      const currentList = Array.isArray(categoryData[field]) ? categoryData[field] as string[] : [];
-      return {
-        ...prev,
-        [category]: {
-          ...prev[category],
-          [field]: currentList.filter((item: string) => item !== value),
-        },
-      };
-    });
-  }, []);
+      setSettings((prev) => {
+        const categoryData = prev[category] as Record<string, unknown>;
+        const currentList = Array.isArray(categoryData[field])
+          ? (categoryData[field] as string[])
+          : [];
+        if (currentList.includes(value.trim())) return prev;
+
+        return {
+          ...prev,
+          [category]: {
+            ...prev[category],
+            [field]: [...currentList, value.trim()],
+          },
+        };
+      });
+    },
+    []
+  );
+
+  const removeFromList = useCallback(
+    (category: 'dietaryNeeds' | 'emergencyInfo', field: string, value: string) => {
+      setSettings((prev) => {
+        const categoryData = prev[category] as Record<string, unknown>;
+        const currentList = Array.isArray(categoryData[field])
+          ? (categoryData[field] as string[])
+          : [];
+        return {
+          ...prev,
+          [category]: {
+            ...prev[category],
+            [field]: currentList.filter((item: string) => item !== value),
+          },
+        };
+      });
+    },
+    []
+  );
 
   const handleSave = useCallback(() => {
     const accessibilityNeeds: string[] = [];
-    
+
     if (settings.visualAssistance.enabled) accessibilityNeeds.push('Visual Assistance');
     if (settings.hearingAssistance.enabled) accessibilityNeeds.push('Hearing Assistance');
     if (settings.mobilityAssistance.enabled) accessibilityNeeds.push('Mobility Assistance');
-    if (settings.mobilityAssistance.wheelchairAccessRequired) accessibilityNeeds.push('Wheelchair Access');
+    if (settings.mobilityAssistance.wheelchairAccessRequired)
+      accessibilityNeeds.push('Wheelchair Access');
     if (settings.cognitiveAssistance.enabled) accessibilityNeeds.push('Cognitive Assistance');
-    
+
     updateUser({
       accessibilityNeeds,
       dietaryRestrictions: [
@@ -168,7 +190,7 @@ export default function AccessibilityScreen() {
         ...settings.dietaryNeeds.allergies,
       ],
     });
-    
+
     Alert.alert(
       'Settings Saved',
       'Your accessibility preferences have been saved and will be applied to your travel recommendations.',
@@ -204,28 +226,22 @@ export default function AccessibilityScreen() {
   ) => (
     <View style={styles.chipsContainer}>
       <View style={styles.selectedChips}>
-        {selected.map(item => (
-          <Pressable
-            key={item}
-            style={styles.selectedChip}
-            onPress={() => onRemove(item)}
-          >
+        {selected.map((item) => (
+          <Pressable key={item} style={styles.selectedChip} onPress={() => onRemove(item)}>
             <Text style={styles.selectedChipText}>{item}</Text>
             <X size={14} color={colors.textLight} />
           </Pressable>
         ))}
       </View>
       <View style={styles.availableChips}>
-        {options.filter(o => !selected.includes(o)).map(option => (
-          <Pressable
-            key={option}
-            style={styles.availableChip}
-            onPress={() => onSelect(option)}
-          >
-            <Plus size={12} color={colors.primary} />
-            <Text style={styles.availableChipText}>{option}</Text>
-          </Pressable>
-        ))}
+        {options
+          .filter((o) => !selected.includes(o))
+          .map((option) => (
+            <Pressable key={option} style={styles.availableChip} onPress={() => onSelect(option)}>
+              <Plus size={12} color={colors.primary} />
+              <Text style={styles.availableChipText}>{option}</Text>
+            </Pressable>
+          ))}
       </View>
     </View>
   );
@@ -233,7 +249,7 @@ export default function AccessibilityScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
@@ -249,14 +265,12 @@ export default function AccessibilityScreen() {
           <View style={styles.infoBanner}>
             <Info size={20} color={colors.primary} />
             <Text style={styles.infoBannerText}>
-              These settings help personalize your travel experience and filter recommendations based on your needs.
+              These settings help personalize your travel experience and filter recommendations
+              based on your needs.
             </Text>
           </View>
 
-          <Pressable
-            style={styles.sectionHeader}
-            onPress={() => toggleSection('visual')}
-          >
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('visual')}>
             <View style={styles.sectionIcon}>
               <Eye size={22} color={colors.primary} />
             </View>
@@ -280,20 +294,14 @@ export default function AccessibilityScreen() {
               )}
               {settings.visualAssistance.enabled && (
                 <>
-                  {renderToggleRow(
-                    'Large Text',
-                    settings.visualAssistance.largeText,
-                    (val) => updateSettings('visualAssistance', { largeText: val })
+                  {renderToggleRow('Large Text', settings.visualAssistance.largeText, (val) =>
+                    updateSettings('visualAssistance', { largeText: val })
                   )}
-                  {renderToggleRow(
-                    'High Contrast',
-                    settings.visualAssistance.highContrast,
-                    (val) => updateSettings('visualAssistance', { highContrast: val })
+                  {renderToggleRow('High Contrast', settings.visualAssistance.highContrast, (val) =>
+                    updateSettings('visualAssistance', { highContrast: val })
                   )}
-                  {renderToggleRow(
-                    'Reduce Motion',
-                    settings.visualAssistance.reduceMotion,
-                    (val) => updateSettings('visualAssistance', { reduceMotion: val })
+                  {renderToggleRow('Reduce Motion', settings.visualAssistance.reduceMotion, (val) =>
+                    updateSettings('visualAssistance', { reduceMotion: val })
                   )}
                   {renderToggleRow(
                     'Screen Reader Optimized',
@@ -305,10 +313,7 @@ export default function AccessibilityScreen() {
             </View>
           )}
 
-          <Pressable
-            style={styles.sectionHeader}
-            onPress={() => toggleSection('hearing')}
-          >
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('hearing')}>
             <View style={styles.sectionIcon}>
               <Ear size={22} color={colors.secondary} />
             </View>
@@ -349,10 +354,7 @@ export default function AccessibilityScreen() {
             </View>
           )}
 
-          <Pressable
-            style={styles.sectionHeader}
-            onPress={() => toggleSection('mobility')}
-          >
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mobility')}>
             <View style={styles.sectionIcon}>
               <Accessibility size={22} color={colors.success} />
             </View>
@@ -393,9 +395,11 @@ export default function AccessibilityScreen() {
                         style={styles.numberInput}
                         keyboardType="numeric"
                         value={settings.mobilityAssistance.maxWalkingDistance?.toString() || ''}
-                        onChangeText={(val) => updateSettings('mobilityAssistance', { 
-                          maxWalkingDistance: val ? parseInt(val) : undefined 
-                        })}
+                        onChangeText={(val) =>
+                          updateSettings('mobilityAssistance', {
+                            maxWalkingDistance: val ? parseInt(val) : undefined,
+                          })
+                        }
                         placeholder="500"
                         placeholderTextColor={colors.textTertiary}
                       />
@@ -416,10 +420,7 @@ export default function AccessibilityScreen() {
             </View>
           )}
 
-          <Pressable
-            style={styles.sectionHeader}
-            onPress={() => toggleSection('cognitive')}
-          >
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('cognitive')}>
             <View style={styles.sectionIcon}>
               <Brain size={22} color={colors.warning} />
             </View>
@@ -430,7 +431,9 @@ export default function AccessibilityScreen() {
             <ChevronRight
               size={20}
               color={colors.textTertiary}
-              style={{ transform: [{ rotate: expandedSection === 'cognitive' ? '90deg' : '0deg' }] }}
+              style={{
+                transform: [{ rotate: expandedSection === 'cognitive' ? '90deg' : '0deg' }],
+              }}
             />
           </Pressable>
           {expandedSection === 'cognitive' && (
@@ -465,10 +468,7 @@ export default function AccessibilityScreen() {
             </View>
           )}
 
-          <Pressable
-            style={styles.sectionHeader}
-            onPress={() => toggleSection('dietary')}
-          >
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('dietary')}>
             <View style={styles.sectionIcon}>
               <UtensilsCrossed size={22} color={colors.accentDark} />
             </View>
@@ -518,10 +518,7 @@ export default function AccessibilityScreen() {
             </View>
           )}
 
-          <Pressable
-            style={styles.sectionHeader}
-            onPress={() => toggleSection('communication')}
-          >
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('communication')}>
             <View style={styles.sectionIcon}>
               <MessageCircle size={22} color={colors.primaryLight} />
             </View>
@@ -532,7 +529,9 @@ export default function AccessibilityScreen() {
             <ChevronRight
               size={20}
               color={colors.textTertiary}
-              style={{ transform: [{ rotate: expandedSection === 'communication' ? '90deg' : '0deg' }] }}
+              style={{
+                transform: [{ rotate: expandedSection === 'communication' ? '90deg' : '0deg' }],
+              }}
             />
           </Pressable>
           {expandedSection === 'communication' && (
@@ -542,7 +541,9 @@ export default function AccessibilityScreen() {
                 <TextInput
                   style={styles.textInput}
                   value={settings.communicationPreferences.preferredLanguage}
-                  onChangeText={(val) => updateSettings('communicationPreferences', { preferredLanguage: val })}
+                  onChangeText={(val) =>
+                    updateSettings('communicationPreferences', { preferredLanguage: val })
+                  }
                   placeholder="English"
                   placeholderTextColor={colors.textTertiary}
                 />
@@ -550,22 +551,21 @@ export default function AccessibilityScreen() {
               {renderToggleRow(
                 'Translation Assistance',
                 settings.communicationPreferences.needsTranslationAssist,
-                (val) => updateSettings('communicationPreferences', { needsTranslationAssist: val }),
+                (val) =>
+                  updateSettings('communicationPreferences', { needsTranslationAssist: val }),
                 'Automatic translation suggestions'
               )}
               {renderToggleRow(
                 'Sign Language Interpreter',
                 settings.communicationPreferences.signLanguageInterpreter,
-                (val) => updateSettings('communicationPreferences', { signLanguageInterpreter: val }),
+                (val) =>
+                  updateSettings('communicationPreferences', { signLanguageInterpreter: val }),
                 'Filter for sign language services'
               )}
             </View>
           )}
 
-          <Pressable
-            style={styles.sectionHeader}
-            onPress={() => toggleSection('emergency')}
-          >
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('emergency')}>
             <View style={styles.sectionIcon}>
               <Heart size={22} color={colors.error} />
             </View>
@@ -576,7 +576,9 @@ export default function AccessibilityScreen() {
             <ChevronRight
               size={20}
               color={colors.textTertiary}
-              style={{ transform: [{ rotate: expandedSection === 'emergency' ? '90deg' : '0deg' }] }}
+              style={{
+                transform: [{ rotate: expandedSection === 'emergency' ? '90deg' : '0deg' }],
+              }}
             />
           </Pressable>
           {expandedSection === 'emergency' && (
@@ -611,7 +613,9 @@ export default function AccessibilityScreen() {
                 {settings.emergencyInfo.medicalConditions.map((item, index) => (
                   <View key={index} style={styles.listItem}>
                     <Text style={styles.listItemText}>{item}</Text>
-                    <Pressable onPress={() => removeFromList('emergencyInfo', 'medicalConditions', item)}>
+                    <Pressable
+                      onPress={() => removeFromList('emergencyInfo', 'medicalConditions', item)}
+                    >
                       <X size={16} color={colors.textTertiary} />
                     </Pressable>
                   </View>
@@ -650,21 +654,27 @@ export default function AccessibilityScreen() {
 
               <Text style={styles.subsectionTitle}>Blood Type</Text>
               <View style={styles.bloodTypeGrid}>
-                {bloodTypes.map(type => (
+                {bloodTypes.map((type) => (
                   <Pressable
                     key={type}
                     style={[
                       styles.bloodTypeChip,
                       settings.emergencyInfo.bloodType === type && styles.bloodTypeChipSelected,
                     ]}
-                    onPress={() => updateSettings('emergencyInfo', { 
-                      bloodType: settings.emergencyInfo.bloodType === type ? undefined : type 
-                    })}
+                    onPress={() =>
+                      updateSettings('emergencyInfo', {
+                        bloodType: settings.emergencyInfo.bloodType === type ? undefined : type,
+                      })
+                    }
                   >
-                    <Text style={[
-                      styles.bloodTypeText,
-                      settings.emergencyInfo.bloodType === type && styles.bloodTypeTextSelected,
-                    ]}>{type}</Text>
+                    <Text
+                      style={[
+                        styles.bloodTypeText,
+                        settings.emergencyInfo.bloodType === type && styles.bloodTypeTextSelected,
+                      ]}
+                    >
+                      {type}
+                    </Text>
                   </Pressable>
                 ))}
               </View>
@@ -673,7 +683,9 @@ export default function AccessibilityScreen() {
               <TextInput
                 style={styles.multilineInput}
                 value={settings.emergencyInfo.emergencyInstructions || ''}
-                onChangeText={(val) => updateSettings('emergencyInfo', { emergencyInstructions: val })}
+                onChangeText={(val) =>
+                  updateSettings('emergencyInfo', { emergencyInstructions: val })
+                }
                 placeholder="Any special instructions for emergency responders..."
                 placeholderTextColor={colors.textTertiary}
                 multiline

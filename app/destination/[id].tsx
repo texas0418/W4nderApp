@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,13 +17,11 @@ import {
 import colors from '@/constants/colors';
 import { destinations } from '@/mocks/destinations';
 
-
-
 export default function DestinationDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
 
-  const destination = destinations.find(d => d.id === id);
+  const destination = destinations.find((d) => d.id === id);
 
   if (!destination) {
     return (
@@ -43,11 +35,7 @@ export default function DestinationDetailsScreen() {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: destination.image }}
-        style={styles.coverImage}
-        contentFit="cover"
-      />
+      <Image source={{ uri: destination.image }} style={styles.coverImage} contentFit="cover" />
       <LinearGradient
         colors={['rgba(0,0,0,0.3)', 'transparent', 'rgba(0,0,0,0.8)']}
         style={styles.coverGradient}
@@ -73,7 +61,9 @@ export default function DestinationDetailsScreen() {
             <View style={styles.ratingBadge}>
               <Star size={14} color={colors.warning} fill={colors.warning} />
               <Text style={styles.ratingText}>{destination.rating}</Text>
-              <Text style={styles.reviewCount}>({destination.reviewCount.toLocaleString()} reviews)</Text>
+              <Text style={styles.reviewCount}>
+                ({destination.reviewCount.toLocaleString()} reviews)
+              </Text>
             </View>
             <Text style={styles.destinationName}>{destination.name}</Text>
             <View style={styles.locationRow}>
@@ -84,7 +74,7 @@ export default function DestinationDetailsScreen() {
 
           <View style={styles.mainContent}>
             <View style={styles.tagsRow}>
-              {destination.tags.map(tag => (
+              {destination.tags.map((tag) => (
                 <View key={tag} style={styles.tag}>
                   <Text style={styles.tagText}>{tag}</Text>
                 </View>
@@ -97,9 +87,7 @@ export default function DestinationDetailsScreen() {
                   <DollarSign size={18} color={colors.primary} />
                 </View>
                 <Text style={styles.infoLabel}>Avg. Daily Cost</Text>
-                <Text style={styles.infoValue}>
-                  ${destination.avgPrice}
-                </Text>
+                <Text style={styles.infoValue}>${destination.avgPrice}</Text>
               </View>
               <View style={styles.infoItem}>
                 <View style={styles.infoIcon}>
@@ -126,7 +114,9 @@ export default function DestinationDetailsScreen() {
                 </View>
                 <View style={styles.highlightItem}>
                   <View style={styles.highlightDot} />
-                  <Text style={styles.highlightText}>Rich local cuisine and dining experiences</Text>
+                  <Text style={styles.highlightText}>
+                    Rich local cuisine and dining experiences
+                  </Text>
                 </View>
                 <View style={styles.highlightItem}>
                   <View style={styles.highlightDot} />
@@ -149,10 +139,7 @@ export default function DestinationDetailsScreen() {
             <Text style={styles.price}>${destination.avgPrice}</Text>
             <Text style={styles.priceUnit}>/ day</Text>
           </View>
-          <Pressable 
-            style={styles.planButton}
-            onPress={() => router.push('/plan-trip')}
-          >
+          <Pressable style={styles.planButton} onPress={() => router.push('/plan-trip')}>
             <Sparkles size={18} color={colors.textLight} />
             <Text style={styles.planButtonText}>Plan Trip</Text>
           </Pressable>

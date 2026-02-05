@@ -7,13 +7,13 @@ export type ConflictSeverity = 'error' | 'warning' | 'info';
 
 // Types of conflicts that can occur
 export type ConflictType =
-  | 'overlap'           // Activities overlap in time
+  | 'overlap' // Activities overlap in time
   | 'insufficient_travel' // Not enough time to travel between activities
-  | 'tight_transition'  // Very little buffer time
-  | 'same_time'         // Activities start at exact same time
-  | 'reverse_order'     // End time is before start time
-  | 'past_midnight'     // Activity spans past midnight (may be intentional)
-  | 'long_gap';         // Unusually long gap between activities
+  | 'tight_transition' // Very little buffer time
+  | 'same_time' // Activities start at exact same time
+  | 'reverse_order' // End time is before start time
+  | 'past_midnight' // Activity spans past midnight (may be intentional)
+  | 'long_gap'; // Unusually long gap between activities
 
 export interface TimeConflict {
   id: string;
@@ -46,11 +46,11 @@ export interface ConflictCheckResult {
 
 // Configuration for conflict detection
 export interface ConflictDetectionConfig {
-  minBufferMinutes: number;        // Minimum buffer time (default: 5)
-  tightBufferMinutes: number;      // Tight but acceptable buffer (default: 15)
-  longGapMinutes: number;          // Gap considered unusually long (default: 180)
-  includeInfos: boolean;           // Include informational notices (default: true)
-  checkPastMidnight: boolean;      // Flag activities past midnight (default: true)
+  minBufferMinutes: number; // Minimum buffer time (default: 5)
+  tightBufferMinutes: number; // Tight but acceptable buffer (default: 15)
+  longGapMinutes: number; // Gap considered unusually long (default: 180)
+  includeInfos: boolean; // Include informational notices (default: true)
+  checkPastMidnight: boolean; // Flag activities past midnight (default: true)
 }
 
 const DEFAULT_CONFIG: ConflictDetectionConfig = {
@@ -123,7 +123,7 @@ export function detectTimeConflicts(
   const conflictsByActivity: Record<string, TimeConflict[]> = {};
 
   // Initialize conflictsByActivity for all activities
-  activities.forEach(a => {
+  activities.forEach((a) => {
     conflictsByActivity[a.id] = [];
   });
 
@@ -174,7 +174,7 @@ export function detectTimeConflicts(
     if (nextActivity) {
       const nextStartMinutes = parseTimeToMinutes(nextActivity.startTime);
       let adjustedEndMinutes = endMinutes;
-      
+
       // Handle midnight spanning
       if (endMinutes < startMinutes) {
         adjustedEndMinutes = endMinutes + 1440;
@@ -263,7 +263,10 @@ export function detectTimeConflicts(
           conflictsByActivity[nextActivity.id].push(conflict);
         }
         // Slightly tight (under preferred buffer)
-        else if (bufferTime >= mergedConfig.minBufferMinutes && bufferTime < mergedConfig.tightBufferMinutes) {
+        else if (
+          bufferTime >= mergedConfig.minBufferMinutes &&
+          bufferTime < mergedConfig.tightBufferMinutes
+        ) {
           if (mergedConfig.includeInfos) {
             const conflict: TimeConflict = {
               id: generateConflictId('tight_transition', [activity.id, nextActivity.id]),
@@ -305,9 +308,9 @@ export function detectTimeConflicts(
   // Calculate summary
   const summary = {
     totalConflicts: conflicts.length,
-    errors: conflicts.filter(c => c.severity === 'error').length,
-    warnings: conflicts.filter(c => c.severity === 'warning').length,
-    infos: conflicts.filter(c => c.severity === 'info').length,
+    errors: conflicts.filter((c) => c.severity === 'error').length,
+    warnings: conflicts.filter((c) => c.severity === 'warning').length,
+    infos: conflicts.filter((c) => c.severity === 'info').length,
   };
 
   return {
@@ -320,15 +323,13 @@ export function detectTimeConflicts(
 }
 
 // Get the most severe conflict for an activity
-export function getMostSevereConflict(
-  conflicts: TimeConflict[]
-): TimeConflict | null {
+export function getMostSevereConflict(conflicts: TimeConflict[]): TimeConflict | null {
   if (conflicts.length === 0) return null;
 
   const severityOrder: ConflictSeverity[] = ['error', 'warning', 'info'];
-  
+
   for (const severity of severityOrder) {
-    const conflict = conflicts.find(c => c.severity === severity);
+    const conflict = conflicts.find((c) => c.severity === severity);
     if (conflict) return conflict;
   }
 

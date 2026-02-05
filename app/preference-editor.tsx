@@ -24,7 +24,11 @@ import {
   AccommodationType,
   TransportMode,
 } from '../types/preferences';
-import { PREFERENCE_CATEGORIES, STRENGTH_LABELS, STRENGTH_COLORS } from '../mocks/mockPreferenceData';
+import {
+  PREFERENCE_CATEGORIES,
+  STRENGTH_LABELS,
+  STRENGTH_COLORS,
+} from '../mocks/mockPreferenceData';
 
 interface PreferenceEditorScreenProps {
   navigation?: any;
@@ -33,33 +37,79 @@ interface PreferenceEditorScreenProps {
 }
 
 const CUISINE_OPTIONS: CuisineType[] = [
-  'italian', 'japanese', 'chinese', 'mexican', 'indian', 'thai',
-  'french', 'mediterranean', 'american', 'korean', 'vietnamese',
-  'greek', 'spanish', 'middle_eastern', 'seafood', 'steakhouse',
+  'italian',
+  'japanese',
+  'chinese',
+  'mexican',
+  'indian',
+  'thai',
+  'french',
+  'mediterranean',
+  'american',
+  'korean',
+  'vietnamese',
+  'greek',
+  'spanish',
+  'middle_eastern',
+  'seafood',
+  'steakhouse',
 ];
 
 const ACTIVITY_OPTIONS: ActivityType[] = [
-  'sightseeing', 'museums', 'outdoor_adventure', 'beach', 'hiking',
-  'water_sports', 'nightlife', 'shopping', 'spa_wellness', 'cultural',
-  'food_drink', 'entertainment', 'photography', 'historical', 'art',
+  'sightseeing',
+  'museums',
+  'outdoor_adventure',
+  'beach',
+  'hiking',
+  'water_sports',
+  'nightlife',
+  'shopping',
+  'spa_wellness',
+  'cultural',
+  'food_drink',
+  'entertainment',
+  'photography',
+  'historical',
+  'art',
 ];
 
 const AMBIANCE_OPTIONS: DiningAmbiance[] = [
-  'romantic', 'lively', 'quiet', 'trendy', 'traditional',
-  'outdoor', 'rooftop', 'waterfront', 'cozy',
+  'romantic',
+  'lively',
+  'quiet',
+  'trendy',
+  'traditional',
+  'outdoor',
+  'rooftop',
+  'waterfront',
+  'cozy',
 ];
 
 const ACCOMMODATION_OPTIONS: AccommodationType[] = [
-  'luxury_hotel', 'boutique_hotel', 'resort', 'vacation_rental',
-  'bed_breakfast', 'apartment', 'villa', 'hostel',
+  'luxury_hotel',
+  'boutique_hotel',
+  'resort',
+  'vacation_rental',
+  'bed_breakfast',
+  'apartment',
+  'villa',
+  'hostel',
 ];
 
 const TRANSPORT_OPTIONS: TransportMode[] = [
-  'walking', 'public_transit', 'taxi_rideshare', 'rental_car', 'bike',
+  'walking',
+  'public_transit',
+  'taxi_rideshare',
+  'rental_car',
+  'bike',
 ];
 
 const STRENGTH_OPTIONS: PreferenceStrength[] = [
-  'must_have', 'strong', 'moderate', 'slight', 'neutral',
+  'must_have',
+  'strong',
+  'moderate',
+  'slight',
+  'neutral',
 ];
 
 const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
@@ -68,7 +118,7 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
   category: propCategory,
 }) => {
   const category = propCategory || route?.params?.category || 'dining';
-  
+
   const {
     preferences,
     updatePreference,
@@ -78,12 +128,10 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
   } = usePreferenceSync();
 
   const [saving, setSaving] = useState(false);
-  const [editedPrefs, setEditedPrefs] = useState<any>(
-    preferences?.[category] || {}
-  );
+  const [editedPrefs, setEditedPrefs] = useState<any>(preferences?.[category] || {});
 
   const categoryInfo = useMemo(() => {
-    return PREFERENCE_CATEGORIES.find(c => c.id === category);
+    return PREFERENCE_CATEGORIES.find((c) => c.id === category);
   }, [category]);
 
   const completeness = getCategoryCompleteness(category);
@@ -110,75 +158,82 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
     }));
   }, []);
 
-  const toggleArrayItem = useCallback((
-    field: string,
-    item: any,
-    strength: PreferenceStrength = 'moderate'
-  ) => {
-    setEditedPrefs((prev: any) => {
-      const current = prev[field] || [];
-      const existingIndex = current.findIndex(
-        (c: any) => (c.type || c.style || c.mode || c.size) === item
-      );
-      
-      if (existingIndex >= 0) {
-        // Remove item
+  const toggleArrayItem = useCallback(
+    (field: string, item: any, strength: PreferenceStrength = 'moderate') => {
+      setEditedPrefs((prev: any) => {
+        const current = prev[field] || [];
+        const existingIndex = current.findIndex(
+          (c: any) => (c.type || c.style || c.mode || c.size) === item
+        );
+
+        if (existingIndex >= 0) {
+          // Remove item
+          return {
+            ...prev,
+            [field]: current.filter((_: any, i: number) => i !== existingIndex),
+          };
+        } else {
+          // Add item with default key
+          const key = field.includes('cuisine')
+            ? 'type'
+            : field.includes('style')
+              ? 'style'
+              : field.includes('ambiance')
+                ? 'type'
+                : field.includes('activity')
+                  ? 'type'
+                  : field.includes('transport')
+                    ? 'mode'
+                    : field.includes('accommodation')
+                      ? 'type'
+                      : field.includes('group')
+                        ? 'size'
+                        : 'type';
+          return {
+            ...prev,
+            [field]: [...current, { [key]: item, strength }],
+          };
+        }
+      });
+    },
+    []
+  );
+
+  const isItemSelected = useCallback(
+    (field: string, item: any): boolean => {
+      const current = editedPrefs[field] || [];
+      return current.some((c: any) => (c.type || c.style || c.mode || c.size) === item);
+    },
+    [editedPrefs]
+  );
+
+  const getItemStrength = useCallback(
+    (field: string, item: any): PreferenceStrength => {
+      const current = editedPrefs[field] || [];
+      const found = current.find((c: any) => (c.type || c.style || c.mode || c.size) === item);
+      return found?.strength || 'neutral';
+    },
+    [editedPrefs]
+  );
+
+  const updateItemStrength = useCallback(
+    (field: string, item: any, strength: PreferenceStrength) => {
+      setEditedPrefs((prev: any) => {
+        const current = prev[field] || [];
         return {
           ...prev,
-          [field]: current.filter((_: any, i: number) => i !== existingIndex),
+          [field]: current.map((c: any) => {
+            const key = c.type || c.style || c.mode || c.size;
+            if (key === item) {
+              return { ...c, strength };
+            }
+            return c;
+          }),
         };
-      } else {
-        // Add item with default key
-        const key = field.includes('cuisine') ? 'type' 
-          : field.includes('style') ? 'style'
-          : field.includes('ambiance') ? 'type'
-          : field.includes('activity') ? 'type'
-          : field.includes('transport') ? 'mode'
-          : field.includes('accommodation') ? 'type'
-          : field.includes('group') ? 'size'
-          : 'type';
-        return {
-          ...prev,
-          [field]: [...current, { [key]: item, strength }],
-        };
-      }
-    });
-  }, []);
-
-  const isItemSelected = useCallback((field: string, item: any): boolean => {
-    const current = editedPrefs[field] || [];
-    return current.some(
-      (c: any) => (c.type || c.style || c.mode || c.size) === item
-    );
-  }, [editedPrefs]);
-
-  const getItemStrength = useCallback((field: string, item: any): PreferenceStrength => {
-    const current = editedPrefs[field] || [];
-    const found = current.find(
-      (c: any) => (c.type || c.style || c.mode || c.size) === item
-    );
-    return found?.strength || 'neutral';
-  }, [editedPrefs]);
-
-  const updateItemStrength = useCallback((
-    field: string,
-    item: any,
-    strength: PreferenceStrength
-  ) => {
-    setEditedPrefs((prev: any) => {
-      const current = prev[field] || [];
-      return {
-        ...prev,
-        [field]: current.map((c: any) => {
-          const key = c.type || c.style || c.mode || c.size;
-          if (key === item) {
-            return { ...c, strength };
-          }
-          return c;
-        }),
-      };
-    });
-  }, []);
+      });
+    },
+    []
+  );
 
   const renderMultiSelect = (
     title: string,
@@ -189,10 +244,10 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
     <View style={styles.fieldSection}>
       <Text style={styles.fieldTitle}>{title}</Text>
       <View style={styles.optionsGrid}>
-        {options.map(option => {
+        {options.map((option) => {
           const selected = isItemSelected(field, option);
           const strength = getItemStrength(field, option);
-          
+
           return (
             <TouchableOpacity
               key={option}
@@ -207,7 +262,7 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
                   Alert.alert(
                     'Set Preference Strength',
                     `How strongly do you prefer ${formatLabel(option)}?`,
-                    STRENGTH_OPTIONS.map(s => ({
+                    STRENGTH_OPTIONS.map((s) => ({
                       text: STRENGTH_LABELS[s],
                       onPress: () => updateItemStrength(field, option, s),
                     }))
@@ -215,26 +270,20 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
                 }
               }}
             >
-              <Text style={[
-                styles.optionChipText,
-                selected && styles.optionChipTextSelected,
-              ]}>
+              <Text style={[styles.optionChipText, selected && styles.optionChipTextSelected]}>
                 {formatLabel(option)}
               </Text>
               {selected && showStrength && (
-                <View style={[
-                  styles.strengthDot,
-                  { backgroundColor: STRENGTH_COLORS[strength] },
-                ]} />
+                <View
+                  style={[styles.strengthDot, { backgroundColor: STRENGTH_COLORS[strength] }]}
+                />
               )}
             </TouchableOpacity>
           );
         })}
       </View>
       {showStrength && (
-        <Text style={styles.fieldHint}>
-          Long press a selected item to set preference strength
-        </Text>
+        <Text style={styles.fieldHint}>Long press a selected item to set preference strength</Text>
       )}
     </View>
   );
@@ -248,7 +297,7 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
     unit: string = ''
   ) => {
     const value = editedPrefs[field] ?? min;
-    
+
     return (
       <View style={styles.fieldSection}>
         <Text style={styles.fieldTitle}>{title}</Text>
@@ -261,7 +310,8 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
           </TouchableOpacity>
           <View style={styles.sliderValue}>
             <Text style={styles.sliderValueText}>
-              {value}{unit}
+              {value}
+              {unit}
             </Text>
           </View>
           <TouchableOpacity
@@ -285,7 +335,7 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
   ) => {
     const minValue = editedPrefs[minField] ?? absoluteMin;
     const maxValue = editedPrefs[maxField] ?? absoluteMax;
-    
+
     return (
       <View style={styles.fieldSection}>
         <Text style={styles.fieldTitle}>{title}</Text>
@@ -299,7 +349,10 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
               >
                 <Text style={styles.rangeBtnSmallText}>−</Text>
               </TouchableOpacity>
-              <Text style={styles.rangeValueText}>{minValue}{unit}</Text>
+              <Text style={styles.rangeValueText}>
+                {minValue}
+                {unit}
+              </Text>
               <TouchableOpacity
                 style={styles.rangeBtnSmall}
                 onPress={() => updateField(minField, Math.min(maxValue, minValue + 1))}
@@ -318,7 +371,10 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
               >
                 <Text style={styles.rangeBtnSmallText}>−</Text>
               </TouchableOpacity>
-              <Text style={styles.rangeValueText}>{maxValue}{unit}</Text>
+              <Text style={styles.rangeValueText}>
+                {maxValue}
+                {unit}
+              </Text>
               <TouchableOpacity
                 style={styles.rangeBtnSmall}
                 onPress={() => updateField(maxField, Math.min(absoluteMax, maxValue + 1))}
@@ -355,7 +411,7 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
     <View style={styles.fieldSection}>
       <Text style={styles.fieldTitle}>{title}</Text>
       <View style={styles.segmentedContainer}>
-        {options.map(option => (
+        {options.map((option) => (
           <TouchableOpacity
             key={option.value}
             style={[
@@ -364,10 +420,12 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
             ]}
             onPress={() => updateField(field, option.value)}
           >
-            <Text style={[
-              styles.segmentedOptionText,
-              editedPrefs[field] === option.value && styles.segmentedOptionTextSelected,
-            ]}>
+            <Text
+              style={[
+                styles.segmentedOptionText,
+                editedPrefs[field] === option.value && styles.segmentedOptionTextSelected,
+              ]}
+            >
               {option.label}
             </Text>
           </TouchableOpacity>
@@ -381,7 +439,12 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
       {renderMultiSelect('Favorite Cuisines', 'cuisineTypes', CUISINE_OPTIONS)}
       {renderMultiSelect('Preferred Ambiance', 'ambiance', AMBIANCE_OPTIONS)}
       {renderMultiSelect('Dining Styles', 'diningStyles', [
-        'fine_dining', 'casual', 'fast_casual', 'cafe', 'bistro', 'food_truck',
+        'fine_dining',
+        'casual',
+        'fast_casual',
+        'cafe',
+        'bistro',
+        'food_truck',
       ])}
       {renderRangeSlider('Price Range', 'priceRange.min', 'priceRange.max', 1, 4, '$')}
       {renderSegmented('Reservations', 'reservationPreference', [
@@ -417,10 +480,22 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
     <>
       {renderMultiSelect('Accommodation Types', 'types', ACCOMMODATION_OPTIONS)}
       {renderRangeSlider('Star Rating', 'starRating.min', 'starRating.preferred', 1, 5, '★')}
-      {renderMultiSelect('Must-Have Amenities', 'mustHaveAmenities', [
-        'wifi', 'pool', 'gym', 'spa', 'restaurant', 'parking',
-        'kitchen', 'balcony', 'breakfast_included',
-      ], false)}
+      {renderMultiSelect(
+        'Must-Have Amenities',
+        'mustHaveAmenities',
+        [
+          'wifi',
+          'pool',
+          'gym',
+          'spa',
+          'restaurant',
+          'parking',
+          'kitchen',
+          'balcony',
+          'breakfast_included',
+        ],
+        false
+      )}
     </>
   );
 
@@ -513,42 +588,39 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
 
   const renderCategoryContent = () => {
     switch (category) {
-      case 'dining': return renderDiningPreferences();
-      case 'activities': return renderActivityPreferences();
-      case 'accommodation': return renderAccommodationPreferences();
-      case 'transportation': return renderTransportationPreferences();
-      case 'budget': return renderBudgetPreferences();
-      case 'timing': return renderTimingPreferences();
-      case 'accessibility': return renderAccessibilityPreferences();
-      case 'social': return renderSocialPreferences();
-      default: return null;
+      case 'dining':
+        return renderDiningPreferences();
+      case 'activities':
+        return renderActivityPreferences();
+      case 'accommodation':
+        return renderAccommodationPreferences();
+      case 'transportation':
+        return renderTransportationPreferences();
+      case 'budget':
+        return renderBudgetPreferences();
+      case 'timing':
+        return renderTimingPreferences();
+      case 'accessibility':
+        return renderAccessibilityPreferences();
+      case 'social':
+        return renderSocialPreferences();
+      default:
+        return null;
     }
   };
 
   const formatLabel = (str: string): string => {
-    return str
-      .replace(/_/g, ' ')
-      .replace(/\b\w/g, c => c.toUpperCase());
+    return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={handleSave}
-            disabled={saving}
-          >
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
             {saving ? (
               <ActivityIndicator color="#667eea" size="small" />
             ) : (
@@ -556,12 +628,12 @@ const PreferenceEditorScreen: React.FC<PreferenceEditorScreenProps> = ({
             )}
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.headerContent}>
           <Text style={styles.headerIcon}>{categoryInfo?.icon}</Text>
           <Text style={styles.headerTitle}>{categoryInfo?.name}</Text>
           <Text style={styles.headerSubtitle}>{categoryInfo?.description}</Text>
-          
+
           <View style={styles.completenessBar}>
             <View style={styles.completenessTrack}>
               <View style={[styles.completenessFill, { width: `${completeness}%` }]} />

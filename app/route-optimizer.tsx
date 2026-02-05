@@ -67,10 +67,13 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
     const newRoute = await applyApprovedChanges();
     if (newRoute) {
       Alert.alert('Route Updated!', 'Your optimized route has been applied.', [
-        { text: 'Done', onPress: () => {
-          onApplyRoute?.(newRoute.stops.map(s => s.activity));
-          navigation?.goBack();
-        }},
+        {
+          text: 'Done',
+          onPress: () => {
+            onApplyRoute?.(newRoute.stops.map((s) => s.activity));
+            navigation?.goBack();
+          },
+        },
       ]);
     }
   }, [applyApprovedChanges, onApplyRoute, navigation]);
@@ -84,7 +87,7 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Optimization Strategy</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.strategyScroll}>
-        {(Object.keys(STRATEGY_INFO) as OptimizationStrategy[]).map(s => {
+        {(Object.keys(STRATEGY_INFO) as OptimizationStrategy[]).map((s) => {
           const info = STRATEGY_INFO[s];
           const selected = strategy === s;
           return (
@@ -97,7 +100,9 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
               <Text style={[styles.strategyName, selected && styles.strategyNameSelected]}>
                 {info.name}
               </Text>
-              <Text style={styles.strategyBestFor} numberOfLines={2}>{info.bestFor}</Text>
+              <Text style={styles.strategyBestFor} numberOfLines={2}>
+                {info.bestFor}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -132,7 +137,7 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
 
   const renderChangeCard = (change: RouteChange) => {
     const expanded = expandedChangeId === change.id;
-    const isPending = pendingChanges.find(c => c.id === change.id);
+    const isPending = pendingChanges.find((c) => c.id === change.id);
 
     return (
       <View key={change.id} style={styles.changeCard}>
@@ -161,16 +166,10 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
 
         {isPending && (
           <View style={styles.changeActions}>
-            <TouchableOpacity
-              style={styles.approveBtn}
-              onPress={() => approveChange(change.id)}
-            >
+            <TouchableOpacity style={styles.approveBtn} onPress={() => approveChange(change.id)}>
               <Text style={styles.approveBtnText}>✓ Approve</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.rejectBtn}
-              onPress={() => rejectChange(change.id)}
-            >
+            <TouchableOpacity style={styles.rejectBtn} onPress={() => rejectChange(change.id)}>
               <Text style={styles.rejectBtnText}>✕ Reject</Text>
             </TouchableOpacity>
           </View>
@@ -192,9 +191,7 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
           </View>
           <View style={styles.savingsDivider} />
           <View style={styles.savingsMetric}>
-            <Text style={styles.savingsValue}>
-              -{(distanceSaved / 1000).toFixed(1)}km
-            </Text>
+            <Text style={styles.savingsValue}>-{(distanceSaved / 1000).toFixed(1)}km</Text>
             <Text style={styles.savingsLabel}>Distance</Text>
           </View>
           <View style={styles.savingsDivider} />
@@ -260,7 +257,8 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Route Optimizer</Text>
           <Text style={styles.headerSubtitle}>
-            {activities.length} activities • {showComparison ? 'Review changes' : 'Ready to optimize'}
+            {activities.length} activities •{' '}
+            {showComparison ? 'Review changes' : 'Ready to optimize'}
           </Text>
         </View>
       </LinearGradient>
@@ -288,10 +286,7 @@ const RouteOptimizerScreen: React.FC<RouteOptimizerScreenProps> = ({
         ) : (
           <>
             {renderOptimizationResults()}
-            <TouchableOpacity
-              style={styles.backToRoute}
-              onPress={() => setShowComparison(false)}
-            >
+            <TouchableOpacity style={styles.backToRoute} onPress={() => setShowComparison(false)}>
               <Text style={styles.backToRouteText}>← Back to Route</Text>
             </TouchableOpacity>
           </>
@@ -319,13 +314,23 @@ const styles = StyleSheet.create({
   headerSubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.9)' },
   content: { flex: 1, padding: 16 },
   section: { marginBottom: 24 },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   sectionTitle: { fontSize: 18, fontWeight: '600', color: '#1a1a1a', marginBottom: 12 },
   changeCount: { fontSize: 14, color: '#888' },
   strategyScroll: { marginBottom: 8 },
   strategyCard: {
-    width: 140, backgroundColor: '#fff', borderRadius: 16, padding: 16, marginRight: 12,
-    borderWidth: 2, borderColor: 'transparent',
+    width: 140,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   strategyCardSelected: { borderColor: '#00b894', backgroundColor: '#E8FFF8' },
   strategyIcon: { fontSize: 28, marginBottom: 8 },
@@ -334,12 +339,20 @@ const styles = StyleSheet.create({
   strategyBestFor: { fontSize: 11, color: '#888', lineHeight: 15 },
   routeList: { backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden' },
   routeItem: {
-    flexDirection: 'row', alignItems: 'center', padding: 16,
-    borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   routeNumber: {
-    width: 32, height: 32, borderRadius: 16, backgroundColor: '#00b894',
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#00b894',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   routeNumberText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   routeContent: { flex: 1 },
@@ -347,13 +360,21 @@ const styles = StyleSheet.create({
   routeMeta: { fontSize: 12, color: '#888' },
   routeTime: { fontSize: 13, color: '#00b894', fontWeight: '600' },
   optimizeButton: {
-    backgroundColor: '#00b894', borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginTop: 8,
+    backgroundColor: '#00b894',
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    marginTop: 8,
   },
   optimizeButtonDisabled: { backgroundColor: '#ccc' },
   optimizeButtonText: { fontSize: 17, fontWeight: '600', color: '#fff' },
   optimizingRow: { flexDirection: 'row', alignItems: 'center' },
   savingsCard: {
-    flexDirection: 'row', backgroundColor: '#fff', borderRadius: 16, padding: 20, marginBottom: 16,
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
   },
   savingsMetric: { flex: 1, alignItems: 'center' },
   savingsDivider: { width: 1, backgroundColor: '#e8e8e8', marginHorizontal: 12 },
@@ -367,8 +388,13 @@ const styles = StyleSheet.create({
   changeCard: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 12, overflow: 'hidden' },
   changeHeader: { flexDirection: 'row', alignItems: 'center', padding: 16 },
   changeIcon: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: '#E8FFF8',
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E8FFF8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   changeIconText: { fontSize: 18 },
   changeContent: { flex: 1 },
@@ -385,15 +411,27 @@ const styles = StyleSheet.create({
   rejectBtnText: { fontSize: 14, fontWeight: '600', color: '#FF3B30' },
   bulkActions: { flexDirection: 'row', gap: 12, marginTop: 16 },
   bulkApprove: {
-    flex: 1, backgroundColor: '#E8FFF8', paddingVertical: 14, borderRadius: 12, alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#E8FFF8',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
   },
   bulkApproveText: { fontSize: 14, fontWeight: '600', color: '#00b894' },
   bulkReject: {
-    flex: 1, backgroundColor: '#FFF5F5', paddingVertical: 14, borderRadius: 12, alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#FFF5F5',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
   },
   bulkRejectText: { fontSize: 14, fontWeight: '600', color: '#FF3B30' },
   applyButton: {
-    backgroundColor: '#00b894', borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginTop: 8,
+    backgroundColor: '#00b894',
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    marginTop: 8,
   },
   applyButtonText: { fontSize: 17, fontWeight: '600', color: '#fff' },
   backToRoute: { paddingVertical: 16, alignItems: 'center' },

@@ -1,12 +1,12 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack, useRouter, useSegments } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AppProvider, useApp } from "@/contexts/AppContext";
-import { DateNightProvider } from "@/contexts/DateNightContext";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
-import colors from "@/constants/colors";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import React, { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { AppProvider, useApp } from '@/contexts/AppContext';
+import { DateNightProvider } from '@/contexts/DateNightContext';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import colors from '@/constants/colors';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,12 +15,12 @@ const queryClient = new QueryClient();
 // Default screen options for consistent transitions
 const defaultCardOptions = {
   headerShown: false,
-  presentation: "card" as const,
+  presentation: 'card' as const,
 };
 
 const defaultModalOptions = {
   headerShown: false,
-  presentation: "modal" as const,
+  presentation: 'modal' as const,
 };
 
 function RootLayoutNav() {
@@ -31,12 +31,12 @@ function RootLayoutNav() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inOnboarding = segments[0] === "onboarding";
+    const inOnboarding = segments[0] === 'onboarding';
 
     if (!isOnboarded && !inOnboarding) {
-      router.replace("/onboarding");
+      router.replace('/onboarding');
     } else if (isOnboarded && inOnboarding) {
-      router.replace("/");
+      router.replace('/');
     }
   }, [isOnboarded, isLoading, segments, router]);
 
@@ -49,7 +49,7 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack screenOptions={{ headerBackTitle: "Back" }}>
+    <Stack screenOptions={{ headerBackTitle: 'Back' }}>
       {/* ===== Core Navigation ===== */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false }} />
@@ -198,8 +198,8 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   loading: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.background,
   },
 });

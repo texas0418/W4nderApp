@@ -44,7 +44,7 @@ const calculateYears = (startDate: Date, endDate: Date): number => {
   const years = endDate.getFullYear() - startDate.getFullYear();
   const monthDiff = endDate.getMonth() - startDate.getMonth();
   const dayDiff = endDate.getDate() - startDate.getDate();
-  
+
   if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
     return years - 1;
   }
@@ -52,22 +52,24 @@ const calculateYears = (startDate: Date, endDate: Date): number => {
 };
 
 // Calculate days until next occurrence of anniversary
-const getDaysUntilAnniversary = (anniversaryDate: string): { daysUntil: number; nextDate: Date; yearsCompleting: number } => {
+const getDaysUntilAnniversary = (
+  anniversaryDate: string
+): { daysUntil: number; nextDate: Date; yearsCompleting: number } => {
   const originalDate = parseDate(anniversaryDate);
   const now = today();
   const currentYear = now.getFullYear();
-  
+
   // Get this year's anniversary date
   let nextAnniversary = new Date(currentYear, originalDate.getMonth(), originalDate.getDate());
-  
+
   // If it's already passed this year, get next year's
   if (nextAnniversary < now) {
     nextAnniversary = new Date(currentYear + 1, originalDate.getMonth(), originalDate.getDate());
   }
-  
+
   const daysUntil = Math.ceil((nextAnniversary.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   const yearsCompleting = nextAnniversary.getFullYear() - originalDate.getFullYear();
-  
+
   return { daysUntil, nextDate: nextAnniversary, yearsCompleting };
 };
 
@@ -85,7 +87,7 @@ class AnniversaryService {
 
   async getAnniversaryById(id: string): Promise<Anniversary | null> {
     const anniversaries = await this.getAllAnniversaries();
-    return anniversaries.find(a => a.id === id) || null;
+    return anniversaries.find((a) => a.id === id) || null;
   }
 
   async createAnniversary(input: CreateAnniversaryInput): Promise<Anniversary> {
@@ -112,8 +114,8 @@ class AnniversaryService {
 
   async updateAnniversary(id: string, input: UpdateAnniversaryInput): Promise<Anniversary | null> {
     const anniversaries = await this.getAllAnniversaries();
-    const index = anniversaries.findIndex(a => a.id === id);
-    
+    const index = anniversaries.findIndex((a) => a.id === id);
+
     if (index === -1) return null;
 
     anniversaries[index] = {
@@ -128,15 +130,15 @@ class AnniversaryService {
 
   async deleteAnniversary(id: string): Promise<boolean> {
     const anniversaries = await this.getAllAnniversaries();
-    const filtered = anniversaries.filter(a => a.id !== id);
-    
+    const filtered = anniversaries.filter((a) => a.id !== id);
+
     if (filtered.length === anniversaries.length) return false;
 
     await AsyncStorage.setItem(STORAGE_KEYS.ANNIVERSARIES, JSON.stringify(filtered));
-    
+
     // Also clean up related reminders
     await this.deleteRemindersForAnniversary(id);
-    
+
     return true;
   }
 
@@ -150,16 +152,16 @@ class AnniversaryService {
     // Apply filters
     if (filters) {
       if (filters.types && filters.types.length > 0) {
-        anniversaries = anniversaries.filter(a => filters.types!.includes(a.type));
+        anniversaries = anniversaries.filter((a) => filters.types!.includes(a.type));
       }
       if (filters.isActive !== undefined) {
-        anniversaries = anniversaries.filter(a => a.isActive === filters.isActive);
+        anniversaries = anniversaries.filter((a) => a.isActive === filters.isActive);
       }
       if (filters.hasUpcomingMilestone) {
-        anniversaries = anniversaries.filter(a => {
+        anniversaries = anniversaries.filter((a) => {
           const { yearsCompleting } = getDaysUntilAnniversary(a.date);
           const milestone = getMilestoneForYears(yearsCompleting);
-          return milestone && ANNIVERSARY_MILESTONES.some(m => m.years === yearsCompleting);
+          return milestone && ANNIVERSARY_MILESTONES.some((m) => m.years === yearsCompleting);
         });
       }
     }
@@ -203,7 +205,7 @@ class AnniversaryService {
 
       if (daysUntil <= daysAhead) {
         const milestone = getMilestoneForYears(yearsCompleting);
-        const suggestions = milestone 
+        const suggestions = milestone
           ? this.generateSuggestions(anniversary.id, milestone, bookmarked)
           : [];
 
@@ -230,7 +232,7 @@ class AnniversaryService {
     bookmarkedIds: string[] = []
   ): MilestoneSuggestion[] {
     const templates = getSuggestionsForMilestone(milestone);
-    
+
     return templates.map((template, index) => {
       const id = `sug_${anniversaryId}_${milestone.years}_${index}`;
       return {
@@ -254,7 +256,7 @@ class AnniversaryService {
 
     const { yearsCompleting } = getDaysUntilAnniversary(anniversary.date);
     const milestone = getMilestoneForYears(yearsCompleting);
-    
+
     if (!milestone) return [];
 
     const bookmarked = await this.getBookmarkedSuggestions();
@@ -283,7 +285,7 @@ class AnniversaryService {
 
       // Find next milestone
       const milestone = getMilestoneForYears(yearsCompleting);
-      if (milestone && ANNIVERSARY_MILESTONES.some(m => m.years === yearsCompleting)) {
+      if (milestone && ANNIVERSARY_MILESTONES.some((m) => m.years === yearsCompleting)) {
         if (daysUntil < minDaysToMilestone) {
           minDaysToMilestone = daysUntil;
           nextMilestoneData = {
@@ -296,7 +298,7 @@ class AnniversaryService {
     }
 
     return {
-      totalAnniversaries: anniversaries.filter(a => a.isActive).length,
+      totalAnniversaries: anniversaries.filter((a) => a.isActive).length,
       upcomingThisMonth,
       nextMilestone: nextMilestoneData,
     };
@@ -316,8 +318,8 @@ class AnniversaryService {
   async getUnreadReminders(): Promise<AnniversaryReminder[]> {
     const reminders = await this.getReminders();
     const now = today();
-    
-    return reminders.filter(r => {
+
+    return reminders.filter((r) => {
       const scheduledDate = parseDate(r.scheduledDate);
       return !r.isRead && scheduledDate <= now;
     });
@@ -325,8 +327,8 @@ class AnniversaryService {
 
   async markReminderAsRead(reminderId: string): Promise<void> {
     const reminders = await this.getReminders();
-    const index = reminders.findIndex(r => r.id === reminderId);
-    
+    const index = reminders.findIndex((r) => r.id === reminderId);
+
     if (index !== -1) {
       reminders[index].isRead = true;
       await AsyncStorage.setItem(STORAGE_KEYS.REMINDERS, JSON.stringify(reminders));
@@ -347,9 +349,9 @@ class AnniversaryService {
       for (const daysBefore of anniversary.reminderDays) {
         if (daysUntil === daysBefore) {
           const reminderId = `rem_${anniversary.id}_${formatDate(nextDate)}_${daysBefore}`;
-          
+
           // Check if reminder already exists
-          if (!newReminders.some(r => r.id === reminderId)) {
+          if (!newReminders.some((r) => r.id === reminderId)) {
             newReminders.push({
               id: reminderId,
               anniversaryId: anniversary.id,
@@ -368,7 +370,7 @@ class AnniversaryService {
 
   private async deleteRemindersForAnniversary(anniversaryId: string): Promise<void> {
     const reminders = await this.getReminders();
-    const filtered = reminders.filter(r => r.anniversaryId !== anniversaryId);
+    const filtered = reminders.filter((r) => r.anniversaryId !== anniversaryId);
     await AsyncStorage.setItem(STORAGE_KEYS.REMINDERS, JSON.stringify(filtered));
   }
 
@@ -386,7 +388,7 @@ class AnniversaryService {
   async toggleBookmark(suggestionId: string): Promise<boolean> {
     const bookmarked = await this.getBookmarkedSuggestions();
     const index = bookmarked.indexOf(suggestionId);
-    
+
     if (index === -1) {
       bookmarked.push(suggestionId);
     } else {
@@ -407,23 +409,31 @@ class AnniversaryService {
     return getNextMilestone(currentYears);
   }
 
-  getMilestoneProgress(anniversaryDate: string): { current: number; next: Milestone | undefined; progress: number } {
+  getMilestoneProgress(anniversaryDate: string): {
+    current: number;
+    next: Milestone | undefined;
+    progress: number;
+  } {
     const currentYears = this.calculateCurrentYears(anniversaryDate);
     const nextMilestone = getNextMilestone(currentYears);
-    
+
     if (!nextMilestone) {
       return { current: currentYears, next: undefined, progress: 100 };
     }
 
     // Find previous milestone
     const prevMilestone = [...ANNIVERSARY_MILESTONES]
-      .filter(m => m.years <= currentYears)
+      .filter((m) => m.years <= currentYears)
       .sort((a, b) => b.years - a.years)[0];
-    
+
     const startYears = prevMilestone?.years || 0;
     const progress = ((currentYears - startYears) / (nextMilestone.years - startYears)) * 100;
 
-    return { current: currentYears, next: nextMilestone, progress: Math.min(100, Math.max(0, progress)) };
+    return {
+      current: currentYears,
+      next: nextMilestone,
+      progress: Math.min(100, Math.max(0, progress)),
+    };
   }
 }
 

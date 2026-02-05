@@ -41,20 +41,20 @@ class WebSocketService {
   private config: WebSocketConfig;
   private connectionInfo: ConnectionInfo;
   private eventHandlers: EventHandlers = {};
-  
+
   // Subscriptions
   private subscriptions: Map<string, Subscription> = new Map();
   private channels: Map<string, Channel> = new Map();
-  
+
   // Message handling
   private messageQueue: QueuedMessage[] = [];
   private messageHandlers: Map<MessageType, Set<MessageHandler>> = new Map();
-  
+
   // Timers
   private reconnectTimer: NodeJS.Timeout | null = null;
   private heartbeatTimer: NodeJS.Timeout | null = null;
   private heartbeatTimeoutTimer: NodeJS.Timeout | null = null;
-  
+
   // State
   private isAuthenticated = false;
   private sessionId: string | null = null;
@@ -72,7 +72,7 @@ class WebSocketService {
       status: 'disconnected',
       reconnectAttempts: 0,
     };
-    
+
     this.setupAppStateListener();
     this.setupNetworkListener();
     this.loadMessageQueue();
@@ -96,12 +96,12 @@ class WebSocketService {
 
     this.manualDisconnect = false;
     this.setStatus('connecting');
-    
+
     try {
       // Build URL with query params
       const url = this.buildConnectionUrl();
       this.log(`Connecting to ${url}`);
-      
+
       this.ws = new WebSocket(url);
       this.setupWebSocketHandlers();
     } catch (error) {
@@ -117,12 +117,12 @@ class WebSocketService {
   disconnect(code: number = 1000, reason: string = 'Client disconnect'): void {
     this.manualDisconnect = true;
     this.clearTimers();
-    
+
     if (this.ws) {
       this.ws.close(code, reason);
       this.ws = null;
     }
-    
+
     this.setStatus('disconnected');
     this.isAuthenticated = false;
     this.sessionId = null;
@@ -173,7 +173,7 @@ class WebSocketService {
     filter?: (message: BaseMessage) => boolean
   ): string {
     const subscriptionId = `${channel}:${resourceId}:${Date.now()}`;
-    
+
     const subscription: Subscription = {
       id: subscriptionId,
       channel,
@@ -181,16 +181,16 @@ class WebSocketService {
       handler,
       filter,
     };
-    
+
     this.subscriptions.set(subscriptionId, subscription);
-    
+
     // Send subscribe message if connected
     if (this.isConnected()) {
       this.sendSubscribe(channel, resourceId);
     }
-    
+
     this.log(`Subscribed to ${channel}:${resourceId}`);
-    
+
     return subscriptionId;
   }
 
@@ -200,19 +200,19 @@ class WebSocketService {
   unsubscribe(subscriptionId: string): void {
     const subscription = this.subscriptions.get(subscriptionId);
     if (!subscription) return;
-    
+
     this.subscriptions.delete(subscriptionId);
-    
+
     // Check if any other subscriptions exist for this channel
     const hasOtherSubscriptions = Array.from(this.subscriptions.values()).some(
-      s => s.channel === subscription.channel && s.resourceId === subscription.resourceId
+      (s) => s.channel === subscription.channel && s.resourceId === subscription.resourceId
     );
-    
+
     // If no other subscriptions, send unsubscribe message
     if (!hasOtherSubscriptions && this.isConnected()) {
       this.sendUnsubscribe(subscription.channel, subscription.resourceId);
     }
-    
+
     this.log(`Unsubscribed from ${subscription.channel}:${subscription.resourceId}`);
   }
 
@@ -237,7 +237,7 @@ class WebSocketService {
       userId: this.config.userId,
       ...message,
     } as BaseMessage;
-    
+
     if (this.isConnected()) {
       this.sendRaw(fullMessage);
     } else {
@@ -253,9 +253,9 @@ class WebSocketService {
     if (!this.messageHandlers.has(type)) {
       this.messageHandlers.set(type, new Set());
     }
-    
+
     this.messageHandlers.get(type)!.add(handler as MessageHandler);
-    
+
     // Return unsubscribe function
     return () => {
       this.messageHandlers.get(type)?.delete(handler as MessageHandler);
@@ -325,7 +325,7 @@ class WebSocketService {
 
   private buildConnectionUrl(): string {
     const params = new URLSearchParams();
-    
+
     if (this.config.userId) {
       params.set('userId', this.config.userId);
     }
@@ -333,7 +333,7 @@ class WebSocketService {
       params.set('deviceId', this.config.deviceId);
     }
     params.set('platform', Platform.OS);
-    
+
     const queryString = params.toString();
     return queryString ? `${this.config.url}?${queryString}` : this.config.url;
   }
@@ -346,15 +346,15 @@ class WebSocketService {
       this.connectionInfo.connectedAt = new Date();
       this.connectionInfo.reconnectAttempts = 0;
       this.setStatus('connected');
-      
+
       // Authenticate
       this.authenticate();
-      
+
       // Start heartbeat
       if (this.config.enableHeartbeat) {
         this.startHeartbeat();
       }
-      
+
       this.eventHandlers.onConnect?.();
     };
 
@@ -362,11 +362,11 @@ class WebSocketService {
       this.log(`Connection closed: ${event.code} - ${event.reason}`);
       this.clearTimers();
       this.isAuthenticated = false;
-      
+
       if (!this.manualDisconnect) {
         this.setStatus('disconnected');
         this.eventHandlers.onDisconnect?.(event.reason);
-        
+
         if (this.config.autoReconnect) {
           this.scheduleReconnect();
         }
@@ -417,13 +417,13 @@ class WebSocketService {
 
   private onAuthenticated(): void {
     this.isAuthenticated = true;
-    
+
     // Resubscribe to all channels
     this.resubscribeAll();
-    
+
     // Flush message queue
     this.flushMessageQueue();
-    
+
     this.eventHandlers.onAuthSuccess?.(this.sessionId || '');
   }
 
@@ -434,11 +434,11 @@ class WebSocketService {
   private handleMessage(data: string): void {
     try {
       const message: BaseMessage = JSON.parse(data);
-      
+
       if (this.config.logMessages) {
         this.log('Received:', message.type, message);
       }
-      
+
       // Handle system messages
       switch (message.type) {
         case 'pong':
@@ -459,23 +459,22 @@ class WebSocketService {
           this.log('Server error:', (message as any).payload);
           break;
       }
-      
+
       // Call type-specific handlers
       const handlers = this.messageHandlers.get(message.type);
-      handlers?.forEach(handler => {
+      handlers?.forEach((handler) => {
         try {
           handler(message);
         } catch (error) {
           this.log('Handler error:', error);
         }
       });
-      
+
       // Dispatch to subscriptions
       this.dispatchToSubscriptions(message);
-      
+
       // Call generic message handler
       this.eventHandlers.onMessage?.(message);
-      
     } catch (error) {
       this.log('Failed to parse message:', error);
     }
@@ -485,11 +484,11 @@ class WebSocketService {
     // Extract channel info from message
     const payload = (message as any).payload;
     if (!payload) return;
-    
+
     // Determine resource info based on message type
     let channel: ChannelType | undefined;
     let resourceId: string | undefined;
-    
+
     if (payload.itineraryId) {
       channel = 'itinerary';
       resourceId = payload.itineraryId;
@@ -500,17 +499,17 @@ class WebSocketService {
       channel = 'booking';
       resourceId = payload.bookingId;
     }
-    
+
     if (!channel || !resourceId) return;
-    
+
     // Dispatch to matching subscriptions
-    this.subscriptions.forEach(subscription => {
+    this.subscriptions.forEach((subscription) => {
       if (subscription.channel === channel && subscription.resourceId === resourceId) {
         // Apply filter if exists
         if (subscription.filter && !subscription.filter(message)) {
           return;
         }
-        
+
         try {
           subscription.handler(message);
         } catch (error) {
@@ -526,10 +525,10 @@ class WebSocketService {
       this.queueMessage(message);
       return;
     }
-    
+
     const data = JSON.stringify(message);
     this.ws.send(data);
-    
+
     if (this.config.logMessages) {
       this.log('Sent:', message.type);
     }
@@ -549,7 +548,7 @@ class WebSocketService {
         resourceId,
       },
     };
-    
+
     this.sendRaw(message);
   }
 
@@ -563,28 +562,28 @@ class WebSocketService {
         resourceId,
       },
     };
-    
+
     this.sendRaw(message);
   }
 
   private handleSubscribed(message: any): void {
     const { channel, resourceId } = message.payload || {};
     if (!channel || !resourceId) return;
-    
+
     const channelKey = `${channel}:${resourceId}`;
     this.channels.set(channelKey, {
       type: channel,
       resourceId,
       subscribedAt: new Date(),
     });
-    
+
     this.log(`Confirmed subscription to ${channelKey}`);
   }
 
   private resubscribeAll(): void {
     const channelSet = new Set<string>();
-    
-    this.subscriptions.forEach(subscription => {
+
+    this.subscriptions.forEach((subscription) => {
       const key = `${subscription.channel}:${subscription.resourceId}`;
       if (!channelSet.has(key)) {
         channelSet.add(key);
@@ -599,7 +598,7 @@ class WebSocketService {
 
   private startHeartbeat(): void {
     this.clearHeartbeatTimers();
-    
+
     this.heartbeatTimer = setInterval(() => {
       this.sendPing();
     }, this.config.heartbeatInterval);
@@ -607,15 +606,15 @@ class WebSocketService {
 
   private sendPing(): void {
     if (this.ws?.readyState !== WebSocket.OPEN) return;
-    
+
     this.connectionInfo.lastPingAt = new Date();
-    
+
     this.sendRaw({
       type: 'ping',
       id: this.generateMessageId(),
       timestamp: new Date().toISOString(),
     });
-    
+
     // Set timeout for pong
     this.heartbeatTimeoutTimer = setTimeout(() => {
       this.log('Heartbeat timeout');
@@ -625,12 +624,12 @@ class WebSocketService {
 
   private handlePong(): void {
     this.connectionInfo.lastPongAt = new Date();
-    
+
     if (this.connectionInfo.lastPingAt) {
-      this.connectionInfo.latency = 
+      this.connectionInfo.latency =
         this.connectionInfo.lastPongAt.getTime() - this.connectionInfo.lastPingAt.getTime();
     }
-    
+
     // Clear timeout
     if (this.heartbeatTimeoutTimer) {
       clearTimeout(this.heartbeatTimeoutTimer);
@@ -660,15 +659,15 @@ class WebSocketService {
       this.setStatus('error');
       return;
     }
-    
+
     this.setStatus('reconnecting');
     this.connectionInfo.reconnectAttempts++;
-    
+
     const delay = this.calculateReconnectDelay();
     this.log(`Reconnecting in ${delay}ms (attempt ${this.connectionInfo.reconnectAttempts})`);
-    
+
     this.eventHandlers.onReconnecting?.(this.connectionInfo.reconnectAttempts);
-    
+
     this.reconnectTimer = setTimeout(() => {
       if (!this.manualDisconnect && this.isNetworkConnected) {
         this.connect();
@@ -679,11 +678,11 @@ class WebSocketService {
   private calculateReconnectDelay(): number {
     const baseDelay = this.config.reconnectInterval;
     const attempts = this.connectionInfo.reconnectAttempts;
-    
+
     if (this.config.reconnectBackoff === 'exponential') {
       return Math.min(baseDelay * Math.pow(2, attempts - 1), 30000);
     }
-    
+
     return baseDelay * attempts;
   }
 
@@ -699,7 +698,7 @@ class WebSocketService {
       attempts: 0,
       maxAttempts: 3,
     };
-    
+
     this.messageQueue.push(queuedMessage);
     this.saveMessageQueue();
     this.log(`Queued message: ${message.type}`);
@@ -707,22 +706,22 @@ class WebSocketService {
 
   private async flushMessageQueue(): Promise<void> {
     if (this.messageQueue.length === 0) return;
-    
+
     this.log(`Flushing ${this.messageQueue.length} queued messages`);
-    
+
     const queue = [...this.messageQueue];
     this.messageQueue = [];
-    
+
     for (const item of queue) {
       if (item.attempts >= item.maxAttempts) {
         this.log(`Dropping message after ${item.attempts} attempts:`, item.message.type);
         continue;
       }
-      
+
       item.attempts++;
       this.sendRaw(item.message);
     }
-    
+
     await this.saveMessageQueue();
   }
 
@@ -753,7 +752,7 @@ class WebSocketService {
     AppState.addEventListener('change', (nextState) => {
       const prevState = this.appState;
       this.appState = nextState;
-      
+
       if (prevState.match(/inactive|background/) && nextState === 'active') {
         // App came to foreground
         this.log('App became active');
@@ -771,7 +770,7 @@ class WebSocketService {
     NetInfo.addEventListener((state: NetInfoState) => {
       const wasConnected = this.isNetworkConnected;
       this.isNetworkConnected = state.isConnected ?? false;
-      
+
       if (!wasConnected && this.isNetworkConnected) {
         // Network restored
         this.log('Network restored');
@@ -791,7 +790,7 @@ class WebSocketService {
 
   private clearTimers(): void {
     this.clearHeartbeatTimers();
-    
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;

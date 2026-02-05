@@ -18,7 +18,13 @@ export type NotificationCategory =
 
 export type NotificationPriority = 'low' | 'normal' | 'high' | 'critical';
 
-export type NotificationStatus = 'scheduled' | 'sent' | 'delivered' | 'read' | 'dismissed' | 'failed';
+export type NotificationStatus =
+  | 'scheduled'
+  | 'sent'
+  | 'delivered'
+  | 'read'
+  | 'dismissed'
+  | 'failed';
 
 export type TravelAlertType = 'leave_now' | 'traffic_delay' | 'route_change' | 'arrival_update';
 
@@ -32,31 +38,31 @@ export interface NotificationPayload {
   id: string;
   category: NotificationCategory;
   priority: NotificationPriority;
-  
+
   // Content
   title: string;
   body: string;
   subtitle?: string;
-  
+
   // Visual
   icon?: string;
   imageUrl?: string;
   color?: string;
-  
+
   // Actions
   actions?: NotificationAction[];
   defaultAction?: NotificationAction;
-  
+
   // Scheduling
   scheduledFor?: Date;
   expiresAt?: Date;
-  
+
   // Metadata
   data?: Record<string, any>;
   itineraryId?: string;
   activityId?: string;
   partnerId?: string;
-  
+
   // Status tracking
   status: NotificationStatus;
   createdAt: string;
@@ -82,20 +88,20 @@ export interface ActivityReminder {
   activityId: string;
   activityName: string;
   activityType: string;
-  
+
   // Location
   venueName: string;
   venueAddress: string;
-  
+
   // Timing
   activityStartTime: Date;
   reminderTime: Date;
   minutesBefore: number;
-  
+
   // Status
   isEnabled: boolean;
   hasBeenSent: boolean;
-  
+
   // Customization
   customMessage?: string;
   includeDirections: boolean;
@@ -120,27 +126,27 @@ export interface ActivityReminderSettings {
 export interface TravelAlert {
   id: string;
   type: TravelAlertType;
-  
+
   // Route info
   fromLocation: LocationInfo;
   toLocation: LocationInfo;
   transportMode: 'car' | 'transit' | 'walking' | 'rideshare';
-  
+
   // Timing
   targetArrivalTime: Date;
   suggestedDepartureTime: Date;
   currentEstimatedDuration: number; // minutes
   normalDuration: number; // minutes without traffic
-  
+
   // Traffic info
   trafficCondition: 'light' | 'moderate' | 'heavy' | 'severe';
   delayMinutes: number;
   trafficIncidents?: TrafficIncident[];
-  
+
   // Status
   isActive: boolean;
   lastUpdated: Date;
-  
+
   // Customization
   bufferMinutes: number; // Extra time to add
 }
@@ -177,40 +183,40 @@ export interface TravelAlertSettings {
 export interface PartnerNotification {
   id: string;
   type: PartnerNotificationType;
-  
+
   // People involved
   senderId: string;
   senderName: string;
   recipientId: string;
   recipientName: string;
-  
+
   // Content
   itineraryId?: string;
   itineraryName?: string;
   message?: string;
-  
+
   // Status
   sentAt: Date;
   deliveredAt?: Date;
   readAt?: Date;
-  
+
   // Options
   requiresResponse: boolean;
   expiresAt?: Date;
 }
 
 export type PartnerNotificationType =
-  | 'itinerary_shared'        // Partner shared an itinerary with you
-  | 'itinerary_updated'       // Partner updated a shared itinerary
-  | 'itinerary_accepted'      // Partner accepted your shared itinerary
-  | 'itinerary_declined'      // Partner declined your shared itinerary
-  | 'availability_updated'    // Partner updated their availability
-  | 'booking_confirmed'       // Booking was confirmed for shared itinerary
-  | 'reminder_shared'         // Partner sent you a reminder
-  | 'location_shared'         // Partner shared their location
-  | 'running_late'            // Partner is running late
-  | 'arrived'                 // Partner has arrived
-  | 'custom_message';         // Custom message from partner
+  | 'itinerary_shared' // Partner shared an itinerary with you
+  | 'itinerary_updated' // Partner updated a shared itinerary
+  | 'itinerary_accepted' // Partner accepted your shared itinerary
+  | 'itinerary_declined' // Partner declined your shared itinerary
+  | 'availability_updated' // Partner updated their availability
+  | 'booking_confirmed' // Booking was confirmed for shared itinerary
+  | 'reminder_shared' // Partner sent you a reminder
+  | 'location_shared' // Partner shared their location
+  | 'running_late' // Partner is running late
+  | 'arrived' // Partner has arrived
+  | 'custom_message'; // Custom message from partner
 
 export interface PartnerNotificationSettings {
   enabled: boolean;
@@ -219,7 +225,7 @@ export interface PartnerNotificationSettings {
   notifyOnBooking: boolean;
   notifyOnLocationShare: boolean;
   allowCustomMessages: boolean;
-  
+
   // Surprise mode - for planning surprises without alerting partner
   surpriseMode: {
     enabled: boolean;
@@ -237,12 +243,12 @@ export interface NotificationPreferences {
   soundEnabled: boolean;
   vibrationEnabled: boolean;
   badgeEnabled: boolean;
-  
+
   // Category-specific
   activityReminders: ActivityReminderSettings;
   travelAlerts: TravelAlertSettings;
   partnerNotifications: PartnerNotificationSettings;
-  
+
   // Quiet hours
   quietHours: {
     enabled: boolean;
@@ -250,7 +256,7 @@ export interface NotificationPreferences {
     endTime: string; // HH:mm
     allowCritical: boolean; // Allow critical notifications during quiet hours
   };
-  
+
   // Do not disturb
   doNotDisturb: {
     enabled: boolean;
@@ -291,11 +297,9 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     titleTemplate: '{{activityName}} in 1 hour',
     bodyTemplate: 'Your {{activityType}} at {{venueName}} starts at {{startTime}}.',
     variables: ['activityName', 'activityType', 'venueName', 'startTime'],
-    defaultActions: [
-      { id: 'view', title: 'View Details', actionType: 'open_app' },
-    ],
+    defaultActions: [{ id: 'view', title: 'View Details', actionType: 'open_app' }],
   },
-  
+
   // Travel alerts
   leave_now: {
     id: 'leave_now',
@@ -305,21 +309,27 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     variables: ['duration', 'destination', 'trafficInfo', 'departureTime'],
     defaultActions: [
       { id: 'directions', title: 'Start Navigation', actionType: 'directions' },
-      { id: 'rideshare', title: 'Book Ride', actionType: 'open_app', payload: { screen: 'rideshare' } },
+      {
+        id: 'rideshare',
+        title: 'Book Ride',
+        actionType: 'open_app',
+        payload: { screen: 'rideshare' },
+      },
     ],
   },
   traffic_delay: {
     id: 'traffic_delay',
     category: 'travel_alert',
     titleTemplate: 'Traffic delay on your route',
-    bodyTemplate: '{{delayMinutes}} min delay to {{destination}}. Leave by {{newDepartureTime}} to arrive on time.',
+    bodyTemplate:
+      '{{delayMinutes}} min delay to {{destination}}. Leave by {{newDepartureTime}} to arrive on time.',
     variables: ['delayMinutes', 'destination', 'newDepartureTime', 'reason'],
     defaultActions: [
       { id: 'directions', title: 'View Route', actionType: 'directions' },
       { id: 'alternatives', title: 'See Alternatives', actionType: 'open_app' },
     ],
   },
-  
+
   // Partner notifications
   itinerary_shared: {
     id: 'itinerary_shared',
@@ -349,9 +359,7 @@ export const NOTIFICATION_TEMPLATES: Record<string, NotificationTemplate> = {
     titleTemplate: '{{partnerName}} has arrived',
     bodyTemplate: '{{partnerName}} is at {{venueName}}.',
     variables: ['partnerName', 'venueName'],
-    defaultActions: [
-      { id: 'ok', title: 'OK', actionType: 'dismiss' },
-    ],
+    defaultActions: [{ id: 'ok', title: 'OK', actionType: 'dismiss' }],
   },
 };
 
@@ -431,7 +439,7 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
   soundEnabled: true,
   vibrationEnabled: true,
   badgeEnabled: true,
-  
+
   activityReminders: {
     enabled: true,
     defaultTimings: ['30min', '1hour'],
@@ -442,7 +450,7 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
     quietHoursStart: '22:00',
     quietHoursEnd: '08:00',
   },
-  
+
   travelAlerts: {
     enabled: true,
     defaultBufferMinutes: 15,
@@ -451,7 +459,7 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
     preferredTransportMode: 'car',
     showAlternativeRoutes: true,
   },
-  
+
   partnerNotifications: {
     enabled: true,
     notifyOnShare: true,
@@ -464,14 +472,14 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
       hiddenItineraryIds: [],
     },
   },
-  
+
   quietHours: {
     enabled: true,
     startTime: '22:00',
     endTime: '08:00',
     allowCritical: true,
   },
-  
+
   doNotDisturb: {
     enabled: false,
     allowFrom: [],

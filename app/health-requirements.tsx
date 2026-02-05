@@ -110,12 +110,42 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇹🇭',
     riskLevel: 'moderate',
     vaccinations: [
-      { name: 'Hepatitis A', status: 'recommended', description: 'Spread through contaminated food/water', timing: '2-4 weeks before travel' },
-      { name: 'Hepatitis B', status: 'recommended', description: 'Spread through blood/body fluids', timing: '6 months before (3 doses)' },
-      { name: 'Typhoid', status: 'recommended', description: 'Common in areas with poor sanitation', timing: '2 weeks before travel' },
-      { name: 'Japanese Encephalitis', status: 'situational', description: 'For rural areas, extended stays', timing: '1 month before travel' },
-      { name: 'Rabies', status: 'situational', description: 'If contact with animals is likely', timing: '1 month before travel' },
-      { name: 'Yellow Fever', status: 'required', description: 'Required if arriving from affected country', timing: '10 days before travel' },
+      {
+        name: 'Hepatitis A',
+        status: 'recommended',
+        description: 'Spread through contaminated food/water',
+        timing: '2-4 weeks before travel',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'recommended',
+        description: 'Spread through blood/body fluids',
+        timing: '6 months before (3 doses)',
+      },
+      {
+        name: 'Typhoid',
+        status: 'recommended',
+        description: 'Common in areas with poor sanitation',
+        timing: '2 weeks before travel',
+      },
+      {
+        name: 'Japanese Encephalitis',
+        status: 'situational',
+        description: 'For rural areas, extended stays',
+        timing: '1 month before travel',
+      },
+      {
+        name: 'Rabies',
+        status: 'situational',
+        description: 'If contact with animals is likely',
+        timing: '1 month before travel',
+      },
+      {
+        name: 'Yellow Fever',
+        status: 'required',
+        description: 'Required if arriving from affected country',
+        timing: '10 days before travel',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -124,9 +154,23 @@ const healthRequirements: HealthRequirement[] = [
       notes: 'No COVID-19 restrictions currently in place',
     },
     diseases: [
-      { name: 'Dengue Fever', risk: 'moderate', prevention: 'Use insect repellent, wear long sleeves', regions: ['Bangkok', 'Chiang Mai', 'Phuket'] },
-      { name: 'Malaria', risk: 'low', prevention: 'Antimalarial medication for border areas', regions: ['Cambodia border', 'Myanmar border'] },
-      { name: 'Zika Virus', risk: 'low', prevention: 'Insect precautions, especially for pregnant women' },
+      {
+        name: 'Dengue Fever',
+        risk: 'moderate',
+        prevention: 'Use insect repellent, wear long sleeves',
+        regions: ['Bangkok', 'Chiang Mai', 'Phuket'],
+      },
+      {
+        name: 'Malaria',
+        risk: 'low',
+        prevention: 'Antimalarial medication for border areas',
+        regions: ['Cambodia border', 'Myanmar border'],
+      },
+      {
+        name: 'Zika Virus',
+        risk: 'low',
+        prevention: 'Insect precautions, especially for pregnant women',
+      },
     ],
     healthInsurance: 'recommended',
     insuranceMinCoverage: '$50,000 USD',
@@ -148,12 +192,42 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇧🇷',
     riskLevel: 'high',
     vaccinations: [
-      { name: 'Yellow Fever', status: 'required', description: 'Required for most areas', timing: '10 days before travel' },
-      { name: 'Hepatitis A', status: 'recommended', description: 'Spread through contaminated food/water', timing: '2-4 weeks before' },
-      { name: 'Hepatitis B', status: 'recommended', description: 'Spread through blood/body fluids', timing: '6 months before' },
-      { name: 'Typhoid', status: 'recommended', description: 'For areas with poor sanitation', timing: '2 weeks before' },
-      { name: 'Rabies', status: 'situational', description: 'For adventure travelers, rural areas', timing: '1 month before' },
-      { name: 'Malaria', status: 'situational', description: 'Antimalarial drugs for Amazon region', timing: '1-2 weeks before' },
+      {
+        name: 'Yellow Fever',
+        status: 'required',
+        description: 'Required for most areas',
+        timing: '10 days before travel',
+      },
+      {
+        name: 'Hepatitis A',
+        status: 'recommended',
+        description: 'Spread through contaminated food/water',
+        timing: '2-4 weeks before',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'recommended',
+        description: 'Spread through blood/body fluids',
+        timing: '6 months before',
+      },
+      {
+        name: 'Typhoid',
+        status: 'recommended',
+        description: 'For areas with poor sanitation',
+        timing: '2 weeks before',
+      },
+      {
+        name: 'Rabies',
+        status: 'situational',
+        description: 'For adventure travelers, rural areas',
+        timing: '1 month before',
+      },
+      {
+        name: 'Malaria',
+        status: 'situational',
+        description: 'Antimalarial drugs for Amazon region',
+        timing: '1-2 weeks before',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -162,10 +236,25 @@ const healthRequirements: HealthRequirement[] = [
       notes: 'COVID restrictions have been lifted',
     },
     diseases: [
-      { name: 'Yellow Fever', risk: 'high', prevention: 'Vaccination required for most regions', regions: ['Amazon', 'Pantanal', 'Most of interior'] },
-      { name: 'Dengue Fever', risk: 'high', prevention: 'Mosquito protection essential', regions: ['All urban areas'] },
+      {
+        name: 'Yellow Fever',
+        risk: 'high',
+        prevention: 'Vaccination required for most regions',
+        regions: ['Amazon', 'Pantanal', 'Most of interior'],
+      },
+      {
+        name: 'Dengue Fever',
+        risk: 'high',
+        prevention: 'Mosquito protection essential',
+        regions: ['All urban areas'],
+      },
       { name: 'Zika Virus', risk: 'moderate', prevention: 'Avoid if pregnant, use repellent' },
-      { name: 'Malaria', risk: 'moderate', prevention: 'Prophylaxis recommended', regions: ['Amazon basin'] },
+      {
+        name: 'Malaria',
+        risk: 'moderate',
+        prevention: 'Prophylaxis recommended',
+        regions: ['Amazon basin'],
+      },
     ],
     healthInsurance: 'recommended',
     insuranceMinCoverage: '$100,000 USD',
@@ -187,9 +276,24 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇯🇵',
     riskLevel: 'low',
     vaccinations: [
-      { name: 'Routine Vaccines', status: 'recommended', description: 'MMR, Tetanus, Flu', timing: 'Check with doctor' },
-      { name: 'Japanese Encephalitis', status: 'situational', description: 'For rural areas during summer', timing: '1 month before' },
-      { name: 'Hepatitis B', status: 'situational', description: 'For extended stays or medical work', timing: '6 months before' },
+      {
+        name: 'Routine Vaccines',
+        status: 'recommended',
+        description: 'MMR, Tetanus, Flu',
+        timing: 'Check with doctor',
+      },
+      {
+        name: 'Japanese Encephalitis',
+        status: 'situational',
+        description: 'For rural areas during summer',
+        timing: '1 month before',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'situational',
+        description: 'For extended stays or medical work',
+        timing: '6 months before',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -198,7 +302,12 @@ const healthRequirements: HealthRequirement[] = [
       notes: 'All COVID-19 border measures lifted',
     },
     diseases: [
-      { name: 'Japanese Encephalitis', risk: 'low', prevention: 'Vaccine for rural summer visits', regions: ['Rural areas'] },
+      {
+        name: 'Japanese Encephalitis',
+        risk: 'low',
+        prevention: 'Vaccine for rural summer visits',
+        regions: ['Rural areas'],
+      },
     ],
     healthInsurance: 'recommended',
     insuranceMinCoverage: '$50,000 USD',
@@ -220,14 +329,54 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇮🇳',
     riskLevel: 'high',
     vaccinations: [
-      { name: 'Hepatitis A', status: 'recommended', description: 'High risk through food/water', timing: '2-4 weeks before' },
-      { name: 'Hepatitis B', status: 'recommended', description: 'For extended stays', timing: '6 months before' },
-      { name: 'Typhoid', status: 'recommended', description: 'Very common in India', timing: '2 weeks before' },
-      { name: 'Yellow Fever', status: 'required', description: 'If arriving from affected country', timing: '10 days before' },
-      { name: 'Japanese Encephalitis', status: 'situational', description: 'For rural areas, monsoon season', timing: '1 month before' },
-      { name: 'Rabies', status: 'situational', description: 'Stray animals common', timing: '1 month before' },
-      { name: 'Cholera', status: 'situational', description: 'For humanitarian workers', timing: '1 week before' },
-      { name: 'Malaria', status: 'situational', description: 'For certain regions', timing: '1-2 weeks before' },
+      {
+        name: 'Hepatitis A',
+        status: 'recommended',
+        description: 'High risk through food/water',
+        timing: '2-4 weeks before',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'recommended',
+        description: 'For extended stays',
+        timing: '6 months before',
+      },
+      {
+        name: 'Typhoid',
+        status: 'recommended',
+        description: 'Very common in India',
+        timing: '2 weeks before',
+      },
+      {
+        name: 'Yellow Fever',
+        status: 'required',
+        description: 'If arriving from affected country',
+        timing: '10 days before',
+      },
+      {
+        name: 'Japanese Encephalitis',
+        status: 'situational',
+        description: 'For rural areas, monsoon season',
+        timing: '1 month before',
+      },
+      {
+        name: 'Rabies',
+        status: 'situational',
+        description: 'Stray animals common',
+        timing: '1 month before',
+      },
+      {
+        name: 'Cholera',
+        status: 'situational',
+        description: 'For humanitarian workers',
+        timing: '1 week before',
+      },
+      {
+        name: 'Malaria',
+        status: 'situational',
+        description: 'For certain regions',
+        timing: '1-2 weeks before',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -236,10 +385,25 @@ const healthRequirements: HealthRequirement[] = [
       notes: 'COVID restrictions lifted for most travelers',
     },
     diseases: [
-      { name: 'Dengue Fever', risk: 'high', prevention: 'Mosquito protection essential', regions: ['Urban areas', 'Monsoon season'] },
-      { name: 'Malaria', risk: 'moderate', prevention: 'Prophylaxis for rural/forest areas', regions: ['Rural areas', 'Northeast'] },
+      {
+        name: 'Dengue Fever',
+        risk: 'high',
+        prevention: 'Mosquito protection essential',
+        regions: ['Urban areas', 'Monsoon season'],
+      },
+      {
+        name: 'Malaria',
+        risk: 'moderate',
+        prevention: 'Prophylaxis for rural/forest areas',
+        regions: ['Rural areas', 'Northeast'],
+      },
       { name: 'Typhoid', risk: 'high', prevention: 'Vaccination + food/water precautions' },
-      { name: 'Cholera', risk: 'moderate', prevention: 'Food/water precautions', regions: ['Bihar', 'West Bengal'] },
+      {
+        name: 'Cholera',
+        risk: 'moderate',
+        prevention: 'Food/water precautions',
+        regions: ['Bihar', 'West Bengal'],
+      },
     ],
     healthInsurance: 'recommended',
     insuranceMinCoverage: '$100,000 USD',
@@ -261,13 +425,48 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇰🇪',
     riskLevel: 'high',
     vaccinations: [
-      { name: 'Yellow Fever', status: 'required', description: 'Certificate required for entry', timing: '10 days before' },
-      { name: 'Hepatitis A', status: 'recommended', description: 'High risk through food/water', timing: '2-4 weeks before' },
-      { name: 'Hepatitis B', status: 'recommended', description: 'For extended stays', timing: '6 months before' },
-      { name: 'Typhoid', status: 'recommended', description: 'Common in Kenya', timing: '2 weeks before' },
-      { name: 'Rabies', status: 'recommended', description: 'Animal bites are a risk', timing: '1 month before' },
-      { name: 'Meningitis', status: 'situational', description: 'For dry season travel', timing: '2 weeks before' },
-      { name: 'Cholera', status: 'situational', description: 'During outbreaks', timing: '1 week before' },
+      {
+        name: 'Yellow Fever',
+        status: 'required',
+        description: 'Certificate required for entry',
+        timing: '10 days before',
+      },
+      {
+        name: 'Hepatitis A',
+        status: 'recommended',
+        description: 'High risk through food/water',
+        timing: '2-4 weeks before',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'recommended',
+        description: 'For extended stays',
+        timing: '6 months before',
+      },
+      {
+        name: 'Typhoid',
+        status: 'recommended',
+        description: 'Common in Kenya',
+        timing: '2 weeks before',
+      },
+      {
+        name: 'Rabies',
+        status: 'recommended',
+        description: 'Animal bites are a risk',
+        timing: '1 month before',
+      },
+      {
+        name: 'Meningitis',
+        status: 'situational',
+        description: 'For dry season travel',
+        timing: '2 weeks before',
+      },
+      {
+        name: 'Cholera',
+        status: 'situational',
+        description: 'During outbreaks',
+        timing: '1 week before',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -276,10 +475,20 @@ const healthRequirements: HealthRequirement[] = [
       notes: 'COVID restrictions have been removed',
     },
     diseases: [
-      { name: 'Malaria', risk: 'high', prevention: 'Antimalarial medication essential', regions: ['Coast', 'Lake Victoria', 'Safari areas'] },
+      {
+        name: 'Malaria',
+        risk: 'high',
+        prevention: 'Antimalarial medication essential',
+        regions: ['Coast', 'Lake Victoria', 'Safari areas'],
+      },
       { name: 'Yellow Fever', risk: 'moderate', prevention: 'Vaccination required' },
       { name: 'Cholera', risk: 'moderate', prevention: 'Water/food precautions' },
-      { name: 'Dengue Fever', risk: 'moderate', prevention: 'Mosquito protection', regions: ['Coastal areas'] },
+      {
+        name: 'Dengue Fever',
+        risk: 'moderate',
+        prevention: 'Mosquito protection',
+        regions: ['Coastal areas'],
+      },
     ],
     healthInsurance: 'required',
     insuranceMinCoverage: '$100,000 USD',
@@ -301,9 +510,24 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇦🇪',
     riskLevel: 'low',
     vaccinations: [
-      { name: 'Routine Vaccines', status: 'recommended', description: 'MMR, Tetanus, Flu', timing: 'Check with doctor' },
-      { name: 'Hepatitis A', status: 'recommended', description: 'For food safety', timing: '2-4 weeks before' },
-      { name: 'Hepatitis B', status: 'situational', description: 'For longer stays', timing: '6 months before' },
+      {
+        name: 'Routine Vaccines',
+        status: 'recommended',
+        description: 'MMR, Tetanus, Flu',
+        timing: 'Check with doctor',
+      },
+      {
+        name: 'Hepatitis A',
+        status: 'recommended',
+        description: 'For food safety',
+        timing: '2-4 weeks before',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'situational',
+        description: 'For longer stays',
+        timing: '6 months before',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -311,9 +535,7 @@ const healthRequirements: HealthRequirement[] = [
       healthDeclaration: false,
       notes: 'No COVID requirements for entry',
     },
-    diseases: [
-      { name: 'MERS-CoV', risk: 'low', prevention: 'Avoid contact with camels' },
-    ],
+    diseases: [{ name: 'MERS-CoV', risk: 'low', prevention: 'Avoid contact with camels' }],
     healthInsurance: 'required',
     insuranceMinCoverage: '$50,000 USD',
     waterSafety: 'safe',
@@ -334,12 +556,42 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇮🇩',
     riskLevel: 'moderate',
     vaccinations: [
-      { name: 'Hepatitis A', status: 'recommended', description: 'High risk through food/water', timing: '2-4 weeks before' },
-      { name: 'Hepatitis B', status: 'recommended', description: 'For extended stays', timing: '6 months before' },
-      { name: 'Typhoid', status: 'recommended', description: 'Common outside major cities', timing: '2 weeks before' },
-      { name: 'Yellow Fever', status: 'required', description: 'If arriving from affected country', timing: '10 days before' },
-      { name: 'Japanese Encephalitis', status: 'situational', description: 'For rural areas', timing: '1 month before' },
-      { name: 'Rabies', status: 'situational', description: 'Especially in Bali', timing: '1 month before' },
+      {
+        name: 'Hepatitis A',
+        status: 'recommended',
+        description: 'High risk through food/water',
+        timing: '2-4 weeks before',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'recommended',
+        description: 'For extended stays',
+        timing: '6 months before',
+      },
+      {
+        name: 'Typhoid',
+        status: 'recommended',
+        description: 'Common outside major cities',
+        timing: '2 weeks before',
+      },
+      {
+        name: 'Yellow Fever',
+        status: 'required',
+        description: 'If arriving from affected country',
+        timing: '10 days before',
+      },
+      {
+        name: 'Japanese Encephalitis',
+        status: 'situational',
+        description: 'For rural areas',
+        timing: '1 month before',
+      },
+      {
+        name: 'Rabies',
+        status: 'situational',
+        description: 'Especially in Bali',
+        timing: '1 month before',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -348,8 +600,18 @@ const healthRequirements: HealthRequirement[] = [
       notes: 'COVID entry requirements removed',
     },
     diseases: [
-      { name: 'Dengue Fever', risk: 'high', prevention: 'Mosquito protection essential', regions: ['All islands'] },
-      { name: 'Malaria', risk: 'moderate', prevention: 'Prophylaxis for eastern islands', regions: ['Papua', 'East Nusa Tenggara'] },
+      {
+        name: 'Dengue Fever',
+        risk: 'high',
+        prevention: 'Mosquito protection essential',
+        regions: ['All islands'],
+      },
+      {
+        name: 'Malaria',
+        risk: 'moderate',
+        prevention: 'Prophylaxis for eastern islands',
+        regions: ['Papua', 'East Nusa Tenggara'],
+      },
       { name: 'Rabies', risk: 'moderate', prevention: 'Avoid animal contact', regions: ['Bali'] },
     ],
     healthInsurance: 'recommended',
@@ -372,11 +634,36 @@ const healthRequirements: HealthRequirement[] = [
     destinationFlag: '🇪🇬',
     riskLevel: 'moderate',
     vaccinations: [
-      { name: 'Hepatitis A', status: 'recommended', description: 'Food/water contamination risk', timing: '2-4 weeks before' },
-      { name: 'Hepatitis B', status: 'recommended', description: 'For extended stays', timing: '6 months before' },
-      { name: 'Typhoid', status: 'recommended', description: 'Common in Egypt', timing: '2 weeks before' },
-      { name: 'Yellow Fever', status: 'required', description: 'If arriving from affected country', timing: '10 days before' },
-      { name: 'Rabies', status: 'situational', description: 'For animal exposure risk', timing: '1 month before' },
+      {
+        name: 'Hepatitis A',
+        status: 'recommended',
+        description: 'Food/water contamination risk',
+        timing: '2-4 weeks before',
+      },
+      {
+        name: 'Hepatitis B',
+        status: 'recommended',
+        description: 'For extended stays',
+        timing: '6 months before',
+      },
+      {
+        name: 'Typhoid',
+        status: 'recommended',
+        description: 'Common in Egypt',
+        timing: '2 weeks before',
+      },
+      {
+        name: 'Yellow Fever',
+        status: 'required',
+        description: 'If arriving from affected country',
+        timing: '10 days before',
+      },
+      {
+        name: 'Rabies',
+        status: 'situational',
+        description: 'For animal exposure risk',
+        timing: '1 month before',
+      },
     ],
     covidRequirements: {
       vaccination: 'none',
@@ -386,7 +673,12 @@ const healthRequirements: HealthRequirement[] = [
     },
     diseases: [
       { name: 'Travelers Diarrhea', risk: 'high', prevention: 'Water/food precautions essential' },
-      { name: 'Schistosomiasis', risk: 'moderate', prevention: 'Avoid freshwater swimming in Nile', regions: ['Nile River', 'Nile Delta'] },
+      {
+        name: 'Schistosomiasis',
+        risk: 'moderate',
+        prevention: 'Avoid freshwater swimming in Nile',
+        regions: ['Nile River', 'Nile Delta'],
+      },
     ],
     healthInsurance: 'recommended',
     insuranceMinCoverage: '$50,000 USD',
@@ -420,44 +712,47 @@ export default function HealthRequirementsScreen() {
 
   const requirement = useMemo(() => {
     if (!selectedDestination) return null;
-    return healthRequirements.find(r => r.destinationCode === selectedDestination.code) || null;
+    return healthRequirements.find((r) => r.destinationCode === selectedDestination.code) || null;
   }, [selectedDestination]);
 
   const filteredCountries = useMemo(() => {
     if (!countrySearch) return countries;
     const query = countrySearch.toLowerCase();
-    return countries.filter(c => c.name.toLowerCase().includes(query));
+    return countries.filter((c) => c.name.toLowerCase().includes(query));
   }, [countrySearch]);
 
   const filteredDestinations = useMemo(() => {
     if (!searchQuery) return healthRequirements;
     const query = searchQuery.toLowerCase();
-    return healthRequirements.filter(r => r.destinationName.toLowerCase().includes(query));
+    return healthRequirements.filter((r) => r.destinationName.toLowerCase().includes(query));
   }, [searchQuery]);
 
-  const renderCountryItem = useCallback(({ item }: { item: Country }) => (
-    <Pressable
-      style={styles.countryItem}
-      onPress={() => {
-        setSelectedDestination(item);
-        setCountryModalVisible(false);
-        setCountrySearch('');
-      }}
-    >
-      <Text style={styles.countryFlag}>{item.flag}</Text>
-      <Text style={styles.countryName}>{item.name}</Text>
-      {selectedDestination?.code === item.code && (
-        <CheckCircle size={20} color={colors.success} />
-      )}
-    </Pressable>
-  ), [selectedDestination]);
+  const renderCountryItem = useCallback(
+    ({ item }: { item: Country }) => (
+      <Pressable
+        style={styles.countryItem}
+        onPress={() => {
+          setSelectedDestination(item);
+          setCountryModalVisible(false);
+          setCountrySearch('');
+        }}
+      >
+        <Text style={styles.countryFlag}>{item.flag}</Text>
+        <Text style={styles.countryName}>{item.name}</Text>
+        {selectedDestination?.code === item.code && (
+          <CheckCircle size={20} color={colors.success} />
+        )}
+      </Pressable>
+    ),
+    [selectedDestination]
+  );
 
   const renderVaccinations = () => {
     if (!requirement) return null;
-    
-    const requiredVaccines = requirement.vaccinations.filter(v => v.status === 'required');
-    const recommendedVaccines = requirement.vaccinations.filter(v => v.status === 'recommended');
-    const situationalVaccines = requirement.vaccinations.filter(v => v.status === 'situational');
+
+    const requiredVaccines = requirement.vaccinations.filter((v) => v.status === 'required');
+    const recommendedVaccines = requirement.vaccinations.filter((v) => v.status === 'recommended');
+    const situationalVaccines = requirement.vaccinations.filter((v) => v.status === 'situational');
 
     return (
       <View style={styles.tabContent}>
@@ -579,12 +874,24 @@ export default function HealthRequirementsScreen() {
           <View style={styles.infoCard}>
             <ThermometerSun size={22} color={colors.primary} />
             <Text style={styles.infoLabel}>Water Safety</Text>
-            <Text style={[styles.infoValue, { 
-              color: requirement.waterSafety === 'safe' ? colors.success : 
-                     requirement.waterSafety === 'caution' ? colors.warning : colors.error 
-            }]}>
-              {requirement.waterSafety === 'safe' ? 'Safe to Drink' : 
-               requirement.waterSafety === 'caution' ? 'Use Caution' : 'Not Safe'}
+            <Text
+              style={[
+                styles.infoValue,
+                {
+                  color:
+                    requirement.waterSafety === 'safe'
+                      ? colors.success
+                      : requirement.waterSafety === 'caution'
+                        ? colors.warning
+                        : colors.error,
+                },
+              ]}
+            >
+              {requirement.waterSafety === 'safe'
+                ? 'Safe to Drink'
+                : requirement.waterSafety === 'caution'
+                  ? 'Use Caution'
+                  : 'Not Safe'}
             </Text>
           </View>
           <View style={styles.infoCard}>
@@ -595,9 +902,14 @@ export default function HealthRequirementsScreen() {
           <View style={styles.infoCard}>
             <Shield size={22} color={colors.primary} />
             <Text style={styles.infoLabel}>Insurance</Text>
-            <Text style={[styles.infoValue, { 
-              color: requirement.healthInsurance === 'required' ? colors.error : colors.warning 
-            }]}>
+            <Text
+              style={[
+                styles.infoValue,
+                {
+                  color: requirement.healthInsurance === 'required' ? colors.error : colors.warning,
+                },
+              ]}
+            >
               {requirement.healthInsurance === 'required' ? 'Required' : 'Recommended'}
             </Text>
           </View>
@@ -623,15 +935,15 @@ export default function HealthRequirementsScreen() {
 
   const renderDestinationCard = (req: HealthRequirement) => {
     const riskConfig = riskLevelConfig[req.riskLevel];
-    const requiredCount = req.vaccinations.filter(v => v.status === 'required').length;
-    const recommendedCount = req.vaccinations.filter(v => v.status === 'recommended').length;
+    const requiredCount = req.vaccinations.filter((v) => v.status === 'required').length;
+    const recommendedCount = req.vaccinations.filter((v) => v.status === 'recommended').length;
 
     return (
       <Pressable
         key={req.destinationCode}
         style={styles.destinationCard}
         onPress={() => {
-          const country = countries.find(c => c.code === req.destinationCode);
+          const country = countries.find((c) => c.code === req.destinationCode);
           if (country) {
             setSelectedDestination(country);
           }
@@ -645,7 +957,9 @@ export default function HealthRequirementsScreen() {
               <View style={styles.destMeta}>
                 <Syringe size={12} color={colors.textSecondary} />
                 <Text style={styles.destMetaText}>
-                  {requiredCount > 0 ? `${requiredCount} required` : `${recommendedCount} recommended`}
+                  {requiredCount > 0
+                    ? `${requiredCount} required`
+                    : `${recommendedCount} recommended`}
                 </Text>
               </View>
             </View>
@@ -667,7 +981,7 @@ export default function HealthRequirementsScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
@@ -703,21 +1017,29 @@ export default function HealthRequirementsScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
           >
-            <View style={[styles.riskBanner, { backgroundColor: riskLevelConfig[requirement.riskLevel].bgColor }]}>
+            <View
+              style={[
+                styles.riskBanner,
+                { backgroundColor: riskLevelConfig[requirement.riskLevel].bgColor },
+              ]}
+            >
               <ShieldCheck size={24} color={riskLevelConfig[requirement.riskLevel].color} />
               <View style={styles.riskBannerInfo}>
-                <Text style={[styles.riskBannerTitle, { color: riskLevelConfig[requirement.riskLevel].color }]}>
+                <Text
+                  style={[
+                    styles.riskBannerTitle,
+                    { color: riskLevelConfig[requirement.riskLevel].color },
+                  ]}
+                >
                   {riskLevelConfig[requirement.riskLevel].label}
                 </Text>
-                <Text style={styles.riskBannerSubtitle}>
-                  Health risk assessment for travelers
-                </Text>
+                <Text style={styles.riskBannerSubtitle}>Health risk assessment for travelers</Text>
               </View>
             </View>
 
-            {requirement.covidRequirements.vaccination !== 'none' || 
-             requirement.covidRequirements.testing !== 'none' || 
-             requirement.covidRequirements.healthDeclaration ? (
+            {requirement.covidRequirements.vaccination !== 'none' ||
+            requirement.covidRequirements.testing !== 'none' ||
+            requirement.covidRequirements.healthDeclaration ? (
               <View style={styles.covidSection}>
                 <View style={styles.covidHeader}>
                   <TestTube size={20} color={colors.primary} />
@@ -726,9 +1048,17 @@ export default function HealthRequirementsScreen() {
                 {requirement.covidRequirements.vaccination !== 'none' && (
                   <View style={styles.covidItem}>
                     <Text style={styles.covidLabel}>Vaccination:</Text>
-                    <Text style={[styles.covidValue, { 
-                      color: requirement.covidRequirements.vaccination === 'required' ? colors.error : colors.warning 
-                    }]}>
+                    <Text
+                      style={[
+                        styles.covidValue,
+                        {
+                          color:
+                            requirement.covidRequirements.vaccination === 'required'
+                              ? colors.error
+                              : colors.warning,
+                        },
+                      ]}
+                    >
                       {requirement.covidRequirements.vaccination}
                     </Text>
                   </View>
@@ -760,8 +1090,13 @@ export default function HealthRequirementsScreen() {
                 style={[styles.tab, activeTab === 'vaccinations' && styles.tabActive]}
                 onPress={() => setActiveTab('vaccinations')}
               >
-                <Syringe size={16} color={activeTab === 'vaccinations' ? colors.primary : colors.textSecondary} />
-                <Text style={[styles.tabText, activeTab === 'vaccinations' && styles.tabTextActive]}>
+                <Syringe
+                  size={16}
+                  color={activeTab === 'vaccinations' ? colors.primary : colors.textSecondary}
+                />
+                <Text
+                  style={[styles.tabText, activeTab === 'vaccinations' && styles.tabTextActive]}
+                >
                   Vaccines
                 </Text>
               </Pressable>
@@ -769,7 +1104,10 @@ export default function HealthRequirementsScreen() {
                 style={[styles.tab, activeTab === 'diseases' && styles.tabActive]}
                 onPress={() => setActiveTab('diseases')}
               >
-                <Activity size={16} color={activeTab === 'diseases' ? colors.primary : colors.textSecondary} />
+                <Activity
+                  size={16}
+                  color={activeTab === 'diseases' ? colors.primary : colors.textSecondary}
+                />
                 <Text style={[styles.tabText, activeTab === 'diseases' && styles.tabTextActive]}>
                   Diseases
                 </Text>
@@ -778,7 +1116,10 @@ export default function HealthRequirementsScreen() {
                 style={[styles.tab, activeTab === 'tips' && styles.tabActive]}
                 onPress={() => setActiveTab('tips')}
               >
-                <Info size={16} color={activeTab === 'tips' ? colors.primary : colors.textSecondary} />
+                <Info
+                  size={16}
+                  color={activeTab === 'tips' ? colors.primary : colors.textSecondary}
+                />
                 <Text style={[styles.tabText, activeTab === 'tips' && styles.tabTextActive]}>
                   Tips
                 </Text>
@@ -792,7 +1133,8 @@ export default function HealthRequirementsScreen() {
             <View style={styles.disclaimer}>
               <AlertTriangle size={16} color={colors.warning} />
               <Text style={styles.disclaimerText}>
-                Health requirements can change. Always consult a healthcare professional and check official sources before traveling.
+                Health requirements can change. Always consult a healthcare professional and check
+                official sources before traveling.
               </Text>
             </View>
 
@@ -847,7 +1189,7 @@ export default function HealthRequirementsScreen() {
               <X size={24} color={colors.text} />
             </Pressable>
           </View>
-          
+
           <View style={styles.modalSearch}>
             <Search size={20} color={colors.textTertiary} />
             <TextInput
@@ -859,7 +1201,7 @@ export default function HealthRequirementsScreen() {
               autoFocus
             />
           </View>
-          
+
           <FlatList
             data={filteredCountries}
             renderItem={renderCountryItem}

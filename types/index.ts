@@ -674,7 +674,14 @@ export interface FeedPost {
 
 export interface SafetyAlert {
   id: string;
-  type: 'advisory' | 'emergency' | 'protest' | 'natural_disaster' | 'health' | 'crime' | 'terrorism';
+  type:
+    | 'advisory'
+    | 'emergency'
+    | 'protest'
+    | 'natural_disaster'
+    | 'health'
+    | 'crime'
+    | 'terrorism';
   severity: 'low' | 'moderate' | 'high' | 'critical';
   title: string;
   description: string;
@@ -715,7 +722,15 @@ export interface EmergencyService {
 
 export interface TravelDocument {
   id: string;
-  type: 'passport' | 'visa' | 'insurance' | 'boarding_pass' | 'vaccination' | 'drivers_license' | 'id_card' | 'other';
+  type:
+    | 'passport'
+    | 'visa'
+    | 'insurance'
+    | 'boarding_pass'
+    | 'vaccination'
+    | 'drivers_license'
+    | 'id_card'
+    | 'other';
   name: string;
   documentNumber?: string;
   issuingCountry?: string;
@@ -782,7 +797,7 @@ export interface VaccinationDocument extends TravelDocument {
 }
 
 // Event & Entertainment Types
-export type EventCategory = 
+export type EventCategory =
   | 'concert'
   | 'theater'
   | 'sports'
@@ -937,7 +952,18 @@ export interface EventReview {
 // Sports-specific types
 export interface SportsEvent extends Event {
   category: 'sports';
-  sportType: 'football' | 'basketball' | 'baseball' | 'soccer' | 'hockey' | 'tennis' | 'golf' | 'boxing' | 'mma' | 'racing' | 'other';
+  sportType:
+    | 'football'
+    | 'basketball'
+    | 'baseball'
+    | 'soccer'
+    | 'hockey'
+    | 'tennis'
+    | 'golf'
+    | 'boxing'
+    | 'mma'
+    | 'racing'
+    | 'other';
   homeTeam?: EventPerformer;
   awayTeam?: EventPerformer;
   league?: string;
@@ -1000,7 +1026,17 @@ export interface EventSearchFilters {
 }
 
 // Lodging Types
-export type LodgingType = 'hotel' | 'airbnb' | 'hostel' | 'resort' | 'villa' | 'apartment' | 'boutique' | 'motel' | 'guesthouse' | 'cabin';
+export type LodgingType =
+  | 'hotel'
+  | 'airbnb'
+  | 'hostel'
+  | 'resort'
+  | 'villa'
+  | 'apartment'
+  | 'boutique'
+  | 'motel'
+  | 'guesthouse'
+  | 'cabin';
 
 export interface LodgingAmenity {
   id: string;
@@ -1195,7 +1231,17 @@ export interface LodgingSearchFilters {
 }
 
 // Car Rental Types
-export type CarCategory = 'economy' | 'compact' | 'midsize' | 'fullsize' | 'suv' | 'luxury' | 'convertible' | 'minivan' | 'pickup' | 'electric';
+export type CarCategory =
+  | 'economy'
+  | 'compact'
+  | 'midsize'
+  | 'fullsize'
+  | 'suv'
+  | 'luxury'
+  | 'convertible'
+  | 'minivan'
+  | 'pickup'
+  | 'electric';
 
 export type FuelType = 'gasoline' | 'diesel' | 'hybrid' | 'electric';
 
@@ -1640,14 +1686,14 @@ export interface EmergencyAlert {
 }
 
 // Trip Templates Types
-export type TripTemplateCategory = 
-  | 'romantic' 
-  | 'adventure' 
-  | 'family' 
-  | 'cultural' 
-  | 'relaxation' 
-  | 'foodie' 
-  | 'budget' 
+export type TripTemplateCategory =
+  | 'romantic'
+  | 'adventure'
+  | 'family'
+  | 'cultural'
+  | 'relaxation'
+  | 'foodie'
+  | 'budget'
   | 'luxury'
   | 'solo'
   | 'accessible';
@@ -1748,7 +1794,19 @@ export interface TemplateSearchFilters {
 export interface ARLandmark {
   id: string;
   name: string;
-  type: 'monument' | 'museum' | 'church' | 'palace' | 'bridge' | 'square' | 'park' | 'tower' | 'statue' | 'theater' | 'fountain' | 'gate';
+  type:
+    | 'monument'
+    | 'museum'
+    | 'church'
+    | 'palace'
+    | 'bridge'
+    | 'square'
+    | 'park'
+    | 'tower'
+    | 'statue'
+    | 'theater'
+    | 'fountain'
+    | 'gate';
   description: string;
   shortDescription: string;
   image: string;

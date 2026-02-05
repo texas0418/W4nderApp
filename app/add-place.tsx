@@ -23,10 +23,7 @@ interface AddPlaceScreenProps {
   route?: { params?: { collectionId?: string; tripId?: string } };
 }
 
-const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({ navigation, route }) => {
   const defaultCollectionId = route?.params?.collectionId;
   const tripId = route?.params?.tripId;
 
@@ -56,7 +53,7 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
   });
 
   const handleFieldChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleGetCurrentLocation = useCallback(async () => {
@@ -172,28 +169,22 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
   }, [formData, addPlace, navigation]);
 
   const getCategoryInfo = (categoryId: PlaceCategory) => {
-    return PLACE_CATEGORIES.find(c => c.id === categoryId) || PLACE_CATEGORIES[0];
+    return PLACE_CATEGORIES.find((c) => c.id === categoryId) || PLACE_CATEGORIES[0];
   };
 
   const getPriceInfo = (priceId?: PriceLevel) => {
     if (!priceId) return null;
-    return PRICE_LEVELS.find(p => p.id === priceId);
+    return PRICE_LEVELS.find((p) => p.id === priceId);
   };
 
   const selectedCategoryInfo = getCategoryInfo(formData.category);
   const selectedPriceInfo = getPriceInfo(formData.priceLevel);
-  const selectedCollection = collections.find(c => c.id === formData.collectionId);
+  const selectedCollection = collections.find((c) => c.id === formData.collectionId);
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add Place</Text>
@@ -250,10 +241,7 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
         {/* Category */}
         <View style={styles.section}>
           <Text style={styles.label}>Category</Text>
-          <TouchableOpacity
-            style={styles.selector}
-            onPress={() => setShowCategoryPicker(true)}
-          >
+          <TouchableOpacity style={styles.selector} onPress={() => setShowCategoryPicker(true)}>
             <Text style={styles.selectorIcon}>{selectedCategoryInfo.icon}</Text>
             <Text style={styles.selectorText}>{selectedCategoryInfo.name}</Text>
             <Text style={styles.selectorArrow}>▼</Text>
@@ -264,14 +252,9 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
         <View style={styles.section}>
           <Text style={styles.label}>Your Rating</Text>
           <View style={styles.ratingContainer}>
-            {[1, 2, 3, 4, 5].map(star => (
-              <TouchableOpacity
-                key={star}
-                onPress={() => handleSetRating(star)}
-              >
-                <Text style={styles.ratingStar}>
-                  {star <= formData.rating ? '⭐' : '☆'}
-                </Text>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <TouchableOpacity key={star} onPress={() => handleSetRating(star)}>
+                <Text style={styles.ratingStar}>{star <= formData.rating ? '⭐' : '☆'}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -296,7 +279,7 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
               )}
             </TouchableOpacity>
           </View>
-          
+
           <TextInput
             style={styles.input}
             value={formData.address}
@@ -304,7 +287,7 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
             placeholder="Address (optional)"
             placeholderTextColor="#999"
           />
-          
+
           <View style={styles.rowInputs}>
             <TextInput
               style={[styles.input, styles.halfInput]}
@@ -333,22 +316,26 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
         <View style={styles.section}>
           <Text style={styles.label}>Price Level</Text>
           <View style={styles.priceLevels}>
-            {PRICE_LEVELS.map(price => (
+            {PRICE_LEVELS.map((price) => (
               <TouchableOpacity
                 key={price.id}
                 style={[
                   styles.priceOption,
                   formData.priceLevel === price.id && styles.priceOptionActive,
                 ]}
-                onPress={() => handleFieldChange(
-                  'priceLevel',
-                  formData.priceLevel === price.id ? undefined : price.id
-                )}
+                onPress={() =>
+                  handleFieldChange(
+                    'priceLevel',
+                    formData.priceLevel === price.id ? undefined : price.id
+                  )
+                }
               >
-                <Text style={[
-                  styles.priceOptionText,
-                  formData.priceLevel === price.id && styles.priceOptionTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.priceOptionText,
+                    formData.priceLevel === price.id && styles.priceOptionTextActive,
+                  ]}
+                >
                   {price.symbol}
                 </Text>
               </TouchableOpacity>
@@ -359,13 +346,8 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
         {/* Collection */}
         <View style={styles.section}>
           <Text style={styles.label}>Add to Collection</Text>
-          <TouchableOpacity
-            style={styles.selector}
-            onPress={() => setShowCollectionPicker(true)}
-          >
-            <Text style={styles.selectorIcon}>
-              {selectedCollection?.emoji || '📁'}
-            </Text>
+          <TouchableOpacity style={styles.selector} onPress={() => setShowCollectionPicker(true)}>
+            <Text style={styles.selectorIcon}>{selectedCollection?.emoji || '📁'}</Text>
             <Text style={styles.selectorText}>
               {selectedCollection?.name || 'Choose collection...'}
             </Text>
@@ -401,7 +383,7 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.pickerList}>
-              {PLACE_CATEGORIES.map(cat => (
+              {PLACE_CATEGORIES.map((cat) => (
                 <TouchableOpacity
                   key={cat.id}
                   style={[
@@ -415,9 +397,7 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
                 >
                   <Text style={styles.pickerOptionIcon}>{cat.icon}</Text>
                   <Text style={styles.pickerOptionText}>{cat.name}</Text>
-                  {formData.category === cat.id && (
-                    <Text style={styles.pickerOptionCheck}>✓</Text>
-                  )}
+                  {formData.category === cat.id && <Text style={styles.pickerOptionCheck}>✓</Text>}
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -437,10 +417,7 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
             </View>
             <ScrollView style={styles.pickerList}>
               <TouchableOpacity
-                style={[
-                  styles.pickerOption,
-                  !formData.collectionId && styles.pickerOptionActive,
-                ]}
+                style={[styles.pickerOption, !formData.collectionId && styles.pickerOptionActive]}
                 onPress={() => {
                   handleFieldChange('collectionId', '');
                   setShowCollectionPicker(false);
@@ -448,11 +425,9 @@ const AddPlaceScreen: React.FC<AddPlaceScreenProps> = ({
               >
                 <Text style={styles.pickerOptionIcon}>📍</Text>
                 <Text style={styles.pickerOptionText}>No Collection</Text>
-                {!formData.collectionId && (
-                  <Text style={styles.pickerOptionCheck}>✓</Text>
-                )}
+                {!formData.collectionId && <Text style={styles.pickerOptionCheck}>✓</Text>}
               </TouchableOpacity>
-              {collections.map(col => (
+              {collections.map((col) => (
                 <TouchableOpacity
                   key={col.id}
                   style={[

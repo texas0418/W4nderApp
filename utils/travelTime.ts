@@ -18,9 +18,9 @@ export interface TravelTimeEstimate {
 
 // Average speeds (mph)
 const SPEEDS = {
-  driving: 25,  // City driving
+  driving: 25, // City driving
   walking: 3.1, // Average walk
-  transit: 15,  // With stops/transfers
+  transit: 15, // With stops/transfers
 };
 
 /**
@@ -61,10 +61,7 @@ export const formatDuration = (minutes: number): string => {
 /**
  * Calculate travel time between two locations
  */
-export const calculateTravelTime = (
-  from: Coordinates,
-  to: Coordinates
-): TravelTimeEstimate => {
+export const calculateTravelTime = (from: Coordinates, to: Coordinates): TravelTimeEstimate => {
   const miles = calculateDistance(from, to);
 
   const drivingMins = (miles / SPEEDS.driving) * 60;

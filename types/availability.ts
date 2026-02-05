@@ -2,7 +2,14 @@
 
 export type CalendarSource = 'apple' | 'google' | 'outlook' | 'manual';
 
-export type DayOfWeek = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+export type DayOfWeek =
+  | 'sunday'
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday';
 
 export interface CalendarAccount {
   id: string;
@@ -139,7 +146,13 @@ export const CALENDAR_SOURCE_COLORS: Record<CalendarSource, string> = {
 
 // Day of week helpers
 export const DAYS_OF_WEEK: DayOfWeek[] = [
-  'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
 ];
 
 export const DAY_LABELS: Record<DayOfWeek, string> = {

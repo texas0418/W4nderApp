@@ -65,11 +65,21 @@ const BUDGET_OPTIONS: { value: PriceRange; label: string; description: string; e
   { value: '$$', label: 'Moderate', description: 'Nice experiences $100-300', emoji: '💙' },
   { value: '$$$', label: 'Splurge', description: 'Special treats $300-1000', emoji: '💜' },
   { value: '$$$$', label: 'Luxury', description: 'Premium experiences $1000+', emoji: '💛' },
-  { value: '$$$$$', label: 'Ultimate', description: 'No limits - make it unforgettable', emoji: '💎' },
+  {
+    value: '$$$$$',
+    label: 'Ultimate',
+    description: 'No limits - make it unforgettable',
+    emoji: '💎',
+  },
 ];
 
 const PREFERENCE_OPTIONS = [
-  { key: 'adventurous', label: 'Adventurous', emoji: '🚀', description: 'Try something new & exciting' },
+  {
+    key: 'adventurous',
+    label: 'Adventurous',
+    emoji: '🚀',
+    description: 'Try something new & exciting',
+  },
   { key: 'relaxing', label: 'Relaxing', emoji: '🧘', description: 'Unwind and reconnect' },
   { key: 'nostalgic', label: 'Nostalgic', emoji: '📸', description: 'Celebrate your journey' },
   { key: 'romantic', label: 'Romantic', emoji: '💕', description: 'Classic love & intimacy' },
@@ -106,7 +116,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
     const priceOrder: PriceRange[] = ['$', '$$', '$$$', '$$$$', '$$$$$'];
     const budgetIndex = priceOrder.indexOf(selectedBudget);
     return getPackagesForMilestone(yearsCompleting).filter(
-      p => priceOrder.indexOf(p.priceRange) <= budgetIndex
+      (p) => priceOrder.indexOf(p.priceRange) <= budgetIndex
     );
   }, [selectedBudget, yearsCompleting]);
 
@@ -114,9 +124,9 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
     if (!selectedBudget) return [];
     const priceOrder: PriceRange[] = ['$', '$$', '$$$', '$$$$', '$$$$$'];
     const budgetIndex = priceOrder.indexOf(selectedBudget);
-    
+
     let suggestions = getSuggestionsForMilestone(yearsCompleting).filter(
-      s => priceOrder.indexOf(s.priceRange) <= budgetIndex
+      (s) => priceOrder.indexOf(s.priceRange) <= budgetIndex
     );
 
     // Filter by preferences if any are selected
@@ -125,7 +135,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
       .map(([key]) => key);
 
     if (activePrefs.length > 0) {
-      suggestions = suggestions.filter(s => {
+      suggestions = suggestions.filter((s) => {
         if (activePrefs.includes('adventurous') && s.emotionalTone === 'adventurous') return true;
         if (activePrefs.includes('relaxing') && s.emotionalTone === 'relaxing') return true;
         if (activePrefs.includes('nostalgic') && s.emotionalTone === 'nostalgic') return true;
@@ -142,22 +152,22 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
     const priceOrder: PriceRange[] = ['$', '$$', '$$$', '$$$$', '$$$$$'];
     const budgetIndex = priceOrder.indexOf(selectedBudget);
     return getGiftIdeasForMilestone(yearsCompleting).filter(
-      g => priceOrder.indexOf(g.priceRange) <= budgetIndex
+      (g) => priceOrder.indexOf(g.priceRange) <= budgetIndex
     );
   }, [selectedBudget, yearsCompleting]);
 
   const togglePreference = (key: string) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       [key]: !prev[key as keyof typeof prev],
     }));
   };
 
   const toggleSuggestion = (suggestion: PersonalizedSuggestion) => {
-    setSelectedSuggestions(prev => {
-      const exists = prev.find(s => s.id === suggestion.id);
+    setSelectedSuggestions((prev) => {
+      const exists = prev.find((s) => s.id === suggestion.id);
       if (exists) {
-        return prev.filter(s => s.id !== suggestion.id);
+        return prev.filter((s) => s.id !== suggestion.id);
       }
       if (prev.length >= 5) {
         Alert.alert('Maximum Selected', 'You can select up to 5 celebration ideas');
@@ -270,14 +280,14 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
   const generatePlanText = (plan: CelebrationPlan): string => {
     let text = `🎉 ${plan.name}\n`;
     text += `Year ${plan.yearsCompleting} Anniversary Celebration Plan\n\n`;
-    
+
     text += `💰 Budget: ${plan.budget}\n\n`;
-    
+
     if (plan.selectedPackage) {
       text += `📦 Package: ${plan.selectedPackage.name}\n`;
       text += `${plan.selectedPackage.description}\n\n`;
     }
-    
+
     if (plan.selectedSuggestions.length > 0) {
       text += `💡 Celebration Ideas:\n`;
       plan.selectedSuggestions.forEach((s, i) => {
@@ -285,18 +295,18 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
       });
       text += '\n';
     }
-    
+
     if (plan.selectedGift) {
       text += `🎁 Gift Idea: ${plan.selectedGift.name}\n`;
       text += `${plan.selectedGift.description}\n\n`;
     }
-    
+
     if (plan.notes) {
       text += `📝 Notes: ${plan.notes}\n`;
     }
-    
+
     text += '\n— Created with W4nder 💕';
-    
+
     return text;
   };
 
@@ -329,10 +339,12 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
             onPress={() => setSelectedBudget(option.value)}
           >
             <Text style={styles.budgetEmoji}>{option.emoji}</Text>
-            <Text style={[
-              styles.budgetLabel,
-              selectedBudget === option.value && styles.budgetLabelSelected,
-            ]}>
+            <Text
+              style={[
+                styles.budgetLabel,
+                selectedBudget === option.value && styles.budgetLabelSelected,
+              ]}
+            >
               {option.label}
             </Text>
             <Text style={styles.budgetPrice}>{option.value}</Text>
@@ -356,15 +368,19 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
             key={option.key}
             style={[
               styles.preferenceOption,
-              preferences[option.key as keyof typeof preferences] && styles.preferenceOptionSelected,
+              preferences[option.key as keyof typeof preferences] &&
+                styles.preferenceOptionSelected,
             ]}
             onPress={() => togglePreference(option.key)}
           >
             <Text style={styles.preferenceEmoji}>{option.emoji}</Text>
-            <Text style={[
-              styles.preferenceLabel,
-              preferences[option.key as keyof typeof preferences] && styles.preferenceLabelSelected,
-            ]}>
+            <Text
+              style={[
+                styles.preferenceLabel,
+                preferences[option.key as keyof typeof preferences] &&
+                  styles.preferenceLabelSelected,
+              ]}
+            >
               {option.label}
             </Text>
             <Text style={styles.preferenceDescription}>{option.description}</Text>
@@ -382,9 +398,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
   const renderPackageStep = () => (
     <View style={styles.stepContent}>
       <Text style={styles.stepTitle}>Choose a Celebration Package 📦</Text>
-      <Text style={styles.stepSubtitle}>
-        Curated experiences for your milestone (optional)
-      </Text>
+      <Text style={styles.stepSubtitle}>Curated experiences for your milestone (optional)</Text>
 
       {availablePackages.length === 0 ? (
         <View style={styles.emptyPackages}>
@@ -397,8 +411,8 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
           </Text>
         </View>
       ) : (
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.packagesScroll}
         >
@@ -409,9 +423,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
                 styles.packageCard,
                 selectedPackage?.id === pkg.id && styles.packageCardSelected,
               ]}
-              onPress={() => setSelectedPackage(
-                selectedPackage?.id === pkg.id ? null : pkg
-              )}
+              onPress={() => setSelectedPackage(selectedPackage?.id === pkg.id ? null : pkg)}
             >
               {pkg.featured && (
                 <View style={styles.packageFeatured}>
@@ -427,7 +439,9 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
               </View>
               <View style={styles.packageHighlights}>
                 {pkg.highlights.slice(0, 2).map((h, i) => (
-                  <Text key={i} style={styles.packageHighlight}>• {h}</Text>
+                  <Text key={i} style={styles.packageHighlight}>
+                    • {h}
+                  </Text>
                 ))}
               </View>
               {selectedPackage?.id === pkg.id && (
@@ -441,10 +455,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
       )}
 
       {selectedPackage && (
-        <TouchableOpacity
-          style={styles.clearSelection}
-          onPress={() => setSelectedPackage(null)}
-        >
+        <TouchableOpacity style={styles.clearSelection} onPress={() => setSelectedPackage(null)}>
           <Text style={styles.clearSelectionText}>Clear Selection</Text>
         </TouchableOpacity>
       )}
@@ -454,40 +465,40 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
   const renderIdeasStep = () => (
     <View style={styles.stepContent}>
       <Text style={styles.stepTitle}>Add Celebration Ideas 💡</Text>
-      <Text style={styles.stepSubtitle}>
-        Select up to 5 ideas to include in your plan
-      </Text>
+      <Text style={styles.stepSubtitle}>Select up to 5 ideas to include in your plan</Text>
 
       {selectedSuggestions.length > 0 && (
         <View style={styles.selectedCount}>
-          <Text style={styles.selectedCountText}>
-            {selectedSuggestions.length}/5 selected
-          </Text>
+          <Text style={styles.selectedCountText}>{selectedSuggestions.length}/5 selected</Text>
         </View>
       )}
 
       <ScrollView style={styles.ideasScroll} showsVerticalScrollIndicator={false}>
         {availableSuggestions.map((suggestion) => {
-          const isSelected = selectedSuggestions.find(s => s.id === suggestion.id);
-          
+          const isSelected = selectedSuggestions.find((s) => s.id === suggestion.id);
+
           return (
             <TouchableOpacity
               key={suggestion.id}
-              style={[
-                styles.ideaCard,
-                isSelected && styles.ideaCardSelected,
-              ]}
+              style={[styles.ideaCard, isSelected && styles.ideaCardSelected]}
               onPress={() => toggleSuggestion(suggestion)}
             >
               <View style={styles.ideaHeader}>
                 <View style={styles.ideaCategoryPill}>
                   <Text style={styles.ideaCategoryText}>
-                    {suggestion.category === 'restaurant' ? '🍽️' :
-                     suggestion.category === 'experience' ? '🎯' :
-                     suggestion.category === 'getaway' ? '🏝️' :
-                     suggestion.category === 'spa' ? '🧘' :
-                     suggestion.category === 'activity' ? '🎨' :
-                     suggestion.category === 'entertainment' ? '🎭' : '🎁'}
+                    {suggestion.category === 'restaurant'
+                      ? '🍽️'
+                      : suggestion.category === 'experience'
+                        ? '🎯'
+                        : suggestion.category === 'getaway'
+                          ? '🏝️'
+                          : suggestion.category === 'spa'
+                            ? '🧘'
+                            : suggestion.category === 'activity'
+                              ? '🎨'
+                              : suggestion.category === 'entertainment'
+                                ? '🎭'
+                                : '🎁'}
                   </Text>
                 </View>
                 <Text style={styles.ideaPrice}>{suggestion.priceRange}</Text>
@@ -526,13 +537,8 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
           {availableGifts.map((gift) => (
             <TouchableOpacity
               key={gift.id}
-              style={[
-                styles.giftCard,
-                selectedGift?.id === gift.id && styles.giftCardSelected,
-              ]}
-              onPress={() => setSelectedGift(
-                selectedGift?.id === gift.id ? null : gift
-              )}
+              style={[styles.giftCard, selectedGift?.id === gift.id && styles.giftCardSelected]}
+              onPress={() => setSelectedGift(selectedGift?.id === gift.id ? null : gift)}
             >
               <View style={styles.giftHeader}>
                 <Text style={styles.giftName}>{gift.name}</Text>
@@ -540,9 +546,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
               </View>
               <Text style={styles.giftDescription}>{gift.description}</Text>
               <View style={styles.giftMeta}>
-                <Text style={styles.giftTie}>
-                  🎀 Theme: {gift.traditionalTie}
-                </Text>
+                <Text style={styles.giftTie}>🎀 Theme: {gift.traditionalTie}</Text>
                 {gift.personalizable && (
                   <Text style={styles.giftPersonalizable}>✨ Personalizable</Text>
                 )}
@@ -563,9 +567,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
   const renderReviewStep = () => (
     <ScrollView style={styles.stepContent} showsVerticalScrollIndicator={false}>
       <Text style={styles.stepTitle}>Review Your Plan 📋</Text>
-      <Text style={styles.stepSubtitle}>
-        Here's everything you've put together
-      </Text>
+      <Text style={styles.stepSubtitle}>Here's everything you've put together</Text>
 
       <View style={styles.planNameInput}>
         <Text style={styles.inputLabel}>Plan Name</Text>
@@ -580,11 +582,11 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
       <View style={styles.reviewSection}>
         <Text style={styles.reviewSectionTitle}>💰 Budget</Text>
         <Text style={styles.reviewValue}>
-          {BUDGET_OPTIONS.find(b => b.value === selectedBudget)?.label} ({selectedBudget})
+          {BUDGET_OPTIONS.find((b) => b.value === selectedBudget)?.label} ({selectedBudget})
         </Text>
       </View>
 
-      {Object.values(preferences).some(v => v) && (
+      {Object.values(preferences).some((v) => v) && (
         <View style={styles.reviewSection}>
           <Text style={styles.reviewSectionTitle}>✨ Vibes</Text>
           <View style={styles.reviewTags}>
@@ -593,7 +595,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
               .map(([key]) => (
                 <View key={key} style={styles.reviewTag}>
                   <Text style={styles.reviewTagText}>
-                    {PREFERENCE_OPTIONS.find(p => p.key === key)?.label}
+                    {PREFERENCE_OPTIONS.find((p) => p.key === key)?.label}
                   </Text>
                 </View>
               ))}
@@ -613,9 +615,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
 
       {selectedSuggestions.length > 0 && (
         <View style={styles.reviewSection}>
-          <Text style={styles.reviewSectionTitle}>
-            💡 Ideas ({selectedSuggestions.length})
-          </Text>
+          <Text style={styles.reviewSectionTitle}>💡 Ideas ({selectedSuggestions.length})</Text>
           {selectedSuggestions.map((s, i) => (
             <View key={s.id} style={styles.reviewIdea}>
               <Text style={styles.reviewIdeaNumber}>{i + 1}.</Text>
@@ -653,9 +653,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={goBack} style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>
-            {currentStepIndex === 0 ? '✕' : '←'}
-          </Text>
+          <Text style={styles.headerButtonText}>{currentStepIndex === 0 ? '✕' : '←'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Plan Celebration</Text>
         <View style={styles.headerButton} />
@@ -680,10 +678,7 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
             onPress={savePlan}
             disabled={isSaving}
           >
-            <LinearGradient
-              colors={['#FF6B6B', '#FF8E8E']}
-              style={styles.buttonGradient}
-            >
+            <LinearGradient colors={['#FF6B6B', '#FF8E8E']} style={styles.buttonGradient}>
               <Text style={styles.primaryButtonText}>
                 {isSaving ? 'Saving...' : '🎉 Save Celebration Plan'}
               </Text>
@@ -691,13 +686,8 @@ export const CelebrationPlannerScreen: React.FC<CelebrationPlannerScreenProps> =
           </TouchableOpacity>
         ) : (
           <>
-            <TouchableOpacity
-              style={styles.skipButton}
-              onPress={goNext}
-            >
-              <Text style={styles.skipButtonText}>
-                {currentStep === 'budget' ? '' : 'Skip'}
-              </Text>
+            <TouchableOpacity style={styles.skipButton} onPress={goNext}>
+              <Text style={styles.skipButtonText}>{currentStep === 'budget' ? '' : 'Skip'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.nextButton, !canProceed() && styles.buttonDisabled]}

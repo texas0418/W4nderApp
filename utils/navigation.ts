@@ -64,10 +64,7 @@ export const getCurrentLocation = async (): Promise<Coordinates | null> => {
 };
 
 // Calculate distance between two points (Haversine formula)
-export const calculateDistance = (
-  point1: Coordinates,
-  point2: Coordinates
-): number => {
+export const calculateDistance = (point1: Coordinates, point2: Coordinates): number => {
   const R = 3959; // Earth's radius in miles
   const dLat = toRad(point2.lat - point1.lat);
   const dLng = toRad(point2.lng - point1.lng);
@@ -178,10 +175,7 @@ export const getRouteInfo = async (
 };
 
 // Generate simple polyline between two points
-const generateSimplePolyline = (
-  origin: Coordinates,
-  destination: Coordinates
-): Coordinates[] => {
+const generateSimplePolyline = (origin: Coordinates, destination: Coordinates): Coordinates[] => {
   const points: Coordinates[] = [];
   const steps = 10;
 
@@ -197,12 +191,9 @@ const generateSimplePolyline = (
 };
 
 // Fallback to external maps app
-export const openExternalMaps = (
-  destination: NavigationLocation,
-  origin?: Coordinates
-) => {
+export const openExternalMaps = (destination: NavigationLocation, origin?: Coordinates) => {
   const destCoords = destination.coordinates;
-  
+
   if (!destCoords) {
     // Use address-based navigation
     const address = encodeURIComponent(destination.address || destination.name);
@@ -211,15 +202,15 @@ export const openExternalMaps = (
       android: `google.navigation:q=${address}`,
       default: `https://www.google.com/maps/dir/?api=1&destination=${address}`,
     });
-    
+
     Linking.openURL(url!);
     return;
   }
 
   const { lat, lng } = destCoords;
-  
+
   let url: string;
-  
+
   if (Platform.OS === 'ios') {
     // Apple Maps
     url = origin

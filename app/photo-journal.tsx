@@ -154,7 +154,7 @@ export default function PhotoJournalScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrip, setSelectedTrip] = useState<string | null>(null);
   const [showTripFilter, setShowTripFilter] = useState(false);
-  
+
   const [newEntry, setNewEntry] = useState<Partial<PhotoJournalEntry>>({
     caption: '',
     note: '',
@@ -166,7 +166,7 @@ export default function PhotoJournalScreen() {
 
   const uniqueTrips = useMemo((): { id: string; name: string }[] => {
     const tripMap: Record<string, string> = {};
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       if (entry.tripId && entry.tripName) {
         tripMap[entry.tripId] = entry.tripName;
       }
@@ -176,35 +176,39 @@ export default function PhotoJournalScreen() {
 
   const filteredEntries = useMemo(() => {
     let filtered = entries;
-    
+
     if (selectedTrip) {
-      filtered = filtered.filter(e => e.tripId === selectedTrip);
+      filtered = filtered.filter((e) => e.tripId === selectedTrip);
     }
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(e => 
-        e.caption.toLowerCase().includes(query) ||
-        e.note.toLowerCase().includes(query) ||
-        e.location?.name.toLowerCase().includes(query) ||
-        e.tags.some(t => t.toLowerCase().includes(query))
+      filtered = filtered.filter(
+        (e) =>
+          e.caption.toLowerCase().includes(query) ||
+          e.note.toLowerCase().includes(query) ||
+          e.location?.name.toLowerCase().includes(query) ||
+          e.tags.some((t) => t.toLowerCase().includes(query))
       );
     }
-    
+
     return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [entries, selectedTrip, searchQuery]);
 
-  const stats = useMemo(() => ({
-    totalPhotos: entries.length,
-    totalLocations: new Set(entries.filter(e => e.location).map(e => e.location?.name)).size,
-    tripsDocumented: uniqueTrips.length,
-    favorites: entries.filter(e => e.isFavorite).length,
-  }), [entries, uniqueTrips]);
+  const stats = useMemo(
+    () => ({
+      totalPhotos: entries.length,
+      totalLocations: new Set(entries.filter((e) => e.location).map((e) => e.location?.name)).size,
+      tripsDocumented: uniqueTrips.length,
+      favorites: entries.filter((e) => e.isFavorite).length,
+    }),
+    [entries, uniqueTrips]
+  );
 
   const pickImage = async (useCamera: boolean) => {
     try {
       let result;
-      
+
       if (useCamera) {
         const permission = await ImagePicker.requestCameraPermissionsAsync();
         if (!permission.granted) {
@@ -232,7 +236,7 @@ export default function PhotoJournalScreen() {
       }
 
       if (!result.canceled && result.assets[0]) {
-        setNewEntry(prev => ({ ...prev, imageUri: result.assets[0].uri }));
+        setNewEntry((prev) => ({ ...prev, imageUri: result.assets[0].uri }));
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     } catch (error) {
@@ -245,11 +249,11 @@ export default function PhotoJournalScreen() {
       Alert.alert('Not available', 'Location services are not available on web.');
       return;
     }
-    
+
     try {
       setIsLoadingLocation(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status !== 'granted') {
         Alert.alert('Permission denied', 'Location access is needed to geo-tag photos.');
         return;
@@ -261,11 +265,11 @@ export default function PhotoJournalScreen() {
         longitude: location.coords.longitude,
       });
 
-      const locationName = address 
+      const locationName = address
         ? `${address.city || address.region}, ${address.country}`
         : 'Unknown location';
 
-      setNewEntry(prev => ({
+      setNewEntry((prev) => ({
         ...prev,
         location: {
           name: locationName,
@@ -275,7 +279,7 @@ export default function PhotoJournalScreen() {
           },
         },
       }));
-      
+
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
       console.log('Error getting location:', error);
@@ -287,7 +291,7 @@ export default function PhotoJournalScreen() {
 
   const addTag = () => {
     if (newTag.trim() && !newEntry.tags?.includes(newTag.trim())) {
-      setNewEntry(prev => ({
+      setNewEntry((prev) => ({
         ...prev,
         tags: [...(prev.tags || []), newTag.trim()],
       }));
@@ -296,9 +300,9 @@ export default function PhotoJournalScreen() {
   };
 
   const removeTag = (tag: string) => {
-    setNewEntry(prev => ({
+    setNewEntry((prev) => ({
       ...prev,
-      tags: prev.tags?.filter(t => t !== tag) || [],
+      tags: prev.tags?.filter((t) => t !== tag) || [],
     }));
   };
 
@@ -322,50 +326,46 @@ export default function PhotoJournalScreen() {
       tripName: newEntry.tripName,
     };
 
-    setEntries(prev => [entry, ...prev]);
+    setEntries((prev) => [entry, ...prev]);
     setShowAddModal(false);
     setNewEntry({ caption: '', note: '', tags: [], isFavorite: false });
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const toggleFavorite = (entryId: string) => {
-    setEntries(prev => prev.map(e => 
-      e.id === entryId ? { ...e, isFavorite: !e.isFavorite } : e
-    ));
+    setEntries((prev) =>
+      prev.map((e) => (e.id === entryId ? { ...e, isFavorite: !e.isFavorite } : e))
+    );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const deleteEntry = (entryId: string) => {
-    Alert.alert(
-      'Delete Entry',
-      'Are you sure you want to delete this journal entry?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            setEntries(prev => prev.filter(e => e.id !== entryId));
-            setShowDetailModal(false);
-            setSelectedEntry(null);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          },
+    Alert.alert('Delete Entry', 'Are you sure you want to delete this journal entry?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          setEntries((prev) => prev.filter((e) => e.id !== entryId));
+          setShowDetailModal(false);
+          setSelectedEntry(null);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      month: 'long', 
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
       day: 'numeric',
       year: 'numeric',
     });
   };
 
   const getMoodEmoji = (mood?: string) => {
-    return MOODS.find(m => m.id === mood)?.emoji || '';
+    return MOODS.find((m) => m.id === mood)?.emoji || '';
   };
 
   const openEntryDetail = (entry: PhotoJournalEntry) => {
@@ -441,7 +441,7 @@ export default function PhotoJournalScreen() {
             )}
             {entry.tags.length > 0 && (
               <View style={styles.tagRow}>
-                {entry.tags.slice(0, 3).map(tag => (
+                {entry.tags.slice(0, 3).map((tag) => (
                   <View key={tag} style={styles.smallTag}>
                     <Text style={styles.smallTagText}>#{tag}</Text>
                   </View>
@@ -456,17 +456,9 @@ export default function PhotoJournalScreen() {
 
   const renderGridView = () => (
     <View style={styles.gridContainer}>
-      {filteredEntries.map(entry => (
-        <Pressable
-          key={entry.id}
-          style={styles.gridItem}
-          onPress={() => openEntryDetail(entry)}
-        >
-          <Image
-            source={{ uri: entry.imageUri }}
-            style={styles.gridImage}
-            contentFit="cover"
-          />
+      {filteredEntries.map((entry) => (
+        <Pressable key={entry.id} style={styles.gridItem} onPress={() => openEntryDetail(entry)}>
+          <Image source={{ uri: entry.imageUri }} style={styles.gridImage} contentFit="cover" />
           {entry.isFavorite && (
             <View style={styles.gridFavorite}>
               <Heart size={14} color={colors.secondary} fill={colors.secondary} />
@@ -482,13 +474,13 @@ export default function PhotoJournalScreen() {
       <Map size={48} color={colors.textTertiary} />
       <Text style={styles.mapPlaceholderTitle}>Map View</Text>
       <Text style={styles.mapPlaceholderText}>
-        {filteredEntries.filter(e => e.location?.coordinates).length} geo-tagged photos
+        {filteredEntries.filter((e) => e.location?.coordinates).length} geo-tagged photos
       </Text>
       <View style={styles.mapLocations}>
         {filteredEntries
-          .filter(e => e.location)
+          .filter((e) => e.location)
           .slice(0, 5)
-          .map(entry => (
+          .map((entry) => (
             <View key={entry.id} style={styles.mapLocationItem}>
               <MapPin size={14} color={colors.primary} />
               <Text style={styles.mapLocationText}>{entry.location?.name}</Text>
@@ -511,10 +503,7 @@ export default function PhotoJournalScreen() {
           </Pressable>
           <Text style={styles.headerTitle}>Photo Journal</Text>
           <View style={styles.headerActions}>
-            <Pressable 
-              style={styles.blogExportButton} 
-              onPress={() => router.push('/blog-export')}
-            >
+            <Pressable style={styles.blogExportButton} onPress={() => router.push('/blog-export')}>
               <BookOpen size={20} color={colors.textLight} />
             </Pressable>
             <Pressable style={styles.addHeaderButton} onPress={() => setShowAddModal(true)}>
@@ -564,33 +553,49 @@ export default function PhotoJournalScreen() {
                 onPress={() => setShowTripFilter(!showTripFilter)}
               >
                 <Filter size={16} color={selectedTrip ? colors.primary : colors.textSecondary} />
-                <Text style={[
-                  styles.filterButtonText,
-                  selectedTrip && styles.filterButtonTextActive
-                ]}>
-                  {selectedTrip ? uniqueTrips.find(t => t.id === selectedTrip)?.name : 'All Trips'}
+                <Text
+                  style={[styles.filterButtonText, selectedTrip && styles.filterButtonTextActive]}
+                >
+                  {selectedTrip
+                    ? uniqueTrips.find((t) => t.id === selectedTrip)?.name
+                    : 'All Trips'}
                 </Text>
                 <ChevronDown size={16} color={colors.textSecondary} />
               </Pressable>
 
               <View style={styles.viewModeButtons}>
                 <Pressable
-                  style={[styles.viewModeButton, viewMode === 'timeline' && styles.viewModeButtonActive]}
+                  style={[
+                    styles.viewModeButton,
+                    viewMode === 'timeline' && styles.viewModeButtonActive,
+                  ]}
                   onPress={() => setViewMode('timeline')}
                 >
-                  <List size={18} color={viewMode === 'timeline' ? colors.primary : colors.textTertiary} />
+                  <List
+                    size={18}
+                    color={viewMode === 'timeline' ? colors.primary : colors.textTertiary}
+                  />
                 </Pressable>
                 <Pressable
-                  style={[styles.viewModeButton, viewMode === 'grid' && styles.viewModeButtonActive]}
+                  style={[
+                    styles.viewModeButton,
+                    viewMode === 'grid' && styles.viewModeButtonActive,
+                  ]}
                   onPress={() => setViewMode('grid')}
                 >
-                  <Grid3X3 size={18} color={viewMode === 'grid' ? colors.primary : colors.textTertiary} />
+                  <Grid3X3
+                    size={18}
+                    color={viewMode === 'grid' ? colors.primary : colors.textTertiary}
+                  />
                 </Pressable>
                 <Pressable
                   style={[styles.viewModeButton, viewMode === 'map' && styles.viewModeButtonActive]}
                   onPress={() => setViewMode('map')}
                 >
-                  <Map size={18} color={viewMode === 'map' ? colors.primary : colors.textTertiary} />
+                  <Map
+                    size={18}
+                    color={viewMode === 'map' ? colors.primary : colors.textTertiary}
+                  />
                 </Pressable>
               </View>
             </View>
@@ -604,23 +609,30 @@ export default function PhotoJournalScreen() {
                     setShowTripFilter(false);
                   }}
                 >
-                  <Text style={[styles.tripFilterText, !selectedTrip && styles.tripFilterTextActive]}>
+                  <Text
+                    style={[styles.tripFilterText, !selectedTrip && styles.tripFilterTextActive]}
+                  >
                     All Trips
                   </Text>
                 </Pressable>
-                {uniqueTrips.map(trip => (
+                {uniqueTrips.map((trip) => (
                   <Pressable
                     key={trip.id}
-                    style={[styles.tripFilterItem, selectedTrip === trip.id && styles.tripFilterItemActive]}
+                    style={[
+                      styles.tripFilterItem,
+                      selectedTrip === trip.id && styles.tripFilterItemActive,
+                    ]}
                     onPress={() => {
                       setSelectedTrip(trip.id);
                       setShowTripFilter(false);
                     }}
                   >
-                    <Text style={[
-                      styles.tripFilterText,
-                      selectedTrip === trip.id && styles.tripFilterTextActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.tripFilterText,
+                        selectedTrip === trip.id && styles.tripFilterTextActive,
+                      ]}
+                    >
                       {trip.name}
                     </Text>
                   </Pressable>
@@ -660,11 +672,7 @@ export default function PhotoJournalScreen() {
         </Pressable>
       </SafeAreaView>
 
-      <Modal
-        visible={showAddModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
+      <Modal visible={showAddModal} animationType="slide" presentationStyle="pageSheet">
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Pressable onPress={() => setShowAddModal(false)}>
@@ -686,7 +694,7 @@ export default function PhotoJournalScreen() {
                 />
                 <Pressable
                   style={styles.changePhotoButton}
-                  onPress={() => setNewEntry(prev => ({ ...prev, imageUri: undefined }))}
+                  onPress={() => setNewEntry((prev) => ({ ...prev, imageUri: undefined }))}
                 >
                   <Edit3 size={16} color={colors.textLight} />
                   <Text style={styles.changePhotoText}>Change</Text>
@@ -718,7 +726,7 @@ export default function PhotoJournalScreen() {
                 placeholder="Give your photo a title..."
                 placeholderTextColor={colors.textTertiary}
                 value={newEntry.caption}
-                onChangeText={(text) => setNewEntry(prev => ({ ...prev, caption: text }))}
+                onChangeText={(text) => setNewEntry((prev) => ({ ...prev, caption: text }))}
               />
             </View>
 
@@ -731,14 +739,14 @@ export default function PhotoJournalScreen() {
                 multiline
                 textAlignVertical="top"
                 value={newEntry.note}
-                onChangeText={(text) => setNewEntry(prev => ({ ...prev, note: text }))}
+                onChangeText={(text) => setNewEntry((prev) => ({ ...prev, note: text }))}
               />
             </View>
 
             <View style={styles.formSection}>
               <View style={styles.formLabelRow}>
                 <Text style={styles.formLabel}>Location</Text>
-                <Pressable 
+                <Pressable
                   style={styles.locationButton}
                   onPress={getCurrentLocation}
                   disabled={isLoadingLocation}
@@ -754,10 +762,12 @@ export default function PhotoJournalScreen() {
                 placeholder="Where was this photo taken?"
                 placeholderTextColor={colors.textTertiary}
                 value={newEntry.location?.name || ''}
-                onChangeText={(text) => setNewEntry(prev => ({
-                  ...prev,
-                  location: { name: text, coordinates: prev.location?.coordinates },
-                }))}
+                onChangeText={(text) =>
+                  setNewEntry((prev) => ({
+                    ...prev,
+                    location: { name: text, coordinates: prev.location?.coordinates },
+                  }))
+                }
               />
             </View>
 
@@ -765,23 +775,30 @@ export default function PhotoJournalScreen() {
               <Text style={styles.formLabel}>Mood</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={styles.moodOptions}>
-                  {MOODS.map(mood => (
+                  {MOODS.map((mood) => (
                     <Pressable
                       key={mood.id}
                       style={[
                         styles.moodOption,
-                        newEntry.mood === mood.id && styles.moodOptionActive
+                        newEntry.mood === mood.id && styles.moodOptionActive,
                       ]}
-                      onPress={() => setNewEntry(prev => ({ 
-                        ...prev, 
-                        mood: prev.mood === mood.id ? undefined : mood.id as PhotoJournalEntry['mood']
-                      }))}
+                      onPress={() =>
+                        setNewEntry((prev) => ({
+                          ...prev,
+                          mood:
+                            prev.mood === mood.id
+                              ? undefined
+                              : (mood.id as PhotoJournalEntry['mood']),
+                        }))
+                      }
                     >
                       <Text style={styles.moodOptionEmoji}>{mood.emoji}</Text>
-                      <Text style={[
-                        styles.moodOptionLabel,
-                        newEntry.mood === mood.id && styles.moodOptionLabelActive
-                      ]}>
+                      <Text
+                        style={[
+                          styles.moodOptionLabel,
+                          newEntry.mood === mood.id && styles.moodOptionLabelActive,
+                        ]}
+                      >
                         {mood.label}
                       </Text>
                     </Pressable>
@@ -807,7 +824,7 @@ export default function PhotoJournalScreen() {
               </View>
               {(newEntry.tags?.length ?? 0) > 0 && (
                 <View style={styles.tagsContainer}>
-                  {newEntry.tags?.map(tag => (
+                  {newEntry.tags?.map((tag) => (
                     <View key={tag} style={styles.tagChip}>
                       <Text style={styles.tagChipText}>#{tag}</Text>
                       <Pressable onPress={() => removeTag(tag)}>
@@ -825,29 +842,40 @@ export default function PhotoJournalScreen() {
                 <View style={styles.tripOptions}>
                   <Pressable
                     style={[styles.tripOption, !newEntry.tripId && styles.tripOptionActive]}
-                    onPress={() => setNewEntry(prev => ({ ...prev, tripId: undefined, tripName: undefined }))}
+                    onPress={() =>
+                      setNewEntry((prev) => ({ ...prev, tripId: undefined, tripName: undefined }))
+                    }
                   >
-                    <Text style={[
-                      styles.tripOptionText,
-                      !newEntry.tripId && styles.tripOptionTextActive
-                    ]}>
+                    <Text
+                      style={[
+                        styles.tripOptionText,
+                        !newEntry.tripId && styles.tripOptionTextActive,
+                      ]}
+                    >
                       No Trip
                     </Text>
                   </Pressable>
-                  {trips.map(trip => (
+                  {trips.map((trip) => (
                     <Pressable
                       key={trip.id}
-                      style={[styles.tripOption, newEntry.tripId === trip.id && styles.tripOptionActive]}
-                      onPress={() => setNewEntry(prev => ({ 
-                        ...prev, 
-                        tripId: trip.id, 
-                        tripName: trip.destination.name 
-                      }))}
+                      style={[
+                        styles.tripOption,
+                        newEntry.tripId === trip.id && styles.tripOptionActive,
+                      ]}
+                      onPress={() =>
+                        setNewEntry((prev) => ({
+                          ...prev,
+                          tripId: trip.id,
+                          tripName: trip.destination.name,
+                        }))
+                      }
                     >
-                      <Text style={[
-                        styles.tripOptionText,
-                        newEntry.tripId === trip.id && styles.tripOptionTextActive
-                      ]}>
+                      <Text
+                        style={[
+                          styles.tripOptionText,
+                          newEntry.tripId === trip.id && styles.tripOptionTextActive,
+                        ]}
+                      >
                         {trip.destination.name}
                       </Text>
                     </Pressable>
@@ -858,7 +886,7 @@ export default function PhotoJournalScreen() {
 
             <Pressable
               style={styles.favoriteToggle}
-              onPress={() => setNewEntry(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
+              onPress={() => setNewEntry((prev) => ({ ...prev, isFavorite: !prev.isFavorite }))}
             >
               <Heart
                 size={20}
@@ -871,11 +899,7 @@ export default function PhotoJournalScreen() {
         </SafeAreaView>
       </Modal>
 
-      <Modal
-        visible={showDetailModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
+      <Modal visible={showDetailModal} animationType="slide" presentationStyle="pageSheet">
         {selectedEntry && (
           <SafeAreaView style={styles.detailModalContainer}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -929,7 +953,7 @@ export default function PhotoJournalScreen() {
 
               <View style={styles.detailContent}>
                 <Text style={styles.detailCaption}>{selectedEntry.caption}</Text>
-                
+
                 <View style={styles.detailMeta}>
                   <View style={styles.detailMetaItem}>
                     <Calendar size={16} color={colors.textSecondary} />
@@ -965,7 +989,7 @@ export default function PhotoJournalScreen() {
 
                 {selectedEntry.tags.length > 0 && (
                   <View style={styles.detailTags}>
-                    {selectedEntry.tags.map(tag => (
+                    {selectedEntry.tags.map((tag) => (
                       <View key={tag} style={styles.detailTag}>
                         <Tag size={12} color={colors.primary} />
                         <Text style={styles.detailTagText}>{tag}</Text>

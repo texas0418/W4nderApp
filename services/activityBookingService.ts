@@ -91,13 +91,12 @@ class ActivityBookingService {
       });
 
       const providerResults = await Promise.all(searchPromises);
-      
+
       // Merge and deduplicate results
       for (const activities of providerResults) {
         for (const activity of activities) {
-          const existing = results.find(a => 
-            a.title === activity.title && 
-            a.location.city === activity.location.city
+          const existing = results.find(
+            (a) => a.title === activity.title && a.location.city === activity.location.city
           );
           if (!existing) {
             results.push(activity);
@@ -141,9 +140,12 @@ class ActivityBookingService {
   }
 
   private getMockViatorResults(params: ActivitySearchParams): Activity[] {
-    return MOCK_ACTIVITIES.filter(a => 
-      a.provider === 'viator' &&
-      (!params.categories || params.categories.length === 0 || params.categories.includes(a.category))
+    return MOCK_ACTIVITIES.filter(
+      (a) =>
+        a.provider === 'viator' &&
+        (!params.categories ||
+          params.categories.length === 0 ||
+          params.categories.includes(a.category))
     );
   }
 
@@ -162,9 +164,12 @@ class ActivityBookingService {
   }
 
   private getMockGetYourGuideResults(params: ActivitySearchParams): Activity[] {
-    return MOCK_ACTIVITIES.filter(a => 
-      a.provider === 'getyourguide' &&
-      (!params.categories || params.categories.length === 0 || params.categories.includes(a.category))
+    return MOCK_ACTIVITIES.filter(
+      (a) =>
+        a.provider === 'getyourguide' &&
+        (!params.categories ||
+          params.categories.length === 0 ||
+          params.categories.includes(a.category))
     );
   }
 
@@ -179,9 +184,12 @@ class ActivityBookingService {
   }
 
   private getMockAirbnbResults(params: ActivitySearchParams): Activity[] {
-    return MOCK_ACTIVITIES.filter(a => 
-      a.provider === 'airbnb_experiences' &&
-      (!params.categories || params.categories.length === 0 || params.categories.includes(a.category))
+    return MOCK_ACTIVITIES.filter(
+      (a) =>
+        a.provider === 'airbnb_experiences' &&
+        (!params.categories ||
+          params.categories.length === 0 ||
+          params.categories.includes(a.category))
     );
   }
 
@@ -189,9 +197,12 @@ class ActivityBookingService {
   // Get Activity Details
   // ============================================================================
 
-  async getActivityDetails(activityId: string, provider: ActivityProvider): Promise<Activity | null> {
+  async getActivityDetails(
+    activityId: string,
+    provider: ActivityProvider
+  ): Promise<Activity | null> {
     // In production, fetch from provider API
-    const activity = MOCK_ACTIVITIES.find(a => a.id === activityId);
+    const activity = MOCK_ACTIVITIES.find((a) => a.id === activityId);
     return activity || null;
   }
 
@@ -225,7 +236,7 @@ class ActivityBookingService {
     date: string,
     participants: { adults: number; children?: number; infants?: number }
   ): AvailabilitySlot[] {
-    const activity = MOCK_ACTIVITIES.find(a => a.id === activityId);
+    const activity = MOCK_ACTIVITIES.find((a) => a.id === activityId);
     if (!activity) return [];
 
     const slots: AvailabilitySlot[] = [];
@@ -238,9 +249,8 @@ class ActivityBookingService {
 
       const adultPrice = activity.pricing.basePrice;
       const childPrice = activity.pricing.childPrice || adultPrice * 0.7;
-      const totalPrice = 
-        (participants.adults * adultPrice) +
-        ((participants.children || 0) * childPrice);
+      const totalPrice =
+        participants.adults * adultPrice + (participants.children || 0) * childPrice;
 
       slots.push({
         id: `slot-${activityId}-${time.replace(':', '')}`,
@@ -259,7 +269,7 @@ class ActivityBookingService {
       });
     }
 
-    return slots.filter(s => s.available);
+    return slots.filter((s) => s.available);
   }
 
   // ============================================================================
@@ -270,7 +280,7 @@ class ActivityBookingService {
     const { activityId, provider, date, startTime, participants, leadTraveler } = request;
 
     // Find activity
-    const activity = MOCK_ACTIVITIES.find(a => a.id === activityId);
+    const activity = MOCK_ACTIVITIES.find((a) => a.id === activityId);
     if (!activity) {
       throw new Error('Activity not found');
     }
@@ -290,9 +300,7 @@ class ActivityBookingService {
     // Calculate pricing
     const adultPrice = activity.pricing.basePrice;
     const childPrice = activity.pricing.childPrice || adultPrice * 0.7;
-    const subtotal = 
-      (participants.adults * adultPrice) +
-      ((participants.children || 0) * childPrice);
+    const subtotal = participants.adults * adultPrice + (participants.children || 0) * childPrice;
     const fees = subtotal * 0.05;
     const total = subtotal + fees;
 
@@ -302,7 +310,7 @@ class ActivityBookingService {
       providerBookingId: `${provider.toUpperCase()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
       provider,
       status: 'confirmed',
-      
+
       activity: {
         id: activity.id,
         title: activity.title,
@@ -311,44 +319,48 @@ class ActivityBookingService {
         location: `${activity.location.city}, ${activity.location.country}`,
         duration: activity.duration.displayText,
       },
-      
+
       date,
       displayDate: this.formatDisplayDate(date),
       startTime,
       endTime: this.calculateEndTime(startTime, activity.duration),
-      
+
       participants: {
         adults: participants.adults,
         children: participants.children,
         infants: participants.infants,
         total: participants.adults + (participants.children || 0) + (participants.infants || 0),
       },
-      
+
       pricing: {
         subtotal,
         fees,
         total,
         currency: activity.pricing.currency,
       },
-      
+
       leadTraveler,
-      
+
       confirmationNumber: this.generateConfirmationNumber(provider),
       voucherUrl: `https://${provider}.com/voucher/${Date.now()}`,
       qrCode: `data:image/png;base64,${Math.random().toString(36)}`,
-      
+
       meetingPoint: activity.location.meetingPoint || activity.location.address,
-      meetingInstructions: 'Please arrive 15 minutes before the start time. Look for the guide holding a sign with your name.',
-      
+      meetingInstructions:
+        'Please arrive 15 minutes before the start time. Look for the guide holding a sign with your name.',
+
       operatorPhone: '+1 (555) 123-4567',
       operatorEmail: `support@${provider}.com`,
-      
+
       createdAt: new Date(),
       confirmedAt: new Date(),
-      
+
       canCancel: activity.cancellationPolicy.type !== 'non_refundable',
       cancelDeadline: activity.cancellationPolicy.freeCancellationUntil
-        ? new Date(new Date(date).getTime() - activity.cancellationPolicy.freeCancellationUntil * 60 * 60 * 1000)
+        ? new Date(
+            new Date(date).getTime() -
+              activity.cancellationPolicy.freeCancellationUntil * 60 * 60 * 1000
+          )
         : undefined,
     };
 
@@ -364,8 +376,9 @@ class ActivityBookingService {
   // ============================================================================
 
   async getBookings(): Promise<ActivityBooking[]> {
-    return Array.from(this.bookings.values())
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return Array.from(this.bookings.values()).sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
   }
 
   async getBooking(id: string): Promise<ActivityBooking | null> {
@@ -428,10 +441,7 @@ class ActivityBookingService {
   // Deep Links
   // ============================================================================
 
-  async openInProviderApp(
-    provider: ActivityProvider,
-    activityId: string
-  ): Promise<boolean> {
+  async openInProviderApp(provider: ActivityProvider, activityId: string): Promise<boolean> {
     let url: string;
 
     switch (provider) {
@@ -485,7 +495,7 @@ class ActivityBookingService {
 
   private notifyListeners() {
     const bookings = Array.from(this.bookings.values());
-    this.listeners.forEach(callback => callback(bookings));
+    this.listeners.forEach((callback) => callback(bookings));
   }
 
   // ============================================================================
@@ -568,7 +578,7 @@ class ActivityBookingService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // Mock results fallback
@@ -577,14 +587,15 @@ class ActivityBookingService {
 
     // Filter by category
     if (params.categories && params.categories.length > 0) {
-      activities = activities.filter(a => params.categories!.includes(a.category));
+      activities = activities.filter((a) => params.categories!.includes(a.category));
     }
 
     // Filter by price
     if (params.priceRange) {
-      activities = activities.filter(a => 
-        a.pricing.basePrice >= params.priceRange!.min &&
-        a.pricing.basePrice <= params.priceRange!.max
+      activities = activities.filter(
+        (a) =>
+          a.pricing.basePrice >= params.priceRange!.min &&
+          a.pricing.basePrice <= params.priceRange!.max
       );
     }
 
@@ -610,7 +621,7 @@ const MOCK_ACTIVITIES: Activity[] = [
     externalIds: { viator: 'v-12345' },
     provider: 'viator',
     title: 'Atlanta City Sightseeing Tour',
-    shortDescription: 'Explore Atlanta\'s most iconic landmarks on this comprehensive city tour.',
+    shortDescription: "Explore Atlanta's most iconic landmarks on this comprehensive city tour.",
     fullDescription: 'Discover the best of Atlanta on this guided sightseeing tour...',
     highlights: [
       'See the Martin Luther King Jr. National Historic Site',
@@ -626,7 +637,7 @@ const MOCK_ACTIVITIES: Activity[] = [
       state: 'GA',
       country: 'USA',
       meetingPoint: 'Centennial Olympic Park',
-      coordinates: { lat: 33.7603, lng: -84.3930 },
+      coordinates: { lat: 33.7603, lng: -84.393 },
     },
     images: ['https://example.com/atlanta-tour.jpg'],
     thumbnailUrl: 'https://example.com/atlanta-tour-thumb.jpg',
@@ -664,7 +675,8 @@ const MOCK_ACTIVITIES: Activity[] = [
     externalIds: { getyourguide: 'gyg-67890' },
     provider: 'getyourguide',
     title: 'Couples Cooking Class: Southern Cuisine',
-    shortDescription: 'Learn to cook authentic Southern dishes together in this hands-on cooking class.',
+    shortDescription:
+      'Learn to cook authentic Southern dishes together in this hands-on cooking class.',
     category: 'classes',
     subcategories: ['cooking', 'food_experience'],
     tags: ['romantic', 'couples', 'hands-on'],
@@ -735,7 +747,12 @@ const MOCK_ACTIVITIES: Activity[] = [
       unit: 'hours',
       displayText: '6 hours',
     },
-    included: ['Round-trip transportation', 'Visits to 3 wineries', 'All tastings', 'Cheese & charcuterie'],
+    included: [
+      'Round-trip transportation',
+      'Visits to 3 wineries',
+      'All tastings',
+      'Cheese & charcuterie',
+    ],
     notIncluded: ['Additional wine purchases'],
     cancellationPolicy: {
       type: 'free',
@@ -754,7 +771,7 @@ const MOCK_ACTIVITIES: Activity[] = [
     externalIds: { airbnb: 'abx-11111' },
     provider: 'airbnb_experiences',
     title: 'Street Art Walking Tour in Little Five Points',
-    shortDescription: 'Discover Atlanta\'s vibrant street art scene with a local artist guide.',
+    shortDescription: "Discover Atlanta's vibrant street art scene with a local artist guide.",
     category: 'arts_culture',
     subcategories: ['street_art', 'walking_tour'],
     tags: ['local', 'art', 'neighborhood'],
@@ -796,7 +813,7 @@ const MOCK_ACTIVITIES: Activity[] = [
     externalIds: { getyourguide: 'gyg-33333' },
     provider: 'getyourguide',
     title: 'Georgia Aquarium VIP Experience',
-    shortDescription: 'Skip the lines and go behind the scenes at the world\'s largest aquarium.',
+    shortDescription: "Skip the lines and go behind the scenes at the world's largest aquarium.",
     category: 'attractions',
     subcategories: ['aquarium', 'vip'],
     tags: ['skip-the-line', 'family-friendly', 'vip'],
@@ -857,7 +874,7 @@ const MOCK_ACTIVITIES: Activity[] = [
       state: 'GA',
       country: 'USA',
       meetingPoint: 'PDK Airport',
-      coordinates: { lat: 33.8756, lng: -84.3020 },
+      coordinates: { lat: 33.8756, lng: -84.302 },
     },
     images: ['https://example.com/helicopter.jpg'],
     thumbnailUrl: 'https://example.com/helicopter-thumb.jpg',
@@ -916,7 +933,13 @@ const MOCK_ACTIVITIES: Activity[] = [
       unit: 'hours',
       displayText: '2 hours',
     },
-    included: ['All materials', 'Expert instruction', 'Wine & snacks', 'Glazing & firing', 'Shipping of finished pieces'],
+    included: [
+      'All materials',
+      'Expert instruction',
+      'Wine & snacks',
+      'Glazing & firing',
+      'Shipping of finished pieces',
+    ],
     cancellationPolicy: {
       type: 'free',
       freeCancellationUntil: 24,

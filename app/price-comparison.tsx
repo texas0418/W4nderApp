@@ -105,12 +105,48 @@ interface HotelResult {
 type SearchResult = FlightResult | HotelResult;
 
 const mockProviders: Provider[] = [
-  { id: '1', name: 'Skyscanner', logo: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=100', rating: 4.5, reviewCount: 12500 },
-  { id: '2', name: 'Kayak', logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100', rating: 4.3, reviewCount: 8900 },
-  { id: '3', name: 'Expedia', logo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100', rating: 4.4, reviewCount: 15600 },
-  { id: '4', name: 'Booking.com', logo: 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=100', rating: 4.6, reviewCount: 25000 },
-  { id: '5', name: 'Hotels.com', logo: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100', rating: 4.2, reviewCount: 9800 },
-  { id: '6', name: 'Priceline', logo: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=100', rating: 4.1, reviewCount: 7500 },
+  {
+    id: '1',
+    name: 'Skyscanner',
+    logo: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=100',
+    rating: 4.5,
+    reviewCount: 12500,
+  },
+  {
+    id: '2',
+    name: 'Kayak',
+    logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100',
+    rating: 4.3,
+    reviewCount: 8900,
+  },
+  {
+    id: '3',
+    name: 'Expedia',
+    logo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100',
+    rating: 4.4,
+    reviewCount: 15600,
+  },
+  {
+    id: '4',
+    name: 'Booking.com',
+    logo: 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=100',
+    rating: 4.6,
+    reviewCount: 25000,
+  },
+  {
+    id: '5',
+    name: 'Hotels.com',
+    logo: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100',
+    rating: 4.2,
+    reviewCount: 9800,
+  },
+  {
+    id: '6',
+    name: 'Priceline',
+    logo: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=100',
+    rating: 4.1,
+    reviewCount: 7500,
+  },
 ];
 
 const mockFlightResults: FlightResult[] = [
@@ -333,7 +369,6 @@ export default function PriceComparisonScreen() {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('price_low');
-  
 
   const [maxPrice, setMaxPrice] = useState(2000);
   const [stopsFilter, setStopsFilter] = useState<number | null>(null);
@@ -360,18 +395,24 @@ export default function PriceComparisonScreen() {
 
   const handleSearch = () => {
     setShowSearchModal(false);
-    console.log('Searching for:', { searchType, origin, destination, departureDate, returnDate, travelers, rooms });
+    console.log('Searching for:', {
+      searchType,
+      origin,
+      destination,
+      departureDate,
+      returnDate,
+      travelers,
+      rooms,
+    });
   };
 
   const handleSaveResult = (id: string, type: 'flight' | 'hotel') => {
     if (type === 'flight') {
-      setFlightResults(prev =>
-        prev.map(r => r.id === id ? { ...r, isSaved: !r.isSaved } : r)
+      setFlightResults((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, isSaved: !r.isSaved } : r))
       );
     } else {
-      setHotelResults(prev =>
-        prev.map(r => r.id === id ? { ...r, isSaved: !r.isSaved } : r)
-      );
+      setHotelResults((prev) => prev.map((r) => (r.id === id ? { ...r, isSaved: !r.isSaved } : r)));
     }
     console.log('Toggled save for:', id);
   };
@@ -394,7 +435,7 @@ export default function PriceComparisonScreen() {
   };
 
   const filterFlights = (flights: FlightResult[]): FlightResult[] => {
-    return flights.filter(f => {
+    return flights.filter((f) => {
       if (f.price > maxPrice) return false;
       if (stopsFilter !== null && f.stops !== stopsFilter) return false;
       return true;
@@ -402,7 +443,7 @@ export default function PriceComparisonScreen() {
   };
 
   const filterHotels = (hotels: HotelResult[]): HotelResult[] => {
-    return hotels.filter(h => {
+    return hotels.filter((h) => {
       if (h.price > maxPrice) return false;
       if (starsFilter !== null && h.stars !== starsFilter) return false;
       if (freeCancellationOnly && !h.freeCancellation) return false;
@@ -412,12 +453,12 @@ export default function PriceComparisonScreen() {
 
   const getLowestPrice = (results: SearchResult[]): number => {
     if (results.length === 0) return 0;
-    return Math.min(...results.map(r => r.price));
+    return Math.min(...results.map((r) => r.price));
   };
 
   const getHighestPrice = (results: SearchResult[]): number => {
     if (results.length === 0) return 0;
-    return Math.max(...results.map(r => r.price));
+    return Math.max(...results.map((r) => r.price));
   };
 
   const getSavingsAmount = (results: SearchResult[]): number => {
@@ -433,7 +474,7 @@ export default function PriceComparisonScreen() {
   const displayedHotels = sortResults(filterHotels(hotelResults));
 
   const renderFlightCard = (flight: FlightResult) => {
-    const discount = flight.originalPrice 
+    const discount = flight.originalPrice
       ? Math.round(((flight.originalPrice - flight.price) / flight.originalPrice) * 100)
       : 0;
 
@@ -487,10 +528,12 @@ export default function PriceComparisonScreen() {
             </View>
             <View style={styles.flightPoint}>
               <Text style={styles.flightTime}>{flight.arrivalTime}</Text>
-              <Text style={styles.flightCode}>{flight.destination.split('(')[1]?.replace(')', '')}</Text>
+              <Text style={styles.flightCode}>
+                {flight.destination.split('(')[1]?.replace(')', '')}
+              </Text>
             </View>
           </View>
-          
+
           <View style={styles.flightMeta}>
             <View style={styles.metaItem}>
               <Clock size={12} color={colors.textTertiary} />
@@ -506,7 +549,9 @@ export default function PriceComparisonScreen() {
                 {feature === 'WiFi' && <Wifi size={10} color={colors.textSecondary} />}
                 {feature === 'Meals' && <Coffee size={10} color={colors.textSecondary} />}
                 {feature === 'Entertainment' && <Zap size={10} color={colors.textSecondary} />}
-                {feature === 'Extra Legroom' && <Briefcase size={10} color={colors.textSecondary} />}
+                {feature === 'Extra Legroom' && (
+                  <Briefcase size={10} color={colors.textSecondary} />
+                )}
                 <Text style={styles.featureTagText}>{feature}</Text>
               </View>
             ))}
@@ -529,7 +574,7 @@ export default function PriceComparisonScreen() {
             <Text style={styles.priceNote}>per person, round trip</Text>
           </View>
           <View style={styles.cardActions}>
-            <Pressable 
+            <Pressable
               style={styles.saveButton}
               onPress={() => handleSaveResult(flight.id, 'flight')}
             >
@@ -550,7 +595,7 @@ export default function PriceComparisonScreen() {
   };
 
   const renderHotelCard = (hotel: HotelResult) => {
-    const discount = hotel.originalPrice 
+    const discount = hotel.originalPrice
       ? Math.round(((hotel.originalPrice - hotel.price) / hotel.originalPrice) * 100)
       : 0;
 
@@ -575,7 +620,7 @@ export default function PriceComparisonScreen() {
               </View>
             )}
           </View>
-          <Pressable 
+          <Pressable
             style={styles.hotelSaveButton}
             onPress={() => handleSaveResult(hotel.id, 'hotel')}
           >
@@ -604,7 +649,7 @@ export default function PriceComparisonScreen() {
           </View>
 
           <Text style={styles.hotelName}>{hotel.name}</Text>
-          
+
           <View style={styles.hotelLocation}>
             <MapPin size={12} color={colors.textTertiary} />
             <Text style={styles.hotelLocationText}>{hotel.location}</Text>
@@ -622,13 +667,17 @@ export default function PriceComparisonScreen() {
             {hotel.freeCancellation && (
               <View style={[styles.hotelTag, styles.hotelTagGreen]}>
                 <CheckCircle size={10} color={colors.success} />
-                <Text style={[styles.hotelTagText, { color: colors.success }]}>Free cancellation</Text>
+                <Text style={[styles.hotelTagText, { color: colors.success }]}>
+                  Free cancellation
+                </Text>
               </View>
             )}
             {hotel.breakfastIncluded && (
               <View style={[styles.hotelTag, styles.hotelTagBlue]}>
                 <Coffee size={10} color={colors.primary} />
-                <Text style={[styles.hotelTagText, { color: colors.primary }]}>Breakfast included</Text>
+                <Text style={[styles.hotelTagText, { color: colors.primary }]}>
+                  Breakfast included
+                </Text>
               </View>
             )}
           </View>
@@ -646,7 +695,9 @@ export default function PriceComparisonScreen() {
                   <Text style={styles.discountText}>{discount}% off</Text>
                 </View>
               )}
-              <Text style={styles.priceNote}>${hotel.pricePerNight}/night • {hotel.nights} nights</Text>
+              <Text style={styles.priceNote}>
+                ${hotel.pricePerNight}/night • {hotel.nights} nights
+              </Text>
             </View>
             <Pressable style={styles.viewButton}>
               <Text style={styles.viewButtonText}>Book Now</Text>
@@ -661,12 +712,12 @@ export default function PriceComparisonScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <LinearGradient
         colors={[colors.primary, colors.primaryLight]}
         style={styles.headerGradient}
       />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
@@ -674,42 +725,41 @@ export default function PriceComparisonScreen() {
               <ArrowLeft size={24} color={colors.textLight} />
             </Pressable>
             <Text style={styles.headerTitle}>Price Comparison</Text>
-            <Pressable 
-              style={styles.filterButton}
-              onPress={() => setShowFilterModal(true)}
-            >
+            <Pressable style={styles.filterButton} onPress={() => setShowFilterModal(true)}>
               <SlidersHorizontal size={22} color={colors.textLight} />
             </Pressable>
           </View>
 
           <View style={styles.tabContainer}>
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.tabIndicator,
                 {
-                  transform: [{
-                    translateX: tabAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, (width - 48) / 2],
-                    }),
-                  }],
+                  transform: [
+                    {
+                      translateX: tabAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, (width - 48) / 2],
+                      }),
+                    },
+                  ],
                 },
               ]}
             />
-            <Pressable
-              style={styles.tab}
-              onPress={() => setSearchType('flights')}
-            >
-              <Plane size={18} color={searchType === 'flights' ? colors.primary : colors.textLight} />
+            <Pressable style={styles.tab} onPress={() => setSearchType('flights')}>
+              <Plane
+                size={18}
+                color={searchType === 'flights' ? colors.primary : colors.textLight}
+              />
               <Text style={[styles.tabText, searchType === 'flights' && styles.tabTextActive]}>
                 Flights
               </Text>
             </Pressable>
-            <Pressable
-              style={styles.tab}
-              onPress={() => setSearchType('hotels')}
-            >
-              <Building2 size={18} color={searchType === 'hotels' ? colors.primary : colors.textLight} />
+            <Pressable style={styles.tab} onPress={() => setSearchType('hotels')}>
+              <Building2
+                size={18}
+                color={searchType === 'hotels' ? colors.primary : colors.textLight}
+              />
               <Text style={[styles.tabText, searchType === 'hotels' && styles.tabTextActive]}>
                 Hotels
               </Text>
@@ -724,7 +774,9 @@ export default function PriceComparisonScreen() {
                 <Text style={styles.searchCity}>{destination.split(',')[0]}</Text>
               </View>
               <View style={styles.searchMeta}>
-                <Text style={styles.searchMetaText}>{departureDate} - {returnDate}</Text>
+                <Text style={styles.searchMetaText}>
+                  {departureDate} - {returnDate}
+                </Text>
                 <Text style={styles.searchMetaDot}>•</Text>
                 <Text style={styles.searchMetaText}>
                   {travelers} {travelers === 1 ? 'traveler' : 'travelers'}
@@ -740,19 +792,24 @@ export default function PriceComparisonScreen() {
           <View style={styles.resultsHeader}>
             <View style={styles.resultsCount}>
               <Text style={styles.resultsCountText}>
-                {searchType === 'flights' ? displayedFlights.length : displayedHotels.length} results
+                {searchType === 'flights' ? displayedFlights.length : displayedHotels.length}{' '}
+                results
               </Text>
               <Text style={styles.resultsRange}>
-                ${getLowestPrice(searchType === 'flights' ? displayedFlights : displayedHotels)} - 
-                ${getHighestPrice(searchType === 'flights' ? displayedFlights : displayedHotels)}
+                ${getLowestPrice(searchType === 'flights' ? displayedFlights : displayedHotels)} - $
+                {getHighestPrice(searchType === 'flights' ? displayedFlights : displayedHotels)}
               </Text>
             </View>
             <Pressable style={styles.sortButton}>
               <ArrowUpDown size={14} color={colors.primary} />
               <Text style={styles.sortButtonText}>
-                {sortBy === 'price_low' ? 'Price: Low to High' : 
-                 sortBy === 'price_high' ? 'Price: High to Low' :
-                 sortBy === 'rating' ? 'Rating' : 'Sort'}
+                {sortBy === 'price_low'
+                  ? 'Price: Low to High'
+                  : sortBy === 'price_high'
+                    ? 'Price: High to Low'
+                    : sortBy === 'rating'
+                      ? 'Rating'
+                      : 'Sort'}
               </Text>
             </Pressable>
           </View>
@@ -761,7 +818,9 @@ export default function PriceComparisonScreen() {
             <View style={styles.savingsBanner}>
               <TrendingDown size={16} color={colors.success} />
               <Text style={styles.savingsBannerText}>
-                Save up to ${getSavingsAmount(searchType === 'flights' ? displayedFlights : displayedHotels)} with current deals
+                Save up to $
+                {getSavingsAmount(searchType === 'flights' ? displayedFlights : displayedHotels)}{' '}
+                with current deals
               </Text>
             </View>
           )}
@@ -769,9 +828,7 @@ export default function PriceComparisonScreen() {
           <ScrollView
             style={styles.scrollView}
             showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             contentContainerStyle={styles.scrollContent}
           >
             {searchType === 'flights' ? (
@@ -781,19 +838,19 @@ export default function PriceComparisonScreen() {
                 <View style={styles.emptyState}>
                   <Plane size={48} color={colors.textTertiary} />
                   <Text style={styles.emptyTitle}>No flights found</Text>
-                  <Text style={styles.emptyText}>Try adjusting your filters or search criteria</Text>
+                  <Text style={styles.emptyText}>
+                    Try adjusting your filters or search criteria
+                  </Text>
                 </View>
               )
+            ) : displayedHotels.length > 0 ? (
+              displayedHotels.map(renderHotelCard)
             ) : (
-              displayedHotels.length > 0 ? (
-                displayedHotels.map(renderHotelCard)
-              ) : (
-                <View style={styles.emptyState}>
-                  <Building2 size={48} color={colors.textTertiary} />
-                  <Text style={styles.emptyTitle}>No hotels found</Text>
-                  <Text style={styles.emptyText}>Try adjusting your filters or search criteria</Text>
-                </View>
-              )
+              <View style={styles.emptyState}>
+                <Building2 size={48} color={colors.textTertiary} />
+                <Text style={styles.emptyTitle}>No hotels found</Text>
+                <Text style={styles.emptyText}>Try adjusting your filters or search criteria</Text>
+              </View>
             )}
           </ScrollView>
         </View>
@@ -808,7 +865,9 @@ export default function PriceComparisonScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Search {searchType === 'flights' ? 'Flights' : 'Hotels'}</Text>
+              <Text style={styles.modalTitle}>
+                Search {searchType === 'flights' ? 'Flights' : 'Hotels'}
+              </Text>
               <Pressable onPress={() => setShowSearchModal(false)}>
                 <X size={24} color={colors.text} />
               </Pressable>
@@ -831,7 +890,9 @@ export default function PriceComparisonScreen() {
             )}
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{searchType === 'flights' ? 'To' : 'Destination'}</Text>
+              <Text style={styles.inputLabel}>
+                {searchType === 'flights' ? 'To' : 'Destination'}
+              </Text>
               <View style={styles.inputBox}>
                 <MapPin size={18} color={colors.textTertiary} />
                 <TextInput
@@ -879,14 +940,14 @@ export default function PriceComparisonScreen() {
                 <View style={styles.inputBox}>
                   <Users size={18} color={colors.textTertiary} />
                   <View style={styles.counterContainer}>
-                    <Pressable 
+                    <Pressable
                       style={styles.counterButton}
                       onPress={() => setTravelers(Math.max(1, travelers - 1))}
                     >
                       <Text style={styles.counterButtonText}>-</Text>
                     </Pressable>
                     <Text style={styles.counterValue}>{travelers}</Text>
-                    <Pressable 
+                    <Pressable
                       style={styles.counterButton}
                       onPress={() => setTravelers(travelers + 1)}
                     >
@@ -901,17 +962,14 @@ export default function PriceComparisonScreen() {
                   <View style={styles.inputBox}>
                     <Building2 size={18} color={colors.textTertiary} />
                     <View style={styles.counterContainer}>
-                      <Pressable 
+                      <Pressable
                         style={styles.counterButton}
                         onPress={() => setRooms(Math.max(1, rooms - 1))}
                       >
                         <Text style={styles.counterButtonText}>-</Text>
                       </Pressable>
                       <Text style={styles.counterValue}>{rooms}</Text>
-                      <Pressable 
-                        style={styles.counterButton}
-                        onPress={() => setRooms(rooms + 1)}
-                      >
+                      <Pressable style={styles.counterButton} onPress={() => setRooms(rooms + 1)}>
                         <Text style={styles.counterButtonText}>+</Text>
                       </Pressable>
                     </View>
@@ -946,15 +1004,23 @@ export default function PriceComparisonScreen() {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Sort by</Text>
               <View style={styles.sortOptions}>
-                {(['price_low', 'price_high', 'rating'] as SortOption[]).map(option => (
+                {(['price_low', 'price_high', 'rating'] as SortOption[]).map((option) => (
                   <Pressable
                     key={option}
                     style={[styles.sortOption, sortBy === option && styles.sortOptionActive]}
                     onPress={() => setSortBy(option)}
                   >
-                    <Text style={[styles.sortOptionText, sortBy === option && styles.sortOptionTextActive]}>
-                      {option === 'price_low' ? 'Price: Low' : 
-                       option === 'price_high' ? 'Price: High' : 'Rating'}
+                    <Text
+                      style={[
+                        styles.sortOptionText,
+                        sortBy === option && styles.sortOptionTextActive,
+                      ]}
+                    >
+                      {option === 'price_low'
+                        ? 'Price: Low'
+                        : option === 'price_high'
+                          ? 'Price: High'
+                          : 'Rating'}
                     </Text>
                   </Pressable>
                 ))}
@@ -964,13 +1030,18 @@ export default function PriceComparisonScreen() {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Max Price: ${maxPrice}</Text>
               <View style={styles.priceSlider}>
-                {[500, 1000, 1500, 2000, 3000].map(price => (
+                {[500, 1000, 1500, 2000, 3000].map((price) => (
                   <Pressable
                     key={price}
                     style={[styles.priceOption, maxPrice === price && styles.priceOptionActive]}
                     onPress={() => setMaxPrice(price)}
                   >
-                    <Text style={[styles.priceOptionText, maxPrice === price && styles.priceOptionTextActive]}>
+                    <Text
+                      style={[
+                        styles.priceOptionText,
+                        maxPrice === price && styles.priceOptionTextActive,
+                      ]}
+                    >
                       ${price}
                     </Text>
                   </Pressable>
@@ -982,13 +1053,25 @@ export default function PriceComparisonScreen() {
               <View style={styles.filterSection}>
                 <Text style={styles.filterSectionTitle}>Stops</Text>
                 <View style={styles.filterOptions}>
-                  {[{ label: 'Any', value: null }, { label: 'Direct', value: 0 }, { label: '1 Stop', value: 1 }].map(option => (
+                  {[
+                    { label: 'Any', value: null },
+                    { label: 'Direct', value: 0 },
+                    { label: '1 Stop', value: 1 },
+                  ].map((option) => (
                     <Pressable
                       key={option.label}
-                      style={[styles.filterOption, stopsFilter === option.value && styles.filterOptionActive]}
+                      style={[
+                        styles.filterOption,
+                        stopsFilter === option.value && styles.filterOptionActive,
+                      ]}
                       onPress={() => setStopsFilter(option.value)}
                     >
-                      <Text style={[styles.filterOptionText, stopsFilter === option.value && styles.filterOptionTextActive]}>
+                      <Text
+                        style={[
+                          styles.filterOptionText,
+                          stopsFilter === option.value && styles.filterOptionTextActive,
+                        ]}
+                      >
                         {option.label}
                       </Text>
                     </Pressable>
@@ -1002,13 +1085,26 @@ export default function PriceComparisonScreen() {
                 <View style={styles.filterSection}>
                   <Text style={styles.filterSectionTitle}>Hotel Stars</Text>
                   <View style={styles.filterOptions}>
-                    {[{ label: 'Any', value: null }, { label: '3★', value: 3 }, { label: '4★', value: 4 }, { label: '5★', value: 5 }].map(option => (
+                    {[
+                      { label: 'Any', value: null },
+                      { label: '3★', value: 3 },
+                      { label: '4★', value: 4 },
+                      { label: '5★', value: 5 },
+                    ].map((option) => (
                       <Pressable
                         key={option.label}
-                        style={[styles.filterOption, starsFilter === option.value && styles.filterOptionActive]}
+                        style={[
+                          styles.filterOption,
+                          starsFilter === option.value && styles.filterOptionActive,
+                        ]}
                         onPress={() => setStarsFilter(option.value)}
                       >
-                        <Text style={[styles.filterOptionText, starsFilter === option.value && styles.filterOptionTextActive]}>
+                        <Text
+                          style={[
+                            styles.filterOptionText,
+                            starsFilter === option.value && styles.filterOptionTextActive,
+                          ]}
+                        >
                           {option.label}
                         </Text>
                       </Pressable>
@@ -1031,10 +1127,7 @@ export default function PriceComparisonScreen() {
               </>
             )}
 
-            <Pressable 
-              style={styles.applyButton}
-              onPress={() => setShowFilterModal(false)}
-            >
+            <Pressable style={styles.applyButton} onPress={() => setShowFilterModal(false)}>
               <Filter size={18} color={colors.textLight} />
               <Text style={styles.applyButtonText}>Apply Filters</Text>
             </Pressable>

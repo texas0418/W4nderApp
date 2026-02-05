@@ -75,11 +75,11 @@ export default function NotificationsScreen() {
     const now = new Date();
 
     bookings
-      .filter(b => b.status === 'confirmed')
-      .forEach(booking => {
-        const trip = trips.find(t => t.id === booking.tripId);
+      .filter((b) => b.status === 'confirmed')
+      .forEach((booking) => {
+        const trip = trips.find((t) => t.id === booking.tripId);
         const eventDate = new Date(booking.startDate);
-        
+
         if (booking.time) {
           const [hours, minutes] = booking.time.split(':').map(Number);
           eventDate.setHours(hours, minutes, 0, 0);
@@ -87,7 +87,9 @@ export default function NotificationsScreen() {
 
         if (eventDate > now) {
           const estimatedTravel = getEstimatedTravelTime(booking.type);
-          const leaveByTime = new Date(eventDate.getTime() - (leadTimeMinutes + estimatedTravel) * 60000);
+          const leaveByTime = new Date(
+            eventDate.getTime() - (leadTimeMinutes + estimatedTravel) * 60000
+          );
           const timeDiff = leaveByTime.getTime() - now.getTime();
           const isUrgent = timeDiff > 0 && timeDiff < 2 * 60 * 60 * 1000;
 
@@ -108,23 +110,24 @@ export default function NotificationsScreen() {
       });
 
     trips
-      .filter(t => t.status === 'upcoming' || t.status === 'ongoing')
-      .forEach(trip => {
-        trip.itinerary.forEach(day => {
-          day.activities.forEach(activity => {
+      .filter((t) => t.status === 'upcoming' || t.status === 'ongoing')
+      .forEach((trip) => {
+        trip.itinerary.forEach((day) => {
+          day.activities.forEach((activity) => {
             const eventDate = new Date(day.date);
             const [hours, minutes] = activity.time.split(':').map(Number);
             eventDate.setHours(hours, minutes, 0, 0);
 
             if (eventDate > now) {
               const estimatedTravel = 30;
-              const leaveByTime = new Date(eventDate.getTime() - (leadTimeMinutes + estimatedTravel) * 60000);
+              const leaveByTime = new Date(
+                eventDate.getTime() - (leadTimeMinutes + estimatedTravel) * 60000
+              );
               const timeDiff = leaveByTime.getTime() - now.getTime();
               const isUrgent = timeDiff > 0 && timeDiff < 2 * 60 * 60 * 1000;
 
-              const existingBookingAlert = alerts.find(a => 
-                a.title === activity.name && 
-                a.eventTime.getTime() === eventDate.getTime()
+              const existingBookingAlert = alerts.find(
+                (a) => a.title === activity.name && a.eventTime.getTime() === eventDate.getTime()
               );
 
               if (!existingBookingAlert) {
@@ -169,9 +172,9 @@ export default function NotificationsScreen() {
   const formatTimeUntil = (date: Date): string => {
     const now = new Date();
     const diff = date.getTime() - now.getTime();
-    
+
     if (diff < 0) return 'Now';
-    
+
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
@@ -278,19 +281,16 @@ export default function NotificationsScreen() {
         activeOpacity={0.7}
       >
         <View style={styles.departureHeader}>
-          <View style={[
-            styles.departureIconContainer,
-            alert.isUrgent && styles.urgentIconContainer,
-          ]}>
+          <View
+            style={[styles.departureIconContainer, alert.isUrgent && styles.urgentIconContainer]}
+          >
             <Icon size={20} color={alert.isUrgent ? colors.error : colors.primary} />
           </View>
           <View style={styles.departureInfo}>
             <Text style={styles.departureTitle} numberOfLines={1}>
               {alert.title}
             </Text>
-            {alert.tripName && (
-              <Text style={styles.departureTripName}>{alert.tripName}</Text>
-            )}
+            {alert.tripName && <Text style={styles.departureTripName}>{alert.tripName}</Text>}
           </View>
           {alert.isUrgent && (
             <View style={styles.urgentBadge}>
@@ -306,15 +306,10 @@ export default function NotificationsScreen() {
                 <Navigation size={14} color={colors.secondary} />
                 <Text style={styles.timeLabelText}>Leave by</Text>
               </View>
-              <Text style={[
-                styles.departureTimeValue,
-                alert.isUrgent && styles.urgentText,
-              ]}>
+              <Text style={[styles.departureTimeValue, alert.isUrgent && styles.urgentText]}>
                 {formatTime(alert.leaveByTime)}
               </Text>
-              <Text style={styles.departureDateText}>
-                {formatDate(alert.leaveByTime)}
-              </Text>
+              <Text style={styles.departureDateText}>{formatDate(alert.leaveByTime)}</Text>
             </View>
 
             <View style={styles.travelIndicator}>
@@ -327,12 +322,8 @@ export default function NotificationsScreen() {
                 <Clock size={14} color={colors.primary} />
                 <Text style={styles.timeLabelText}>Event at</Text>
               </View>
-              <Text style={styles.departureTimeValue}>
-                {formatTime(alert.eventTime)}
-              </Text>
-              <Text style={styles.departureDateText}>
-                {formatDate(alert.eventTime)}
-              </Text>
+              <Text style={styles.departureTimeValue}>{formatTime(alert.eventTime)}</Text>
+              <Text style={styles.departureDateText}>{formatDate(alert.eventTime)}</Text>
             </View>
           </View>
 
@@ -345,10 +336,7 @@ export default function NotificationsScreen() {
 
           <View style={styles.countdownRow}>
             <Timer size={16} color={alert.isUrgent ? colors.error : colors.success} />
-            <Text style={[
-              styles.countdownText,
-              alert.isUrgent && styles.urgentText,
-            ]}>
+            <Text style={[styles.countdownText, alert.isUrgent && styles.urgentText]}>
               {isPast ? 'Departure time passed' : `Leave in ${timeUntilLeave}`}
             </Text>
           </View>
@@ -365,10 +353,7 @@ export default function NotificationsScreen() {
     return (
       <TouchableOpacity
         key={notification.id}
-        style={[
-          styles.notificationCard,
-          !notification.read && styles.unreadCard,
-        ]}
+        style={[styles.notificationCard, !notification.read && styles.unreadCard]}
         activeOpacity={0.7}
         onPress={() => markNotificationRead(notification.id)}
       >
@@ -405,18 +390,15 @@ export default function NotificationsScreen() {
     return 'Just now';
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const upcomingAlerts = departureAlerts.filter(a => a.leaveByTime > new Date());
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const upcomingAlerts = departureAlerts.filter((a) => a.leaveByTime > new Date());
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notifications</Text>
         {activeTab === 'all' && unreadCount > 0 && (
-          <TouchableOpacity
-            style={styles.markAllButton}
-            onPress={markAllNotificationsRead}
-          >
+          <TouchableOpacity style={styles.markAllButton} onPress={markAllNotificationsRead}>
             <CheckCircle size={16} color={colors.primary} />
             <Text style={styles.markAllText}>Mark all read</Text>
           </TouchableOpacity>
@@ -428,7 +410,10 @@ export default function NotificationsScreen() {
           style={[styles.tab, activeTab === 'departures' && styles.activeTab]}
           onPress={() => setActiveTab('departures')}
         >
-          <Navigation size={18} color={activeTab === 'departures' ? colors.primary : colors.textTertiary} />
+          <Navigation
+            size={18}
+            color={activeTab === 'departures' ? colors.primary : colors.textTertiary}
+          />
           <Text style={[styles.tabText, activeTab === 'departures' && styles.activeTabText]}>
             Departures
           </Text>
@@ -458,9 +443,7 @@ export default function NotificationsScreen() {
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {activeTab === 'departures' ? (
           <>
@@ -473,7 +456,7 @@ export default function NotificationsScreen() {
                 Get notified this many minutes before you need to leave
               </Text>
               <View style={styles.leadTimeOptions}>
-                {[30, 60, 90, 120].map(minutes => (
+                {[30, 60, 90, 120].map((minutes) => (
                   <TouchableOpacity
                     key={minutes}
                     style={[
@@ -482,10 +465,12 @@ export default function NotificationsScreen() {
                     ]}
                     onPress={() => setLeadTimeMinutes(minutes)}
                   >
-                    <Text style={[
-                      styles.leadTimeOptionText,
-                      leadTimeMinutes === minutes && styles.leadTimeOptionTextActive,
-                    ]}>
+                    <Text
+                      style={[
+                        styles.leadTimeOptionText,
+                        leadTimeMinutes === minutes && styles.leadTimeOptionTextActive,
+                      ]}
+                    >
                       {minutes}m
                     </Text>
                   </TouchableOpacity>
@@ -496,12 +481,10 @@ export default function NotificationsScreen() {
             {upcomingAlerts.length > 0 ? (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Upcoming Departures</Text>
-                <Text style={styles.sectionSubtitle}>
-                  When to leave for your next experiences
-                </Text>
-                {upcomingAlerts.slice(0, 10).map((alert, index) => 
-                  renderDepartureAlert(alert, index)
-                )}
+                <Text style={styles.sectionSubtitle}>When to leave for your next experiences</Text>
+                {upcomingAlerts
+                  .slice(0, 10)
+                  .map((alert, index) => renderDepartureAlert(alert, index))}
               </View>
             ) : (
               <View style={styles.emptyState}>
@@ -510,7 +493,8 @@ export default function NotificationsScreen() {
                 </View>
                 <Text style={styles.emptyTitle}>No Upcoming Departures</Text>
                 <Text style={styles.emptyMessage}>
-                  When you have bookings or activities scheduled, we'll show you exactly when to leave
+                  When you have bookings or activities scheduled, we'll show you exactly when to
+                  leave
                 </Text>
               </View>
             )}
@@ -518,9 +502,7 @@ export default function NotificationsScreen() {
         ) : (
           <>
             {notifications.length > 0 ? (
-              <View style={styles.section}>
-                {notifications.map(renderNotification)}
-              </View>
+              <View style={styles.section}>{notifications.map(renderNotification)}</View>
             ) : (
               <View style={styles.emptyState}>
                 <View style={styles.emptyIconContainer}>

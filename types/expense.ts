@@ -7,38 +7,38 @@ export interface Expense {
   itineraryId?: string;
   activityId?: string;
   activityName?: string;
-  
+
   // Basic info
   description: string;
   amount: number;
   currency: string;
   category: ExpenseCategory;
-  
+
   // Multi-currency support
   originalAmount?: number;
   originalCurrency?: string;
   exchangeRate?: number;
   convertedAmount?: number; // Amount in base currency
-  
+
   // Timing
   date: string;
   createdAt: string;
   updatedAt?: string;
-  
+
   // Payment info
   paidBy: string; // participant ID
   paidByName: string;
   paymentMethod?: PaymentMethod;
-  
+
   // Split info
   splitType: SplitType;
   splitDetails?: SplitDetails;
-  
+
   // Receipt
   receiptUrl?: string;
   receiptData?: ReceiptOCRData;
   notes?: string;
-  
+
   // Tracking
   isEstimated: boolean;
   estimatedAmount?: number;
@@ -52,7 +52,7 @@ export interface ReceiptOCRData {
   imageUri: string;
   scannedAt: string;
   confidence: number; // 0-1
-  
+
   // Extracted data
   merchantName?: string;
   merchantAddress?: string;
@@ -63,10 +63,10 @@ export interface ReceiptOCRData {
   tip?: number;
   total?: number;
   currency?: string;
-  
+
   // Line items
   items?: ReceiptLineItem[];
-  
+
   // Raw text for debugging
   rawText?: string;
 }
@@ -120,7 +120,7 @@ export const SUPPORTED_CURRENCIES: Currency[] = [
 ];
 
 export function getCurrencyByCode(code: string): Currency | undefined {
-  return SUPPORTED_CURRENCIES.find(c => c.code === code);
+  return SUPPORTED_CURRENCIES.find((c) => c.code === code);
 }
 
 export function formatCurrency(amount: number, currencyCode: string): string {
@@ -129,7 +129,7 @@ export function formatCurrency(amount: number, currencyCode: string): string {
   return `${currency.symbol}${amount.toFixed(2)}`;
 }
 
-export type ExpenseCategory = 
+export type ExpenseCategory =
   | 'dining'
   | 'drinks'
   | 'entertainment'
@@ -141,10 +141,10 @@ export type ExpenseCategory =
   | 'parking'
   | 'other';
 
-export type SplitType = 
-  | 'equal'        // Split equally among all participants
-  | 'percentage'   // Custom percentage split
-  | 'exact'        // Exact amounts for each person
+export type SplitType =
+  | 'equal' // Split equally among all participants
+  | 'percentage' // Custom percentage split
+  | 'exact' // Exact amounts for each person
   | 'paid_by_one'; // One person covers entirely
 
 export interface SplitDetails {
@@ -165,7 +165,7 @@ export interface SplitParticipant {
 // Payment Types
 // ============================================================================
 
-export type PaymentMethod = 
+export type PaymentMethod =
   | 'cash'
   | 'credit_card'
   | 'debit_card'
@@ -209,22 +209,25 @@ export interface BudgetComparison {
 export interface ItineraryBudgetSummary {
   itineraryId: string;
   itineraryName: string;
-  
+
   // Totals
   totalEstimated: number;
   totalActual: number;
   totalDifference: number;
-  
+
   // By category
-  byCategory: Record<ExpenseCategory, {
-    estimated: number;
-    actual: number;
-    difference: number;
-  }>;
-  
+  byCategory: Record<
+    ExpenseCategory,
+    {
+      estimated: number;
+      actual: number;
+      difference: number;
+    }
+  >;
+
   // By activity
   byActivity: BudgetComparison[];
-  
+
   // Status
   overallStatus: 'under' | 'on_track' | 'over';
   percentageUsed: number;
@@ -274,30 +277,30 @@ export interface SavingsGoal {
   targetAmount: number;
   currentAmount: number;
   currency: string;
-  
+
   // Target date
   targetDate?: string;
-  
+
   // Linked itinerary (optional)
   linkedItineraryId?: string;
   linkedItineraryName?: string;
-  
+
   // Progress
   percentComplete: number;
   remainingAmount: number;
-  
+
   // Contributions
   contributions: SavingsContribution[];
-  
+
   // Recommendations
   suggestedWeeklyAmount?: number;
   weeksRemaining?: number;
-  
+
   // Status
   status: 'active' | 'completed' | 'paused';
   createdAt: string;
   completedAt?: string;
-  
+
   // Visual
   color?: string;
   icon?: string;
@@ -396,5 +399,8 @@ export const EXPENSE_CATEGORIES: {
 ];
 
 export function getCategoryConfig(category: ExpenseCategory) {
-  return EXPENSE_CATEGORIES.find(c => c.id === category) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+  return (
+    EXPENSE_CATEGORIES.find((c) => c.id === category) ||
+    EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1]
+  );
 }

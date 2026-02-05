@@ -39,12 +39,7 @@ import {
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
-import {
-  DailyForecast,
-  WeatherCondition,
-  WeatherActivity,
-  WeatherAlertItem,
-} from '@/types';
+import { DailyForecast, WeatherCondition, WeatherActivity, WeatherAlertItem } from '@/types';
 
 const { width } = Dimensions.get('window');
 
@@ -217,7 +212,16 @@ const mockActivities: WeatherActivity[] = [
     category: 'cultural',
     image: 'https://images.unsplash.com/photo-1566054757965-8c4085344c96?w=800',
     duration: '2-3 hours',
-    suitableWeather: ['sunny', 'partly_cloudy', 'cloudy', 'rainy', 'stormy', 'snowy', 'windy', 'foggy'],
+    suitableWeather: [
+      'sunny',
+      'partly_cloudy',
+      'cloudy',
+      'rainy',
+      'stormy',
+      'snowy',
+      'windy',
+      'foggy',
+    ],
     unsuitableWeather: [],
     price: 20,
     currency: 'USD',
@@ -232,7 +236,16 @@ const mockActivities: WeatherActivity[] = [
     category: 'relaxation',
     image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800',
     duration: '3-4 hours',
-    suitableWeather: ['sunny', 'partly_cloudy', 'cloudy', 'rainy', 'stormy', 'snowy', 'windy', 'foggy'],
+    suitableWeather: [
+      'sunny',
+      'partly_cloudy',
+      'cloudy',
+      'rainy',
+      'stormy',
+      'snowy',
+      'windy',
+      'foggy',
+    ],
     unsuitableWeather: [],
     price: 120,
     currency: 'USD',
@@ -247,7 +260,16 @@ const mockActivities: WeatherActivity[] = [
     category: 'indoor',
     image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800',
     duration: '3 hours',
-    suitableWeather: ['sunny', 'partly_cloudy', 'cloudy', 'rainy', 'stormy', 'snowy', 'windy', 'foggy'],
+    suitableWeather: [
+      'sunny',
+      'partly_cloudy',
+      'cloudy',
+      'rainy',
+      'stormy',
+      'snowy',
+      'windy',
+      'foggy',
+    ],
     unsuitableWeather: [],
     price: 85,
     currency: 'USD',
@@ -278,7 +300,16 @@ const mockActivities: WeatherActivity[] = [
     category: 'adventure',
     image: 'https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800',
     duration: '2 hours',
-    suitableWeather: ['sunny', 'partly_cloudy', 'cloudy', 'rainy', 'stormy', 'snowy', 'windy', 'foggy'],
+    suitableWeather: [
+      'sunny',
+      'partly_cloudy',
+      'cloudy',
+      'rainy',
+      'stormy',
+      'snowy',
+      'windy',
+      'foggy',
+    ],
     unsuitableWeather: [],
     price: 40,
     currency: 'USD',
@@ -309,7 +340,8 @@ const mockAlerts: WeatherAlertItem[] = [
     type: 'storm',
     severity: 'high',
     title: 'Thunderstorm Warning',
-    message: 'Severe thunderstorms expected on Tuesday. Avoid outdoor activities and stay in safe locations.',
+    message:
+      'Severe thunderstorms expected on Tuesday. Avoid outdoor activities and stay in safe locations.',
     date: '2025-01-28',
     affectedActivities: ['Beach Day', 'Mountain Hiking', 'Sunset Sailing'],
   },
@@ -324,7 +356,11 @@ const mockAlerts: WeatherAlertItem[] = [
   },
 ];
 
-const getWeatherIcon = (type: WeatherCondition['type'], size: number = 24, color: string = colors.text) => {
+const getWeatherIcon = (
+  type: WeatherCondition['type'],
+  size: number = 24,
+  color: string = colors.text
+) => {
   switch (type) {
     case 'sunny':
       return <Sun size={size} color={color} />;
@@ -390,7 +426,7 @@ export default function WeatherItineraryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showAlternatives, setShowAlternatives] = useState(false);
 
-  const currentTrip = trips.find(t => t.status === 'upcoming' || t.status === 'planning');
+  const currentTrip = trips.find((t) => t.status === 'upcoming' || t.status === 'planning');
   const destination = currentTrip?.destination.name || 'Barcelona, Spain';
 
   const onRefresh = useCallback(() => {
@@ -401,10 +437,10 @@ export default function WeatherItineraryScreen() {
   const selectedForecast = mockForecasts[selectedDay];
 
   const getSuggestedActivities = useCallback((forecast: DailyForecast): WeatherActivity[] => {
-    return mockActivities.filter(activity => {
+    return mockActivities.filter((activity) => {
       const weatherSuitable = activity.suitableWeather.includes(forecast.condition.type);
       const notUnsuitable = !activity.unsuitableWeather.includes(forecast.condition.type);
-      const tempSuitable = 
+      const tempSuitable =
         (!activity.minTemp || forecast.condition.temperature >= activity.minTemp) &&
         (!activity.maxTemp || forecast.condition.temperature <= activity.maxTemp);
       return weatherSuitable && notUnsuitable && tempSuitable;
@@ -412,17 +448,23 @@ export default function WeatherItineraryScreen() {
   }, []);
 
   const getAlternativeActivities = useCallback((forecast: DailyForecast): WeatherActivity[] => {
-    return mockActivities.filter(activity => {
+    return mockActivities.filter((activity) => {
       const isIndoor = ['indoor', 'cultural', 'relaxation'].includes(activity.category);
       return isIndoor && activity.unsuitableWeather.length === 0;
     });
   }, []);
 
-  const suggestedActivities = useMemo(() => getSuggestedActivities(selectedForecast), [selectedForecast, getSuggestedActivities]);
-  const alternativeActivities = useMemo(() => getAlternativeActivities(selectedForecast), [selectedForecast, getAlternativeActivities]);
+  const suggestedActivities = useMemo(
+    () => getSuggestedActivities(selectedForecast),
+    [selectedForecast, getSuggestedActivities]
+  );
+  const alternativeActivities = useMemo(
+    () => getAlternativeActivities(selectedForecast),
+    [selectedForecast, getAlternativeActivities]
+  );
 
-  const dayAlerts = useMemo(() => 
-    mockAlerts.filter(alert => alert.date === selectedForecast.date),
+  const dayAlerts = useMemo(
+    () => mockAlerts.filter((alert) => alert.date === selectedForecast.date),
     [selectedForecast.date]
   );
 
@@ -447,9 +489,7 @@ export default function WeatherItineraryScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <LinearGradient
           colors={getWeatherGradient(selectedForecast.condition.type)}
@@ -466,7 +506,9 @@ export default function WeatherItineraryScreen() {
                 {getWeatherIcon(selectedForecast.condition.type, 64, colors.textLight)}
               </View>
               <Text style={styles.temperature}>{selectedForecast.condition.temperature}°</Text>
-              <Text style={styles.weatherDescription}>{selectedForecast.condition.description}</Text>
+              <Text style={styles.weatherDescription}>
+                {selectedForecast.condition.description}
+              </Text>
               <View style={styles.highLow}>
                 <Text style={styles.highLowText}>H: {selectedForecast.high}°</Text>
                 <Text style={styles.highLowDivider}>|</Text>
@@ -478,22 +520,30 @@ export default function WeatherItineraryScreen() {
               <View style={styles.weatherDetail}>
                 <Thermometer size={18} color={colors.textLight} />
                 <Text style={styles.weatherDetailLabel}>Feels like</Text>
-                <Text style={styles.weatherDetailValue}>{selectedForecast.condition.feelsLike}°</Text>
+                <Text style={styles.weatherDetailValue}>
+                  {selectedForecast.condition.feelsLike}°
+                </Text>
               </View>
               <View style={styles.weatherDetail}>
                 <Droplets size={18} color={colors.textLight} />
                 <Text style={styles.weatherDetailLabel}>Humidity</Text>
-                <Text style={styles.weatherDetailValue}>{selectedForecast.condition.humidity}%</Text>
+                <Text style={styles.weatherDetailValue}>
+                  {selectedForecast.condition.humidity}%
+                </Text>
               </View>
               <View style={styles.weatherDetail}>
                 <Wind size={18} color={colors.textLight} />
                 <Text style={styles.weatherDetailLabel}>Wind</Text>
-                <Text style={styles.weatherDetailValue}>{selectedForecast.condition.windSpeed} km/h</Text>
+                <Text style={styles.weatherDetailValue}>
+                  {selectedForecast.condition.windSpeed} km/h
+                </Text>
               </View>
               <View style={styles.weatherDetail}>
                 <Umbrella size={18} color={colors.textLight} />
                 <Text style={styles.weatherDetailLabel}>Rain</Text>
-                <Text style={styles.weatherDetailValue}>{selectedForecast.condition.precipitation}%</Text>
+                <Text style={styles.weatherDetailValue}>
+                  {selectedForecast.condition.precipitation}%
+                </Text>
               </View>
             </View>
 
@@ -519,22 +569,13 @@ export default function WeatherItineraryScreen() {
             {mockForecasts.map((forecast, index) => (
               <Pressable
                 key={forecast.date}
-                style={[
-                  styles.dayCard,
-                  selectedDay === index && styles.dayCardSelected,
-                ]}
+                style={[styles.dayCard, selectedDay === index && styles.dayCardSelected]}
                 onPress={() => setSelectedDay(index)}
               >
-                <Text style={[
-                  styles.dayName,
-                  selectedDay === index && styles.dayNameSelected,
-                ]}>
+                <Text style={[styles.dayName, selectedDay === index && styles.dayNameSelected]}>
                   {forecast.dayName.slice(0, 3)}
                 </Text>
-                <Text style={[
-                  styles.dayDate,
-                  selectedDay === index && styles.dayDateSelected,
-                ]}>
+                <Text style={[styles.dayDate, selectedDay === index && styles.dayDateSelected]}>
                   {formatDate(forecast.date)}
                 </Text>
                 <View style={styles.dayWeatherIcon}>
@@ -544,10 +585,7 @@ export default function WeatherItineraryScreen() {
                     selectedDay === index ? colors.primary : colors.textSecondary
                   )}
                 </View>
-                <Text style={[
-                  styles.dayTemp,
-                  selectedDay === index && styles.dayTempSelected,
-                ]}>
+                <Text style={[styles.dayTemp, selectedDay === index && styles.dayTempSelected]}>
                   {forecast.high}°/{forecast.low}°
                 </Text>
               </Pressable>
@@ -579,7 +617,7 @@ export default function WeatherItineraryScreen() {
 
           {dayAlerts.length > 0 && (
             <View style={styles.alertsSection}>
-              {dayAlerts.map(alert => (
+              {dayAlerts.map((alert) => (
                 <View
                   key={alert.id}
                   style={[styles.alertCard, { borderLeftColor: getAlertColor(alert.severity) }]}
@@ -594,9 +632,7 @@ export default function WeatherItineraryScreen() {
                   {alert.affectedActivities.length > 0 && (
                     <View style={styles.affectedActivities}>
                       <Text style={styles.affectedLabel}>Affected activities:</Text>
-                      <Text style={styles.affectedList}>
-                        {alert.affectedActivities.join(', ')}
-                      </Text>
+                      <Text style={styles.affectedList}>{alert.affectedActivities.join(', ')}</Text>
                     </View>
                   )}
                 </View>
@@ -611,8 +647,8 @@ export default function WeatherItineraryScreen() {
                   {isGoodWeather ? 'Perfect Day For' : 'Recommended Activities'}
                 </Text>
                 <Text style={styles.sectionSubtitle}>
-                  {isGoodWeather 
-                    ? 'Great weather for outdoor adventures!' 
+                  {isGoodWeather
+                    ? 'Great weather for outdoor adventures!'
                     : 'Weather-adjusted suggestions for you'}
                 </Text>
               </View>
@@ -629,7 +665,7 @@ export default function WeatherItineraryScreen() {
               )}
             </View>
 
-            {(showAlternatives ? alternativeActivities : suggestedActivities).map(activity => (
+            {(showAlternatives ? alternativeActivities : suggestedActivities).map((activity) => (
               <Pressable
                 key={activity.id}
                 style={styles.activityCard}
@@ -642,14 +678,18 @@ export default function WeatherItineraryScreen() {
                 />
                 <View style={styles.activityContent}>
                   <View style={styles.activityTop}>
-                    <View style={[
-                      styles.activityCategory,
-                      { backgroundColor: getCategoryColor(activity.category) + '20' }
-                    ]}>
-                      <Text style={[
-                        styles.activityCategoryText,
-                        { color: getCategoryColor(activity.category) }
-                      ]}>
+                    <View
+                      style={[
+                        styles.activityCategory,
+                        { backgroundColor: getCategoryColor(activity.category) + '20' },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.activityCategoryText,
+                          { color: getCategoryColor(activity.category) },
+                        ]}
+                      >
                         {activity.category.replace('_', ' ')}
                       </Text>
                     </View>
@@ -754,7 +794,10 @@ const getWeatherTips = (weatherType: WeatherCondition['type']) => {
       return [
         { icon: <Umbrella size={20} color={colors.primary} />, text: 'Bring an umbrella' },
         { icon: <CloudRain size={20} color={colors.accentDark} />, text: 'Wear waterproof shoes' },
-        { icon: <AlertTriangle size={20} color={colors.warning} />, text: 'Check for flash flood warnings' },
+        {
+          icon: <AlertTriangle size={20} color={colors.warning} />,
+          text: 'Check for flash flood warnings',
+        },
       ];
     case 'snowy':
       return [
@@ -770,8 +813,14 @@ const getWeatherTips = (weatherType: WeatherCondition['type']) => {
       ];
     default:
       return [
-        { icon: <Calendar size={20} color={colors.primary} />, text: 'Check weather updates regularly' },
-        { icon: <Umbrella size={20} color={colors.accentDark} />, text: 'Pack layers for changing weather' },
+        {
+          icon: <Calendar size={20} color={colors.primary} />,
+          text: 'Check weather updates regularly',
+        },
+        {
+          icon: <Umbrella size={20} color={colors.accentDark} />,
+          text: 'Pack layers for changing weather',
+        },
         { icon: <MapPin size={20} color={colors.secondary} />, text: 'Have backup indoor plans' },
       ];
   }

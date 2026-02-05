@@ -13,11 +13,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMultiCurrency } from '../hooks/useMultiCurrency';
-import {
-  CurrencyCode,
-  ExpenseCategory,
-  Expense,
-} from '../types/currency';
+import { CurrencyCode, ExpenseCategory, Expense } from '../types/currency';
 import { EXPENSE_CATEGORIES } from '../mocks/mockCurrencyData';
 
 interface ExpenseTrackerScreenProps {
@@ -48,7 +44,9 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
   } = useMultiCurrency({ tripId });
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const [filterCategory, setFilterCategory] = useState<ExpenseCategory | 'all'>(initialCategory || 'all');
+  const [filterCategory, setFilterCategory] = useState<ExpenseCategory | 'all'>(
+    initialCategory || 'all'
+  );
   const [newExpense, setNewExpense] = useState({
     amount: '',
     currency: homeCurrency as CurrencyCode,
@@ -59,13 +57,16 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
   });
 
   // Handle tap on expense to edit
-  const handleEditExpense = useCallback((expense: Expense) => {
-    navigation?.navigate('ExpenseEdit', { expense });
-  }, [navigation]);
+  const handleEditExpense = useCallback(
+    (expense: Expense) => {
+      navigation?.navigate('ExpenseEdit', { expense });
+    },
+    [navigation]
+  );
 
   const filteredExpenses = useMemo(() => {
     if (filterCategory === 'all') return expenses;
-    return expenses.filter(e => e.category === filterCategory);
+    return expenses.filter((e) => e.category === filterCategory);
   }, [expenses, filterCategory]);
 
   const handleAddExpense = useCallback(async () => {
@@ -105,11 +106,9 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
     }
   }, [newExpense, addExpense, tripId, homeCurrency]);
 
-  const handleDeleteExpense = useCallback(async (id: string) => {
-    Alert.alert(
-      'Delete Expense',
-      'Are you sure you want to delete this expense?',
-      [
+  const handleDeleteExpense = useCallback(
+    async (id: string) => {
+      Alert.alert('Delete Expense', 'Are you sure you want to delete this expense?', [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
@@ -118,12 +117,13 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
             await deleteExpense(id);
           },
         },
-      ]
-    );
-  }, [deleteExpense]);
+      ]);
+    },
+    [deleteExpense]
+  );
 
   const getCategoryInfo = (category: ExpenseCategory) => {
-    return EXPENSE_CATEGORIES.find(c => c.id === category);
+    return EXPENSE_CATEGORIES.find((c) => c.id === category);
   };
 
   const formatDate = (dateString: string): string => {
@@ -145,7 +145,7 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
         <View style={[styles.categoryIcon, { backgroundColor: categoryInfo?.color + '20' }]}>
           <Text style={styles.categoryIconText}>{categoryInfo?.icon}</Text>
         </View>
-        
+
         <View style={styles.expenseInfo}>
           <Text style={styles.expenseDescription} numberOfLines={1}>
             {expense.description}
@@ -183,13 +183,11 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
         {/* Amount & Currency */}
         <View style={styles.formRow}>
           <View style={styles.amountInputContainer}>
-            <Text style={styles.currencySymbol}>
-              {getCurrency(newExpense.currency)?.symbol}
-            </Text>
+            <Text style={styles.currencySymbol}>{getCurrency(newExpense.currency)?.symbol}</Text>
             <TextInput
               style={styles.amountFormInput}
               value={newExpense.amount}
-              onChangeText={(text) => setNewExpense(prev => ({ ...prev, amount: text }))}
+              onChangeText={(text) => setNewExpense((prev) => ({ ...prev, amount: text }))}
               keyboardType="decimal-pad"
               placeholder="0.00"
               placeholderTextColor="#999"
@@ -199,10 +197,13 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
             style={styles.currencySelector}
             onPress={() => {
               // In a real app, this would open a currency picker
-              const currencies: CurrencyCode[] = [homeCurrency, ...recentCurrencies.filter(c => c !== homeCurrency)];
+              const currencies: CurrencyCode[] = [
+                homeCurrency,
+                ...recentCurrencies.filter((c) => c !== homeCurrency),
+              ];
               const currentIndex = currencies.indexOf(newExpense.currency);
               const nextIndex = (currentIndex + 1) % currencies.length;
-              setNewExpense(prev => ({ ...prev, currency: currencies[nextIndex] }));
+              setNewExpense((prev) => ({ ...prev, currency: currencies[nextIndex] }));
             }}
           >
             <Text style={styles.currencySelectorText}>
@@ -215,7 +216,7 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
         <TextInput
           style={styles.formInput}
           value={newExpense.description}
-          onChangeText={(text) => setNewExpense(prev => ({ ...prev, description: text }))}
+          onChangeText={(text) => setNewExpense((prev) => ({ ...prev, description: text }))}
           placeholder="Description"
           placeholderTextColor="#999"
         />
@@ -223,7 +224,7 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
         {/* Category */}
         <Text style={styles.formLabel}>Category</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-          {EXPENSE_CATEGORIES.map(cat => (
+          {EXPENSE_CATEGORIES.map((cat) => (
             <TouchableOpacity
               key={cat.id}
               style={[
@@ -231,13 +232,15 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
                 newExpense.category === cat.id && styles.categoryOptionActive,
                 { borderColor: cat.color },
               ]}
-              onPress={() => setNewExpense(prev => ({ ...prev, category: cat.id }))}
+              onPress={() => setNewExpense((prev) => ({ ...prev, category: cat.id }))}
             >
               <Text style={styles.categoryOptionIcon}>{cat.icon}</Text>
-              <Text style={[
-                styles.categoryOptionText,
-                newExpense.category === cat.id && { color: cat.color },
-              ]}>
+              <Text
+                style={[
+                  styles.categoryOptionText,
+                  newExpense.category === cat.id && { color: cat.color },
+                ]}
+              >
                 {cat.name}
               </Text>
             </TouchableOpacity>
@@ -248,7 +251,7 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
         <TextInput
           style={styles.formInput}
           value={newExpense.vendor}
-          onChangeText={(text) => setNewExpense(prev => ({ ...prev, vendor: text }))}
+          onChangeText={(text) => setNewExpense((prev) => ({ ...prev, vendor: text }))}
           placeholder="Vendor (optional)"
           placeholderTextColor="#999"
         />
@@ -260,22 +263,26 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
             { value: 'card', label: '💳 Card' },
             { value: 'cash', label: '💵 Cash' },
             { value: 'mobile', label: '📱 Mobile' },
-          ].map(method => (
+          ].map((method) => (
             <TouchableOpacity
               key={method.value}
               style={[
                 styles.paymentOption,
                 newExpense.paymentMethod === method.value && styles.paymentOptionActive,
               ]}
-              onPress={() => setNewExpense(prev => ({ 
-                ...prev, 
-                paymentMethod: method.value as 'cash' | 'card' | 'mobile' 
-              }))}
+              onPress={() =>
+                setNewExpense((prev) => ({
+                  ...prev,
+                  paymentMethod: method.value as 'cash' | 'card' | 'mobile',
+                }))
+              }
             >
-              <Text style={[
-                styles.paymentOptionText,
-                newExpense.paymentMethod === method.value && styles.paymentOptionTextActive,
-              ]}>
+              <Text
+                style={[
+                  styles.paymentOptionText,
+                  newExpense.paymentMethod === method.value && styles.paymentOptionTextActive,
+                ]}
+              >
                 {method.label}
               </Text>
             </TouchableOpacity>
@@ -283,10 +290,7 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
         </View>
 
         {/* Submit Button */}
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleAddExpense}
-        >
+        <TouchableOpacity style={styles.submitButton} onPress={handleAddExpense}>
           <Text style={styles.submitButtonText}>Add Expense</Text>
         </TouchableOpacity>
       </View>
@@ -303,20 +307,14 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
-        
+
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Expenses</Text>
-          
+
           {/* Summary */}
           <View style={styles.summaryCard}>
             <View style={styles.summaryMain}>
@@ -325,16 +323,16 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
                 {format(expenseSummary?.totalInHomeCurrency || 0, homeCurrency)}
               </Text>
             </View>
-            
+
             {budget && (
               <View style={styles.budgetInfo}>
                 <View style={styles.budgetBar}>
-                  <View 
+                  <View
                     style={[
-                      styles.budgetFill, 
+                      styles.budgetFill,
                       { width: `${Math.min(budget.percentUsed, 100)}%` },
                       budget.percentUsed > 80 && styles.budgetFillWarning,
-                    ]} 
+                    ]}
                   />
                 </View>
                 <Text style={styles.budgetText}>
@@ -353,18 +351,28 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
             style={[styles.filterChip, filterCategory === 'all' && styles.filterChipActive]}
             onPress={() => setFilterCategory('all')}
           >
-            <Text style={[styles.filterChipText, filterCategory === 'all' && styles.filterChipTextActive]}>
+            <Text
+              style={[
+                styles.filterChipText,
+                filterCategory === 'all' && styles.filterChipTextActive,
+              ]}
+            >
               All
             </Text>
           </TouchableOpacity>
-          {EXPENSE_CATEGORIES.slice(0, 6).map(cat => (
+          {EXPENSE_CATEGORIES.slice(0, 6).map((cat) => (
             <TouchableOpacity
               key={cat.id}
               style={[styles.filterChip, filterCategory === cat.id && styles.filterChipActive]}
               onPress={() => setFilterCategory(cat.id)}
             >
               <Text style={styles.filterChipIcon}>{cat.icon}</Text>
-              <Text style={[styles.filterChipText, filterCategory === cat.id && styles.filterChipTextActive]}>
+              <Text
+                style={[
+                  styles.filterChipText,
+                  filterCategory === cat.id && styles.filterChipTextActive,
+                ]}
+              >
                 {cat.name}
               </Text>
             </TouchableOpacity>
@@ -378,14 +386,10 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>📝</Text>
             <Text style={styles.emptyText}>No expenses yet</Text>
-            <Text style={styles.emptySubtext}>
-              Tap the + button to add your first expense
-            </Text>
+            <Text style={styles.emptySubtext}>Tap the + button to add your first expense</Text>
           </View>
         ) : (
-          <View style={styles.expensesList}>
-            {filteredExpenses.map(renderExpenseCard)}
-          </View>
+          <View style={styles.expensesList}>{filteredExpenses.map(renderExpenseCard)}</View>
         )}
 
         {/* Category Breakdown */}
@@ -405,15 +409,13 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
                         <Text style={styles.breakdownName}>{catInfo?.name}</Text>
                       </View>
                       <View style={styles.breakdownRight}>
-                        <Text style={styles.breakdownAmount}>
-                          {format(amount, homeCurrency)}
-                        </Text>
+                        <Text style={styles.breakdownAmount}>{format(amount, homeCurrency)}</Text>
                         <View style={styles.breakdownBarContainer}>
-                          <View 
+                          <View
                             style={[
-                              styles.breakdownBar, 
-                              { width: `${percentage}%`, backgroundColor: catInfo?.color }
-                            ]} 
+                              styles.breakdownBar,
+                              { width: `${percentage}%`, backgroundColor: catInfo?.color },
+                            ]}
                           />
                         </View>
                       </View>
@@ -448,10 +450,7 @@ const ExpenseTrackerScreen: React.FC<ExpenseTrackerScreenProps> = ({
       </ScrollView>
 
       {/* Add Button */}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setShowAddForm(true)}
-      >
+      <TouchableOpacity style={styles.addButton} onPress={() => setShowAddForm(true)}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
 

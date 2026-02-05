@@ -48,10 +48,10 @@ const tripScopeOptions: { value: TripScope; label: string; icon: any; descriptio
 
 export default function GeneratePlanScreen() {
   const router = useRouter();
-  const { 
-    selectedPartner, 
-    suggestions, 
-    generateSuggestions, 
+  const {
+    selectedPartner,
+    suggestions,
+    generateSuggestions,
     isGenerating,
     createItinerary,
     setCurrentItinerary,
@@ -83,7 +83,12 @@ export default function GeneratePlanScreen() {
 
   const handleGenerate = async () => {
     if (!selectedPartner) return;
-    await generateSuggestions(selectedPartner.id, selectedBudget, selectedDate.toISOString(), selectedTripScope);
+    await generateSuggestions(
+      selectedPartner.id,
+      selectedBudget,
+      selectedDate.toISOString(),
+      selectedTripScope
+    );
     setHasGenerated(true);
     setSelectedSuggestion(null);
   };
@@ -101,7 +106,8 @@ export default function GeneratePlanScreen() {
       partnerId: selectedPartner.id,
       partnerName: selectedPartner.name,
       tripScope: selectedTripScope,
-      destination: selectedTripScope !== 'local' ? (destination || selectedSuggestion.destination) : undefined,
+      destination:
+        selectedTripScope !== 'local' ? destination || selectedSuggestion.destination : undefined,
       activities: selectedSuggestion.activities.map((a, i) => ({
         ...a,
         id: `activity-${i}`,
@@ -130,7 +136,7 @@ export default function GeneratePlanScreen() {
           <View style={styles.placeholder} />
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
@@ -156,37 +162,31 @@ export default function GeneratePlanScreen() {
               <Text style={styles.sectionTitle}>Trip Type</Text>
             </View>
             <View style={styles.tripScopeContainer}>
-              {tripScopeOptions.map(option => {
+              {tripScopeOptions.map((option) => {
                 const IconComponent = option.icon;
                 const isSelected = selectedTripScope === option.value;
                 return (
                   <Pressable
                     key={option.value}
-                    style={[
-                      styles.tripScopeOption,
-                      isSelected && styles.tripScopeOptionSelected,
-                    ]}
+                    style={[styles.tripScopeOption, isSelected && styles.tripScopeOptionSelected]}
                     onPress={() => setSelectedTripScope(option.value)}
                   >
-                    <View style={[
-                      styles.tripScopeIcon,
-                      isSelected && styles.tripScopeIconSelected,
-                    ]}>
-                      <IconComponent 
-                        size={22} 
-                        color={isSelected ? colors.textLight : colors.secondary} 
+                    <View
+                      style={[styles.tripScopeIcon, isSelected && styles.tripScopeIconSelected]}
+                    >
+                      <IconComponent
+                        size={22}
+                        color={isSelected ? colors.textLight : colors.secondary}
                       />
                     </View>
-                    <Text style={[
-                      styles.tripScopeLabel,
-                      isSelected && styles.tripScopeLabelSelected,
-                    ]}>
+                    <Text
+                      style={[styles.tripScopeLabel, isSelected && styles.tripScopeLabelSelected]}
+                    >
                       {option.label}
                     </Text>
-                    <Text style={[
-                      styles.tripScopeDesc,
-                      isSelected && styles.tripScopeDescSelected,
-                    ]}>
+                    <Text
+                      style={[styles.tripScopeDesc, isSelected && styles.tripScopeDescSelected]}
+                    >
                       {option.description}
                     </Text>
                     {isSelected && (
@@ -209,7 +209,11 @@ export default function GeneratePlanScreen() {
                   style={styles.destinationInput}
                   value={destination}
                   onChangeText={setDestination}
-                  placeholder={selectedTripScope === 'domestic' ? 'e.g., Napa Valley, Miami' : 'e.g., Paris, Tokyo'}
+                  placeholder={
+                    selectedTripScope === 'domestic'
+                      ? 'e.g., Napa Valley, Miami'
+                      : 'e.g., Paris, Tokyo'
+                  }
                   placeholderTextColor={colors.textTertiary}
                 />
               </View>
@@ -222,8 +226,8 @@ export default function GeneratePlanScreen() {
               <Calendar size={20} color={colors.secondary} />
               <Text style={styles.sectionTitle}>When?</Text>
             </View>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.datesContainer}
             >
@@ -236,22 +240,31 @@ export default function GeneratePlanScreen() {
                   ]}
                   onPress={() => setSelectedDate(date)}
                 >
-                  <Text style={[
-                    styles.dateDayName,
-                    selectedDate.toDateString() === date.toDateString() && styles.dateTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.dateDayName,
+                      selectedDate.toDateString() === date.toDateString() &&
+                        styles.dateTextSelected,
+                    ]}
+                  >
                     {formatDateLabel(date, index)}
                   </Text>
-                  <Text style={[
-                    styles.dateDayNumber,
-                    selectedDate.toDateString() === date.toDateString() && styles.dateTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.dateDayNumber,
+                      selectedDate.toDateString() === date.toDateString() &&
+                        styles.dateTextSelected,
+                    ]}
+                  >
                     {date.getDate()}
                   </Text>
-                  <Text style={[
-                    styles.dateMonth,
-                    selectedDate.toDateString() === date.toDateString() && styles.dateTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.dateMonth,
+                      selectedDate.toDateString() === date.toDateString() &&
+                        styles.dateTextSelected,
+                    ]}
+                  >
                     {date.toLocaleDateString('en-US', { month: 'short' })}
                   </Text>
                 </Pressable>
@@ -266,7 +279,7 @@ export default function GeneratePlanScreen() {
               <Text style={styles.sectionTitle}>Budget</Text>
             </View>
             <View style={styles.budgetContainer}>
-              {budgetOptions.map(option => (
+              {budgetOptions.map((option) => (
                 <Pressable
                   key={option.value}
                   style={[
@@ -275,16 +288,20 @@ export default function GeneratePlanScreen() {
                   ]}
                   onPress={() => setSelectedBudget(option.value)}
                 >
-                  <Text style={[
-                    styles.budgetLabel,
-                    selectedBudget === option.value && styles.budgetTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.budgetLabel,
+                      selectedBudget === option.value && styles.budgetTextSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
-                  <Text style={[
-                    styles.budgetRange,
-                    selectedBudget === option.value && styles.budgetRangeSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.budgetRange,
+                      selectedBudget === option.value && styles.budgetRangeSelected,
+                    ]}
+                  >
                     {option.range}
                   </Text>
                 </Pressable>
@@ -293,10 +310,7 @@ export default function GeneratePlanScreen() {
           </View>
 
           {/* Surprise Toggle */}
-          <Pressable 
-            style={styles.surpriseToggle}
-            onPress={() => setIsSurprise(!isSurprise)}
-          >
+          <Pressable style={styles.surpriseToggle} onPress={() => setIsSurprise(!isSurprise)}>
             <View style={styles.surpriseContent}>
               {isSurprise ? (
                 <EyeOff size={24} color={colors.secondary} />
@@ -316,7 +330,7 @@ export default function GeneratePlanScreen() {
           </Pressable>
 
           {/* Generate Button */}
-          <Pressable 
+          <Pressable
             style={[styles.generateButton, isGenerating && styles.generateButtonDisabled]}
             onPress={handleGenerate}
             disabled={isGenerating}
@@ -341,11 +355,13 @@ export default function GeneratePlanScreen() {
           {hasGenerated && suggestions.length > 0 && (
             <View style={styles.suggestionsSection}>
               <Text style={styles.suggestionsTitle}>
-                {selectedTripScope === 'local' ? 'Local Date Ideas' : 
-                 selectedTripScope === 'domestic' ? 'Domestic Getaway Ideas' : 
-                 'International Adventure Ideas'}
+                {selectedTripScope === 'local'
+                  ? 'Local Date Ideas'
+                  : selectedTripScope === 'domestic'
+                    ? 'Domestic Getaway Ideas'
+                    : 'International Adventure Ideas'}
               </Text>
-              {suggestions.map(suggestion => (
+              {suggestions.map((suggestion) => (
                 <Pressable
                   key={suggestion.id}
                   style={[

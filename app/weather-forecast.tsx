@@ -96,15 +96,15 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
   const weatherSummary = useMemo(() => {
     if (!forecast?.daily || forecast.daily.length === 0) return null;
 
-    const temps = forecast.daily.map(d => d.condition.temperature);
-    const highs = forecast.daily.map(d => d.high);
-    const lows = forecast.daily.map(d => d.low);
-    
-    const goodDays = forecast.daily.filter(d => isGoodWeatherDay(d.date)).length;
-    const rainyDays = forecast.daily.filter(d => 
+    const temps = forecast.daily.map((d) => d.condition.temperature);
+    const highs = forecast.daily.map((d) => d.high);
+    const lows = forecast.daily.map((d) => d.low);
+
+    const goodDays = forecast.daily.filter((d) => isGoodWeatherDay(d.date)).length;
+    const rainyDays = forecast.daily.filter((d) =>
       ['light_rain', 'rainy', 'heavy_rain', 'thunderstorm'].includes(d.condition.type)
     ).length;
-    const sunnyDays = forecast.daily.filter(d =>
+    const sunnyDays = forecast.daily.filter((d) =>
       ['sunny', 'partly_cloudy'].includes(d.condition.type)
     ).length;
 
@@ -128,7 +128,8 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
   const handleShareForecast = async () => {
     if (!forecast || !weatherSummary) return;
 
-    const shareText = `🌤️ Weather Forecast for ${tripName}\n\n` +
+    const shareText =
+      `🌤️ Weather Forecast for ${tripName}\n\n` +
       `📍 ${forecast.location.name}, ${forecast.location.country}\n` +
       `📅 ${forecast.daily[0]?.date} - ${forecast.daily[forecast.daily.length - 1]?.date}\n\n` +
       `🌡️ Temperature Range: ${weatherSummary.minTemp}°C - ${weatherSummary.maxTemp}°C\n` +
@@ -154,27 +155,19 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
     return (
       <LinearGradient colors={gradient} style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.shareButton}
-            onPress={handleShareForecast}
-          >
+          <TouchableOpacity style={styles.shareButton} onPress={handleShareForecast}>
             <Text style={styles.shareButtonText}>📤 Share</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.headerContent}>
-          <Text style={styles.locationIcon}>
-            {getWeatherIcon(dominantCondition)}
-          </Text>
+          <Text style={styles.locationIcon}>{getWeatherIcon(dominantCondition)}</Text>
           <Text style={styles.locationName}>{forecast.location.name}</Text>
           <Text style={styles.locationCountry}>{forecast.location.country}</Text>
-          
+
           <View style={styles.tempRange}>
             <Text style={styles.tempRangeText}>
               {weatherSummary.minTemp}°C - {weatherSummary.maxTemp}°C
@@ -182,7 +175,8 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
           </View>
 
           <Text style={styles.tripDates}>
-            {weatherSummary.totalDays} days • {forecast.daily[0]?.date.slice(5)} to {forecast.daily[forecast.daily.length - 1]?.date.slice(5)}
+            {weatherSummary.totalDays} days • {forecast.daily[0]?.date.slice(5)} to{' '}
+            {forecast.daily[forecast.daily.length - 1]?.date.slice(5)}
           </Text>
         </View>
 
@@ -209,13 +203,11 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
 
         {/* Alerts Banner */}
         {weatherSummary.alerts > 0 && (
-          <TouchableOpacity 
-            style={styles.alertsBanner}
-            onPress={() => setShowAlertsModal(true)}
-          >
+          <TouchableOpacity style={styles.alertsBanner} onPress={() => setShowAlertsModal(true)}>
             <Text style={styles.alertsBannerIcon}>⚠️</Text>
             <Text style={styles.alertsBannerText}>
-              {weatherSummary.alerts} weather alert{weatherSummary.alerts > 1 ? 's' : ''} for your trip
+              {weatherSummary.alerts} weather alert{weatherSummary.alerts > 1 ? 's' : ''} for your
+              trip
             </Text>
             <Text style={styles.alertsBannerArrow}>→</Text>
           </TouchableOpacity>
@@ -229,9 +221,10 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
     const isGood = isGoodWeatherDay(day.date);
     const date = new Date(day.date);
     const isToday = new Date().toDateString() === date.toDateString();
-    const dayAlerts = forecast?.alerts?.filter(a => 
-      a.startTime.includes(day.date) || a.endTime.includes(day.date)
-    ) || [];
+    const dayAlerts =
+      forecast?.alerts?.filter(
+        (a) => a.startTime.includes(day.date) || a.endTime.includes(day.date)
+      ) || [];
 
     return (
       <TouchableOpacity
@@ -242,20 +235,14 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
       >
         <View style={styles.dayCardLeft}>
           <View style={styles.dayCardDate}>
-            <Text style={styles.dayCardWeekday}>
-              {isToday ? 'Today' : day.dayName.slice(0, 3)}
-            </Text>
+            <Text style={styles.dayCardWeekday}>{isToday ? 'Today' : day.dayName.slice(0, 3)}</Text>
             <Text style={styles.dayCardDay}>{date.getDate()}</Text>
           </View>
         </View>
 
         <View style={styles.dayCardCenter}>
-          <Text style={styles.dayCardIcon}>
-            {getWeatherIcon(day.condition.type)}
-          </Text>
-          <Text style={styles.dayCardCondition}>
-            {day.condition.description}
-          </Text>
+          <Text style={styles.dayCardIcon}>{getWeatherIcon(day.condition.type)}</Text>
+          <Text style={styles.dayCardCondition}>{day.condition.description}</Text>
           {dayAlerts.length > 0 && (
             <View style={styles.dayCardAlertBadge}>
               <Text style={styles.dayCardAlertText}>⚠️ {dayAlerts.length}</Text>
@@ -286,16 +273,32 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
     const tips: { icon: string; tip: string; priority: 'high' | 'medium' | 'low' }[] = [];
 
     if (weatherSummary.rainyDays > weatherSummary.totalDays / 2) {
-      tips.push({ icon: '☂️', tip: 'Pack rain gear - multiple rainy days expected', priority: 'high' });
+      tips.push({
+        icon: '☂️',
+        tip: 'Pack rain gear - multiple rainy days expected',
+        priority: 'high',
+      });
     }
     if (weatherSummary.maxTemp > 30) {
-      tips.push({ icon: '🧴', tip: 'High temperatures expected - bring sun protection', priority: 'high' });
+      tips.push({
+        icon: '🧴',
+        tip: 'High temperatures expected - bring sun protection',
+        priority: 'high',
+      });
     }
     if (weatherSummary.minTemp < 10) {
-      tips.push({ icon: '🧣', tip: 'Cool evenings expected - pack warm layers', priority: 'medium' });
+      tips.push({
+        icon: '🧣',
+        tip: 'Cool evenings expected - pack warm layers',
+        priority: 'medium',
+      });
     }
     if (weatherSummary.alerts > 0) {
-      tips.push({ icon: '📱', tip: 'Check weather alerts before outdoor activities', priority: 'high' });
+      tips.push({
+        icon: '📱',
+        tip: 'Check weather alerts before outdoor activities',
+        priority: 'high',
+      });
     }
     if (weatherSummary.sunnyDays >= weatherSummary.totalDays * 0.7) {
       tips.push({ icon: '😎', tip: 'Great conditions for outdoor activities!', priority: 'low' });
@@ -309,8 +312,8 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
       <View style={styles.tipsSection}>
         <Text style={styles.sectionTitle}>Weather Tips</Text>
         {tips.map((tip, index) => (
-          <View 
-            key={index} 
+          <View
+            key={index}
             style={[
               styles.tipCard,
               tip.priority === 'high' && styles.tipCardHigh,
@@ -330,9 +333,10 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
     if (!selectedDay) return null;
 
     const date = new Date(selectedDay.date);
-    const dayAlerts = forecast?.alerts?.filter(a =>
-      a.startTime.includes(selectedDay.date) || a.endTime.includes(selectedDay.date)
-    ) || [];
+    const dayAlerts =
+      forecast?.alerts?.filter(
+        (a) => a.startTime.includes(selectedDay.date) || a.endTime.includes(selectedDay.date)
+      ) || [];
 
     return (
       <Modal
@@ -358,9 +362,7 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
               <Text style={styles.dayModalDate}>
                 {date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
               </Text>
-              <Text style={styles.dayModalIcon}>
-                {getWeatherIcon(selectedDay.condition.type)}
-              </Text>
+              <Text style={styles.dayModalIcon}>{getWeatherIcon(selectedDay.condition.type)}</Text>
               <Text style={styles.dayModalTemp}>
                 {formatTemperature(selectedDay.condition.temperature)}
               </Text>
@@ -431,15 +433,11 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
                   {selectedDay.hourlyForecast.map((hour, index) => (
                     <View key={index} style={styles.hourlyCard}>
                       <Text style={styles.hourlyTime}>{hour.time}</Text>
-                      <Text style={styles.hourlyIcon}>
-                        {getWeatherIcon(hour.condition.type)}
-                      </Text>
+                      <Text style={styles.hourlyIcon}>{getWeatherIcon(hour.condition.type)}</Text>
                       <Text style={styles.hourlyTemp}>
                         {formatTemperature(hour.condition.temperature)}
                       </Text>
-                      <Text style={styles.hourlyRain}>
-                        💧 {hour.condition.precipitation}%
-                      </Text>
+                      <Text style={styles.hourlyRain}>💧 {hour.condition.precipitation}%</Text>
                     </View>
                   ))}
                 </ScrollView>
@@ -451,17 +449,15 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
               <View style={styles.dayAlertsSection}>
                 <Text style={styles.sectionTitle}>⚠️ Weather Alerts</Text>
                 {dayAlerts.map((alert) => (
-                  <View 
-                    key={alert.id} 
-                    style={[
-                      styles.alertCard,
-                      { borderLeftColor: ALERT_COLORS[alert.severity] }
-                    ]}
+                  <View
+                    key={alert.id}
+                    style={[styles.alertCard, { borderLeftColor: ALERT_COLORS[alert.severity] }]}
                   >
                     <Text style={styles.alertTitle}>{alert.title}</Text>
                     <Text style={styles.alertDescription}>{alert.description}</Text>
                     <Text style={styles.alertTime}>
-                      {alert.startTime.split('T')[1]?.slice(0, 5)} - {alert.endTime.split('T')[1]?.slice(0, 5)}
+                      {alert.startTime.split('T')[1]?.slice(0, 5)} -{' '}
+                      {alert.endTime.split('T')[1]?.slice(0, 5)}
                     </Text>
                   </View>
                 ))}
@@ -473,14 +469,40 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
               <Text style={styles.sectionTitle}>Activity Suitability</Text>
               <View style={styles.activityTypes}>
                 {[
-                  { type: 'Beach', icon: '🏖️', good: selectedDay.condition.type === 'sunny' && selectedDay.high > 24 },
-                  { type: 'Hiking', icon: '🥾', good: ['sunny', 'partly_cloudy', 'cloudy'].includes(selectedDay.condition.type) && selectedDay.condition.precipitation < 30 },
-                  { type: 'Cycling', icon: '🚴', good: selectedDay.condition.windSpeed < 30 && selectedDay.condition.precipitation < 20 },
-                  { type: 'Sightseeing', icon: '📸', good: !['heavy_rain', 'thunderstorm'].includes(selectedDay.condition.type) },
-                  { type: 'Water Sports', icon: '🚤', good: selectedDay.condition.type === 'sunny' && selectedDay.condition.windSpeed < 25 },
+                  {
+                    type: 'Beach',
+                    icon: '🏖️',
+                    good: selectedDay.condition.type === 'sunny' && selectedDay.high > 24,
+                  },
+                  {
+                    type: 'Hiking',
+                    icon: '🥾',
+                    good:
+                      ['sunny', 'partly_cloudy', 'cloudy'].includes(selectedDay.condition.type) &&
+                      selectedDay.condition.precipitation < 30,
+                  },
+                  {
+                    type: 'Cycling',
+                    icon: '🚴',
+                    good:
+                      selectedDay.condition.windSpeed < 30 &&
+                      selectedDay.condition.precipitation < 20,
+                  },
+                  {
+                    type: 'Sightseeing',
+                    icon: '📸',
+                    good: !['heavy_rain', 'thunderstorm'].includes(selectedDay.condition.type),
+                  },
+                  {
+                    type: 'Water Sports',
+                    icon: '🚤',
+                    good:
+                      selectedDay.condition.type === 'sunny' &&
+                      selectedDay.condition.windSpeed < 25,
+                  },
                   { type: 'Indoor', icon: '🏛️', good: true },
                 ].map((activity) => (
-                  <View 
+                  <View
                     key={activity.type}
                     style={[
                       styles.activityTypeCard,
@@ -488,15 +510,15 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
                     ]}
                   >
                     <Text style={styles.activityTypeIcon}>{activity.icon}</Text>
-                    <Text style={[
-                      styles.activityTypeLabel,
-                      activity.good ? styles.activityGoodText : styles.activityBadText,
-                    ]}>
+                    <Text
+                      style={[
+                        styles.activityTypeLabel,
+                        activity.good ? styles.activityGoodText : styles.activityBadText,
+                      ]}
+                    >
                       {activity.type}
                     </Text>
-                    <Text style={styles.activityTypeStatus}>
-                      {activity.good ? '✓' : '✗'}
-                    </Text>
+                    <Text style={styles.activityTypeStatus}>{activity.good ? '✓' : '✗'}</Text>
                   </View>
                 ))}
               </View>
@@ -527,29 +549,28 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
         <ScrollView style={styles.modalContent}>
           {forecast?.alerts && forecast.alerts.length > 0 ? (
             forecast.alerts.map((alert) => (
-              <View 
+              <View
                 key={alert.id}
-                style={[
-                  styles.fullAlertCard,
-                  { borderLeftColor: ALERT_COLORS[alert.severity] }
-                ]}
+                style={[styles.fullAlertCard, { borderLeftColor: ALERT_COLORS[alert.severity] }]}
               >
                 <View style={styles.alertHeader}>
-                  <View style={[styles.alertSeverityBadge, { backgroundColor: ALERT_COLORS[alert.severity] }]}>
-                    <Text style={styles.alertSeverityText}>
-                      {alert.severity.toUpperCase()}
-                    </Text>
+                  <View
+                    style={[
+                      styles.alertSeverityBadge,
+                      { backgroundColor: ALERT_COLORS[alert.severity] },
+                    ]}
+                  >
+                    <Text style={styles.alertSeverityText}>{alert.severity.toUpperCase()}</Text>
                   </View>
                   <Text style={styles.alertType}>{alert.type}</Text>
                 </View>
                 <Text style={styles.fullAlertTitle}>{alert.title}</Text>
                 <Text style={styles.fullAlertDescription}>{alert.description}</Text>
                 <View style={styles.alertMeta}>
+                  <Text style={styles.alertMetaItem}>📅 {alert.startTime.split('T')[0]}</Text>
                   <Text style={styles.alertMetaItem}>
-                    📅 {alert.startTime.split('T')[0]}
-                  </Text>
-                  <Text style={styles.alertMetaItem}>
-                    ⏰ {alert.startTime.split('T')[1]?.slice(0, 5)} - {alert.endTime.split('T')[1]?.slice(0, 5)}
+                    ⏰ {alert.startTime.split('T')[1]?.slice(0, 5)} -{' '}
+                    {alert.endTime.split('T')[1]?.slice(0, 5)}
                   </Text>
                 </View>
                 <Text style={styles.alertSource}>Source: {alert.source}</Text>
@@ -595,9 +616,7 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
         showsVerticalScrollIndicator={false}
       >
         {renderHeader()}
@@ -613,10 +632,12 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
           {/* View Activities Button */}
           <TouchableOpacity
             style={styles.viewActivitiesButton}
-            onPress={() => navigation?.navigate('WeatherAwareActivities', {
-              location,
-              tripDates,
-            })}
+            onPress={() =>
+              navigation?.navigate('WeatherAwareActivities', {
+                location,
+                tripDates,
+              })
+            }
           >
             <Text style={styles.viewActivitiesIcon}>🎯</Text>
             <View style={styles.viewActivitiesContent}>
@@ -631,10 +652,12 @@ export const WeatherForecastScreen: React.FC<WeatherForecastScreenProps> = ({
           {/* Packing List Button */}
           <TouchableOpacity
             style={styles.packingButton}
-            onPress={() => navigation?.navigate('PackingList', {
-              location,
-              tripDates,
-            })}
+            onPress={() =>
+              navigation?.navigate('PackingList', {
+                location,
+                tripDates,
+              })
+            }
           >
             <Text style={styles.packingIcon}>🎒</Text>
             <View style={styles.packingContent}>

@@ -40,7 +40,7 @@ import {
 import colors from '@/constants/colors';
 import { tripTemplates, templateCategories, getFeaturedTemplates } from '@/mocks/templates';
 import { TripTemplate, TripTemplateCategory, TemplateDayPlan } from '@/types';
-import React from "react";
+import React from 'react';
 
 const { width } = Dimensions.get('window');
 
@@ -69,122 +69,138 @@ export default function TripTemplatesScreen() {
 
   const filteredTemplates = useMemo(() => {
     let results = tripTemplates;
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      results = results.filter(t => 
-        t.name.toLowerCase().includes(query) ||
-        t.destination.name.toLowerCase().includes(query) ||
-        t.destination.country.toLowerCase().includes(query) ||
-        t.tags.some(tag => tag.toLowerCase().includes(query))
+      results = results.filter(
+        (t) =>
+          t.name.toLowerCase().includes(query) ||
+          t.destination.name.toLowerCase().includes(query) ||
+          t.destination.country.toLowerCase().includes(query) ||
+          t.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     }
-    
+
     if (selectedCategory) {
-      results = results.filter(t => t.category === selectedCategory);
+      results = results.filter((t) => t.category === selectedCategory);
     }
-    
+
     return results;
   }, [searchQuery, selectedCategory]);
 
   const featuredTemplates = useMemo(() => getFeaturedTemplates(), []);
 
-  const handleUseTemplate = useCallback((template: TripTemplate) => {
-    Alert.alert(
-      'Use This Template?',
-      `Start planning your trip to ${template.destination.name} based on "${template.name}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Start Planning',
-          onPress: () => {
-            console.log('Using template:', template.id);
-            router.push('/plan-trip');
-          }
-        },
-      ]
-    );
-  }, [router]);
+  const handleUseTemplate = useCallback(
+    (template: TripTemplate) => {
+      Alert.alert(
+        'Use This Template?',
+        `Start planning your trip to ${template.destination.name} based on "${template.name}"?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Start Planning',
+            onPress: () => {
+              console.log('Using template:', template.id);
+              router.push('/plan-trip');
+            },
+          },
+        ]
+      );
+    },
+    [router]
+  );
 
-  const renderCategoryChip = useCallback((category: typeof templateCategories[0]) => {
-    const isSelected = selectedCategory === category.id;
-    return (
-      <Pressable
-        key={category.id}
-        style={[
-          styles.categoryChip,
-          isSelected && { backgroundColor: category.color },
-        ]}
-        onPress={() => setSelectedCategory(isSelected ? null : category.id)}
-      >
-        {getCategoryIcon(category.icon, 16, isSelected ? colors.textLight : category.color)}
-        <Text style={[
-          styles.categoryChipText,
-          isSelected && { color: colors.textLight },
-        ]}>
-          {category.name}
-        </Text>
-      </Pressable>
-    );
-  }, [selectedCategory]);
-
-  const renderTemplateCard = useCallback((template: TripTemplate, featured = false) => (
-    <Pressable
-      key={template.id}
-      style={[styles.templateCard, featured && styles.featuredCard]}
-      onPress={() => setSelectedTemplate(template)}
-    >
-      <Image
-        source={{ uri: template.image }}
-        style={[styles.templateImage, featured && styles.featuredImage]}
-        contentFit="cover"
-      />
-      <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)']}
-        style={styles.templateGradient}
-      />
-      {template.isNew && (
-        <View style={styles.newBadge}>
-          <Text style={styles.newBadgeText}>NEW</Text>
-        </View>
-      )}
-      <View style={styles.templateContent}>
-        <View style={styles.templateMeta}>
-          <View style={[styles.categoryBadge, { backgroundColor: templateCategories.find(c => c.id === template.category)?.color || colors.primary }]}>
-            <Text style={styles.categoryBadgeText}>{template.category}</Text>
-          </View>
-          <View style={styles.ratingBadge}>
-            <Star size={12} color="#FFC107" fill="#FFC107" />
-            <Text style={styles.ratingText}>{template.rating}</Text>
-          </View>
-        </View>
-        <Text style={styles.templateName} numberOfLines={2}>{template.name}</Text>
-        <View style={styles.templateLocation}>
-          <MapPin size={12} color={colors.textLight} />
-          <Text style={styles.templateLocationText}>
-            {template.destination.name}, {template.destination.country}
+  const renderCategoryChip = useCallback(
+    (category: (typeof templateCategories)[0]) => {
+      const isSelected = selectedCategory === category.id;
+      return (
+        <Pressable
+          key={category.id}
+          style={[styles.categoryChip, isSelected && { backgroundColor: category.color }]}
+          onPress={() => setSelectedCategory(isSelected ? null : category.id)}
+        >
+          {getCategoryIcon(category.icon, 16, isSelected ? colors.textLight : category.color)}
+          <Text style={[styles.categoryChipText, isSelected && { color: colors.textLight }]}>
+            {category.name}
           </Text>
-        </View>
-        <View style={styles.templateInfo}>
-          <View style={styles.templateInfoItem}>
-            <Clock size={12} color={colors.accent} />
-            <Text style={styles.templateInfoText}>{template.duration} days</Text>
+        </Pressable>
+      );
+    },
+    [selectedCategory]
+  );
+
+  const renderTemplateCard = useCallback(
+    (template: TripTemplate, featured = false) => (
+      <Pressable
+        key={template.id}
+        style={[styles.templateCard, featured && styles.featuredCard]}
+        onPress={() => setSelectedTemplate(template)}
+      >
+        <Image
+          source={{ uri: template.image }}
+          style={[styles.templateImage, featured && styles.featuredImage]}
+          contentFit="cover"
+        />
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          style={styles.templateGradient}
+        />
+        {template.isNew && (
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>NEW</Text>
           </View>
-          <View style={styles.templateInfoItem}>
-            <DollarSign size={12} color={colors.accent} />
-            <Text style={styles.templateInfoText}>
-              {template.estimatedBudget.min.toLocaleString()}-{template.estimatedBudget.max.toLocaleString()}
+        )}
+        <View style={styles.templateContent}>
+          <View style={styles.templateMeta}>
+            <View
+              style={[
+                styles.categoryBadge,
+                {
+                  backgroundColor:
+                    templateCategories.find((c) => c.id === template.category)?.color ||
+                    colors.primary,
+                },
+              ]}
+            >
+              <Text style={styles.categoryBadgeText}>{template.category}</Text>
+            </View>
+            <View style={styles.ratingBadge}>
+              <Star size={12} color="#FFC107" fill="#FFC107" />
+              <Text style={styles.ratingText}>{template.rating}</Text>
+            </View>
+          </View>
+          <Text style={styles.templateName} numberOfLines={2}>
+            {template.name}
+          </Text>
+          <View style={styles.templateLocation}>
+            <MapPin size={12} color={colors.textLight} />
+            <Text style={styles.templateLocationText}>
+              {template.destination.name}, {template.destination.country}
             </Text>
           </View>
+          <View style={styles.templateInfo}>
+            <View style={styles.templateInfoItem}>
+              <Clock size={12} color={colors.accent} />
+              <Text style={styles.templateInfoText}>{template.duration} days</Text>
+            </View>
+            <View style={styles.templateInfoItem}>
+              <DollarSign size={12} color={colors.accent} />
+              <Text style={styles.templateInfoText}>
+                {template.estimatedBudget.min.toLocaleString()}-
+                {template.estimatedBudget.max.toLocaleString()}
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
-    </Pressable>
-  ), []);
+      </Pressable>
+    ),
+    []
+  );
 
   const renderTemplateDetail = useCallback(() => {
     if (!selectedTemplate) return null;
 
-    const category = templateCategories.find(c => c.id === selectedTemplate.category);
+    const category = templateCategories.find((c) => c.id === selectedTemplate.category);
 
     return (
       <View style={styles.detailOverlay}>
@@ -200,14 +216,16 @@ export default function TripTemplatesScreen() {
                 colors={['transparent', 'rgba(0,0,0,0.9)']}
                 style={styles.detailImageGradient}
               />
-              <Pressable
-                style={styles.detailClose}
-                onPress={() => setSelectedTemplate(null)}
-              >
+              <Pressable style={styles.detailClose} onPress={() => setSelectedTemplate(null)}>
                 <X size={24} color={colors.textLight} />
               </Pressable>
               <View style={styles.detailHeaderContent}>
-                <View style={[styles.categoryBadge, { backgroundColor: category?.color || colors.primary }]}>
+                <View
+                  style={[
+                    styles.categoryBadge,
+                    { backgroundColor: category?.color || colors.primary },
+                  ]}
+                >
                   <Text style={styles.categoryBadgeText}>{selectedTemplate.category}</Text>
                 </View>
                 <Text style={styles.detailTitle}>{selectedTemplate.name}</Text>
@@ -220,11 +238,15 @@ export default function TripTemplatesScreen() {
                 <View style={styles.detailStats}>
                   <View style={styles.detailStat}>
                     <Star size={14} color="#FFC107" fill="#FFC107" />
-                    <Text style={styles.detailStatText}>{selectedTemplate.rating} ({selectedTemplate.reviewCount})</Text>
+                    <Text style={styles.detailStatText}>
+                      {selectedTemplate.rating} ({selectedTemplate.reviewCount})
+                    </Text>
                   </View>
                   <View style={styles.detailStat}>
                     <Users size={14} color={colors.accent} />
-                    <Text style={styles.detailStatText}>{selectedTemplate.usageCount.toLocaleString()} used</Text>
+                    <Text style={styles.detailStatText}>
+                      {selectedTemplate.usageCount.toLocaleString()} used
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -241,13 +263,17 @@ export default function TripTemplatesScreen() {
                   <DollarSign size={20} color={colors.primary} />
                   <Text style={styles.quickInfoLabel}>Budget</Text>
                   <Text style={styles.quickInfoValue}>
-                    {selectedTemplate.estimatedBudget.currency} {selectedTemplate.estimatedBudget.min.toLocaleString()}-{selectedTemplate.estimatedBudget.max.toLocaleString()}
+                    {selectedTemplate.estimatedBudget.currency}{' '}
+                    {selectedTemplate.estimatedBudget.min.toLocaleString()}-
+                    {selectedTemplate.estimatedBudget.max.toLocaleString()}
                   </Text>
                 </View>
                 <View style={styles.quickInfoItem}>
                   <Calendar size={20} color={colors.primary} />
                   <Text style={styles.quickInfoLabel}>Best Season</Text>
-                  <Text style={styles.quickInfoValue} numberOfLines={2}>{selectedTemplate.bestSeason}</Text>
+                  <Text style={styles.quickInfoValue} numberOfLines={2}>
+                    {selectedTemplate.bestSeason}
+                  </Text>
                 </View>
               </View>
 
@@ -296,7 +322,10 @@ export default function TripTemplatesScreen() {
                           <View style={styles.activityContent}>
                             <Text style={styles.activityName}>{activity.name}</Text>
                             <Text style={styles.activityMeta}>
-                              {activity.duration} • {activity.estimatedCost > 0 ? `${activity.currency} ${activity.estimatedCost}` : 'Free'}
+                              {activity.duration} •{' '}
+                              {activity.estimatedCost > 0
+                                ? `${activity.currency} ${activity.estimatedCost}`
+                                : 'Free'}
                             </Text>
                           </View>
                         </View>
@@ -322,13 +351,16 @@ export default function TripTemplatesScreen() {
                           key={star}
                           style={[
                             styles.accessibilityStar,
-                            star <= selectedTemplate.accessibilityScore && styles.accessibilityStarFilled,
+                            star <= selectedTemplate.accessibilityScore &&
+                              styles.accessibilityStarFilled,
                           ]}
                         />
                       ))}
                     </View>
                     <Text style={styles.accessibilityLabel}>
-                      {selectedTemplate.accessibilityScore >= 4 ? 'Highly Accessible' : 'Moderately Accessible'}
+                      {selectedTemplate.accessibilityScore >= 4
+                        ? 'Highly Accessible'
+                        : 'Moderately Accessible'}
                     </Text>
                   </View>
                   <View style={styles.accessibilityFeatures}>
@@ -369,7 +401,9 @@ export default function TripTemplatesScreen() {
             <View style={styles.priceInfo}>
               <Text style={styles.priceLabel}>Estimated Budget</Text>
               <Text style={styles.priceValue}>
-                {selectedTemplate.estimatedBudget.currency} {selectedTemplate.estimatedBudget.min.toLocaleString()} - {selectedTemplate.estimatedBudget.max.toLocaleString()}
+                {selectedTemplate.estimatedBudget.currency}{' '}
+                {selectedTemplate.estimatedBudget.min.toLocaleString()} -{' '}
+                {selectedTemplate.estimatedBudget.max.toLocaleString()}
               </Text>
             </View>
             <Pressable
@@ -388,12 +422,12 @@ export default function TripTemplatesScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <LinearGradient
         colors={[colors.primary, colors.primaryLight]}
         style={styles.headerGradient}
       />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
@@ -421,10 +455,7 @@ export default function TripTemplatesScreen() {
           </View>
         </View>
 
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -441,7 +472,7 @@ export default function TripTemplatesScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.featuredScroll}
               >
-                {featuredTemplates.map(template => renderTemplateCard(template, true))}
+                {featuredTemplates.map((template) => renderTemplateCard(template, true))}
               </ScrollView>
             </View>
           )}
@@ -449,25 +480,22 @@ export default function TripTemplatesScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>
-                {selectedCategory 
-                  ? `${templateCategories.find(c => c.id === selectedCategory)?.name} Templates`
-                  : searchQuery 
+                {selectedCategory
+                  ? `${templateCategories.find((c) => c.id === selectedCategory)?.name} Templates`
+                  : searchQuery
                     ? 'Search Results'
-                    : 'All Templates'
-                }
+                    : 'All Templates'}
               </Text>
               <Text style={styles.resultsCount}>{filteredTemplates.length} templates</Text>
             </View>
             <View style={styles.templatesGrid}>
-              {filteredTemplates.map(template => renderTemplateCard(template))}
+              {filteredTemplates.map((template) => renderTemplateCard(template))}
             </View>
             {filteredTemplates.length === 0 && (
               <View style={styles.emptyState}>
                 <Search size={48} color={colors.textTertiary} />
                 <Text style={styles.emptyTitle}>No templates found</Text>
-                <Text style={styles.emptyText}>
-                  Try adjusting your search or filters
-                </Text>
+                <Text style={styles.emptyText}>Try adjusting your search or filters</Text>
               </View>
             )}
           </View>

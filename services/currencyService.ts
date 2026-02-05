@@ -65,7 +65,7 @@ class CurrencyService {
   // ============================================================================
 
   getCurrency(code: CurrencyCode): Currency | undefined {
-    return CURRENCIES.find(c => c.code === code);
+    return CURRENCIES.find((c) => c.code === code);
   }
 
   getAllCurrencies(): Currency[] {
@@ -74,16 +74,17 @@ class CurrencyService {
 
   searchCurrencies(query: string): Currency[] {
     const lowerQuery = query.toLowerCase();
-    return CURRENCIES.filter(c =>
-      c.code.toLowerCase().includes(lowerQuery) ||
-      c.name.toLowerCase().includes(lowerQuery) ||
-      c.country.toLowerCase().includes(lowerQuery)
+    return CURRENCIES.filter(
+      (c) =>
+        c.code.toLowerCase().includes(lowerQuery) ||
+        c.name.toLowerCase().includes(lowerQuery) ||
+        c.country.toLowerCase().includes(lowerQuery)
     );
   }
 
   getPopularCurrencies(): Currency[] {
     const popularCodes: CurrencyCode[] = ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'AUD', 'CAD', 'CHF'];
-    return popularCodes.map(code => this.getCurrency(code)!).filter(Boolean);
+    return popularCodes.map((code) => this.getCurrency(code)!).filter(Boolean);
   }
 
   // ============================================================================
@@ -117,13 +118,16 @@ class CurrencyService {
   }
 
   async addRecentCurrency(code: CurrencyCode): Promise<void> {
-    const recent = [code, ...this.preferences.recentCurrencies.filter(c => c !== code)].slice(0, 10);
+    const recent = [code, ...this.preferences.recentCurrencies.filter((c) => c !== code)].slice(
+      0,
+      10
+    );
     await this.savePreferences({ recentCurrencies: recent });
   }
 
   async toggleFavoriteCurrency(code: CurrencyCode): Promise<void> {
     const favorites = this.preferences.favoriteCurrencies.includes(code)
-      ? this.preferences.favoriteCurrencies.filter(c => c !== code)
+      ? this.preferences.favoriteCurrencies.filter((c) => c !== code)
       : [...this.preferences.favoriteCurrencies, code];
     await this.savePreferences({ favoriteCurrencies: favorites });
   }
@@ -136,10 +140,10 @@ class CurrencyService {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEYS.RATES);
       const timestamp = await AsyncStorage.getItem(STORAGE_KEYS.RATES_TIMESTAMP);
-      
+
       if (stored) {
         const ratesArray: ExchangeRate[] = JSON.parse(stored);
-        ratesArray.forEach(rate => {
+        ratesArray.forEach((rate) => {
           this.rates.set(`${rate.from}_${rate.to}`, rate);
         });
         this.ratesTimestamp = timestamp;
@@ -154,7 +158,7 @@ class CurrencyService {
   }
 
   private loadMockRates(): void {
-    MOCK_EXCHANGE_RATES.forEach(rate => {
+    MOCK_EXCHANGE_RATES.forEach((rate) => {
       this.rates.set(`${rate.from}_${rate.to}`, rate);
     });
     this.ratesTimestamp = new Date().toISOString();
@@ -165,8 +169,8 @@ class CurrencyService {
       // In production, this would call a real API
       // For now, we use mock rates with slight variations
       const timestamp = new Date().toISOString();
-      
-      MOCK_EXCHANGE_RATES.forEach(rate => {
+
+      MOCK_EXCHANGE_RATES.forEach((rate) => {
         // Add small random variation to simulate live rates
         const variation = 1 + (Math.random() - 0.5) * 0.02;
         const updatedRate: ExchangeRate = {
@@ -180,7 +184,7 @@ class CurrencyService {
       });
 
       this.ratesTimestamp = timestamp;
-      
+
       // Persist rates
       const ratesArray = Array.from(this.rates.values());
       await AsyncStorage.setItem(STORAGE_KEYS.RATES, JSON.stringify(ratesArray));
@@ -254,7 +258,7 @@ class CurrencyService {
 
   convert(request: ConversionRequest): ConversionResult | null {
     const { amount, from, to } = request;
-    
+
     if (from === to) {
       return {
         originalAmount: amount,
@@ -351,19 +355,22 @@ class CurrencyService {
         minimumFractionDigits,
         maximumFractionDigits,
       });
-      
+
       // Replace separators based on currency
       if (currency.decimalSeparator === ',') {
-        formattedAmount = formattedAmount.replace(/,/g, 'TEMP').replace(/\./g, ',').replace(/TEMP/g, '.');
+        formattedAmount = formattedAmount
+          .replace(/,/g, 'TEMP')
+          .replace(/\./g, ',')
+          .replace(/TEMP/g, '.');
       }
     }
 
     // Build final string
     let result = '';
-    
+
     if (showSign && amount > 0) result += '+';
     if (amount < 0) result += '-';
-    
+
     if (showSymbol) {
       if (currency.symbolPosition === 'before') {
         result += currency.symbol + formattedAmount;
@@ -373,7 +380,7 @@ class CurrencyService {
     } else {
       result += formattedAmount;
     }
-    
+
     if (showCode) {
       result += ' ' + currencyCode;
     }
@@ -388,7 +395,7 @@ class CurrencyService {
   formatWithConversion(money: Money, targetCurrency?: CurrencyCode): string {
     const target = targetCurrency || this.preferences.homeCurrency;
     const original = this.format(money.amount, money.currency);
-    
+
     if (money.currency === target) return original;
 
     const converted = this.convert({
@@ -410,9 +417,9 @@ class CurrencyService {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEYS.EXPENSES);
       if (!stored) return [];
-      
+
       const expenses: Expense[] = JSON.parse(stored);
-      return tripId ? expenses.filter(e => e.tripId === tripId) : expenses;
+      return tripId ? expenses.filter((e) => e.tripId === tripId) : expenses;
     } catch (error) {
       console.error('Failed to load expenses:', error);
       return [];
@@ -453,7 +460,7 @@ class CurrencyService {
 
   async updateExpense(id: string, updates: Partial<Expense>): Promise<Expense | null> {
     const expenses = await this.getExpenses();
-    const index = expenses.findIndex(e => e.id === id);
+    const index = expenses.findIndex((e) => e.id === id);
     if (index === -1) return null;
 
     expenses[index] = {
@@ -468,7 +475,7 @@ class CurrencyService {
 
   async deleteExpense(id: string): Promise<boolean> {
     const expenses = await this.getExpenses();
-    const filtered = expenses.filter(e => e.id !== id);
+    const filtered = expenses.filter((e) => e.id !== id);
     await AsyncStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(filtered));
     return filtered.length !== expenses.length;
   }
@@ -507,11 +514,11 @@ class CurrencyService {
       }
 
       // By category
-      summary.byCategory[expense.category] = 
+      summary.byCategory[expense.category] =
         (summary.byCategory[expense.category] || 0) + expense.amount;
 
       // By currency
-      summary.byCurrency[expense.currency] = 
+      summary.byCurrency[expense.currency] =
         (summary.byCurrency[expense.currency] || 0) + expense.amount;
 
       // By date
@@ -533,9 +540,9 @@ class CurrencyService {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEYS.BUDGET);
       if (!stored) return null;
-      
+
       const budgets: Budget[] = JSON.parse(stored);
-      return budgets.find(b => b.tripId === tripId) || budgets[0] || null;
+      return budgets.find((b) => b.tripId === tripId) || budgets[0] || null;
     } catch (error) {
       console.error('Failed to load budget:', error);
       return null;
@@ -546,14 +553,14 @@ class CurrencyService {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEYS.BUDGET);
       const budgets: Budget[] = stored ? JSON.parse(stored) : [];
-      
-      const index = budgets.findIndex(b => b.id === budget.id);
+
+      const index = budgets.findIndex((b) => b.id === budget.id);
       if (index >= 0) {
         budgets[index] = budget;
       } else {
         budgets.push(budget);
       }
-      
+
       await AsyncStorage.setItem(STORAGE_KEYS.BUDGET, JSON.stringify(budgets));
       return budget;
     } catch (error) {
@@ -567,7 +574,7 @@ class CurrencyService {
     if (!budget) return null;
 
     const summary = await this.getExpenseSummary(tripId);
-    
+
     // Convert total to budget currency if needed
     let spent = summary.totalInHomeCurrency;
     if (budget.currency !== this.preferences.homeCurrency) {
@@ -586,7 +593,7 @@ class CurrencyService {
     budget.percentUsed = (spent / budget.totalAmount) * 100;
 
     // Check alerts
-    budget.alerts.forEach(alert => {
+    budget.alerts.forEach((alert) => {
       if (alert.type === 'threshold' && alert.threshold) {
         alert.triggered = budget.percentUsed >= alert.threshold;
         if (alert.triggered && !alert.triggeredAt) {
@@ -617,7 +624,7 @@ class CurrencyService {
     } catch (error) {
       console.error('Failed to load cash wallet:', error);
     }
-    
+
     return {
       balances: [],
       transactions: [],
@@ -630,9 +637,11 @@ class CurrencyService {
     await AsyncStorage.setItem(STORAGE_KEYS.CASH_WALLET, JSON.stringify(wallet));
   }
 
-  async addCashTransaction(transaction: Omit<CashTransaction, 'id' | 'createdAt'>): Promise<CashTransaction> {
+  async addCashTransaction(
+    transaction: Omit<CashTransaction, 'id' | 'createdAt'>
+  ): Promise<CashTransaction> {
     const wallet = await this.getCashWallet();
-    
+
     const newTransaction: CashTransaction = {
       ...transaction,
       id: `cash_${Date.now()}`,
@@ -675,7 +684,7 @@ class CurrencyService {
   }
 
   private updateCashBalance(wallet: CashWallet, currency: CurrencyCode, amount: number): void {
-    const balance = wallet.balances.find(b => b.currency === currency);
+    const balance = wallet.balances.find((b) => b.currency === currency);
     if (balance) {
       balance.amount += amount;
       balance.lastUpdated = new Date().toISOString();
@@ -696,9 +705,9 @@ class CurrencyService {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEYS.TRIP_SETTINGS);
       if (!stored) return null;
-      
+
       const allSettings: TripCurrencySettings[] = JSON.parse(stored);
-      return allSettings.find(s => s.tripId === tripId) || null;
+      return allSettings.find((s) => s.tripId === tripId) || null;
     } catch (error) {
       console.error('Failed to load trip settings:', error);
       return null;
@@ -709,14 +718,14 @@ class CurrencyService {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEYS.TRIP_SETTINGS);
       const allSettings: TripCurrencySettings[] = stored ? JSON.parse(stored) : [];
-      
-      const index = allSettings.findIndex(s => s.tripId === settings.tripId);
+
+      const index = allSettings.findIndex((s) => s.tripId === settings.tripId);
       if (index >= 0) {
         allSettings[index] = settings;
       } else {
         allSettings.push(settings);
       }
-      
+
       await AsyncStorage.setItem(STORAGE_KEYS.TRIP_SETTINGS, JSON.stringify(allSettings));
     } catch (error) {
       console.error('Failed to save trip settings:', error);

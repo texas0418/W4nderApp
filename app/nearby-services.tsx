@@ -96,7 +96,7 @@ const mockServices: NearbyService[] = [
     services: ['General Medicine', 'Internal Medicine', 'Vaccinations'],
     emergencyServices: false,
     languages: ['Japanese', 'English', 'Chinese'],
-    coordinates: { lat: 35.7108, lng: 139.7730 },
+    coordinates: { lat: 35.7108, lng: 139.773 },
   },
   {
     id: '3',
@@ -178,7 +178,12 @@ const mockServices: NearbyService[] = [
     hours: '8:30 AM - 12:00 PM, 1:00 PM - 4:30 PM (Mon-Fri)',
     isOpen: false,
     is24Hours: false,
-    services: ['Passport Services', 'Visa Services', 'Citizen Registration', 'Emergency Assistance'],
+    services: [
+      'Passport Services',
+      'Visa Services',
+      'Citizen Registration',
+      'Emergency Assistance',
+    ],
     website: 'https://canada.ca/japan',
     emergencyServices: true,
     languages: ['English', 'French', 'Japanese'],
@@ -214,11 +219,11 @@ const mockServices: NearbyService[] = [
     services: ['Directions', 'Lost & Found', 'Minor Incidents', 'Tourist Assistance'],
     emergencyServices: true,
     languages: ['Japanese', 'English'],
-    coordinates: { lat: 35.7155, lng: 139.7960 },
+    coordinates: { lat: 35.7155, lng: 139.796 },
   },
   {
     id: '10',
-    name: 'Saint Luke\'s International Hospital',
+    name: "Saint Luke's International Hospital",
     category: 'hospital',
     address: '9-1 Akashi-cho, Chuo City, Tokyo',
     distance: '3.8 km',
@@ -233,7 +238,7 @@ const mockServices: NearbyService[] = [
     website: 'https://luke.example.com',
     emergencyServices: true,
     languages: ['Japanese', 'English', 'Chinese', 'Korean'],
-    coordinates: { lat: 35.6680, lng: 139.7728 },
+    coordinates: { lat: 35.668, lng: 139.7728 },
   },
 ];
 
@@ -269,16 +274,16 @@ export default function NearbyServicesScreen() {
         embassies: 'embassy',
         police: 'police',
       };
-      services = services.filter(s => s.category === categoryMap[selectedCategory]);
+      services = services.filter((s) => s.category === categoryMap[selectedCategory]);
     }
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       services = services.filter(
-        s =>
+        (s) =>
           s.name.toLowerCase().includes(query) ||
           s.address.toLowerCase().includes(query) ||
-          s.services?.some(service => service.toLowerCase().includes(query))
+          s.services?.some((service) => service.toLowerCase().includes(query))
       );
     }
 
@@ -332,7 +337,7 @@ export default function NearbyServicesScreen() {
 
   const handleCall = useCallback((phone: string) => {
     const phoneUrl = Platform.OS === 'ios' ? `telprompt:${phone}` : `tel:${phone}`;
-    Linking.openURL(phoneUrl).catch(err => console.log('Error opening phone:', err));
+    Linking.openURL(phoneUrl).catch((err) => console.log('Error opening phone:', err));
   }, []);
 
   const handleDirections = useCallback((service: NearbyService) => {
@@ -342,98 +347,99 @@ export default function NearbyServicesScreen() {
       android: `google.navigation:q=${lat},${lng}`,
       default: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
     });
-    Linking.openURL(url).catch(err => console.log('Error opening maps:', err));
+    Linking.openURL(url).catch((err) => console.log('Error opening maps:', err));
   }, []);
 
   const handleWebsite = useCallback((url: string) => {
-    Linking.openURL(url).catch(err => console.log('Error opening website:', err));
+    Linking.openURL(url).catch((err) => console.log('Error opening website:', err));
   }, []);
 
-  const renderServiceCard = useCallback((service: NearbyService) => {
-    const Icon = getCategoryIcon(service.category);
-    const categoryColor = getCategoryColor(service.category);
+  const renderServiceCard = useCallback(
+    (service: NearbyService) => {
+      const Icon = getCategoryIcon(service.category);
+      const categoryColor = getCategoryColor(service.category);
 
-    return (
-      <Pressable
-        key={service.id}
-        style={styles.serviceCard}
-        onPress={() => setSelectedService(service)}
-      >
-        <View style={styles.serviceCardHeader}>
-          <View style={[styles.serviceIconContainer, { backgroundColor: `${categoryColor}15` }]}>
-            <Icon size={24} color={categoryColor} />
-          </View>
-          <View style={styles.serviceMainInfo}>
-            <View style={styles.serviceNameRow}>
-              <Text style={styles.serviceName} numberOfLines={1}>
-                {service.name}
-              </Text>
-              {service.emergencyServices && (
-                <View style={styles.emergencyBadge}>
-                  <AlertCircle size={10} color={colors.textLight} />
-                </View>
-              )}
+      return (
+        <Pressable
+          key={service.id}
+          style={styles.serviceCard}
+          onPress={() => setSelectedService(service)}
+        >
+          <View style={styles.serviceCardHeader}>
+            <View style={[styles.serviceIconContainer, { backgroundColor: `${categoryColor}15` }]}>
+              <Icon size={24} color={categoryColor} />
             </View>
-            <View style={styles.categoryRow}>
-              <Text style={[styles.categoryLabel, { color: categoryColor }]}>
-                {getCategoryLabel(service.category)}
-              </Text>
-              {service.rating && (
-                <View style={styles.ratingContainer}>
-                  <Star size={12} color={colors.warning} fill={colors.warning} />
-                  <Text style={styles.ratingText}>{service.rating}</Text>
-                </View>
-              )}
+            <View style={styles.serviceMainInfo}>
+              <View style={styles.serviceNameRow}>
+                <Text style={styles.serviceName} numberOfLines={1}>
+                  {service.name}
+                </Text>
+                {service.emergencyServices && (
+                  <View style={styles.emergencyBadge}>
+                    <AlertCircle size={10} color={colors.textLight} />
+                  </View>
+                )}
+              </View>
+              <View style={styles.categoryRow}>
+                <Text style={[styles.categoryLabel, { color: categoryColor }]}>
+                  {getCategoryLabel(service.category)}
+                </Text>
+                {service.rating && (
+                  <View style={styles.ratingContainer}>
+                    <Star size={12} color={colors.warning} fill={colors.warning} />
+                    <Text style={styles.ratingText}>{service.rating}</Text>
+                  </View>
+                )}
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.serviceDetails}>
-          <View style={styles.serviceDetailRow}>
-            <MapPin size={14} color={colors.textTertiary} />
-            <Text style={styles.serviceDetailText} numberOfLines={1}>
-              {service.address}
-            </Text>
+          <View style={styles.serviceDetails}>
+            <View style={styles.serviceDetailRow}>
+              <MapPin size={14} color={colors.textTertiary} />
+              <Text style={styles.serviceDetailText} numberOfLines={1}>
+                {service.address}
+              </Text>
+            </View>
+            <View style={styles.serviceDetailRow}>
+              <Navigation size={14} color={colors.textTertiary} />
+              <Text style={styles.serviceDetailText}>{service.distance}</Text>
+            </View>
+            <View style={styles.serviceDetailRow}>
+              <Clock size={14} color={service.isOpen ? colors.success : colors.error} />
+              <Text
+                style={[
+                  styles.serviceDetailText,
+                  { color: service.isOpen ? colors.success : colors.error },
+                ]}
+              >
+                {service.isOpen ? (service.is24Hours ? 'Open 24/7' : 'Open now') : 'Closed'}
+              </Text>
+              {!service.is24Hours && <Text style={styles.hoursText}> • {service.hours}</Text>}
+            </View>
           </View>
-          <View style={styles.serviceDetailRow}>
-            <Navigation size={14} color={colors.textTertiary} />
-            <Text style={styles.serviceDetailText}>{service.distance}</Text>
-          </View>
-          <View style={styles.serviceDetailRow}>
-            <Clock size={14} color={service.isOpen ? colors.success : colors.error} />
-            <Text
-              style={[
-                styles.serviceDetailText,
-                { color: service.isOpen ? colors.success : colors.error },
-              ]}
+
+          <View style={styles.serviceActions}>
+            <Pressable
+              style={[styles.actionButton, styles.callButton]}
+              onPress={() => handleCall(service.phone)}
             >
-              {service.isOpen ? (service.is24Hours ? 'Open 24/7' : 'Open now') : 'Closed'}
-            </Text>
-            {!service.is24Hours && (
-              <Text style={styles.hoursText}> • {service.hours}</Text>
-            )}
+              <Phone size={16} color={colors.textLight} />
+              <Text style={styles.callButtonText}>Call</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.actionButton, styles.directionsButton]}
+              onPress={() => handleDirections(service)}
+            >
+              <Navigation size={16} color={colors.primary} />
+              <Text style={styles.directionsButtonText}>Directions</Text>
+            </Pressable>
           </View>
-        </View>
-
-        <View style={styles.serviceActions}>
-          <Pressable
-            style={[styles.actionButton, styles.callButton]}
-            onPress={() => handleCall(service.phone)}
-          >
-            <Phone size={16} color={colors.textLight} />
-            <Text style={styles.callButtonText}>Call</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.actionButton, styles.directionsButton]}
-            onPress={() => handleDirections(service)}
-          >
-            <Navigation size={16} color={colors.primary} />
-            <Text style={styles.directionsButtonText}>Directions</Text>
-          </Pressable>
-        </View>
-      </Pressable>
-    );
-  }, [getCategoryIcon, getCategoryColor, getCategoryLabel, handleCall, handleDirections]);
+        </Pressable>
+      );
+    },
+    [getCategoryIcon, getCategoryColor, getCategoryLabel, handleCall, handleDirections]
+  );
 
   const renderServiceDetail = useCallback(() => {
     if (!selectedService) return null;
@@ -446,7 +452,7 @@ export default function NearbyServicesScreen() {
         <Pressable style={styles.detailBackdrop} onPress={() => setSelectedService(null)} />
         <View style={styles.detailSheet}>
           <View style={styles.detailHandle} />
-          
+
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.detailHeader}>
               <View style={[styles.detailIconContainer, { backgroundColor: `${categoryColor}15` }]}>
@@ -468,10 +474,7 @@ export default function NearbyServicesScreen() {
                   )}
                 </View>
               </View>
-              <Pressable
-                style={styles.detailCloseButton}
-                onPress={() => setSelectedService(null)}
-              >
+              <Pressable style={styles.detailCloseButton} onPress={() => setSelectedService(null)}>
                 <X size={20} color={colors.textSecondary} />
               </Pressable>
             </View>
@@ -567,7 +570,15 @@ export default function NearbyServicesScreen() {
         </View>
       </View>
     );
-  }, [selectedService, getCategoryIcon, getCategoryColor, getCategoryLabel, handleCall, handleDirections, handleWebsite]);
+  }, [
+    selectedService,
+    getCategoryIcon,
+    getCategoryColor,
+    getCategoryLabel,
+    handleCall,
+    handleDirections,
+    handleWebsite,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -637,7 +648,7 @@ export default function NearbyServicesScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoriesContainer}
         >
-          {categories.map(category => (
+          {categories.map((category) => (
             <Pressable
               key={category.id}
               style={[
@@ -669,7 +680,8 @@ export default function NearbyServicesScreen() {
         >
           <View style={styles.resultsHeader}>
             <Text style={styles.resultsCount}>
-              {filteredServices.length} {filteredServices.length === 1 ? 'service' : 'services'} found
+              {filteredServices.length} {filteredServices.length === 1 ? 'service' : 'services'}{' '}
+              found
             </Text>
             <Text style={styles.locationText}>
               <MapPin size={12} color={colors.textTertiary} /> Tokyo, Japan
@@ -684,9 +696,7 @@ export default function NearbyServicesScreen() {
                 <MapPin size={48} color={colors.textTertiary} />
               </View>
               <Text style={styles.emptyTitle}>No services found</Text>
-              <Text style={styles.emptySubtitle}>
-                Try adjusting your search or category filter
-              </Text>
+              <Text style={styles.emptySubtitle}>Try adjusting your search or category filter</Text>
             </View>
           )}
         </ScrollView>

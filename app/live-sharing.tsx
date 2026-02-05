@@ -42,11 +42,7 @@ import {
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import colors from '@/constants/colors';
-import {
-  LiveSharingContact,
-  SafetyCheckIn,
-  LocationUpdate,
-} from '@/types';
+import { LiveSharingContact, SafetyCheckIn, LocationUpdate } from '@/types';
 
 type TabType = 'sharing' | 'contacts' | 'history' | 'settings';
 
@@ -165,7 +161,7 @@ export default function LiveSharingScreen() {
     email: '',
     relationship: 'family' as LiveSharingContact['relationship'],
   });
-  
+
   const [settings, setSettings] = useState({
     updateFrequency: 'every_5_min',
     shareSpeed: false,
@@ -236,7 +232,7 @@ export default function LiveSharingScreen() {
 
   const handleSOS = useCallback(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    
+
     Animated.sequence([
       Animated.timing(sosAnim, { toValue: 1, duration: 100, useNativeDriver: true }),
       Animated.timing(sosAnim, { toValue: 0, duration: 100, useNativeDriver: true }),
@@ -270,7 +266,7 @@ export default function LiveSharingScreen() {
         status: 'safe',
         message: 'I am safe!',
       };
-      setCheckIns(prev => [newCheckIn, ...prev]);
+      setCheckIns((prev) => [newCheckIn, ...prev]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setShowCheckInModal(false);
       console.log('Quick check-in sent');
@@ -284,7 +280,7 @@ export default function LiveSharingScreen() {
       status: 'safe',
       message: checkInMessage,
     };
-    setCheckIns(prev => [newCheckIn, ...prev]);
+    setCheckIns((prev) => [newCheckIn, ...prev]);
     setCheckInMessage('');
     setShowCheckInModal(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -319,35 +315,34 @@ export default function LiveSharingScreen() {
       addedAt: new Date().toISOString(),
     };
 
-    setContacts(prev => [...prev, contact]);
+    setContacts((prev) => [...prev, contact]);
     setNewContact({ name: '', phone: '', email: '', relationship: 'family' });
     setShowAddContact(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     console.log('Contact added:', contact.name);
   }, [newContact]);
 
-  const handleRemoveContact = useCallback((contactId: string) => {
-    const contact = contacts.find(c => c.id === contactId);
-    Alert.alert(
-      'Remove Contact',
-      `Remove ${contact?.name} from your sharing list?`,
-      [
+  const handleRemoveContact = useCallback(
+    (contactId: string) => {
+      const contact = contacts.find((c) => c.id === contactId);
+      Alert.alert('Remove Contact', `Remove ${contact?.name} from your sharing list?`, [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Remove',
           style: 'destructive',
           onPress: () => {
-            setContacts(prev => prev.filter(c => c.id !== contactId));
+            setContacts((prev) => prev.filter((c) => c.id !== contactId));
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           },
         },
-      ]
-    );
-  }, [contacts]);
+      ]);
+    },
+    [contacts]
+  );
 
   const toggleContactActive = useCallback((contactId: string) => {
-    setContacts(prev =>
-      prev.map(c =>
+    setContacts((prev) =>
+      prev.map((c) =>
         c.id === contactId ? { ...c, isActive: !c.isActive, canSeeLocation: !c.isActive } : c
       )
     );
@@ -370,7 +365,7 @@ export default function LiveSharingScreen() {
     const diffMs = now.getTime() - then.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
@@ -415,7 +410,8 @@ export default function LiveSharingScreen() {
                 {locationHistory[0]?.address || 'Getting location...'}
               </Text>
               <Text style={styles.locationMeta}>
-                {locationHistory[0]?.city}, {locationHistory[0]?.country} • Updated {getRelativeTime(locationHistory[0]?.timestamp || new Date().toISOString())}
+                {locationHistory[0]?.city}, {locationHistory[0]?.country} • Updated{' '}
+                {getRelativeTime(locationHistory[0]?.timestamp || new Date().toISOString())}
               </Text>
             </View>
           </View>
@@ -443,9 +439,7 @@ export default function LiveSharingScreen() {
                 ) : (
                   <Pause size={20} color={colors.textLight} />
                 )}
-                <Text style={styles.controlButtonText}>
-                  {isPaused ? 'Resume' : 'Pause'}
-                </Text>
+                <Text style={styles.controlButtonText}>{isPaused ? 'Resume' : 'Pause'}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.controlButton, styles.stopButton]}
@@ -471,12 +465,19 @@ export default function LiveSharingScreen() {
           <Text style={styles.checkInSubtext}>Let them know you are safe</Text>
         </TouchableOpacity>
 
-        <Animated.View style={{ transform: [{ scale: Animated.add(1, sosAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.1] })) }] }}>
-          <TouchableOpacity
-            style={styles.sosButton}
-            onPress={handleSOS}
-            activeOpacity={0.8}
-          >
+        <Animated.View
+          style={{
+            transform: [
+              {
+                scale: Animated.add(
+                  1,
+                  sosAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.1] })
+                ),
+              },
+            ],
+          }}
+        >
+          <TouchableOpacity style={styles.sosButton} onPress={handleSOS} activeOpacity={0.8}>
             <AlertTriangle size={24} color={colors.textLight} />
             <Text style={styles.sosButtonText}>SOS</Text>
             <Text style={styles.sosSubtext}>Emergency alert</Text>
@@ -486,27 +487,35 @@ export default function LiveSharingScreen() {
 
       <View style={styles.activeContacts}>
         <Text style={styles.sectionTitle}>Active Viewers</Text>
-        {contacts.filter(c => c.isActive).length === 0 ? (
+        {contacts.filter((c) => c.isActive).length === 0 ? (
           <View style={styles.emptyState}>
             <Users size={40} color={colors.textTertiary} />
             <Text style={styles.emptyText}>No active contacts</Text>
             <Text style={styles.emptySubtext}>Add contacts to share your location</Text>
           </View>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.contactsScroll}>
-            {contacts.filter(c => c.isActive).map(contact => (
-              <View key={contact.id} style={styles.activeContactCard}>
-                <View style={styles.contactAvatar}>
-                  <Text style={styles.contactInitial}>{contact.name[0]}</Text>
-                  <View style={styles.onlineIndicator} />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.contactsScroll}
+          >
+            {contacts
+              .filter((c) => c.isActive)
+              .map((contact) => (
+                <View key={contact.id} style={styles.activeContactCard}>
+                  <View style={styles.contactAvatar}>
+                    <Text style={styles.contactInitial}>{contact.name[0]}</Text>
+                    <View style={styles.onlineIndicator} />
+                  </View>
+                  <Text style={styles.contactName} numberOfLines={1}>
+                    {contact.name}
+                  </Text>
+                  <View style={styles.contactPermissions}>
+                    {contact.canSeeLocation && <MapPin size={12} color={colors.success} />}
+                    {contact.canSeeItinerary && <Calendar size={12} color={colors.primary} />}
+                  </View>
                 </View>
-                <Text style={styles.contactName} numberOfLines={1}>{contact.name}</Text>
-                <View style={styles.contactPermissions}>
-                  {contact.canSeeLocation && <MapPin size={12} color={colors.success} />}
-                  {contact.canSeeItinerary && <Calendar size={12} color={colors.primary} />}
-                </View>
-              </View>
-            ))}
+              ))}
           </ScrollView>
         )}
       </View>
@@ -546,8 +555,8 @@ export default function LiveSharingScreen() {
       </TouchableOpacity>
 
       <Text style={styles.sectionTitle}>Your Contacts ({contacts.length})</Text>
-      
-      {contacts.map(contact => (
+
+      {contacts.map((contact) => (
         <View key={contact.id} style={styles.contactCard}>
           <View style={styles.contactHeader}>
             <View style={styles.contactAvatar}>
@@ -583,21 +592,57 @@ export default function LiveSharingScreen() {
           <View style={styles.contactPermissionsSection}>
             <Text style={styles.permissionsLabel}>Permissions</Text>
             <View style={styles.permissionTags}>
-              <View style={[styles.permissionTag, contact.canSeeLocation && styles.permissionTagActive]}>
-                <MapPin size={12} color={contact.canSeeLocation ? colors.textLight : colors.textSecondary} />
-                <Text style={[styles.permissionTagText, contact.canSeeLocation && styles.permissionTagTextActive]}>
+              <View
+                style={[styles.permissionTag, contact.canSeeLocation && styles.permissionTagActive]}
+              >
+                <MapPin
+                  size={12}
+                  color={contact.canSeeLocation ? colors.textLight : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.permissionTagText,
+                    contact.canSeeLocation && styles.permissionTagTextActive,
+                  ]}
+                >
                   Location
                 </Text>
               </View>
-              <View style={[styles.permissionTag, contact.canSeeItinerary && styles.permissionTagActive]}>
-                <Calendar size={12} color={contact.canSeeItinerary ? colors.textLight : colors.textSecondary} />
-                <Text style={[styles.permissionTagText, contact.canSeeItinerary && styles.permissionTagTextActive]}>
+              <View
+                style={[
+                  styles.permissionTag,
+                  contact.canSeeItinerary && styles.permissionTagActive,
+                ]}
+              >
+                <Calendar
+                  size={12}
+                  color={contact.canSeeItinerary ? colors.textLight : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.permissionTagText,
+                    contact.canSeeItinerary && styles.permissionTagTextActive,
+                  ]}
+                >
                   Itinerary
                 </Text>
               </View>
-              <View style={[styles.permissionTag, contact.notifyOnArrival && styles.permissionTagActive]}>
-                <Bell size={12} color={contact.notifyOnArrival ? colors.textLight : colors.textSecondary} />
-                <Text style={[styles.permissionTagText, contact.notifyOnArrival && styles.permissionTagTextActive]}>
+              <View
+                style={[
+                  styles.permissionTag,
+                  contact.notifyOnArrival && styles.permissionTagActive,
+                ]}
+              >
+                <Bell
+                  size={12}
+                  color={contact.notifyOnArrival ? colors.textLight : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.permissionTagText,
+                    contact.notifyOnArrival && styles.permissionTagTextActive,
+                  ]}
+                >
                   Alerts
                 </Text>
               </View>
@@ -619,7 +664,7 @@ export default function LiveSharingScreen() {
   const renderHistoryTab = () => (
     <View style={styles.tabContent}>
       <Text style={styles.sectionTitle}>Location Timeline</Text>
-      
+
       <View style={styles.timeline}>
         {locationHistory.map((location, index) => (
           <View key={location.id} style={styles.timelineItem}>
@@ -639,7 +684,10 @@ export default function LiveSharingScreen() {
                 </Text>
                 {location.batteryLevel && (
                   <>
-                    <Battery size={12} color={location.batteryLevel < 20 ? colors.error : colors.textTertiary} />
+                    <Battery
+                      size={12}
+                      color={location.batteryLevel < 20 ? colors.error : colors.textTertiary}
+                    />
                     <Text style={styles.timelineTime}>{location.batteryLevel}%</Text>
                   </>
                 )}
@@ -650,10 +698,15 @@ export default function LiveSharingScreen() {
       </View>
 
       <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Check-in History</Text>
-      
-      {checkIns.map(checkIn => (
+
+      {checkIns.map((checkIn) => (
         <View key={checkIn.id} style={styles.historyCheckIn}>
-          <View style={[styles.checkInStatusDot, { backgroundColor: checkIn.status === 'safe' ? colors.success : colors.error }]} />
+          <View
+            style={[
+              styles.checkInStatusDot,
+              { backgroundColor: checkIn.status === 'safe' ? colors.success : colors.error },
+            ]}
+          />
           <View style={styles.historyCheckInContent}>
             <Text style={styles.historyCheckInMessage}>{checkIn.message}</Text>
             <Text style={styles.historyCheckInTime}>
@@ -675,7 +728,7 @@ export default function LiveSharingScreen() {
     <View style={styles.tabContent}>
       <View style={styles.settingsSection}>
         <Text style={styles.settingsSectionTitle}>Location Updates</Text>
-        
+
         <View style={styles.settingItem}>
           <View style={styles.settingInfo}>
             <Radio size={20} color={colors.primary} />
@@ -700,7 +753,7 @@ export default function LiveSharingScreen() {
           </View>
           <Switch
             value={settings.shareSpeed}
-            onValueChange={v => setSettings(s => ({ ...s, shareSpeed: v }))}
+            onValueChange={(v) => setSettings((s) => ({ ...s, shareSpeed: v }))}
             trackColor={{ false: colors.border, true: colors.primaryLight }}
             thumbColor={settings.shareSpeed ? colors.primary : colors.textTertiary}
           />
@@ -716,7 +769,7 @@ export default function LiveSharingScreen() {
           </View>
           <Switch
             value={settings.shareBattery}
-            onValueChange={v => setSettings(s => ({ ...s, shareBattery: v }))}
+            onValueChange={(v) => setSettings((s) => ({ ...s, shareBattery: v }))}
             trackColor={{ false: colors.border, true: colors.primaryLight }}
             thumbColor={settings.shareBattery ? colors.primary : colors.textTertiary}
           />
@@ -732,7 +785,7 @@ export default function LiveSharingScreen() {
           </View>
           <Switch
             value={settings.shareItinerary}
-            onValueChange={v => setSettings(s => ({ ...s, shareItinerary: v }))}
+            onValueChange={(v) => setSettings((s) => ({ ...s, shareItinerary: v }))}
             trackColor={{ false: colors.border, true: colors.primaryLight }}
             thumbColor={settings.shareItinerary ? colors.primary : colors.textTertiary}
           />
@@ -752,7 +805,7 @@ export default function LiveSharingScreen() {
           </View>
           <Switch
             value={settings.lowBatteryAlert}
-            onValueChange={v => setSettings(s => ({ ...s, lowBatteryAlert: v }))}
+            onValueChange={(v) => setSettings((s) => ({ ...s, lowBatteryAlert: v }))}
             trackColor={{ false: colors.border, true: colors.primaryLight }}
             thumbColor={settings.lowBatteryAlert ? colors.primary : colors.textTertiary}
           />
@@ -768,7 +821,7 @@ export default function LiveSharingScreen() {
           </View>
           <Switch
             value={settings.geofenceAlerts}
-            onValueChange={v => setSettings(s => ({ ...s, geofenceAlerts: v }))}
+            onValueChange={(v) => setSettings((s) => ({ ...s, geofenceAlerts: v }))}
             trackColor={{ false: colors.border, true: colors.primaryLight }}
             thumbColor={settings.geofenceAlerts ? colors.primary : colors.textTertiary}
           />
@@ -788,7 +841,7 @@ export default function LiveSharingScreen() {
           </View>
           <Switch
             value={settings.nightModeEnabled}
-            onValueChange={v => setSettings(s => ({ ...s, nightModeEnabled: v }))}
+            onValueChange={(v) => setSettings((s) => ({ ...s, nightModeEnabled: v }))}
             trackColor={{ false: colors.border, true: colors.primaryLight }}
             thumbColor={settings.nightModeEnabled ? colors.primary : colors.textTertiary}
           />
@@ -815,7 +868,7 @@ export default function LiveSharingScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <TouchableOpacity
@@ -835,7 +888,7 @@ export default function LiveSharingScreen() {
             { id: 'contacts' as const, label: 'Contacts', icon: Users },
             { id: 'history' as const, label: 'History', icon: Clock },
             { id: 'settings' as const, label: 'Settings', icon: Settings },
-          ].map(tab => (
+          ].map((tab) => (
             <TouchableOpacity
               key={tab.id}
               style={[styles.tab, activeTab === tab.id && styles.tabActive]}
@@ -845,9 +898,7 @@ export default function LiveSharingScreen() {
                 size={18}
                 color={activeTab === tab.id ? colors.primary : colors.textTertiary}
               />
-              <Text
-                style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}
-              >
+              <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
                 {tab.label}
               </Text>
             </TouchableOpacity>
@@ -879,7 +930,7 @@ export default function LiveSharingScreen() {
                 <TextInput
                   style={styles.input}
                   value={newContact.name}
-                  onChangeText={v => setNewContact(c => ({ ...c, name: v }))}
+                  onChangeText={(v) => setNewContact((c) => ({ ...c, name: v }))}
                   placeholder="Enter name"
                   placeholderTextColor={colors.textTertiary}
                 />
@@ -890,7 +941,7 @@ export default function LiveSharingScreen() {
                 <TextInput
                   style={styles.input}
                   value={newContact.phone}
-                  onChangeText={v => setNewContact(c => ({ ...c, phone: v }))}
+                  onChangeText={(v) => setNewContact((c) => ({ ...c, phone: v }))}
                   placeholder="+1 234 567 8900"
                   placeholderTextColor={colors.textTertiary}
                   keyboardType="phone-pad"
@@ -902,7 +953,7 @@ export default function LiveSharingScreen() {
                 <TextInput
                   style={styles.input}
                   value={newContact.email}
-                  onChangeText={v => setNewContact(c => ({ ...c, email: v }))}
+                  onChangeText={(v) => setNewContact((c) => ({ ...c, email: v }))}
                   placeholder="email@example.com"
                   placeholderTextColor={colors.textTertiary}
                   keyboardType="email-address"
@@ -913,14 +964,14 @@ export default function LiveSharingScreen() {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Relationship</Text>
                 <View style={styles.relationshipOptions}>
-                  {(['family', 'friend', 'emergency', 'other'] as const).map(rel => (
+                  {(['family', 'friend', 'emergency', 'other'] as const).map((rel) => (
                     <TouchableOpacity
                       key={rel}
                       style={[
                         styles.relationshipOption,
                         newContact.relationship === rel && styles.relationshipOptionActive,
                       ]}
-                      onPress={() => setNewContact(c => ({ ...c, relationship: rel }))}
+                      onPress={() => setNewContact((c) => ({ ...c, relationship: rel }))}
                     >
                       <Text
                         style={[
@@ -955,10 +1006,7 @@ export default function LiveSharingScreen() {
 
             <View style={styles.modalContent}>
               <View style={styles.quickCheckIn}>
-                <TouchableOpacity
-                  style={styles.quickCheckInButton}
-                  onPress={handleCheckIn}
-                >
+                <TouchableOpacity style={styles.quickCheckInButton} onPress={handleCheckIn}>
                   <CheckCircle size={32} color={colors.success} />
                   <Text style={styles.quickCheckInText}>I am Safe!</Text>
                   <Text style={styles.quickCheckInSubtext}>Quick check-in</Text>

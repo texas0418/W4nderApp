@@ -88,94 +88,45 @@ export default function OfflineModeScreen() {
     }
   };
 
-  const simulateDownload = useCallback((trip: Trip) => {
-    const isAlreadyDownloaded = offlineTrips.some(t => t.tripId === trip.id);
-    if (isAlreadyDownloaded) {
-      Alert.alert('Already Downloaded', 'This trip is already available offline.');
-      return;
-    }
-
-    setDownloadProgress({ tripId: trip.id, progress: 0, status: 'downloading' });
-    progressAnim.setValue(0);
-
-    const estimatedSize = Math.floor(Math.random() * 30 + 20);
-    let progress = 0;
-
-    const interval = setInterval(() => {
-      progress += Math.random() * 15 + 5;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
-
-        const newOfflineTrip: OfflineTrip = {
-          tripId: trip.id,
-          downloadedAt: new Date().toISOString(),
-          size: estimatedSize,
-          includesMap: true,
-          includesImages: true,
-          lastUpdated: new Date().toISOString(),
-        };
-
-        const updated = [...offlineTrips, newOfflineTrip];
-        saveOfflineTrips(updated);
-        
-        setDownloadProgress({ tripId: trip.id, progress: 100, status: 'completed' });
-        
-        setTimeout(() => {
-          setDownloadProgress(null);
-        }, 1500);
-      } else {
-        setDownloadProgress(prev => prev ? { ...prev, progress } : null);
+  const simulateDownload = useCallback(
+    (trip: Trip) => {
+      const isAlreadyDownloaded = offlineTrips.some((t) => t.tripId === trip.id);
+      if (isAlreadyDownloaded) {
+        Alert.alert('Already Downloaded', 'This trip is already available offline.');
+        return;
       }
 
-      Animated.timing(progressAnim, {
-        toValue: progress / 100,
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
-    }, 300);
-  }, [offlineTrips, progressAnim]);
-
-  const deleteOfflineTrip = useCallback((tripId: string) => {
-    Alert.alert(
-      'Delete Offline Data',
-      'Are you sure you want to remove this trip from offline storage?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            const updated = offlineTrips.filter(t => t.tripId !== tripId);
-            saveOfflineTrips(updated);
-          },
-        },
-      ]
-    );
-  }, [offlineTrips]);
-
-  const updateOfflineTrip = useCallback((tripId: string) => {
-    const trip = trips.find(t => t.id === tripId);
-    if (trip) {
-      setDownloadProgress({ tripId, progress: 0, status: 'downloading' });
+      setDownloadProgress({ tripId: trip.id, progress: 0, status: 'downloading' });
       progressAnim.setValue(0);
 
+      const estimatedSize = Math.floor(Math.random() * 30 + 20);
       let progress = 0;
+
       const interval = setInterval(() => {
-        progress += Math.random() * 20 + 10;
+        progress += Math.random() * 15 + 5;
         if (progress >= 100) {
           progress = 100;
           clearInterval(interval);
 
-          const updated = offlineTrips.map(t =>
-            t.tripId === tripId ? { ...t, lastUpdated: new Date().toISOString() } : t
-          );
+          const newOfflineTrip: OfflineTrip = {
+            tripId: trip.id,
+            downloadedAt: new Date().toISOString(),
+            size: estimatedSize,
+            includesMap: true,
+            includesImages: true,
+            lastUpdated: new Date().toISOString(),
+          };
+
+          const updated = [...offlineTrips, newOfflineTrip];
           saveOfflineTrips(updated);
-          
-          setDownloadProgress({ tripId, progress: 100, status: 'completed' });
-          setTimeout(() => setDownloadProgress(null), 1500);
+
+          setDownloadProgress({ tripId: trip.id, progress: 100, status: 'completed' });
+
+          setTimeout(() => {
+            setDownloadProgress(null);
+          }, 1500);
         } else {
-          setDownloadProgress(prev => prev ? { ...prev, progress } : null);
+          setDownloadProgress((prev) => (prev ? { ...prev, progress } : null));
         }
 
         Animated.timing(progressAnim, {
@@ -183,9 +134,67 @@ export default function OfflineModeScreen() {
           duration: 200,
           useNativeDriver: false,
         }).start();
-      }, 200);
-    }
-  }, [trips, offlineTrips, progressAnim]);
+      }, 300);
+    },
+    [offlineTrips, progressAnim]
+  );
+
+  const deleteOfflineTrip = useCallback(
+    (tripId: string) => {
+      Alert.alert(
+        'Delete Offline Data',
+        'Are you sure you want to remove this trip from offline storage?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => {
+              const updated = offlineTrips.filter((t) => t.tripId !== tripId);
+              saveOfflineTrips(updated);
+            },
+          },
+        ]
+      );
+    },
+    [offlineTrips]
+  );
+
+  const updateOfflineTrip = useCallback(
+    (tripId: string) => {
+      const trip = trips.find((t) => t.id === tripId);
+      if (trip) {
+        setDownloadProgress({ tripId, progress: 0, status: 'downloading' });
+        progressAnim.setValue(0);
+
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 20 + 10;
+          if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+
+            const updated = offlineTrips.map((t) =>
+              t.tripId === tripId ? { ...t, lastUpdated: new Date().toISOString() } : t
+            );
+            saveOfflineTrips(updated);
+
+            setDownloadProgress({ tripId, progress: 100, status: 'completed' });
+            setTimeout(() => setDownloadProgress(null), 1500);
+          } else {
+            setDownloadProgress((prev) => (prev ? { ...prev, progress } : null));
+          }
+
+          Animated.timing(progressAnim, {
+            toValue: progress / 100,
+            duration: 200,
+            useNativeDriver: false,
+          }).start();
+        }, 200);
+      }
+    },
+    [trips, offlineTrips, progressAnim]
+  );
 
   const formatSize = (mb: number) => {
     if (mb < 1) return `${Math.round(mb * 1024)} KB`;
@@ -197,26 +206,33 @@ export default function OfflineModeScreen() {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  const availableTrips = trips.filter(t => 
-    !offlineTrips.some(o => o.tripId === t.id) && 
-    (t.status === 'upcoming' || t.status === 'planning')
+  const availableTrips = trips.filter(
+    (t) =>
+      !offlineTrips.some((o) => o.tripId === t.id) &&
+      (t.status === 'upcoming' || t.status === 'planning')
   );
 
-  const downloadedTripDetails = offlineTrips.map(offline => {
-    const trip = trips.find(t => t.id === offline.tripId);
-    return { offline, trip };
-  }).filter(item => item.trip);
+  const downloadedTripDetails = offlineTrips
+    .map((offline) => {
+      const trip = trips.find((t) => t.id === offline.tripId);
+      return { offline, trip };
+    })
+    .filter((item) => item.trip);
 
   const renderTripCard = (trip: Trip, isDownloaded: boolean, offlineData?: OfflineTrip) => {
-    const isDownloading = downloadProgress?.tripId === trip.id && downloadProgress.status === 'downloading';
-    const justCompleted = downloadProgress?.tripId === trip.id && downloadProgress.status === 'completed';
+    const isDownloading =
+      downloadProgress?.tripId === trip.id && downloadProgress.status === 'downloading';
+    const justCompleted =
+      downloadProgress?.tripId === trip.id && downloadProgress.status === 'completed';
 
     return (
       <View key={trip.id} style={styles.tripCard}>
         <Image source={{ uri: trip.coverImage }} style={styles.tripImage} />
         <View style={styles.tripContent}>
           <View style={styles.tripHeader}>
-            <Text style={styles.tripName} numberOfLines={1}>{trip.destination.name}</Text>
+            <Text style={styles.tripName} numberOfLines={1}>
+              {trip.destination.name}
+            </Text>
             {isDownloaded && (
               <View style={styles.downloadedBadge}>
                 <CheckCircle size={12} color={colors.success} />
@@ -224,7 +240,7 @@ export default function OfflineModeScreen() {
               </View>
             )}
           </View>
-          
+
           <View style={styles.tripMeta}>
             <MapPin size={12} color={colors.textSecondary} />
             <Text style={styles.tripMetaText}>{trip.destination.country}</Text>
@@ -240,7 +256,9 @@ export default function OfflineModeScreen() {
                 <HardDrive size={12} color={colors.textSecondary} />
                 <Text style={styles.offlineInfoText}>{formatSize(offlineData.size)}</Text>
                 <Clock size={12} color={colors.textSecondary} style={{ marginLeft: 12 }} />
-                <Text style={styles.offlineInfoText}>Updated {formatDate(offlineData.lastUpdated)}</Text>
+                <Text style={styles.offlineInfoText}>
+                  Updated {formatDate(offlineData.lastUpdated)}
+                </Text>
               </View>
               <View style={styles.offlineFeatures}>
                 {offlineData.includesMap && (
@@ -349,9 +367,7 @@ export default function OfflineModeScreen() {
               ]}
             />
           </View>
-          <Text style={styles.storageText}>
-            {formatSize(totalStorage)} used of 500 MB
-          </Text>
+          <Text style={styles.storageText}>{formatSize(totalStorage)} used of 500 MB</Text>
           <Text style={styles.storageSubtext}>
             {offlineTrips.length} trip{offlineTrips.length !== 1 ? 's' : ''} saved for offline use
           </Text>
@@ -379,7 +395,7 @@ export default function OfflineModeScreen() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {selectedTab === 'available' ? (
             availableTrips.length > 0 ? (
-              availableTrips.map(trip => renderTripCard(trip, false))
+              availableTrips.map((trip) => renderTripCard(trip, false))
             ) : (
               <View style={styles.emptyState}>
                 <Download size={48} color={colors.textSecondary} />
@@ -389,20 +405,16 @@ export default function OfflineModeScreen() {
                 </Text>
               </View>
             )
-          ) : (
-            downloadedTripDetails.length > 0 ? (
-              downloadedTripDetails.map(({ offline, trip }) =>
-                trip ? renderTripCard(trip, true, offline) : null
-              )
-            ) : (
-              <View style={styles.emptyState}>
-                <WifiOff size={48} color={colors.textSecondary} />
-                <Text style={styles.emptyTitle}>No Offline Trips</Text>
-                <Text style={styles.emptyText}>
-                  Download trips to access them without internet
-                </Text>
-              </View>
+          ) : downloadedTripDetails.length > 0 ? (
+            downloadedTripDetails.map(({ offline, trip }) =>
+              trip ? renderTripCard(trip, true, offline) : null
             )
+          ) : (
+            <View style={styles.emptyState}>
+              <WifiOff size={48} color={colors.textSecondary} />
+              <Text style={styles.emptyTitle}>No Offline Trips</Text>
+              <Text style={styles.emptyText}>Download trips to access them without internet</Text>
+            </View>
           )}
 
           <View style={styles.infoSection}>
@@ -435,9 +447,7 @@ export default function OfflineModeScreen() {
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoItemTitle}>Images & Media</Text>
-                <Text style={styles.infoItemText}>
-                  All activity photos and destination images
-                </Text>
+                <Text style={styles.infoItemText}>All activity photos and destination images</Text>
               </View>
             </View>
           </View>

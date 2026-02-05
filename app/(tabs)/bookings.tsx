@@ -1,13 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  RefreshControl,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -82,7 +74,7 @@ export default function BookingsScreen() {
 
   // Filter bookings
   const filteredBookings = useMemo(() => {
-    return bookings.filter(b => {
+    return bookings.filter((b) => {
       if (filter === 'all') return true;
       if (filter === 'upcoming') return b.status === 'confirmed' || b.status === 'pending';
       if (filter === 'completed') return b.status === 'completed';
@@ -94,11 +86,11 @@ export default function BookingsScreen() {
   // Group bookings by date
   const groupedBookings = useMemo(() => {
     const groups: { [key: string]: Booking[] } = {};
-    
-    filteredBookings.forEach(booking => {
+
+    filteredBookings.forEach((booking) => {
       const date = new Date(booking.startDate);
       const key = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      
+
       if (!groups[key]) {
         groups[key] = [];
       }
@@ -106,10 +98,8 @@ export default function BookingsScreen() {
     });
 
     // Sort each group by date
-    Object.keys(groups).forEach(key => {
-      groups[key].sort((a, b) => 
-        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-      );
+    Object.keys(groups).forEach((key) => {
+      groups[key].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
     });
 
     return groups;
@@ -127,21 +117,31 @@ export default function BookingsScreen() {
   // Status helpers
   const getStatusIcon = (status: Booking['status']) => {
     switch (status) {
-      case 'confirmed': return CheckCircle;
-      case 'pending': return Clock;
-      case 'cancelled': return XCircle;
-      case 'completed': return CheckCircle;
-      default: return AlertCircle;
+      case 'confirmed':
+        return CheckCircle;
+      case 'pending':
+        return Clock;
+      case 'cancelled':
+        return XCircle;
+      case 'completed':
+        return CheckCircle;
+      default:
+        return AlertCircle;
     }
   };
 
   const getStatusColor = (status: Booking['status']) => {
     switch (status) {
-      case 'confirmed': return colors.success;
-      case 'pending': return colors.warning;
-      case 'cancelled': return colors.error;
-      case 'completed': return colors.textSecondary;
-      default: return colors.textTertiary;
+      case 'confirmed':
+        return colors.success;
+      case 'pending':
+        return colors.warning;
+      case 'cancelled':
+        return colors.error;
+      case 'completed':
+        return colors.textSecondary;
+      default:
+        return colors.textTertiary;
     }
   };
 
@@ -166,11 +166,9 @@ export default function BookingsScreen() {
   };
 
   // Handle quick cancel
-  const handleQuickCancel = useCallback((booking: Booking) => {
-    Alert.alert(
-      'Cancel Booking',
-      `Are you sure you want to cancel "${booking.name}"?`,
-      [
+  const handleQuickCancel = useCallback(
+    (booking: Booking) => {
+      Alert.alert('Cancel Booking', `Are you sure you want to cancel "${booking.name}"?`, [
         { text: 'Keep Booking', style: 'cancel' },
         {
           text: 'Cancel',
@@ -180,19 +178,26 @@ export default function BookingsScreen() {
             setSelectedBookingId(null);
           },
         },
-      ]
-    );
-  }, [cancelBooking]);
+      ]);
+    },
+    [cancelBooking]
+  );
 
   // Handle booking press
-  const handleBookingPress = useCallback((booking: Booking) => {
-    router.push(`/booking/${booking.id}`);
-  }, [router]);
+  const handleBookingPress = useCallback(
+    (booking: Booking) => {
+      router.push(`/booking/${booking.id}`);
+    },
+    [router]
+  );
 
   // Handle actions menu
-  const handleActionsPress = useCallback((bookingId: string) => {
-    setSelectedBookingId(selectedBookingId === bookingId ? null : bookingId);
-  }, [selectedBookingId]);
+  const handleActionsPress = useCallback(
+    (bookingId: string) => {
+      setSelectedBookingId(selectedBookingId === bookingId ? null : bookingId);
+    },
+    [selectedBookingId]
+  );
 
   // Render booking card
   const renderBookingCard = (booking: Booking) => {
@@ -224,7 +229,7 @@ export default function BookingsScreen() {
                   {booking.type.charAt(0).toUpperCase() + booking.type.slice(1)}
                 </Text>
               </View>
-              
+
               <View style={styles.bookingActions}>
                 <View style={[styles.statusBadge, { backgroundColor: statusColor + '15' }]}>
                   <StatusIcon size={12} color={statusColor} />
@@ -232,7 +237,7 @@ export default function BookingsScreen() {
                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                   </Text>
                 </View>
-                
+
                 {canCancel && (
                   <Pressable
                     style={styles.moreButton}
@@ -291,11 +296,7 @@ export default function BookingsScreen() {
 
           {/* Image if available */}
           {booking.image && (
-            <Image
-              source={{ uri: booking.image }}
-              style={styles.bookingImage}
-              contentFit="cover"
-            />
+            <Image source={{ uri: booking.image }} style={styles.bookingImage} contentFit="cover" />
           )}
         </Pressable>
 
@@ -312,21 +313,16 @@ export default function BookingsScreen() {
               <Edit3 size={16} color={colors.primary} />
               <Text style={styles.quickActionText}>Modify</Text>
             </Pressable>
-            
+
             <View style={styles.quickActionDivider} />
-            
-            <Pressable
-              style={styles.quickActionButton}
-              onPress={() => handleQuickCancel(booking)}
-            >
+
+            <Pressable style={styles.quickActionButton} onPress={() => handleQuickCancel(booking)}>
               <Trash2 size={16} color={colors.error} />
-              <Text style={[styles.quickActionText, { color: colors.error }]}>
-                Cancel
-              </Text>
+              <Text style={[styles.quickActionText, { color: colors.error }]}>Cancel</Text>
             </Pressable>
-            
+
             <View style={styles.quickActionDivider} />
-            
+
             <Pressable
               style={styles.quickActionButton}
               onPress={() => {
@@ -354,10 +350,7 @@ export default function BookingsScreen() {
           : `No ${filter} bookings found.`}
       </Text>
       {filter === 'all' && (
-        <Pressable
-          style={styles.emptyButton}
-          onPress={() => router.push('/plan-trip')}
-        >
+        <Pressable style={styles.emptyButton} onPress={() => router.push('/plan-trip')}>
           <Text style={styles.emptyButtonText}>Plan a Trip</Text>
         </Pressable>
       )}
@@ -382,7 +375,7 @@ export default function BookingsScreen() {
           style={styles.filterScroll}
           contentContainerStyle={styles.filterContent}
         >
-          {(['all', 'upcoming', 'completed', 'cancelled'] as FilterType[]).map(f => (
+          {(['all', 'upcoming', 'completed', 'cancelled'] as FilterType[]).map((f) => (
             <Pressable
               key={f}
               style={[styles.filterChip, filter === f && styles.filterChipActive]}
@@ -400,21 +393,17 @@ export default function BookingsScreen() {
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-          {filteredBookings.length > 0 ? (
-            sortedGroupKeys.map(groupKey => (
-              <View key={groupKey} style={styles.group}>
-                <Text style={styles.groupTitle}>{groupKey}</Text>
-                {groupedBookings[groupKey].map(renderBookingCard)}
-              </View>
-            ))
-          ) : (
-            renderEmptyState()
-          )}
-          
+          {filteredBookings.length > 0
+            ? sortedGroupKeys.map((groupKey) => (
+                <View key={groupKey} style={styles.group}>
+                  <Text style={styles.groupTitle}>{groupKey}</Text>
+                  {groupedBookings[groupKey].map(renderBookingCard)}
+                </View>
+              ))
+            : renderEmptyState()}
+
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </SafeAreaView>

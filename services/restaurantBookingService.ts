@@ -70,10 +70,10 @@ class RestaurantBookingService {
 
   async searchRestaurants(params: RestaurantSearchParams): Promise<RestaurantSearchResult> {
     const results: RestaurantWithAvailability[] = [];
-    
+
     // In production, call actual APIs
     // For now, use mock data that simulates real responses
-    
+
     try {
       // Search OpenTable
       if (this.isProviderEnabled('opentable')) {
@@ -86,9 +86,8 @@ class RestaurantBookingService {
         const resyResults = await this.searchResy(params);
         // Merge or add restaurants
         for (const restaurant of resyResults) {
-          const existing = results.find(r => 
-            r.name === restaurant.name && 
-            r.address === restaurant.address
+          const existing = results.find(
+            (r) => r.name === restaurant.name && r.address === restaurant.address
           );
           if (existing) {
             // Merge availability from Resy
@@ -129,29 +128,33 @@ class RestaurantBookingService {
   // OpenTable Integration
   // ============================================================================
 
-  private async searchOpenTable(params: RestaurantSearchParams): Promise<RestaurantWithAvailability[]> {
+  private async searchOpenTable(
+    params: RestaurantSearchParams
+  ): Promise<RestaurantWithAvailability[]> {
     const config = PROVIDER_CONFIGS.opentable;
-    
+
     // In production, this would call the real OpenTable API:
     // POST https://platform.opentable.com/v1/availability
     // Headers: Authorization: Bearer {apiKey}
     // Body: { datetime, party_size, lat, lng, etc. }
-    
+
     // For demo, return mock data
     return this.getMockOpenTableResults(params);
   }
 
   private getMockOpenTableResults(params: RestaurantSearchParams): RestaurantWithAvailability[] {
-    const mockRestaurants = MOCK_RESTAURANTS.filter(r => 
+    const mockRestaurants = MOCK_RESTAURANTS.filter((r) =>
       r.reservationProviders.includes('opentable')
     );
 
-    return mockRestaurants.map(restaurant => ({
+    return mockRestaurants.map((restaurant) => ({
       ...restaurant,
-      availability: [{
-        provider: 'opentable',
-        slots: this.generateMockTimeSlots('opentable', restaurant.id, params),
-      }],
+      availability: [
+        {
+          provider: 'opentable',
+          slots: this.generateMockTimeSlots('opentable', restaurant.id, params),
+        },
+      ],
     }));
   }
 
@@ -161,27 +164,27 @@ class RestaurantBookingService {
 
   private async searchResy(params: RestaurantSearchParams): Promise<RestaurantWithAvailability[]> {
     const config = PROVIDER_CONFIGS.resy;
-    
+
     // In production, this would call the real Resy API:
     // GET https://api.resy.com/v4/find
     // Headers: Authorization: ResyAPI api_key="{apiKey}"
     // Params: lat, long, day, party_size, etc.
-    
+
     // For demo, return mock data
     return this.getMockResyResults(params);
   }
 
   private getMockResyResults(params: RestaurantSearchParams): RestaurantWithAvailability[] {
-    const mockRestaurants = MOCK_RESTAURANTS.filter(r => 
-      r.reservationProviders.includes('resy')
-    );
+    const mockRestaurants = MOCK_RESTAURANTS.filter((r) => r.reservationProviders.includes('resy'));
 
-    return mockRestaurants.map(restaurant => ({
+    return mockRestaurants.map((restaurant) => ({
       ...restaurant,
-      availability: [{
-        provider: 'resy',
-        slots: this.generateMockTimeSlots('resy', restaurant.id, params),
-      }],
+      availability: [
+        {
+          provider: 'resy',
+          slots: this.generateMockTimeSlots('resy', restaurant.id, params),
+        },
+      ],
     }));
   }
 
@@ -196,8 +199,8 @@ class RestaurantBookingService {
     providers?: ReservationProvider[]
   ): Promise<TimeSlotGroup[]> {
     const availability: TimeSlotGroup[] = [];
-    const restaurant = MOCK_RESTAURANTS.find(r => r.id === restaurantId);
-    
+    const restaurant = MOCK_RESTAURANTS.find((r) => r.id === restaurantId);
+
     if (!restaurant) {
       throw new Error('Restaurant not found');
     }
@@ -225,9 +228,9 @@ class RestaurantBookingService {
 
   async makeReservation(request: ReservationRequest): Promise<Reservation> {
     const { timeSlot, restaurantId, primaryGuest, partySize } = request;
-    
+
     // Find restaurant
-    const restaurant = MOCK_RESTAURANTS.find(r => r.id === restaurantId);
+    const restaurant = MOCK_RESTAURANTS.find((r) => r.id === restaurantId);
     if (!restaurant) {
       throw new Error('Restaurant not found');
     }
@@ -250,30 +253,30 @@ class RestaurantBookingService {
       providerReservationId: `${timeSlot.provider.toUpperCase()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
       provider: timeSlot.provider,
       status: 'confirmed',
-      
+
       restaurant,
-      
+
       dateTime: timeSlot.dateTime,
       displayDate: this.formatDisplayDate(timeSlot.dateTime),
       displayTime: timeSlot.displayTime,
       partySize,
-      
+
       guestName: `${primaryGuest.firstName} ${primaryGuest.lastName}`,
       guestEmail: primaryGuest.email,
       guestPhone: primaryGuest.phone,
-      
+
       specialRequests: request.specialRequests,
       occasion: request.occasion,
       seatingPreference: request.seatingPreference,
-      
+
       confirmationNumber: this.generateConfirmationNumber(timeSlot.provider),
       confirmationUrl: `https://${timeSlot.provider}.com/confirmation/${Date.now()}`,
-      
+
       depositPaid: timeSlot.depositAmount,
       depositRefundable: true,
-      
+
       createdAt: new Date(),
-      
+
       cancellationPolicy: 'Free cancellation up to 2 hours before reservation',
       canCancel: true,
       canModify: true,
@@ -292,8 +295,9 @@ class RestaurantBookingService {
   // ============================================================================
 
   async getReservations(): Promise<Reservation[]> {
-    return Array.from(this.reservations.values())
-      .sort((a, b) => b.dateTime.getTime() - a.dateTime.getTime());
+    return Array.from(this.reservations.values()).sort(
+      (a, b) => b.dateTime.getTime() - a.dateTime.getTime()
+    );
   }
 
   async getReservation(id: string): Promise<Reservation | null> {
@@ -346,7 +350,7 @@ class RestaurantBookingService {
       const [hours, minutes] = this.parseTime(timeStr);
       const newDateTime = new Date(dateStr);
       newDateTime.setHours(hours, minutes, 0, 0);
-      
+
       reservation.dateTime = newDateTime;
       reservation.displayDate = this.formatDisplayDate(newDateTime);
       reservation.displayTime = timeStr;
@@ -384,7 +388,7 @@ class RestaurantBookingService {
           url += `?date=${date}&time=${time}&partySize=${partySize}`;
         }
         break;
-        
+
       case 'resy':
         // Resy deep link
         url = `resy://restaurant/${restaurantId}`;
@@ -392,13 +396,13 @@ class RestaurantBookingService {
           url += `?date=${date}&seats=${partySize}`;
         }
         break;
-        
+
       default:
         return false;
     }
 
     const canOpen = await Linking.canOpenURL(url);
-    
+
     if (canOpen) {
       await Linking.openURL(url);
       return true;
@@ -424,14 +428,14 @@ class RestaurantBookingService {
           otUrl += `?dateTime=${date}T${time}&partySize=${partySize}`;
         }
         return otUrl;
-        
+
       case 'resy':
         let resyUrl = `https://resy.com/cities/venue/${restaurantId}`;
         if (date && partySize) {
           resyUrl += `?date=${date}&seats=${partySize}`;
         }
         return resyUrl;
-        
+
       default:
         return '';
     }
@@ -448,7 +452,7 @@ class RestaurantBookingService {
 
   private notifyListeners() {
     const reservations = Array.from(this.reservations.values());
-    this.listeners.forEach(callback => callback(reservations));
+    this.listeners.forEach((callback) => callback(reservations));
   }
 
   // ============================================================================
@@ -459,10 +463,7 @@ class RestaurantBookingService {
     return PROVIDER_CONFIGS[provider]?.isEnabled ?? false;
   }
 
-  private sortResults(
-    results: RestaurantWithAvailability[],
-    sortBy: string
-  ) {
+  private sortResults(results: RestaurantWithAvailability[], sortBy: string) {
     switch (sortBy) {
       case 'rating':
         results.sort((a, b) => (b.aggregateRating || 0) - (a.aggregateRating || 0));
@@ -493,9 +494,9 @@ class RestaurantBookingService {
   ): TimeSlot[] {
     const slots: TimeSlot[] = [];
     const baseHour = parseInt(params.time.split(':')[0]);
-    
+
     // Generate slots around requested time
-    const times = [-1, -0.5, 0, 0.5, 1, 1.5, 2].map(offset => {
+    const times = [-1, -0.5, 0, 0.5, 1, 1.5, 2].map((offset) => {
       const hour = baseHour + offset;
       const minutes = offset % 1 === 0 ? '00' : '30';
       return `${Math.floor(hour)}:${minutes}`;
@@ -504,13 +505,13 @@ class RestaurantBookingService {
     for (const time of times) {
       const [hours, minutes] = time.split(':').map(Number);
       if (hours < 11 || hours > 22) continue; // Skip unrealistic times
-      
+
       const dateTime = new Date(params.date);
       dateTime.setHours(hours, minutes, 0, 0);
-      
+
       // Random availability (80% chance available)
       const isAvailable = Math.random() > 0.2;
-      
+
       slots.push({
         id: `slot-${provider}-${restaurantId}-${time.replace(':', '')}`,
         provider,
@@ -526,7 +527,7 @@ class RestaurantBookingService {
       });
     }
 
-    return slots.filter(s => s.isAvailable);
+    return slots.filter((s) => s.isAvailable);
   }
 
   private formatTime(hours: number, minutes: number): string {
@@ -547,14 +548,14 @@ class RestaurantBookingService {
   private parseTime(timeStr: string): [number, number] {
     const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
     if (!match) return [18, 0];
-    
+
     let hours = parseInt(match[1]);
     const minutes = parseInt(match[2]);
     const period = match[3].toUpperCase();
-    
+
     if (period === 'PM' && hours !== 12) hours += 12;
     if (period === 'AM' && hours === 12) hours = 0;
-    
+
     return [hours, minutes];
   }
 
@@ -564,13 +565,13 @@ class RestaurantBookingService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // Mock search results for demo
   private getMockSearchResults(params: RestaurantSearchParams): RestaurantSearchResult {
     return {
-      restaurants: MOCK_RESTAURANTS.map(r => ({
+      restaurants: MOCK_RESTAURANTS.map((r) => ({
         ...r,
         availability: [
           {
@@ -608,7 +609,7 @@ const MOCK_RESTAURANTS: Restaurant[] = [
     state: 'GA',
     zipCode: '30305',
     neighborhood: 'Buckhead',
-    coordinates: { lat: 33.8406, lng: -84.3780 },
+    coordinates: { lat: 33.8406, lng: -84.378 },
     phone: '(404) 233-7673',
     website: 'https://aria-atl.com',
     photos: ['https://example.com/aria1.jpg'],

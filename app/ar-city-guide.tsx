@@ -80,7 +80,7 @@ export default function ARCityGuideScreen() {
   const cities = ['Paris', 'Rome', 'London', 'Barcelona', 'Berlin', 'Athens', 'New York', 'Sydney'];
 
   useEffect(() => {
-    const cityLandmarks = landmarks.filter(l => l.city === currentCity);
+    const cityLandmarks = landmarks.filter((l) => l.city === currentCity);
     const landmarksWithDistance = cityLandmarks.map((l, index) => ({
       ...l,
       distance: 0.1 + index * 0.3,
@@ -201,7 +201,8 @@ export default function ARCityGuideScreen() {
           </View>
           <Text style={styles.permissionTitle}>Camera Access Required</Text>
           <Text style={styles.permissionText}>
-            AR City Guide needs camera access to identify landmarks around you and provide instant information.
+            AR City Guide needs camera access to identify landmarks around you and provide instant
+            information.
           </Text>
           <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
             <Text style={styles.permissionButtonText}>Enable Camera</Text>
@@ -258,15 +259,10 @@ export default function ARCityGuideScreen() {
                     onPress={() => handleLandmarkPress(landmark)}
                   >
                     <Animated.View
-                      style={[
-                        styles.markerPulse,
-                        { transform: [{ scale: pulseAnimation }] },
-                      ]}
+                      style={[styles.markerPulse, { transform: [{ scale: pulseAnimation }] }]}
                     />
                     <View style={styles.markerContent}>
-                      <Text style={styles.markerEmoji}>
-                        {LANDMARK_TYPE_ICONS[landmark.type]}
-                      </Text>
+                      <Text style={styles.markerEmoji}>{LANDMARK_TYPE_ICONS[landmark.type]}</Text>
                     </View>
                     <View style={styles.markerLabel}>
                       <Text style={styles.markerName} numberOfLines={1}>
@@ -377,9 +373,7 @@ export default function ARCityGuideScreen() {
                     </Text>
                     <View style={styles.nearbyMeta}>
                       <Navigation size={10} color={colors.textSecondary} />
-                      <Text style={styles.nearbyDistance}>
-                        {formatDistance(landmark.distance)}
-                      </Text>
+                      <Text style={styles.nearbyDistance}>{formatDistance(landmark.distance)}</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -438,7 +432,8 @@ export default function ARCityGuideScreen() {
                       {LANDMARK_TYPE_ICONS[selectedLandmark.type]}
                     </Text>
                     <Text style={styles.landmarkTypeText}>
-                      {selectedLandmark.type.charAt(0).toUpperCase() + selectedLandmark.type.slice(1)}
+                      {selectedLandmark.type.charAt(0).toUpperCase() +
+                        selectedLandmark.type.slice(1)}
                     </Text>
                   </View>
                   <Text style={styles.modalTitle}>{selectedLandmark.name}</Text>
@@ -535,7 +530,14 @@ export default function ARCityGuideScreen() {
                           styles.accessibilityItemActive,
                       ]}
                     >
-                      <Accessibility size={18} color={selectedLandmark.accessibility.wheelchairAccessible ? colors.success : colors.textTertiary} />
+                      <Accessibility
+                        size={18}
+                        color={
+                          selectedLandmark.accessibility.wheelchairAccessible
+                            ? colors.success
+                            : colors.textTertiary
+                        }
+                      />
                       <Text
                         style={[
                           styles.accessibilityText,
@@ -553,7 +555,14 @@ export default function ARCityGuideScreen() {
                           styles.accessibilityItemActive,
                       ]}
                     >
-                      <Volume2 size={18} color={selectedLandmark.accessibility.audioDescription ? colors.success : colors.textTertiary} />
+                      <Volume2
+                        size={18}
+                        color={
+                          selectedLandmark.accessibility.audioDescription
+                            ? colors.success
+                            : colors.textTertiary
+                        }
+                      />
                       <Text
                         style={[
                           styles.accessibilityText,
@@ -571,7 +580,14 @@ export default function ARCityGuideScreen() {
                           styles.accessibilityItemActive,
                       ]}
                     >
-                      <Info size={18} color={selectedLandmark.accessibility.signLanguageTours ? colors.success : colors.textTertiary} />
+                      <Info
+                        size={18}
+                        color={
+                          selectedLandmark.accessibility.signLanguageTours
+                            ? colors.success
+                            : colors.textTertiary
+                        }
+                      />
                       <Text
                         style={[
                           styles.accessibilityText,

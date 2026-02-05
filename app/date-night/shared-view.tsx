@@ -47,7 +47,7 @@ const { width } = Dimensions.get('window');
 export default function SharedViewScreen() {
   const router = useRouter();
   const { code } = useLocalSearchParams<{ code?: string }>();
-  
+
   const [enteredCode, setEnteredCode] = useState(code || '');
   const [password, setPassword] = useState('');
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
@@ -81,13 +81,13 @@ export default function SharedViewScreen() {
 
   const handleSendSuggestion = () => {
     if (!suggestionText.trim()) return;
-    
+
     submitSuggestion({
       activityId: selectedActivity?.id,
       type: 'note',
       message: suggestionText,
     });
-    
+
     setSuggestionText('');
     setShowSuggestionModal(false);
     setSelectedActivity(null);
@@ -123,7 +123,7 @@ export default function SharedViewScreen() {
         <Text style={styles.codeEntrySubtitle}>
           Enter the 6-character code your partner shared with you
         </Text>
-        
+
         <View style={styles.codeInputContainer}>
           <TextInput
             style={styles.codeInput}
@@ -136,12 +136,9 @@ export default function SharedViewScreen() {
             autoCorrect={false}
           />
         </View>
-        
-        <Pressable 
-          style={[
-            styles.codeSubmitBtn,
-            enteredCode.length !== 6 && styles.codeSubmitBtnDisabled
-          ]}
+
+        <Pressable
+          style={[styles.codeSubmitBtn, enteredCode.length !== 6 && styles.codeSubmitBtnDisabled]}
           onPress={handleCodeSubmit}
           disabled={enteredCode.length !== 6}
         >
@@ -171,7 +168,7 @@ export default function SharedViewScreen() {
         <Text style={styles.codeEntrySubtitle}>
           This itinerary is password protected. Ask your partner for the password.
         </Text>
-        
+
         <View style={styles.codeInputContainer}>
           <TextInput
             style={styles.codeInput}
@@ -183,12 +180,9 @@ export default function SharedViewScreen() {
             autoCorrect={false}
           />
         </View>
-        
-        <Pressable 
-          style={[
-            styles.codeSubmitBtn,
-            !password && styles.codeSubmitBtnDisabled
-          ]}
+
+        <Pressable
+          style={[styles.codeSubmitBtn, !password && styles.codeSubmitBtnDisabled]}
           onPress={handlePasswordSubmit}
           disabled={!password}
         >
@@ -204,31 +198,23 @@ export default function SharedViewScreen() {
 
   const renderActivityCard = (activity: SharedViewActivity, index: number) => {
     const isSurprise = activity.isSurprise;
-    
+
     return (
       <View key={activity.id} style={styles.activityCard}>
         {/* Timeline connector */}
         <View style={styles.timelineContainer}>
-          <View style={[
-            styles.timelineDot,
-            isSurprise && styles.timelineDotSurprise
-          ]}>
+          <View style={[styles.timelineDot, isSurprise && styles.timelineDotSurprise]}>
             {isSurprise ? (
               <Gift size={14} color="#fff" />
             ) : (
               <Text style={styles.timelineNumber}>{index + 1}</Text>
             )}
           </View>
-          {index < (sharedView?.activities.length || 0) - 1 && (
-            <View style={styles.timelineLine} />
-          )}
+          {index < (sharedView?.activities.length || 0) - 1 && <View style={styles.timelineLine} />}
         </View>
 
         {/* Activity content */}
-        <View style={[
-          styles.activityContent,
-          isSurprise && styles.activityContentSurprise
-        ]}>
+        <View style={[styles.activityContent, isSurprise && styles.activityContentSurprise]}>
           {/* Time */}
           <View style={styles.activityTime}>
             <Clock size={14} color={colors.textSecondary} />
@@ -239,10 +225,7 @@ export default function SharedViewScreen() {
           </View>
 
           {/* Name */}
-          <Text style={[
-            styles.activityName,
-            isSurprise && styles.activityNameSurprise
-          ]}>
+          <Text style={[styles.activityName, isSurprise && styles.activityNameSurprise]}>
             {activity.name || 'Activity'}
           </Text>
 
@@ -266,14 +249,16 @@ export default function SharedViewScreen() {
           )}
 
           {/* Neighborhood hint for surprises */}
-          {isSurprise && activity.teaseLevel === 'neighborhood' && activity.location?.neighborhood && (
-            <View style={styles.activityLocation}>
-              <MapPin size={14} color={colors.textTertiary} />
-              <Text style={styles.activityLocationText}>
-                Somewhere in {activity.location.neighborhood}
-              </Text>
-            </View>
-          )}
+          {isSurprise &&
+            activity.teaseLevel === 'neighborhood' &&
+            activity.location?.neighborhood && (
+              <View style={styles.activityLocation}>
+                <MapPin size={14} color={colors.textTertiary} />
+                <Text style={styles.activityLocationText}>
+                  Somewhere in {activity.location.neighborhood}
+                </Text>
+              </View>
+            )}
 
           {/* Description (if not surprise) */}
           {!isSurprise && activity.description && (
@@ -285,15 +270,13 @@ export default function SharedViewScreen() {
           {/* Travel time to next */}
           {activity.travelTime && activity.travelTime > 0 && (
             <View style={styles.travelInfo}>
-              <Text style={styles.travelInfoText}>
-                {activity.travelTime} min to next stop
-              </Text>
+              <Text style={styles.travelInfoText}>{activity.travelTime} min to next stop</Text>
             </View>
           )}
 
           {/* Suggestion button */}
           {sharedView?.shareSettings.accessLevel !== 'view_only' && (
-            <Pressable 
+            <Pressable
               style={styles.suggestBtn}
               onPress={() => {
                 setSelectedActivity(activity);
@@ -317,25 +300,17 @@ export default function SharedViewScreen() {
     if (!sharedView) return null;
 
     return (
-      <ScrollView 
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
-        <LinearGradient
-          colors={[colors.primary, colors.primary + 'CC']}
-          style={styles.heroSection}
-        >
+        <LinearGradient colors={[colors.primary, colors.primary + 'CC']} style={styles.heroSection}>
           <View style={styles.heroContent}>
             <View style={styles.heroIcon}>
               <Heart size={28} color="#fff" fill="#fff" />
             </View>
             <Text style={styles.heroTitle}>{sharedView.name}</Text>
             <Text style={styles.heroDate}>{formatDate(sharedView.date)}</Text>
-            
-            {sharedView.greeting && (
-              <Text style={styles.heroGreeting}>{sharedView.greeting}</Text>
-            )}
+
+            {sharedView.greeting && <Text style={styles.heroGreeting}>{sharedView.greeting}</Text>}
 
             {/* Stats */}
             <View style={styles.heroStats}>
@@ -370,8 +345,9 @@ export default function SharedViewScreen() {
           <View style={styles.surpriseBanner}>
             <Gift size={20} color={colors.primary} />
             <Text style={styles.surpriseBannerText}>
-              {sharedView.surpriseCount} surprise{sharedView.surpriseCount > 1 ? 's' : ''} await{sharedView.surpriseCount === 1 ? 's' : ''} you! 
-              Some details are hidden until the big reveal.
+              {sharedView.surpriseCount} surprise{sharedView.surpriseCount > 1 ? 's' : ''} await
+              {sharedView.surpriseCount === 1 ? 's' : ''} you! Some details are hidden until the big
+              reveal.
             </Text>
           </View>
         )}
@@ -379,9 +355,7 @@ export default function SharedViewScreen() {
         {/* Activities */}
         <View style={styles.activitiesSection}>
           <Text style={styles.sectionTitle}>Your Itinerary</Text>
-          {sharedView.activities.map((activity, index) => 
-            renderActivityCard(activity, index)
-          )}
+          {sharedView.activities.map((activity, index) => renderActivityCard(activity, index))}
         </View>
 
         {/* Actions */}
@@ -393,9 +367,9 @@ export default function SharedViewScreen() {
               <ChevronRight size={18} color={colors.textTertiary} />
             </Pressable>
           )}
-          
+
           {sharedView.shareSettings.accessLevel !== 'view_only' && (
-            <Pressable 
+            <Pressable
               style={styles.actionBtn}
               onPress={() => {
                 setSelectedActivity(null);
@@ -411,9 +385,7 @@ export default function SharedViewScreen() {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Planned with 💕 by {sharedView.creatorName}
-          </Text>
+          <Text style={styles.footerText}>Planned with 💕 by {sharedView.creatorName}</Text>
           <Text style={styles.footerSubtext}>
             Last updated {new Date(sharedView.lastUpdated).toLocaleDateString()}
           </Text>
@@ -462,8 +434,8 @@ export default function SharedViewScreen() {
             style={styles.suggestionInput}
             placeholder={
               selectedActivity
-                ? "Any thoughts or questions about this activity?"
-                : "Share your thoughts or ask a question..."
+                ? 'Any thoughts or questions about this activity?'
+                : 'Share your thoughts or ask a question...'
             }
             placeholderTextColor={colors.textTertiary}
             value={suggestionText}
@@ -487,12 +459,12 @@ export default function SharedViewScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen 
+      <Stack.Screen
         options={{
           headerShown: false,
         }}
       />
-      
+
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>

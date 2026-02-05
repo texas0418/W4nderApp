@@ -48,8 +48,18 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DAY_WIDTH = (SCREEN_WIDTH - 40 - 12) / 7;
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 // ============================================================================
@@ -129,7 +139,7 @@ export default function TripsScreen() {
   }, []);
 
   const filteredBookings = useMemo(() => {
-    return bookings.filter(b => {
+    return bookings.filter((b) => {
       if (filter === 'all') return true;
       if (filter === 'upcoming') return b.status === 'confirmed' || b.status === 'pending';
       if (filter === 'completed') return b.status === 'completed';
@@ -140,16 +150,14 @@ export default function TripsScreen() {
 
   const groupedBookings = useMemo(() => {
     const groups: { [key: string]: Booking[] } = {};
-    filteredBookings.forEach(booking => {
+    filteredBookings.forEach((booking) => {
       const date = new Date(booking.startDate);
       const key = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       if (!groups[key]) groups[key] = [];
       groups[key].push(booking);
     });
-    Object.keys(groups).forEach(key => {
-      groups[key].sort((a, b) =>
-        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-      );
+    Object.keys(groups).forEach((key) => {
+      groups[key].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
     });
     return groups;
   }, [filteredBookings]);
@@ -164,21 +172,31 @@ export default function TripsScreen() {
 
   const getStatusIcon = (status: Booking['status']) => {
     switch (status) {
-      case 'confirmed': return CheckCircle;
-      case 'pending': return Clock;
-      case 'cancelled': return XCircle;
-      case 'completed': return CheckCircle;
-      default: return AlertCircle;
+      case 'confirmed':
+        return CheckCircle;
+      case 'pending':
+        return Clock;
+      case 'cancelled':
+        return XCircle;
+      case 'completed':
+        return CheckCircle;
+      default:
+        return AlertCircle;
     }
   };
 
   const getStatusColor = (status: Booking['status']) => {
     switch (status) {
-      case 'confirmed': return colors.success;
-      case 'pending': return colors.warning;
-      case 'cancelled': return colors.error;
-      case 'completed': return colors.textSecondary;
-      default: return colors.textTertiary;
+      case 'confirmed':
+        return colors.success;
+      case 'pending':
+        return colors.warning;
+      case 'cancelled':
+        return colors.error;
+      case 'completed':
+        return colors.textSecondary;
+      default:
+        return colors.textTertiary;
     }
   };
 
@@ -190,15 +208,15 @@ export default function TripsScreen() {
     if (date.toDateString() === today.toDateString()) return 'Today';
     if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
     return date.toLocaleDateString('en-US', {
-      weekday: 'short', month: 'short', day: 'numeric',
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
-  const handleQuickCancel = useCallback((booking: Booking) => {
-    Alert.alert(
-      'Cancel Booking',
-      `Are you sure you want to cancel "${booking.name}"?`,
-      [
+  const handleQuickCancel = useCallback(
+    (booking: Booking) => {
+      Alert.alert('Cancel Booking', `Are you sure you want to cancel "${booking.name}"?`, [
         { text: 'Keep Booking', style: 'cancel' },
         {
           text: 'Cancel',
@@ -208,22 +226,29 @@ export default function TripsScreen() {
             setSelectedBookingId(null);
           },
         },
-      ]
-    );
-  }, [cancelBooking]);
+      ]);
+    },
+    [cancelBooking]
+  );
 
-  const handleBookingPress = useCallback((booking: Booking) => {
-    router.push(`/booking/${booking.id}`);
-  }, [router]);
+  const handleBookingPress = useCallback(
+    (booking: Booking) => {
+      router.push(`/booking/${booking.id}`);
+    },
+    [router]
+  );
 
-  const handleActionsPress = useCallback((bookingId: string) => {
-    setSelectedBookingId(selectedBookingId === bookingId ? null : bookingId);
-  }, [selectedBookingId]);
+  const handleActionsPress = useCallback(
+    (bookingId: string) => {
+      setSelectedBookingId(selectedBookingId === bookingId ? null : bookingId);
+    },
+    [selectedBookingId]
+  );
 
   // ========== Calendar View Logic ==========
 
   const allItineraries = useMemo((): GenericItinerary[] => {
-    const dateNights: GenericItinerary[] = dateNightItineraries.map(i => ({
+    const dateNights: GenericItinerary[] = dateNightItineraries.map((i) => ({
       id: i.id,
       name: i.name,
       date: i.date,
@@ -238,16 +263,19 @@ export default function TripsScreen() {
     return [...dateNights];
   }, [dateNightItineraries]);
 
-  const getItinerariesForDate = useCallback((date: Date): GenericItinerary[] => {
-    return allItineraries.filter(itinerary => {
-      const itineraryDate = new Date(itinerary.date);
-      return (
-        itineraryDate.getFullYear() === date.getFullYear() &&
-        itineraryDate.getMonth() === date.getMonth() &&
-        itineraryDate.getDate() === date.getDate()
-      );
-    });
-  }, [allItineraries]);
+  const getItinerariesForDate = useCallback(
+    (date: Date): GenericItinerary[] => {
+      return allItineraries.filter((itinerary) => {
+        const itineraryDate = new Date(itinerary.date);
+        return (
+          itineraryDate.getFullYear() === date.getFullYear() &&
+          itineraryDate.getMonth() === date.getMonth() &&
+          itineraryDate.getDate() === date.getDate()
+        );
+      });
+    },
+    [allItineraries]
+  );
 
   const calendarDays = useMemo(() => {
     const year = currentDate.getFullYear();
@@ -264,17 +292,32 @@ export default function TripsScreen() {
     const prevMonthDays = prevMonth.getDate();
     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
       const date = new Date(year, month - 1, prevMonthDays - i);
-      days.push({ date, isCurrentMonth: false, isToday: false, itineraries: getItinerariesForDate(date) });
+      days.push({
+        date,
+        isCurrentMonth: false,
+        isToday: false,
+        itineraries: getItinerariesForDate(date),
+      });
     }
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
       date.setHours(0, 0, 0, 0);
-      days.push({ date, isCurrentMonth: true, isToday: date.getTime() === today.getTime(), itineraries: getItinerariesForDate(date) });
+      days.push({
+        date,
+        isCurrentMonth: true,
+        isToday: date.getTime() === today.getTime(),
+        itineraries: getItinerariesForDate(date),
+      });
     }
     const remainingDays = 42 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
       const date = new Date(year, month + 1, i);
-      days.push({ date, isCurrentMonth: false, isToday: false, itineraries: getItinerariesForDate(date) });
+      days.push({
+        date,
+        isCurrentMonth: false,
+        isToday: false,
+        itineraries: getItinerariesForDate(date),
+      });
     }
     return days;
   }, [currentDate, getItinerariesForDate]);
@@ -285,11 +328,11 @@ export default function TripsScreen() {
   }, [selectedDate, getItinerariesForDate]);
 
   const goToPreviousMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
   const goToToday = () => {
@@ -313,34 +356,46 @@ export default function TripsScreen() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'date-night': return colors.secondary;
-      case 'trip': return colors.primary;
-      case 'business': return '#6366F1';
-      default: return colors.textSecondary;
+      case 'date-night':
+        return colors.secondary;
+      case 'trip':
+        return colors.primary;
+      case 'business':
+        return '#6366F1';
+      default:
+        return colors.textSecondary;
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'date-night': return Heart;
-      case 'trip': return Plane;
-      case 'business': return Briefcase;
-      default: return CalendarIcon;
+      case 'date-night':
+        return Heart;
+      case 'trip':
+        return Plane;
+      case 'business':
+        return Briefcase;
+      default:
+        return CalendarIcon;
     }
   };
 
   const getCalendarStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return colors.success;
-      case 'cancelled': return colors.error;
-      case 'draft': return colors.textTertiary;
-      default: return colors.secondary;
+      case 'completed':
+        return colors.success;
+      case 'cancelled':
+        return colors.error;
+      case 'draft':
+        return colors.textTertiary;
+      default:
+        return colors.secondary;
     }
   };
 
   const getDotColors = (dayItineraries: GenericItinerary[]) => {
     if (dayItineraries.length === 0) return [];
-    const types = [...new Set(dayItineraries.map(i => i.type))];
+    const types = [...new Set(dayItineraries.map((i) => i.type))];
     return types.map(getTypeColor).slice(0, 3);
   };
 
@@ -395,7 +450,9 @@ export default function TripsScreen() {
                 )}
               </View>
             </View>
-            <Text style={styles.bookingName} numberOfLines={1}>{booking.name}</Text>
+            <Text style={styles.bookingName} numberOfLines={1}>
+              {booking.name}
+            </Text>
             <View style={styles.detailsRow}>
               <View style={styles.detailItem}>
                 <CalendarIcon size={14} color={colors.textSecondary} />
@@ -410,7 +467,9 @@ export default function TripsScreen() {
             </View>
             <View style={styles.locationRow}>
               <MapPin size={14} color={colors.textSecondary} />
-              <Text style={styles.locationText} numberOfLines={1}>{booking.location}</Text>
+              <Text style={styles.locationText} numberOfLines={1}>
+                {booking.location}
+              </Text>
             </View>
             <View style={styles.bookingFooter}>
               <View style={styles.priceContainer}>
@@ -436,7 +495,10 @@ export default function TripsScreen() {
           <View style={styles.quickActions}>
             <Pressable
               style={styles.quickActionButton}
-              onPress={() => { setSelectedBookingId(null); router.push(`/booking/${booking.id}`); }}
+              onPress={() => {
+                setSelectedBookingId(null);
+                router.push(`/booking/${booking.id}`);
+              }}
             >
               <Edit3 size={16} color={colors.primary} />
               <Text style={styles.quickActionText}>Modify</Text>
@@ -449,7 +511,10 @@ export default function TripsScreen() {
             <View style={styles.quickActionDivider} />
             <Pressable
               style={styles.quickActionButton}
-              onPress={() => { setSelectedBookingId(null); router.push(`/booking/${booking.id}`); }}
+              onPress={() => {
+                setSelectedBookingId(null);
+                router.push(`/booking/${booking.id}`);
+              }}
             >
               <ExternalLink size={16} color={colors.textSecondary} />
               <Text style={styles.quickActionText}>Details</Text>
@@ -469,7 +534,7 @@ export default function TripsScreen() {
         style={styles.filterScroll}
         contentContainerStyle={styles.filterContent}
       >
-        {(['all', 'upcoming', 'completed', 'cancelled'] as FilterType[]).map(f => (
+        {(['all', 'upcoming', 'completed', 'cancelled'] as FilterType[]).map((f) => (
           <Pressable
             key={f}
             style={[styles.filterChip, filter === f && styles.filterChipActive]}
@@ -489,7 +554,7 @@ export default function TripsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {filteredBookings.length > 0 ? (
-          sortedGroupKeys.map(groupKey => (
+          sortedGroupKeys.map((groupKey) => (
             <View key={groupKey} style={styles.group}>
               <Text style={styles.groupTitle}>{groupKey}</Text>
               {groupedBookings[groupKey].map(renderBookingCard)}
@@ -535,7 +600,7 @@ export default function TripsScreen() {
 
       {/* Weekday Headers */}
       <View style={styles.weekdayHeader}>
-        {WEEKDAYS.map(day => (
+        {WEEKDAYS.map((day) => (
           <View key={day} style={styles.weekdayCell}>
             <Text style={styles.weekdayText}>{day}</Text>
           </View>
@@ -545,7 +610,8 @@ export default function TripsScreen() {
       {/* Calendar Grid */}
       <View style={styles.calendarGrid}>
         {calendarDays.map((day, index) => {
-          const isSelected = selectedDate && day.date.toDateString() === selectedDate.toDateString();
+          const isSelected =
+            selectedDate && day.date.toDateString() === selectedDate.toDateString();
           const dotColors = getDotColors(day.itineraries);
           return (
             <Pressable
@@ -557,12 +623,14 @@ export default function TripsScreen() {
               ]}
               onPress={() => setSelectedDate(day.date)}
             >
-              <Text style={[
-                styles.dayNumber,
-                !day.isCurrentMonth && styles.dayNumberOtherMonth,
-                isSelected && styles.dayNumberSelected,
-                day.isToday && !isSelected && styles.dayNumberToday,
-              ]}>
+              <Text
+                style={[
+                  styles.dayNumber,
+                  !day.isCurrentMonth && styles.dayNumberOtherMonth,
+                  isSelected && styles.dayNumberSelected,
+                  day.isToday && !isSelected && styles.dayNumberToday,
+                ]}
+              >
                 {day.date.getDate()}
               </Text>
               {dotColors.length > 0 && (
@@ -604,7 +672,7 @@ export default function TripsScreen() {
               </Pressable>
             </View>
           ) : (
-            selectedDateItineraries.map(itinerary => {
+            selectedDateItineraries.map((itinerary) => {
               const TypeIcon = getTypeIcon(itinerary.type);
               const typeColor = getTypeColor(itinerary.type);
               return (
@@ -622,9 +690,24 @@ export default function TripsScreen() {
                           : itinerary.type.charAt(0).toUpperCase() + itinerary.type.slice(1)}
                       </Text>
                     </View>
-                    <View style={[styles.calStatusBadge, { backgroundColor: `${getCalendarStatusColor(itinerary.status)}15` }]}>
-                      <View style={[styles.statusDot, { backgroundColor: getCalendarStatusColor(itinerary.status) }]} />
-                      <Text style={[styles.calStatusText, { color: getCalendarStatusColor(itinerary.status) }]}>
+                    <View
+                      style={[
+                        styles.calStatusBadge,
+                        { backgroundColor: `${getCalendarStatusColor(itinerary.status)}15` },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.statusDot,
+                          { backgroundColor: getCalendarStatusColor(itinerary.status) },
+                        ]}
+                      />
+                      <Text
+                        style={[
+                          styles.calStatusText,
+                          { color: getCalendarStatusColor(itinerary.status) },
+                        ]}
+                      >
                         {itinerary.status.charAt(0).toUpperCase() + itinerary.status.slice(1)}
                       </Text>
                     </View>
@@ -687,7 +770,10 @@ export default function TripsScreen() {
               style={[styles.toggleButton, viewMode === 'calendar' && styles.toggleButtonActive]}
               onPress={() => setViewMode('calendar')}
             >
-              <CalendarIcon size={18} color={viewMode === 'calendar' ? colors.primary : colors.textLight} />
+              <CalendarIcon
+                size={18}
+                color={viewMode === 'calendar' ? colors.primary : colors.textLight}
+              />
             </Pressable>
           </View>
         </View>

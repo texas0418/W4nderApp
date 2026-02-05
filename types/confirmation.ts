@@ -5,7 +5,7 @@
 // Confirmation Types
 // ============================================================================
 
-export type ConfirmationType = 
+export type ConfirmationType =
   | 'restaurant'
   | 'activity'
   | 'flight'
@@ -17,36 +17,36 @@ export type ConfirmationType =
 
 export type ConfirmationStatus =
   | 'upcoming'
-  | 'active'      // Currently in use (e.g., checked in)
+  | 'active' // Currently in use (e.g., checked in)
   | 'completed'
   | 'cancelled'
   | 'expired';
 
 export interface Confirmation {
   id: string;
-  
+
   // Type and provider
   type: ConfirmationType;
   provider: string; // "OpenTable", "Viator", "United Airlines", etc.
   providerColor?: string;
   providerLogo?: string;
-  
+
   // Booking details
   confirmationNumber: string;
   bookingReference?: string; // Secondary reference if needed
-  
+
   // What was booked
   title: string;
   subtitle?: string; // e.g., "Table for 2" or "2 Adults"
   description?: string;
-  
+
   // When
   date: string; // YYYY-MM-DD
   startTime?: string; // HH:mm
   endTime?: string;
   displayDateTime: string; // Formatted for display
   timezone?: string;
-  
+
   // Where
   location: {
     name: string;
@@ -59,17 +59,17 @@ export interface Confirmation {
     meetingPoint?: string;
     instructions?: string;
   };
-  
+
   // Tickets/QR codes
   tickets?: Ticket[];
-  
+
   // Contact
   contact?: {
     phone?: string;
     email?: string;
     website?: string;
   };
-  
+
   // Pricing
   pricing?: {
     total: number;
@@ -77,10 +77,10 @@ export interface Confirmation {
     isPaid: boolean;
     paymentMethod?: string;
   };
-  
+
   // Status
   status: ConfirmationStatus;
-  
+
   // Cancellation
   cancellation?: {
     policy: string;
@@ -88,20 +88,20 @@ export interface Confirmation {
     refundable: boolean;
     refundAmount?: number;
   };
-  
+
   // Notes
   notes?: string;
   specialRequests?: string;
-  
+
   // Metadata
   createdAt: string;
   updatedAt: string;
   source: 'manual' | 'auto' | 'import'; // How it was added
-  
+
   // Linking
   itineraryId?: string;
   linkedConfirmations?: string[]; // Related bookings
-  
+
   // Raw data (for reference)
   rawData?: Record<string, any>;
 }
@@ -112,39 +112,39 @@ export interface Confirmation {
 
 export interface Ticket {
   id: string;
-  
+
   // Ticket info
   type: 'qr_code' | 'barcode' | 'pdf' | 'passbook' | 'image' | 'text';
   label?: string; // "Adult Ticket", "VIP Pass", etc.
-  
+
   // Code data
   code?: string; // The actual code string
   codeFormat?: 'qr' | 'code128' | 'code39' | 'ean13' | 'pdf417';
-  
+
   // Visual
   imageUri?: string; // Local file URI or base64
   imageUrl?: string; // Remote URL
-  
+
   // PDF
   pdfUri?: string;
   pdfUrl?: string;
-  
+
   // Passbook/Wallet
   passbookUrl?: string;
-  
+
   // Holder info
   holderName?: string;
   seat?: string;
   section?: string;
   row?: string;
   gate?: string;
-  
+
   // Validity
   validFrom?: string;
   validUntil?: string;
   isUsed: boolean;
   usedAt?: string;
-  
+
   // Metadata
   createdAt: string;
 }
@@ -191,11 +191,14 @@ export interface ExportFormat {
 // Constants
 // ============================================================================
 
-export const CONFIRMATION_TYPE_CONFIG: Record<ConfirmationType, {
-  label: string;
-  icon: string;
-  color: string;
-}> = {
+export const CONFIRMATION_TYPE_CONFIG: Record<
+  ConfirmationType,
+  {
+    label: string;
+    icon: string;
+    color: string;
+  }
+> = {
   restaurant: {
     label: 'Restaurant',
     icon: 'Utensils',
@@ -238,11 +241,14 @@ export const CONFIRMATION_TYPE_CONFIG: Record<ConfirmationType, {
   },
 };
 
-export const STATUS_CONFIG: Record<ConfirmationStatus, {
-  label: string;
-  color: string;
-  bgColor: string;
-}> = {
+export const STATUS_CONFIG: Record<
+  ConfirmationStatus,
+  {
+    label: string;
+    color: string;
+    bgColor: string;
+  }
+> = {
   upcoming: {
     label: 'Upcoming',
     color: '#3B82F6',
@@ -290,11 +296,11 @@ export function formatConfirmationNumber(number: string): string {
 export function isConfirmationActive(confirmation: Confirmation): boolean {
   const now = new Date();
   const confirmationDate = new Date(confirmation.date);
-  
+
   if (confirmation.status === 'cancelled' || confirmation.status === 'expired') {
     return false;
   }
-  
+
   // Check if it's today
   const today = now.toISOString().split('T')[0];
   return confirmation.date === today;
@@ -318,7 +324,7 @@ export function sortConfirmations(
 ): Confirmation[] {
   return [...confirmations].sort((a, b) => {
     let comparison = 0;
-    
+
     switch (sort.field) {
       case 'date':
         comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -333,22 +339,20 @@ export function sortConfirmations(
         comparison = a.type.localeCompare(b.type);
         break;
     }
-    
+
     return sort.direction === 'asc' ? comparison : -comparison;
   });
 }
 
-export function groupConfirmationsByDate(
-  confirmations: Confirmation[]
-): ConfirmationGroup[] {
+export function groupConfirmationsByDate(confirmations: Confirmation[]): ConfirmationGroup[] {
   const groups: Map<string, Confirmation[]> = new Map();
   const now = new Date();
   const today = now.toISOString().split('T')[0];
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  
+
   for (const conf of confirmations) {
     let label: string;
-    
+
     if (conf.date === today) {
       label = 'Today';
     } else if (conf.date === tomorrow) {
@@ -363,17 +367,17 @@ export function groupConfirmationsByDate(
         year: 'numeric',
       });
     }
-    
+
     if (!groups.has(label)) {
       groups.set(label, []);
     }
     groups.get(label)!.push(conf);
   }
-  
+
   // Convert to array and sort groups
   const groupOrder = ['Today', 'Tomorrow'];
   const result: ConfirmationGroup[] = [];
-  
+
   // Add Today and Tomorrow first if they exist
   for (const label of groupOrder) {
     if (groups.has(label)) {
@@ -381,21 +385,21 @@ export function groupConfirmationsByDate(
       groups.delete(label);
     }
   }
-  
+
   // Add remaining groups sorted by date
   const remainingGroups = Array.from(groups.entries())
     .filter(([label]) => label !== 'Past')
     .sort(([, a], [, b]) => new Date(a[0].date).getTime() - new Date(b[0].date).getTime());
-  
+
   for (const [label, confs] of remainingGroups) {
     result.push({ label, confirmations: confs });
   }
-  
+
   // Add Past at the end
   if (groups.has('Past')) {
     result.push({ label: 'Past', confirmations: groups.get('Past')! });
   }
-  
+
   return result;
 }
 

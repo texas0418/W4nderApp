@@ -12,11 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouteOptimizer } from '../hooks/useRouteOptimizer';
-import {
-  RouteChange,
-  OptimizationResult,
-  ApprovalStatus,
-} from '../types/routes';
+import { RouteChange, OptimizationResult, ApprovalStatus } from '../types/routes';
 
 interface ChangeApprovalScreenProps {
   navigation?: any;
@@ -43,25 +39,34 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
   const changes = optimizationResult?.changes || [];
   const approvals = session?.approvals || [];
 
-  const getApprovalStatus = useCallback((changeId: string): ApprovalStatus => {
-    const approval = approvals.find(a => a.changeId === changeId);
-    return approval?.status || 'pending';
-  }, [approvals]);
+  const getApprovalStatus = useCallback(
+    (changeId: string): ApprovalStatus => {
+      const approval = approvals.find((a) => a.changeId === changeId);
+      return approval?.status || 'pending';
+    },
+    [approvals]
+  );
 
   const stats = useMemo(() => {
-    const approved = changes.filter(c => getApprovalStatus(c.activityId) === 'approved').length;
-    const rejected = changes.filter(c => getApprovalStatus(c.activityId) === 'rejected').length;
-    const pending = changes.filter(c => getApprovalStatus(c.activityId) === 'pending').length;
+    const approved = changes.filter((c) => getApprovalStatus(c.activityId) === 'approved').length;
+    const rejected = changes.filter((c) => getApprovalStatus(c.activityId) === 'rejected').length;
+    const pending = changes.filter((c) => getApprovalStatus(c.activityId) === 'pending').length;
     return { approved, rejected, pending, total: changes.length };
   }, [changes, getApprovalStatus]);
 
-  const handleApprove = useCallback(async (changeId: string) => {
-    await approveChange(changeId);
-  }, [approveChange]);
+  const handleApprove = useCallback(
+    async (changeId: string) => {
+      await approveChange(changeId);
+    },
+    [approveChange]
+  );
 
-  const handleReject = useCallback(async (changeId: string) => {
-    await rejectChange(changeId);
-  }, [rejectChange]);
+  const handleReject = useCallback(
+    async (changeId: string) => {
+      await rejectChange(changeId);
+    },
+    [rejectChange]
+  );
 
   const handleApproveAll = useCallback(async () => {
     Alert.alert(
@@ -168,11 +173,11 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
             <View style={styles.changeInfo}>
               <Text style={styles.changeName}>{change.activityName}</Text>
               <Text style={styles.changeType}>
-                {change.changeType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                {change.changeType.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
               </Text>
             </View>
           </View>
-          
+
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) + '20' }]}>
             <View style={[styles.statusDot, { backgroundColor: getStatusColor(status) }]} />
             <Text style={[styles.statusText, { color: getStatusColor(status) }]}>
@@ -198,17 +203,15 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
                     Time: {formatTime(change.before.startTime)}
                   </Text>
                   {change.before.travelMode && (
-                    <Text style={styles.comparisonItem}>
-                      Travel: {change.before.travelMode}
-                    </Text>
+                    <Text style={styles.comparisonItem}>Travel: {change.before.travelMode}</Text>
                   )}
                 </View>
               </View>
-              
+
               <View style={styles.comparisonArrow}>
                 <Text style={styles.arrowText}>→</Text>
               </View>
-              
+
               <View style={styles.comparisonSide}>
                 <Text style={styles.comparisonLabel}>After</Text>
                 <View style={[styles.comparisonBox, styles.comparisonBoxAfter]}>
@@ -219,9 +222,7 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
                     Time: {formatTime(change.after.startTime)}
                   </Text>
                   {change.after.travelMode && (
-                    <Text style={styles.comparisonItem}>
-                      Travel: {change.after.travelMode}
-                    </Text>
+                    <Text style={styles.comparisonItem}>Travel: {change.after.travelMode}</Text>
                   )}
                 </View>
               </View>
@@ -254,9 +255,11 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
         {status !== 'pending' && (
           <TouchableOpacity
             style={styles.undoButton}
-            onPress={() => status === 'approved' 
-              ? handleReject(change.activityId) 
-              : handleApprove(change.activityId)}
+            onPress={() =>
+              status === 'approved'
+                ? handleReject(change.activityId)
+                : handleApprove(change.activityId)
+            }
           >
             <Text style={styles.undoButtonText}>
               {status === 'approved' ? 'Undo Approval' : 'Reconsider'}
@@ -280,22 +283,14 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
-        
+
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Review Changes</Text>
-          <Text style={styles.headerSubtitle}>
-            Approve the optimizations you want to apply
-          </Text>
+          <Text style={styles.headerSubtitle}>Approve the optimizations you want to apply</Text>
         </View>
 
         {/* Summary Stats */}
@@ -306,7 +301,9 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{Math.round(optimizationResult.distanceSaved / 1000 * 10) / 10}</Text>
+            <Text style={styles.statValue}>
+              {Math.round((optimizationResult.distanceSaved / 1000) * 10) / 10}
+            </Text>
             <Text style={styles.statLabel}>km saved</Text>
           </View>
           <View style={styles.statDivider} />
@@ -320,17 +317,17 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
       {/* Progress Bar */}
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View 
+          <View
             style={[
-              styles.progressFillApproved, 
-              { width: `${(stats.approved / stats.total) * 100}%` }
-            ]} 
+              styles.progressFillApproved,
+              { width: `${(stats.approved / stats.total) * 100}%` },
+            ]}
           />
-          <View 
+          <View
             style={[
-              styles.progressFillRejected, 
-              { width: `${(stats.rejected / stats.total) * 100}%` }
-            ]} 
+              styles.progressFillRejected,
+              { width: `${(stats.rejected / stats.total) * 100}%` },
+            ]}
           />
         </View>
         <View style={styles.progressLabels}>
@@ -350,10 +347,7 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
         {/* Quick Actions */}
         {stats.pending > 0 && (
           <View style={styles.quickActions}>
-            <TouchableOpacity
-              style={styles.quickActionBtn}
-              onPress={handleApproveAll}
-            >
+            <TouchableOpacity style={styles.quickActionBtn} onPress={handleApproveAll}>
               <Text style={styles.quickActionText}>✓ Approve All</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -377,7 +371,7 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
         {optimizationResult.recommendations.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Additional Recommendations</Text>
-            {optimizationResult.recommendations.map(rec => (
+            {optimizationResult.recommendations.map((rec) => (
               <View key={rec.id} style={styles.recommendationCard}>
                 <Text style={styles.recommendationTitle}>{rec.title}</Text>
                 <Text style={styles.recommendationDesc}>{rec.description}</Text>
@@ -393,10 +387,7 @@ const ChangeApprovalScreen: React.FC<ChangeApprovalScreenProps> = ({
       {/* Apply Button */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[
-            styles.applyButton,
-            stats.approved === 0 && styles.applyButtonDisabled,
-          ]}
+          style={[styles.applyButton, stats.approved === 0 && styles.applyButtonDisabled]}
           onPress={handleApply}
           disabled={isLoading || stats.approved === 0}
         >

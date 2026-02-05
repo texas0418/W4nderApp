@@ -27,13 +27,13 @@ export interface ShareableContent {
   title: string;
   subtitle?: string;
   description?: string;
-  
+
   // The data to encode
   payload: SharePayload;
-  
+
   // Display options
   displayOptions?: QRDisplayOptions;
-  
+
   // Metadata
   createdAt: string;
   expiresAt?: string;
@@ -159,14 +159,14 @@ export interface CustomSharePayload {
 export interface QRCodeOptions {
   // Size
   size: number;
-  
+
   // Colors
   foregroundColor: string;
   backgroundColor: string;
-  
+
   // Error correction level
   errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H';
-  
+
   // Logo/branding
   logo?: {
     uri: string;
@@ -174,10 +174,10 @@ export interface QRCodeOptions {
     borderRadius?: number;
     backgroundColor?: string;
   };
-  
+
   // Styling
   style?: QRCodeStyle;
-  
+
   // Quiet zone (margin)
   quietZone: number;
 }
@@ -199,21 +199,21 @@ export const DEFAULT_QR_OPTIONS: QRCodeOptions = {
 export interface QRDisplayOptions {
   // Show content preview
   showPreview: boolean;
-  
+
   // Card styling
   cardStyle?: 'minimal' | 'branded' | 'ticket' | 'pass';
-  
+
   // Colors
   accentColor?: string;
-  
+
   // Header
   showHeader: boolean;
   headerIcon?: string;
-  
+
   // Footer
   showFooter: boolean;
   footerText?: string;
-  
+
   // Actions
   showShareButton: boolean;
   showSaveButton: boolean;
@@ -238,21 +238,21 @@ export const DEFAULT_DISPLAY_OPTIONS: QRDisplayOptions = {
 export interface GeneratedQRCode {
   id: string;
   content: ShareableContent;
-  
+
   // QR data
   qrDataUrl: string; // Base64 data URL
   qrSvg?: string; // SVG string
-  
+
   // Encoded value
   encodedValue: string;
-  
+
   // Options used
   options: QRCodeOptions;
-  
+
   // Metadata
   generatedAt: string;
   expiresAt?: string;
-  
+
   // Stats (if tracked)
   scanCount?: number;
   lastScannedAt?: string;
@@ -395,14 +395,14 @@ export const CONTENT_TYPE_CONFIG: Record<ShareableContentType, ContentTypeConfig
 // URL Scheme Types
 // ============================================================================
 
-export type URLScheme = 
-  | 'w4nder'    // App deep link
-  | 'https'     // Web URL
-  | 'geo'       // Location
-  | 'tel'       // Phone
-  | 'mailto'    // Email
-  | 'sms'       // SMS
-  | 'data';     // Data URI
+export type URLScheme =
+  | 'w4nder' // App deep link
+  | 'https' // Web URL
+  | 'geo' // Location
+  | 'tel' // Phone
+  | 'mailto' // Email
+  | 'sms' // SMS
+  | 'data'; // Data URI
 
 // ============================================================================
 // vCard Format (for contacts)

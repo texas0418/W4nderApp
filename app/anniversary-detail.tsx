@@ -13,12 +13,7 @@ import {
 import { useAnniversary } from '../hooks/useAnniversary';
 import anniversaryService from '../services/anniversaryService';
 import { SuggestionCardCompact } from '../components/SuggestionCard';
-import {
-  Anniversary,
-  Milestone,
-  MilestoneSuggestion,
-  MilestoneLevel,
-} from '../types/anniversary';
+import { Anniversary, Milestone, MilestoneSuggestion, MilestoneLevel } from '../types/anniversary';
 
 interface AnniversaryDetailScreenProps {
   navigation: any;
@@ -51,7 +46,8 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
   route,
 }) => {
   const { anniversaryId } = route.params;
-  const { deleteAnniversary, getMilestoneProgress, toggleSuggestionBookmark, refresh } = useAnniversary();
+  const { deleteAnniversary, getMilestoneProgress, toggleSuggestionBookmark, refresh } =
+    useAnniversary();
 
   const [anniversary, setAnniversary] = useState<Anniversary | null>(null);
   const [suggestions, setSuggestions] = useState<MilestoneSuggestion[]>([]);
@@ -60,13 +56,17 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
     daysUntil: number;
     milestone: Milestone | null;
   } | null>(null);
-  const [progress, setProgress] = useState({ current: 0, next: undefined as Milestone | undefined, progress: 0 });
+  const [progress, setProgress] = useState({
+    current: 0,
+    next: undefined as Milestone | undefined,
+    progress: 0,
+  });
 
   const loadData = useCallback(async () => {
     const ann = await anniversaryService.getAnniversaryById(anniversaryId);
     if (ann) {
       setAnniversary(ann);
-      
+
       // Get milestone progress
       const prog = getMilestoneProgress(ann.date);
       setProgress(prog);
@@ -76,19 +76,25 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       const currentYear = now.getFullYear();
-      
+
       let nextAnniversary = new Date(currentYear, originalDate.getMonth(), originalDate.getDate());
       if (nextAnniversary < now) {
-        nextAnniversary = new Date(currentYear + 1, originalDate.getMonth(), originalDate.getDate());
+        nextAnniversary = new Date(
+          currentYear + 1,
+          originalDate.getMonth(),
+          originalDate.getDate()
+        );
       }
-      
-      const daysUntil = Math.ceil((nextAnniversary.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      const daysUntil = Math.ceil(
+        (nextAnniversary.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      );
       const yearsCompleting = nextAnniversary.getFullYear() - originalDate.getFullYear();
-      
+
       // Get milestone for upcoming anniversary
       const upcomingData = await anniversaryService.getUpcomingAnniversaries(365);
-      const upcoming = upcomingData.find(u => u.anniversary.id === anniversaryId);
-      
+      const upcoming = upcomingData.find((u) => u.anniversary.id === anniversaryId);
+
       setMilestoneInfo({
         yearsCompleting,
         daysUntil,
@@ -144,10 +150,8 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
 
   const handleToggleBookmark = async (suggestionId: string) => {
     await toggleSuggestionBookmark(suggestionId);
-    setSuggestions(prev =>
-      prev.map(s =>
-        s.id === suggestionId ? { ...s, isBookmarked: !s.isBookmarked } : s
-      )
+    setSuggestions((prev) =>
+      prev.map((s) => (s.id === suggestionId ? { ...s, isBookmarked: !s.isBookmarked } : s))
     );
   };
 
@@ -195,14 +199,17 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
               with {anniversary.partnerName}
             </Text>
           )}
-          
+
           {/* Countdown */}
           {milestoneInfo && (
             <View style={styles.countdownContainer}>
               <Text style={styles.countdownNumber}>{milestoneInfo.daysUntil}</Text>
               <Text style={styles.countdownLabel}>
-                {milestoneInfo.daysUntil === 0 ? "It's Today! 🎉" :
-                 milestoneInfo.daysUntil === 1 ? 'day until' : 'days until'}
+                {milestoneInfo.daysUntil === 0
+                  ? "It's Today! 🎉"
+                  : milestoneInfo.daysUntil === 1
+                    ? 'day until'
+                    : 'days until'}
               </Text>
               <Text style={[styles.countdownYears, { color: colors.accent }]}>
                 Year {milestoneInfo.yearsCompleting}
@@ -217,15 +224,15 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
             <Text style={styles.sectionTitle}>🏆 Upcoming Milestone</Text>
             <View style={[styles.milestoneCard, { borderLeftColor: colors.accent }]}>
               <Text style={styles.milestoneName}>{milestoneInfo.milestone.name}</Text>
-              <Text style={styles.milestoneDescription}>
-                {milestoneInfo.milestone.description}
-              </Text>
-              
+              <Text style={styles.milestoneDescription}>{milestoneInfo.milestone.description}</Text>
+
               {milestoneInfo.milestone.traditionalGift && (
                 <View style={styles.giftRow}>
                   <View style={styles.giftItem}>
                     <Text style={styles.giftLabel}>Traditional Gift</Text>
-                    <Text style={styles.giftValue}>🎁 {milestoneInfo.milestone.traditionalGift}</Text>
+                    <Text style={styles.giftValue}>
+                      🎁 {milestoneInfo.milestone.traditionalGift}
+                    </Text>
                   </View>
                   {milestoneInfo.milestone.modernGift && (
                     <View style={styles.giftItem}>
@@ -246,9 +253,7 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
             <View style={styles.progressInfo}>
               <Text style={styles.progressYears}>{progress.current} years</Text>
               {progress.next && (
-                <Text style={styles.progressNext}>
-                  Next milestone: {progress.next.name}
-                </Text>
+                <Text style={styles.progressNext}>Next milestone: {progress.next.name}</Text>
               )}
             </View>
             <View style={styles.progressBarContainer}>
@@ -282,9 +287,9 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Reminders</Text>
               <Text style={styles.detailValue}>
-                {anniversary.reminderDays.map(d => 
-                  d === 0 ? 'On the day' : `${d} day${d > 1 ? 's' : ''} before`
-                ).join(', ')}
+                {anniversary.reminderDays
+                  .map((d) => (d === 0 ? 'On the day' : `${d} day${d > 1 ? 's' : ''} before`))
+                  .join(', ')}
               </Text>
             </View>
           </View>
@@ -311,7 +316,7 @@ export const AnniversaryDetailScreen: React.FC<AnniversaryDetailScreenProps> = (
                 <Text style={styles.seeAllButton}>See All →</Text>
               </TouchableOpacity>
             </View>
-            {suggestions.slice(0, 3).map(suggestion => (
+            {suggestions.slice(0, 3).map((suggestion) => (
               <SuggestionCardCompact
                 key={suggestion.id}
                 suggestion={suggestion}

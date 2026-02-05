@@ -1,6 +1,6 @@
 // Anniversary Tracker Types for W4nder
 
-export type AnniversaryType = 
+export type AnniversaryType =
   | 'relationship'
   | 'wedding'
   | 'engagement'
@@ -49,7 +49,7 @@ export interface MilestoneSuggestion {
   isBookmarked: boolean;
 }
 
-export type SuggestionCategory = 
+export type SuggestionCategory =
   | 'restaurant'
   | 'experience'
   | 'getaway'
@@ -114,7 +114,7 @@ export interface AnniversaryFilters {
   hasUpcomingMilestone?: boolean;
 }
 
-export type AnniversarySortOption = 
+export type AnniversarySortOption =
   | 'date_asc'
   | 'date_desc'
   | 'name_asc'

@@ -21,10 +21,7 @@ interface FavoritePlacesScreenProps {
   route?: { params?: { collectionId?: string } };
 }
 
-const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({ navigation, route }) => {
   const collectionId = route?.params?.collectionId;
 
   const {
@@ -51,45 +48,56 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
     setRefreshing(false);
   }, [refresh]);
 
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-    setFilters({ ...filters, searchQuery: query || undefined });
-  }, [filters, setFilters]);
+  const handleSearch = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      setFilters({ ...filters, searchQuery: query || undefined });
+    },
+    [filters, setFilters]
+  );
 
-  const handleCategoryFilter = useCallback((category: PlaceCategory | null) => {
-    setSelectedCategory(category);
-    setFilters({
-      ...filters,
-      categories: category ? [category] : undefined,
-    });
-  }, [filters, setFilters]);
+  const handleCategoryFilter = useCallback(
+    (category: PlaceCategory | null) => {
+      setSelectedCategory(category);
+      setFilters({
+        ...filters,
+        categories: category ? [category] : undefined,
+      });
+    },
+    [filters, setFilters]
+  );
 
-  const handleToggleFavorite = useCallback(async (place: FavoritePlace) => {
-    await toggleFavorite(place.id);
-  }, [toggleFavorite]);
+  const handleToggleFavorite = useCallback(
+    async (place: FavoritePlace) => {
+      await toggleFavorite(place.id);
+    },
+    [toggleFavorite]
+  );
 
-  const handleDeletePlace = useCallback((place: FavoritePlace) => {
-    Alert.alert(
-      'Delete Place',
-      `Are you sure you want to delete "${place.name}"?`,
-      [
+  const handleDeletePlace = useCallback(
+    (place: FavoritePlace) => {
+      Alert.alert('Delete Place', `Are you sure you want to delete "${place.name}"?`, [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
           style: 'destructive',
           onPress: () => deletePlace(place.id),
         },
-      ]
-    );
-  }, [deletePlace]);
+      ]);
+    },
+    [deletePlace]
+  );
 
   const getCategoryInfo = (categoryId: PlaceCategory) => {
-    return PLACE_CATEGORIES.find(c => c.id === categoryId) || PLACE_CATEGORIES[PLACE_CATEGORIES.length - 1];
+    return (
+      PLACE_CATEGORIES.find((c) => c.id === categoryId) ||
+      PLACE_CATEGORIES[PLACE_CATEGORIES.length - 1]
+    );
   };
 
   const currentCollection = useMemo(() => {
     if (!collectionId) return null;
-    return collections.find(c => c.id === collectionId);
+    return collections.find((c) => c.id === collectionId);
   }, [collectionId, collections]);
 
   const formatVisitInfo = (place: FavoritePlace): string => {
@@ -100,7 +108,7 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
 
   const renderPlaceCard = (place: FavoritePlace) => {
     const categoryInfo = getCategoryInfo(place.category);
-    const coverPhoto = place.photos.find(p => p.id === place.coverPhotoId) || place.photos[0];
+    const coverPhoto = place.photos.find((p) => p.id === place.coverPhotoId) || place.photos[0];
 
     return (
       <TouchableOpacity
@@ -115,11 +123,13 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
           {coverPhoto ? (
             <Image source={{ uri: coverPhoto.uri }} style={styles.cardImage} />
           ) : (
-            <View style={[styles.cardImagePlaceholder, { backgroundColor: categoryInfo.color + '30' }]}>
+            <View
+              style={[styles.cardImagePlaceholder, { backgroundColor: categoryInfo.color + '30' }]}
+            >
               <Text style={styles.cardImagePlaceholderIcon}>{categoryInfo.icon}</Text>
             </View>
           )}
-          
+
           {/* Favorite Button */}
           <TouchableOpacity
             style={styles.favoriteButton}
@@ -139,7 +149,9 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
         {/* Info */}
         <View style={styles.cardInfo}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardName} numberOfLines={1}>{place.name}</Text>
+            <Text style={styles.cardName} numberOfLines={1}>
+              {place.name}
+            </Text>
             <View style={[styles.categoryBadge, { backgroundColor: categoryInfo.color + '20' }]}>
               <Text style={styles.categoryBadgeText}>{categoryInfo.icon}</Text>
             </View>
@@ -147,7 +159,8 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
 
           {place.location.city && (
             <Text style={styles.cardLocation} numberOfLines={1}>
-              📍 {place.location.city}{place.location.country ? `, ${place.location.country}` : ''}
+              📍 {place.location.city}
+              {place.location.country ? `, ${place.location.country}` : ''}
             </Text>
           )}
 
@@ -169,14 +182,8 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
@@ -187,10 +194,7 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
             {filteredPlaces.length} {filteredPlaces.length === 1 ? 'place' : 'places'}
           </Text>
         </View>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation?.navigate('AddPlace')}
-        >
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation?.navigate('AddPlace')}>
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </LinearGradient>
@@ -228,11 +232,13 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
               style={[styles.filterChip, !selectedCategory && styles.filterChipActive]}
               onPress={() => handleCategoryFilter(null)}
             >
-              <Text style={[styles.filterChipText, !selectedCategory && styles.filterChipTextActive]}>
+              <Text
+                style={[styles.filterChipText, !selectedCategory && styles.filterChipTextActive]}
+              >
                 All
               </Text>
             </TouchableOpacity>
-            {PLACE_CATEGORIES.map(cat => (
+            {PLACE_CATEGORIES.map((cat) => (
               <TouchableOpacity
                 key={cat.id}
                 style={[
@@ -243,10 +249,12 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
                 onPress={() => handleCategoryFilter(cat.id as PlaceCategory)}
               >
                 <Text style={styles.filterChipIcon}>{cat.icon}</Text>
-                <Text style={[
-                  styles.filterChipText,
-                  selectedCategory === cat.id && styles.filterChipTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.filterChipText,
+                    selectedCategory === cat.id && styles.filterChipTextActive,
+                  ]}
+                >
                   {cat.name}
                 </Text>
               </TouchableOpacity>
@@ -259,11 +267,13 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
       {!collectionId && collections.length > 0 && (
         <View style={styles.collectionsBar}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {collections.map(collection => (
+            {collections.map((collection) => (
               <TouchableOpacity
                 key={collection.id}
                 style={[styles.collectionChip, { borderColor: collection.color }]}
-                onPress={() => navigation?.navigate('FavoritePlaces', { collectionId: collection.id })}
+                onPress={() =>
+                  navigation?.navigate('FavoritePlaces', { collectionId: collection.id })
+                }
               >
                 <Text style={styles.collectionEmoji}>{collection.emoji}</Text>
                 <Text style={styles.collectionName}>{collection.name}</Text>
@@ -279,9 +289,7 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
       {/* Places List */}
       <ScrollView
         style={styles.content}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
         showsVerticalScrollIndicator={false}
       >
         {filteredPlaces.length === 0 ? (
@@ -305,9 +313,7 @@ const FavoritePlacesScreen: React.FC<FavoritePlacesScreenProps> = ({
             )}
           </View>
         ) : (
-          <View style={styles.placesGrid}>
-            {filteredPlaces.map(renderPlaceCard)}
-          </View>
+          <View style={styles.placesGrid}>{filteredPlaces.map(renderPlaceCard)}</View>
         )}
 
         <View style={styles.bottomPadding} />

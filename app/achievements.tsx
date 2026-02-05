@@ -1,24 +1,17 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { 
-  Trophy, 
-  Globe, 
-  Plane, 
-  MapPin, 
-  Camera, 
-  Users, 
-  Star, 
-  Compass, 
-  Mountain, 
+import {
+  Trophy,
+  Globe,
+  Plane,
+  MapPin,
+  Camera,
+  Users,
+  Star,
+  Compass,
+  Mountain,
   Palmtree,
   Building2,
   Ship,
@@ -378,8 +371,8 @@ export default function AchievementsScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
 
-  const unlockedCount = achievements.filter(a => a.isUnlocked).length;
-  const totalXP = achievements.filter(a => a.isUnlocked).reduce((sum, a) => sum + a.xpReward, 0);
+  const unlockedCount = achievements.filter((a) => a.isUnlocked).length;
+  const totalXP = achievements.filter((a) => a.isUnlocked).reduce((sum, a) => sum + a.xpReward, 0);
 
   const categories = [
     { id: 'all', label: 'All' },
@@ -390,23 +383,27 @@ export default function AchievementsScreen() {
     { id: 'milestone', label: 'Milestone' },
   ];
 
-  const filteredAchievements = selectedCategory === 'all' 
-    ? achievements 
-    : achievements.filter(a => a.category === selectedCategory);
+  const filteredAchievements =
+    selectedCategory === 'all'
+      ? achievements
+      : achievements.filter((a) => a.category === selectedCategory);
 
   const sortedAchievements = [...filteredAchievements].sort((a, b) => {
     if (a.isUnlocked && !b.isUnlocked) return -1;
     if (!a.isUnlocked && b.isUnlocked) return 1;
-    return (b.progress / b.target) - (a.progress / a.target);
+    return b.progress / b.target - a.progress / a.target;
   });
 
-  const renderStatCard = useCallback((label: string, value: string | number, icon: React.ReactNode) => (
-    <View style={styles.statCard}>
-      <View style={styles.statIcon}>{icon}</View>
-      <Text style={styles.statValue}>{value.toLocaleString()}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  ), []);
+  const renderStatCard = useCallback(
+    (label: string, value: string | number, icon: React.ReactNode) => (
+      <View style={styles.statCard}>
+        <View style={styles.statIcon}>{icon}</View>
+        <Text style={styles.statValue}>{value.toLocaleString()}</Text>
+        <Text style={styles.statLabel}>{label}</Text>
+      </View>
+    ),
+    []
+  );
 
   const renderAchievementBadge = useCallback((achievement: Achievement) => {
     const IconComponent = achievement.icon;
@@ -416,10 +413,7 @@ export default function AchievementsScreen() {
     return (
       <TouchableOpacity
         key={achievement.id}
-        style={[
-          styles.badgeCard,
-          !achievement.isUnlocked && styles.badgeCardLocked,
-        ]}
+        style={[styles.badgeCard, !achievement.isUnlocked && styles.badgeCardLocked]}
         onPress={() => setSelectedAchievement(achievement)}
         activeOpacity={0.7}
       >
@@ -430,69 +424,55 @@ export default function AchievementsScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <IconComponent 
-              size={28} 
-              color={achievement.isUnlocked ? '#FFFFFF' : colors.textTertiary} 
+            <IconComponent
+              size={28}
+              color={achievement.isUnlocked ? '#FFFFFF' : colors.textTertiary}
             />
           </LinearGradient>
-          
+
           <View style={styles.badgeInfo}>
             <View style={styles.badgeHeader}>
-              <Text 
-                style={[
-                  styles.badgeName,
-                  !achievement.isUnlocked && styles.badgeNameLocked,
-                ]}
+              <Text
+                style={[styles.badgeName, !achievement.isUnlocked && styles.badgeNameLocked]}
                 numberOfLines={1}
               >
                 {achievement.name}
               </Text>
-              <View style={[
-                styles.rarityBadge,
-                { backgroundColor: `${RARITY_COLORS[achievement.rarity]}20` }
-              ]}>
-                <Text style={[
-                  styles.rarityText,
-                  { color: RARITY_COLORS[achievement.rarity] }
-                ]}>
+              <View
+                style={[
+                  styles.rarityBadge,
+                  { backgroundColor: `${RARITY_COLORS[achievement.rarity]}20` },
+                ]}
+              >
+                <Text style={[styles.rarityText, { color: RARITY_COLORS[achievement.rarity] }]}>
                   {achievement.rarity.toUpperCase()}
                 </Text>
               </View>
             </View>
-            
-            <Text 
-              style={styles.badgeDescription}
-              numberOfLines={1}
-            >
+
+            <Text style={styles.badgeDescription} numberOfLines={1}>
               {achievement.description}
             </Text>
-            
+
             {!achievement.isUnlocked && (
               <View style={styles.progressContainer}>
                 <View style={styles.progressBar}>
-                  <View 
-                    style={[
-                      styles.progressFill,
-                      { width: `${progressPercent}%` }
-                    ]} 
-                  />
+                  <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
                 </View>
                 <Text style={styles.progressText}>
                   {achievement.progress.toLocaleString()}/{achievement.target.toLocaleString()}
                 </Text>
               </View>
             )}
-            
+
             {achievement.isUnlocked && (
               <View style={styles.unlockedInfo}>
                 <Trophy size={12} color={TIER_COLORS[achievement.tier][0]} />
-                <Text style={styles.unlockedText}>
-                  Unlocked {achievement.unlockedAt}
-                </Text>
+                <Text style={styles.unlockedText}>Unlocked {achievement.unlockedAt}</Text>
               </View>
             )}
           </View>
-          
+
           <View style={styles.xpBadge}>
             <Text style={styles.xpText}>+{achievement.xpReward} XP</Text>
           </View>
@@ -506,23 +486,23 @@ export default function AchievementsScreen() {
 
     const IconComponent = selectedAchievement.icon;
     const tierColors = TIER_COLORS[selectedAchievement.tier];
-    const progressPercent = Math.min((selectedAchievement.progress / selectedAchievement.target) * 100, 100);
+    const progressPercent = Math.min(
+      (selectedAchievement.progress / selectedAchievement.target) * 100,
+      100
+    );
 
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.modalOverlay}
         activeOpacity={1}
         onPress={() => setSelectedAchievement(null)}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.modalContent}
           activeOpacity={1}
           onPress={(e) => e.stopPropagation()}
         >
-          <TouchableOpacity 
-            style={styles.modalClose}
-            onPress={() => setSelectedAchievement(null)}
-          >
+          <TouchableOpacity style={styles.modalClose} onPress={() => setSelectedAchievement(null)}>
             <X size={24} color={colors.text} />
           </TouchableOpacity>
 
@@ -532,20 +512,21 @@ export default function AchievementsScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <IconComponent 
-              size={48} 
-              color={selectedAchievement.isUnlocked ? '#FFFFFF' : colors.textTertiary} 
+            <IconComponent
+              size={48}
+              color={selectedAchievement.isUnlocked ? '#FFFFFF' : colors.textTertiary}
             />
           </LinearGradient>
 
-          <View style={[
-            styles.modalRarityBadge,
-            { backgroundColor: `${RARITY_COLORS[selectedAchievement.rarity]}20` }
-          ]}>
-            <Text style={[
-              styles.modalRarityText,
-              { color: RARITY_COLORS[selectedAchievement.rarity] }
-            ]}>
+          <View
+            style={[
+              styles.modalRarityBadge,
+              { backgroundColor: `${RARITY_COLORS[selectedAchievement.rarity]}20` },
+            ]}
+          >
+            <Text
+              style={[styles.modalRarityText, { color: RARITY_COLORS[selectedAchievement.rarity] }]}
+            >
               {selectedAchievement.rarity.toUpperCase()}
             </Text>
           </View>
@@ -557,15 +538,18 @@ export default function AchievementsScreen() {
             <View style={styles.modalStatItem}>
               <Text style={styles.modalStatLabel}>Tier</Text>
               <Text style={[styles.modalStatValue, { color: tierColors[0] }]}>
-                {selectedAchievement.tier.charAt(0).toUpperCase() + selectedAchievement.tier.slice(1)}
+                {selectedAchievement.tier.charAt(0).toUpperCase() +
+                  selectedAchievement.tier.slice(1)}
               </Text>
             </View>
             <View style={styles.modalStatItem}>
               <Text style={styles.modalStatLabel}>Category</Text>
-              <Text style={[
-                styles.modalStatValue,
-                { color: CATEGORY_INFO[selectedAchievement.category].color }
-              ]}>
+              <Text
+                style={[
+                  styles.modalStatValue,
+                  { color: CATEGORY_INFO[selectedAchievement.category].color },
+                ]}
+              >
                 {CATEGORY_INFO[selectedAchievement.category].label}
               </Text>
             </View>
@@ -579,12 +563,17 @@ export default function AchievementsScreen() {
             <View style={styles.modalProgressHeader}>
               <Text style={styles.modalProgressLabel}>Progress</Text>
               <Text style={styles.modalProgressValue}>
-                {selectedAchievement.progress.toLocaleString()} / {selectedAchievement.target.toLocaleString()}
+                {selectedAchievement.progress.toLocaleString()} /{' '}
+                {selectedAchievement.target.toLocaleString()}
               </Text>
             </View>
             <View style={styles.modalProgressBar}>
               <LinearGradient
-                colors={selectedAchievement.isUnlocked ? tierColors : [colors.primary, colors.primaryLight]}
+                colors={
+                  selectedAchievement.isUnlocked
+                    ? tierColors
+                    : [colors.primary, colors.primaryLight]
+                }
                 style={[styles.modalProgressFill, { width: `${progressPercent}%` }]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -601,9 +590,7 @@ export default function AchievementsScreen() {
             </View>
           ) : (
             <View style={styles.modalLockedSection}>
-              <Text style={styles.modalLockedText}>
-                {Math.round(progressPercent)}% complete
-              </Text>
+              <Text style={styles.modalLockedText}>{Math.round(progressPercent)}% complete</Text>
             </View>
           )}
 
@@ -643,11 +630,11 @@ export default function AchievementsScreen() {
               </Text>
             </View>
             <View style={styles.xpBar}>
-              <View 
+              <View
                 style={[
                   styles.xpFill,
-                  { width: `${(stats.currentXP / stats.nextLevelXP) * 100}%` }
-                ]} 
+                  { width: `${(stats.currentXP / stats.nextLevelXP) * 100}%` },
+                ]}
               />
             </View>
           </View>
@@ -655,7 +642,9 @@ export default function AchievementsScreen() {
           <View style={styles.overviewStats}>
             <View style={styles.overviewItem}>
               <Trophy size={20} color="#FFD700" />
-              <Text style={styles.overviewValue}>{unlockedCount}/{achievements.length}</Text>
+              <Text style={styles.overviewValue}>
+                {unlockedCount}/{achievements.length}
+              </Text>
               <Text style={styles.overviewLabel}>Unlocked</Text>
             </View>
             <View style={styles.overviewDivider} />
@@ -668,27 +657,40 @@ export default function AchievementsScreen() {
         </SafeAreaView>
       </LinearGradient>
 
-      <ScrollView 
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.statsSection}>
           <Text style={styles.sectionTitle}>Travel Stats</Text>
           <View style={styles.statsGrid}>
-            {renderStatCard('Countries', stats.countriesVisited, <Globe size={20} color={colors.primary} />)}
-            {renderStatCard('Cities', stats.citiesVisited, <MapPin size={20} color={colors.secondary} />)}
-            {renderStatCard('Miles', `${(stats.totalMiles / 1000).toFixed(1)}K`, <Plane size={20} color={colors.accentDark} />)}
-            {renderStatCard('Trips', stats.totalTrips, <Compass size={20} color={colors.success} />)}
+            {renderStatCard(
+              'Countries',
+              stats.countriesVisited,
+              <Globe size={20} color={colors.primary} />
+            )}
+            {renderStatCard(
+              'Cities',
+              stats.citiesVisited,
+              <MapPin size={20} color={colors.secondary} />
+            )}
+            {renderStatCard(
+              'Miles',
+              `${(stats.totalMiles / 1000).toFixed(1)}K`,
+              <Plane size={20} color={colors.accentDark} />
+            )}
+            {renderStatCard(
+              'Trips',
+              stats.totalTrips,
+              <Compass size={20} color={colors.success} />
+            )}
           </View>
         </View>
 
         <View style={styles.categorySection}>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoryScroll}
           >
-            {categories.map(category => (
+            {categories.map((category) => (
               <TouchableOpacity
                 key={category.id}
                 style={[
@@ -697,10 +699,12 @@ export default function AchievementsScreen() {
                 ]}
                 onPress={() => setSelectedCategory(category.id)}
               >
-                <Text style={[
-                  styles.categoryChipText,
-                  selectedCategory === category.id && styles.categoryChipTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.categoryChipText,
+                    selectedCategory === category.id && styles.categoryChipTextActive,
+                  ]}
+                >
                   {category.label}
                 </Text>
               </TouchableOpacity>
@@ -713,14 +717,14 @@ export default function AchievementsScreen() {
             <Text style={styles.sectionTitle}>Badges</Text>
             <TouchableOpacity style={styles.viewAllButton}>
               <Text style={styles.viewAllText}>
-                {sortedAchievements.filter(a => a.isUnlocked).length} unlocked
+                {sortedAchievements.filter((a) => a.isUnlocked).length} unlocked
               </Text>
               <ChevronRight size={16} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.achievementsList}>
-            {sortedAchievements.map(achievement => renderAchievementBadge(achievement))}
+            {sortedAchievements.map((achievement) => renderAchievementBadge(achievement))}
           </View>
         </View>
 

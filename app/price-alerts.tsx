@@ -260,10 +260,10 @@ export default function PriceAlertsScreen() {
     }, 1500);
   }, []);
 
-  const filteredAlerts = alerts.filter(alert => {
+  const filteredAlerts = alerts.filter((alert) => {
     const matchesSearch = alert.destination.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
-    
+
     switch (filter) {
       case 'flights':
         return alert.type === 'flight';
@@ -276,7 +276,7 @@ export default function PriceAlertsScreen() {
     }
   });
 
-  const unreadNotifications = notifications.filter(n => !n.isRead).length;
+  const unreadNotifications = notifications.filter((n) => !n.isRead).length;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -288,7 +288,7 @@ export default function PriceAlertsScreen() {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
+
     if (diffHours < 1) return 'Just now';
     if (diffHours < 24) return `${diffHours}h ago`;
     const diffDays = Math.floor(diffHours / 24);
@@ -297,18 +297,14 @@ export default function PriceAlertsScreen() {
   };
 
   const handleToggleAlert = (alertId: string) => {
-    setAlerts(prev => 
-      prev.map(alert => 
-        alert.id === alertId 
-          ? { ...alert, isActive: !alert.isActive }
-          : alert
-      )
+    setAlerts((prev) =>
+      prev.map((alert) => (alert.id === alertId ? { ...alert, isActive: !alert.isActive } : alert))
     );
     console.log('Toggled alert:', alertId);
   };
 
   const handleDeleteAlert = (alertId: string) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+    setAlerts((prev) => prev.filter((alert) => alert.id !== alertId));
     setSelectedAlert(null);
     console.log('Deleted alert:', alertId);
   };
@@ -327,7 +323,9 @@ export default function PriceAlertsScreen() {
       lowestPrice: parseInt(newTargetPrice),
       targetPrice: parseInt(newTargetPrice),
       currency: 'USD',
-      priceHistory: [{ date: new Date().toISOString().split('T')[0], price: parseInt(newTargetPrice) + 50 }],
+      priceHistory: [
+        { date: new Date().toISOString().split('T')[0], price: parseInt(newTargetPrice) + 50 },
+      ],
       dates: { start: '2024-04-01', end: '2024-04-08' },
       lastUpdated: new Date().toISOString(),
       isActive: true,
@@ -336,7 +334,7 @@ export default function PriceAlertsScreen() {
       provider: 'Searching...',
     };
 
-    setAlerts(prev => [newAlert, ...prev]);
+    setAlerts((prev) => [newAlert, ...prev]);
     setShowAddModal(false);
     setNewDestination('');
     setNewOrigin('');
@@ -345,20 +343,20 @@ export default function PriceAlertsScreen() {
   };
 
   const handleMarkNotificationRead = (notificationId: string) => {
-    setNotifications(prev =>
-      prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n))
     );
   };
 
   const handleMarkAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
   const renderPriceChart = (priceHistory: PriceHistory[]) => {
     if (priceHistory.length < 2) return null;
-    
-    const maxPrice = Math.max(...priceHistory.map(p => p.price));
-    const minPrice = Math.min(...priceHistory.map(p => p.price));
+
+    const maxPrice = Math.max(...priceHistory.map((p) => p.price));
+    const minPrice = Math.min(...priceHistory.map((p) => p.price));
     const range = maxPrice - minPrice || 1;
     const chartHeight = 50;
     const chartWidth = 120;
@@ -373,7 +371,7 @@ export default function PriceAlertsScreen() {
             const prevY = chartHeight - ((prevPoint.price - minPrice) / range) * chartHeight;
             const currY = chartHeight - ((point.price - minPrice) / range) * chartHeight;
             const isDecreasing = point.price < prevPoint.price;
-            
+
             return (
               <View
                 key={point.date}
@@ -385,7 +383,9 @@ export default function PriceAlertsScreen() {
                     top: Math.min(prevY, currY),
                     height: Math.abs(currY - prevY) + 3,
                     backgroundColor: isDecreasing ? colors.success : colors.error,
-                    transform: [{ rotate: `${Math.atan2(currY - prevY, pointWidth) * (180 / Math.PI)}deg` }],
+                    transform: [
+                      { rotate: `${Math.atan2(currY - prevY, pointWidth) * (180 / Math.PI)}deg` },
+                    ],
                   },
                 ]}
               />
@@ -401,7 +401,8 @@ export default function PriceAlertsScreen() {
                   {
                     left: index * pointWidth - 3,
                     top: y - 3,
-                    backgroundColor: index === priceHistory.length - 1 ? colors.primary : colors.textTertiary,
+                    backgroundColor:
+                      index === priceHistory.length - 1 ? colors.primary : colors.textTertiary,
                   },
                 ]}
               />
@@ -417,17 +418,13 @@ export default function PriceAlertsScreen() {
     const targetReached = alert.currentPrice <= alert.targetPrice;
 
     return (
-      <Pressable
-        key={alert.id}
-        style={styles.alertCard}
-        onPress={() => setSelectedAlert(alert)}
-      >
+      <Pressable key={alert.id} style={styles.alertCard} onPress={() => setSelectedAlert(alert)}>
         <Image source={{ uri: alert.image }} style={styles.alertImage} contentFit="cover" />
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.8)']}
           style={styles.alertImageGradient}
         />
-        
+
         {targetReached && (
           <View style={styles.targetBadge}>
             <Target size={12} color={colors.textLight} />
@@ -448,10 +445,7 @@ export default function PriceAlertsScreen() {
             <Text style={styles.alertDestination} numberOfLines={1}>
               {alert.destination}
             </Text>
-            <Pressable
-              style={styles.alertToggle}
-              onPress={() => handleToggleAlert(alert.id)}
-            >
+            <Pressable style={styles.alertToggle} onPress={() => handleToggleAlert(alert.id)}>
               {alert.isActive ? (
                 <Bell size={18} color={colors.primary} />
               ) : (
@@ -460,15 +454,11 @@ export default function PriceAlertsScreen() {
             </Pressable>
           </View>
 
-          {alert.origin && (
-            <Text style={styles.alertOrigin}>From {alert.origin}</Text>
-          )}
+          {alert.origin && <Text style={styles.alertOrigin}>From {alert.origin}</Text>}
 
           <View style={styles.alertPricing}>
             <View style={styles.priceMain}>
-              <Text style={styles.currentPrice}>
-                ${alert.currentPrice}
-              </Text>
+              <Text style={styles.currentPrice}>${alert.currentPrice}</Text>
               {isDropped && (
                 <View style={styles.dropBadge}>
                   <TrendingDown size={12} color={colors.success} />
@@ -478,13 +468,13 @@ export default function PriceAlertsScreen() {
               {!isDropped && alert.dropPercentage < 0 && (
                 <View style={[styles.dropBadge, styles.increaseBadge]}>
                   <TrendingUp size={12} color={colors.error} />
-                  <Text style={[styles.dropText, styles.increaseText]}>{Math.abs(alert.dropPercentage)}%</Text>
+                  <Text style={[styles.dropText, styles.increaseText]}>
+                    {Math.abs(alert.dropPercentage)}%
+                  </Text>
                 </View>
               )}
             </View>
-            <Text style={styles.originalPrice}>
-              was ${alert.originalPrice}
-            </Text>
+            <Text style={styles.originalPrice}>was ${alert.originalPrice}</Text>
           </View>
 
           {renderPriceChart(alert.priceHistory)}
@@ -507,22 +497,25 @@ export default function PriceAlertsScreen() {
 
   const renderNotificationItem = (notification: PriceNotification) => {
     const isPositive = notification.type !== 'increase';
-    const Icon = notification.type === 'target_reached' ? CheckCircle : 
-                 notification.type === 'drop' ? TrendingDown : TrendingUp;
+    const Icon =
+      notification.type === 'target_reached'
+        ? CheckCircle
+        : notification.type === 'drop'
+          ? TrendingDown
+          : TrendingUp;
 
     return (
       <Pressable
         key={notification.id}
-        style={[
-          styles.notificationItem,
-          !notification.isRead && styles.notificationUnread,
-        ]}
+        style={[styles.notificationItem, !notification.isRead && styles.notificationUnread]}
         onPress={() => handleMarkNotificationRead(notification.id)}
       >
-        <View style={[
-          styles.notificationIcon,
-          { backgroundColor: isPositive ? `${colors.success}15` : `${colors.error}15` },
-        ]}>
+        <View
+          style={[
+            styles.notificationIcon,
+            { backgroundColor: isPositive ? `${colors.success}15` : `${colors.error}15` },
+          ]}
+        >
           <Icon size={20} color={isPositive ? colors.success : colors.error} />
         </View>
         <View style={styles.notificationContent}>
@@ -533,14 +526,14 @@ export default function PriceAlertsScreen() {
           </Text>
           <Text style={styles.notificationDestination}>{notification.destination}</Text>
           <View style={styles.notificationPrices}>
-            <Text style={styles.notificationOldPrice}>
-              ${notification.oldPrice}
-            </Text>
+            <Text style={styles.notificationOldPrice}>${notification.oldPrice}</Text>
             <ChevronRight size={14} color={colors.textTertiary} />
-            <Text style={[
-              styles.notificationNewPrice,
-              { color: isPositive ? colors.success : colors.error },
-            ]}>
+            <Text
+              style={[
+                styles.notificationNewPrice,
+                { color: isPositive ? colors.success : colors.error },
+              ]}
+            >
               ${notification.newPrice}
             </Text>
           </View>
@@ -557,12 +550,12 @@ export default function PriceAlertsScreen() {
           headerShown: false,
         }}
       />
-      
+
       <LinearGradient
         colors={[colors.primary, colors.primaryLight]}
         style={styles.headerGradient}
       />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
@@ -570,10 +563,7 @@ export default function PriceAlertsScreen() {
               <ArrowLeft size={24} color={colors.textLight} />
             </Pressable>
             <Text style={styles.headerTitle}>Price Alerts</Text>
-            <Pressable 
-              style={styles.settingsButton}
-              onPress={() => setShowSettingsModal(true)}
-            >
+            <Pressable style={styles.settingsButton} onPress={() => setShowSettingsModal(true)}>
               <Settings size={22} color={colors.textLight} />
             </Pressable>
           </View>
@@ -585,7 +575,7 @@ export default function PriceAlertsScreen() {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{alerts.filter(a => a.hasDropped).length}</Text>
+              <Text style={styles.statValue}>{alerts.filter((a) => a.hasDropped).length}</Text>
               <Text style={styles.statLabel}>Dropped</Text>
             </View>
             <View style={styles.statDivider} />
@@ -604,7 +594,10 @@ export default function PriceAlertsScreen() {
               style={[styles.tab, activeTab === 'alerts' && styles.tabActive]}
               onPress={() => setActiveTab('alerts')}
             >
-              <TrendingDown size={18} color={activeTab === 'alerts' ? colors.primary : colors.textTertiary} />
+              <TrendingDown
+                size={18}
+                color={activeTab === 'alerts' ? colors.primary : colors.textTertiary}
+              />
               <Text style={[styles.tabText, activeTab === 'alerts' && styles.tabTextActive]}>
                 Alerts
               </Text>
@@ -613,7 +606,10 @@ export default function PriceAlertsScreen() {
               style={[styles.tab, activeTab === 'notifications' && styles.tabActive]}
               onPress={() => setActiveTab('notifications')}
             >
-              <Bell size={18} color={activeTab === 'notifications' ? colors.primary : colors.textTertiary} />
+              <Bell
+                size={18}
+                color={activeTab === 'notifications' ? colors.primary : colors.textTertiary}
+              />
               <Text style={[styles.tabText, activeTab === 'notifications' && styles.tabTextActive]}>
                 Notifications
               </Text>
@@ -645,16 +641,27 @@ export default function PriceAlertsScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.filterScroll}
               >
-                {(['all', 'flights', 'hotels', 'dropped'] as FilterType[]).map(f => (
+                {(['all', 'flights', 'hotels', 'dropped'] as FilterType[]).map((f) => (
                   <Pressable
                     key={f}
                     style={[styles.filterChip, filter === f && styles.filterChipActive]}
                     onPress={() => setFilter(f)}
                   >
-                    {f === 'flights' && <Plane size={14} color={filter === f ? colors.textLight : colors.text} />}
-                    {f === 'hotels' && <Building2 size={14} color={filter === f ? colors.textLight : colors.text} />}
-                    {f === 'dropped' && <TrendingDown size={14} color={filter === f ? colors.textLight : colors.success} />}
-                    <Text style={[styles.filterChipText, filter === f && styles.filterChipTextActive]}>
+                    {f === 'flights' && (
+                      <Plane size={14} color={filter === f ? colors.textLight : colors.text} />
+                    )}
+                    {f === 'hotels' && (
+                      <Building2 size={14} color={filter === f ? colors.textLight : colors.text} />
+                    )}
+                    {f === 'dropped' && (
+                      <TrendingDown
+                        size={14}
+                        color={filter === f ? colors.textLight : colors.success}
+                      />
+                    )}
+                    <Text
+                      style={[styles.filterChipText, filter === f && styles.filterChipTextActive]}
+                    >
                       {f.charAt(0).toUpperCase() + f.slice(1)}
                     </Text>
                   </Pressable>
@@ -663,7 +670,7 @@ export default function PriceAlertsScreen() {
             </>
           )}
 
-          {activeTab === 'notifications' && notifications.filter(n => !n.isRead).length > 0 && (
+          {activeTab === 'notifications' && notifications.filter((n) => !n.isRead).length > 0 && (
             <Pressable style={styles.markAllRead} onPress={handleMarkAllRead}>
               <Text style={styles.markAllReadText}>Mark all as read</Text>
             </Pressable>
@@ -672,9 +679,7 @@ export default function PriceAlertsScreen() {
           <ScrollView
             style={styles.scrollView}
             showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             contentContainerStyle={styles.scrollContent}
           >
             {activeTab === 'alerts' ? (
@@ -689,26 +694,19 @@ export default function PriceAlertsScreen() {
                   </Text>
                 </View>
               )
+            ) : notifications.length > 0 ? (
+              notifications.map(renderNotificationItem)
             ) : (
-              notifications.length > 0 ? (
-                notifications.map(renderNotificationItem)
-              ) : (
-                <View style={styles.emptyState}>
-                  <Bell size={48} color={colors.textTertiary} />
-                  <Text style={styles.emptyTitle}>No notifications</Text>
-                  <Text style={styles.emptyText}>
-                    You&apos;ll be notified when prices change
-                  </Text>
-                </View>
-              )
+              <View style={styles.emptyState}>
+                <Bell size={48} color={colors.textTertiary} />
+                <Text style={styles.emptyTitle}>No notifications</Text>
+                <Text style={styles.emptyText}>You&apos;ll be notified when prices change</Text>
+              </View>
             )}
           </ScrollView>
         </View>
 
-        <Pressable
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}
-        >
+        <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
           <LinearGradient
             colors={[colors.secondary, colors.secondaryDark]}
             style={styles.addButtonGradient}
@@ -738,8 +736,16 @@ export default function PriceAlertsScreen() {
                 style={[styles.typeOption, newAlertType === 'flight' && styles.typeOptionActive]}
                 onPress={() => setNewAlertType('flight')}
               >
-                <Plane size={20} color={newAlertType === 'flight' ? colors.textLight : colors.text} />
-                <Text style={[styles.typeOptionText, newAlertType === 'flight' && styles.typeOptionTextActive]}>
+                <Plane
+                  size={20}
+                  color={newAlertType === 'flight' ? colors.textLight : colors.text}
+                />
+                <Text
+                  style={[
+                    styles.typeOptionText,
+                    newAlertType === 'flight' && styles.typeOptionTextActive,
+                  ]}
+                >
                   Flight
                 </Text>
               </Pressable>
@@ -747,8 +753,16 @@ export default function PriceAlertsScreen() {
                 style={[styles.typeOption, newAlertType === 'hotel' && styles.typeOptionActive]}
                 onPress={() => setNewAlertType('hotel')}
               >
-                <Building2 size={20} color={newAlertType === 'hotel' ? colors.textLight : colors.text} />
-                <Text style={[styles.typeOptionText, newAlertType === 'hotel' && styles.typeOptionTextActive]}>
+                <Building2
+                  size={20}
+                  color={newAlertType === 'hotel' ? colors.textLight : colors.text}
+                />
+                <Text
+                  style={[
+                    styles.typeOptionText,
+                    newAlertType === 'hotel' && styles.typeOptionTextActive,
+                  ]}
+                >
                   Hotel
                 </Text>
               </Pressable>
@@ -829,11 +843,8 @@ export default function PriceAlertsScreen() {
                 colors={['transparent', 'rgba(0,0,0,0.8)']}
                 style={styles.detailImageGradient}
               />
-              
-              <Pressable
-                style={styles.detailClose}
-                onPress={() => setSelectedAlert(null)}
-              >
+
+              <Pressable style={styles.detailClose} onPress={() => setSelectedAlert(null)}>
                 <X size={24} color={colors.textLight} />
               </Pressable>
 
@@ -845,10 +856,15 @@ export default function PriceAlertsScreen() {
                       <Text style={styles.detailOrigin}>From {selectedAlert.origin}</Text>
                     )}
                   </View>
-                  <View style={[
-                    styles.detailTypeBadge,
-                    { backgroundColor: selectedAlert.type === 'flight' ? colors.primary : colors.secondary },
-                  ]}>
+                  <View
+                    style={[
+                      styles.detailTypeBadge,
+                      {
+                        backgroundColor:
+                          selectedAlert.type === 'flight' ? colors.primary : colors.secondary,
+                      },
+                    ]}
+                  >
                     {selectedAlert.type === 'flight' ? (
                       <Plane size={14} color={colors.textLight} />
                     ) : (
@@ -867,7 +883,9 @@ export default function PriceAlertsScreen() {
                   </View>
                   <View style={styles.detailPriceItem}>
                     <Text style={styles.detailPriceLabel}>Original</Text>
-                    <Text style={styles.detailPriceValueStrike}>${selectedAlert.originalPrice}</Text>
+                    <Text style={styles.detailPriceValueStrike}>
+                      ${selectedAlert.originalPrice}
+                    </Text>
                   </View>
                   <View style={styles.detailPriceItem}>
                     <Text style={styles.detailPriceLabel}>Lowest</Text>
@@ -887,7 +905,8 @@ export default function PriceAlertsScreen() {
                   <View style={styles.detailInfoRow}>
                     <Calendar size={16} color={colors.textSecondary} />
                     <Text style={styles.detailInfoText}>
-                      {formatDate(selectedAlert.dates.start)} - {formatDate(selectedAlert.dates.end)}
+                      {formatDate(selectedAlert.dates.start)} -{' '}
+                      {formatDate(selectedAlert.dates.end)}
                     </Text>
                   </View>
                   <View style={styles.detailInfoRow}>
@@ -953,9 +972,7 @@ export default function PriceAlertsScreen() {
                 <Bell size={20} color={colors.primary} />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>Push Notifications</Text>
-                  <Text style={styles.settingDescription}>
-                    Receive alerts when prices change
-                  </Text>
+                  <Text style={styles.settingDescription}>Receive alerts when prices change</Text>
                 </View>
               </View>
               <Switch
@@ -979,7 +996,7 @@ export default function PriceAlertsScreen() {
             </View>
 
             <View style={styles.thresholdSelector}>
-              {[5, 10, 15, 20, 25].map(value => (
+              {[5, 10, 15, 20, 25].map((value) => (
                 <Pressable
                   key={value}
                   style={[
@@ -988,10 +1005,12 @@ export default function PriceAlertsScreen() {
                   ]}
                   onPress={() => setPriceDropThreshold(value)}
                 >
-                  <Text style={[
-                    styles.thresholdText,
-                    priceDropThreshold === value && styles.thresholdTextActive,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.thresholdText,
+                      priceDropThreshold === value && styles.thresholdTextActive,
+                    ]}
+                  >
                     {value}%
                   </Text>
                 </Pressable>

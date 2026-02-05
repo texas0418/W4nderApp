@@ -1,13 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  TextInput,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,15 +30,13 @@ export default function ExploreScreen() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        d =>
-          d.name.toLowerCase().includes(query) ||
-          d.country.toLowerCase().includes(query)
+        (d) => d.name.toLowerCase().includes(query) || d.country.toLowerCase().includes(query)
       );
     }
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(d =>
-        d.tags.some(tag => tag.toLowerCase() === selectedCategory.toLowerCase())
+      filtered = filtered.filter((d) =>
+        d.tags.some((tag) => tag.toLowerCase() === selectedCategory.toLowerCase())
       );
     }
 
@@ -84,7 +74,7 @@ export default function ExploreScreen() {
             style={styles.categoriesScroll}
             contentContainerStyle={styles.categoriesContent}
           >
-            {categories.map(cat => (
+            {categories.map((cat) => (
               <Pressable
                 key={cat.id}
                 style={[
@@ -116,17 +106,13 @@ export default function ExploreScreen() {
           </Text>
 
           <View style={styles.grid}>
-            {results.map(dest => (
+            {results.map((dest) => (
               <Pressable
                 key={dest.id}
                 style={styles.destCard}
                 onPress={() => router.push(`/destination/${dest.id}`)}
               >
-                <Image
-                  source={{ uri: dest.image }}
-                  style={styles.destImage}
-                  contentFit="cover"
-                />
+                <Image source={{ uri: dest.image }} style={styles.destImage} contentFit="cover" />
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.8)']}
                   style={styles.destGradient}

@@ -28,12 +28,7 @@ import {
 import colors from '@/constants/colors';
 import BookingProgress from '@/components/BookingProgress';
 import BookingItemCard from '@/components/BookingItemCard';
-import {
-  BookingSession,
-  BookingRequest,
-  BookingResult,
-  PaymentMethodInfo,
-} from '@/types/booking';
+import { BookingSession, BookingRequest, BookingResult, PaymentMethodInfo } from '@/types/booking';
 import {
   bookingService,
   createBookingRequestsFromItinerary,
@@ -43,7 +38,7 @@ import {
 // Mock itinerary data (would come from params/context in real app)
 const MOCK_ITINERARY = {
   id: 'itin-1',
-  name: 'Romantic Valentine\'s Evening',
+  name: "Romantic Valentine's Evening",
   date: '2024-02-14',
   activities: [
     {
@@ -89,10 +84,9 @@ export default function BookingConfirmationScreen() {
   const [paymentSheetVisible, setPaymentSheetVisible] = useState(false);
 
   // Create booking requests from itinerary
-  const bookingRequests = createBookingRequestsFromItinerary(
-    MOCK_ITINERARY.activities,
-    { partySize: 2 }
-  );
+  const bookingRequests = createBookingRequestsFromItinerary(MOCK_ITINERARY.activities, {
+    partySize: 2,
+  });
 
   const estimatedTotal = bookingRequests.reduce((sum, r) => sum + r.estimatedCost, 0);
 
@@ -100,10 +94,12 @@ export default function BookingConfirmationScreen() {
   useEffect(() => {
     const unsubscribe = bookingService.subscribe('confirmation-screen', (updatedSession) => {
       setSession(updatedSession);
-      
-      if (updatedSession.status === 'completed' || 
-          updatedSession.status === 'partial' || 
-          updatedSession.status === 'failed') {
+
+      if (
+        updatedSession.status === 'completed' ||
+        updatedSession.status === 'partial' ||
+        updatedSession.status === 'failed'
+      ) {
         setPhase('complete');
       }
     });
@@ -131,15 +127,18 @@ export default function BookingConfirmationScreen() {
   }, [bookingRequests, selectedPaymentMethod]);
 
   // Retry a failed booking
-  const handleRetry = useCallback(async (requestId: string) => {
-    if (!session) return;
-    
-    try {
-      await bookingService.retryBooking(requestId);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to retry booking');
-    }
-  }, [session]);
+  const handleRetry = useCallback(
+    async (requestId: string) => {
+      if (!session) return;
+
+      try {
+        await bookingService.retryBooking(requestId);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to retry booking');
+      }
+    },
+    [session]
+  );
 
   // Cancel a booking
   const handleCancel = useCallback(async (requestId: string) => {
@@ -225,21 +224,16 @@ export default function BookingConfirmationScreen() {
       {/* Payment method */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Payment Method</Text>
-        <TouchableOpacity
-          style={styles.paymentCard}
-          onPress={() => setPaymentSheetVisible(true)}
-        >
+        <TouchableOpacity style={styles.paymentCard} onPress={() => setPaymentSheetVisible(true)}>
           <View style={styles.paymentIcon}>
             <CreditCard size={20} color={colors.primary} />
           </View>
           <View style={styles.paymentInfo}>
             <Text style={styles.paymentLabel}>
-              {selectedPaymentMethod.brand || selectedPaymentMethod.type} 
+              {selectedPaymentMethod.brand || selectedPaymentMethod.type}
               {selectedPaymentMethod.last4 ? ` •••• ${selectedPaymentMethod.last4}` : ''}
             </Text>
-            {selectedPaymentMethod.isDefault && (
-              <Text style={styles.paymentDefault}>Default</Text>
-            )}
+            {selectedPaymentMethod.isDefault && <Text style={styles.paymentDefault}>Default</Text>}
           </View>
           <ChevronRight size={18} color={colors.textTertiary} />
         </TouchableOpacity>
@@ -260,13 +254,9 @@ export default function BookingConfirmationScreen() {
           <View style={styles.costDivider} />
           <View style={styles.costRow}>
             <Text style={styles.costTotalLabel}>Estimated Total</Text>
-            <Text style={styles.costTotalValue}>
-              {formatCurrency(estimatedTotal, 'USD')}
-            </Text>
+            <Text style={styles.costTotalValue}>{formatCurrency(estimatedTotal, 'USD')}</Text>
           </View>
-          <Text style={styles.costNote}>
-            Final amounts may vary based on availability and fees
-          </Text>
+          <Text style={styles.costNote}>Final amounts may vary based on availability and fees</Text>
         </View>
       </View>
 
@@ -311,10 +301,7 @@ export default function BookingConfirmationScreen() {
       </View>
 
       {session?.status === 'in_progress' && (
-        <TouchableOpacity
-          style={styles.cancelAllButton}
-          onPress={handleCancelAll}
-        >
+        <TouchableOpacity style={styles.cancelAllButton} onPress={handleCancelAll}>
           <Text style={styles.cancelAllText}>Cancel All Bookings</Text>
         </TouchableOpacity>
       )}
@@ -325,21 +312,21 @@ export default function BookingConfirmationScreen() {
   const renderCompletePhase = () => (
     <>
       {/* Success/partial header */}
-      <View style={[
-        styles.completeHeader,
-        session?.status === 'completed' && styles.completeHeaderSuccess,
-        session?.status === 'partial' && styles.completeHeaderPartial,
-        session?.status === 'failed' && styles.completeHeaderFailed,
-      ]}>
+      <View
+        style={[
+          styles.completeHeader,
+          session?.status === 'completed' && styles.completeHeaderSuccess,
+          session?.status === 'partial' && styles.completeHeaderPartial,
+          session?.status === 'failed' && styles.completeHeaderFailed,
+        ]}
+      >
         {session?.status === 'completed' ? (
           <>
             <View style={styles.completeIcon}>
               <Check size={32} color={colors.success} />
             </View>
             <Text style={styles.completeTitle}>All Bookings Confirmed!</Text>
-            <Text style={styles.completeSubtitle}>
-              Your {MOCK_ITINERARY.name} is all set
-            </Text>
+            <Text style={styles.completeSubtitle}>Your {MOCK_ITINERARY.name} is all set</Text>
           </>
         ) : session?.status === 'partial' ? (
           <>
@@ -347,9 +334,7 @@ export default function BookingConfirmationScreen() {
               <AlertTriangle size={32} color={colors.warning} />
             </View>
             <Text style={styles.completeTitle}>Partially Booked</Text>
-            <Text style={styles.completeSubtitle}>
-              Some bookings need your attention
-            </Text>
+            <Text style={styles.completeSubtitle}>Some bookings need your attention</Text>
           </>
         ) : (
           <>
@@ -357,9 +342,7 @@ export default function BookingConfirmationScreen() {
               <X size={32} color={colors.error} />
             </View>
             <Text style={styles.completeTitle}>Bookings Failed</Text>
-            <Text style={styles.completeSubtitle}>
-              We couldn't complete your bookings
-            </Text>
+            <Text style={styles.completeSubtitle}>We couldn't complete your bookings</Text>
           </>
         )}
       </View>
@@ -371,7 +354,10 @@ export default function BookingConfirmationScreen() {
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Total Charged</Text>
               <Text style={styles.summaryValue}>
-                {formatCurrency(session.paymentSummary.actualTotal, session.paymentSummary.currency)}
+                {formatCurrency(
+                  session.paymentSummary.actualTotal,
+                  session.paymentSummary.currency
+                )}
               </Text>
             </View>
             <View style={styles.summaryRow}>
@@ -428,15 +414,12 @@ export default function BookingConfirmationScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
@@ -465,10 +448,7 @@ export default function BookingConfirmationScreen() {
             <Text style={styles.footerLabel}>Estimated Total</Text>
             <Text style={styles.footerValue}>{formatCurrency(estimatedTotal, 'USD')}</Text>
           </View>
-          <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={handleConfirmBooking}
-          >
+          <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmBooking}>
             <Text style={styles.confirmButtonText}>Confirm & Book All</Text>
           </TouchableOpacity>
         </View>
@@ -476,10 +456,7 @@ export default function BookingConfirmationScreen() {
 
       {phase === 'complete' && (
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.doneButton}
-            onPress={() => router.push('/date-night')}
-          >
+          <TouchableOpacity style={styles.doneButton} onPress={() => router.push('/date-night')}>
             <Text style={styles.doneButtonText}>Done</Text>
           </TouchableOpacity>
         </View>

@@ -62,7 +62,8 @@ const mockFeedPosts: FeedPost[] = [
       'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800',
       'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800',
     ],
-    caption: 'Golden hour in Santorini hits different ✨ The sunsets here are absolutely unreal. Every evening feels like a painting coming to life.',
+    caption:
+      'Golden hour in Santorini hits different ✨ The sunsets here are absolutely unreal. Every evening feels like a painting coming to life.',
     likes: 1247,
     comments: [
       {
@@ -93,10 +94,9 @@ const mockFeedPosts: FeedPost[] = [
     type: 'photo',
     destination: 'Kyoto',
     country: 'Japan',
-    images: [
-      'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800',
-    ],
-    caption: 'Found this hidden bamboo path away from the crowds. Sometimes getting lost leads to the best discoveries 🎋',
+    images: ['https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800'],
+    caption:
+      'Found this hidden bamboo path away from the crowds. Sometimes getting lost leads to the best discoveries 🎋',
     likes: 892,
     comments: [],
     isLiked: true,
@@ -117,10 +117,9 @@ const mockFeedPosts: FeedPost[] = [
     type: 'milestone',
     destination: 'Iceland',
     country: 'Iceland',
-    images: [
-      'https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=800',
-    ],
-    caption: '🎉 Just hit 25 countries visited! Iceland made it extra special with the Northern Lights dancing above. Dreams do come true!',
+    images: ['https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=800'],
+    caption:
+      '🎉 Just hit 25 countries visited! Iceland made it extra special with the Northern Lights dancing above. Dreams do come true!',
     likes: 2341,
     comments: [
       {
@@ -159,10 +158,9 @@ const mockFeedPosts: FeedPost[] = [
     type: 'tip',
     destination: 'Bali',
     country: 'Indonesia',
-    images: [
-      'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800',
-    ],
-    caption: '💡 Pro tip: Wake up at 4am to see Uluwatu Temple without crowds. Yes it is early, but watching sunrise from here is absolutely worth it. Trust me!',
+    images: ['https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800'],
+    caption:
+      '💡 Pro tip: Wake up at 4am to see Uluwatu Temple without crowds. Yes it is early, but watching sunrise from here is absolutely worth it. Trust me!',
     likes: 567,
     comments: [],
     isLiked: false,
@@ -187,7 +185,8 @@ const mockFeedPosts: FeedPost[] = [
       'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=800',
       'https://images.unsplash.com/photo-1509735855316-1bce9ef3cc2a?w=800',
     ],
-    caption: 'Getting lost in the medina is part of the magic ✨ The colors, the sounds, the smells - every sense is awakened here.',
+    caption:
+      'Getting lost in the medina is part of the magic ✨ The colors, the sounds, the smells - every sense is awakened here.',
     likes: 1089,
     comments: [],
     isLiked: true,
@@ -223,37 +222,43 @@ export default function TravelFeedScreen() {
   }, []);
 
   const handleLike = useCallback((postId: string) => {
-    setPosts(prev => prev.map(post => {
-      if (post.id === postId) {
-        return {
-          ...post,
-          isLiked: !post.isLiked,
-          likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-        };
-      }
-      return post;
-    }));
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            isLiked: !post.isLiked,
+            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+          };
+        }
+        return post;
+      })
+    );
   }, []);
 
   const handleSave = useCallback((postId: string) => {
-    setPosts(prev => prev.map(post => {
-      if (post.id === postId) {
-        return { ...post, isSaved: !post.isSaved };
-      }
-      return post;
-    }));
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.id === postId) {
+          return { ...post, isSaved: !post.isSaved };
+        }
+        return post;
+      })
+    );
   }, []);
 
   const handleFollow = useCallback((userId: string) => {
-    setPosts(prev => prev.map(post => {
-      if (post.user.id === userId) {
-        return {
-          ...post,
-          user: { ...post.user, isFollowing: !post.user.isFollowing },
-        };
-      }
-      return post;
-    }));
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.user.id === userId) {
+          return {
+            ...post,
+            user: { ...post.user, isFollowing: !post.user.isFollowing },
+          };
+        }
+        return post;
+      })
+    );
   }, []);
 
   const handleAddComment = useCallback(() => {
@@ -269,12 +274,14 @@ export default function TravelFeedScreen() {
       likes: 0,
     };
 
-    setPosts(prev => prev.map(post => {
-      if (post.id === selectedPost.id) {
-        return { ...post, comments: [...post.comments, comment] };
-      }
-      return post;
-    }));
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.id === selectedPost.id) {
+          return { ...post, comments: [...post.comments, comment] };
+        }
+        return post;
+      })
+    );
 
     setNewComment('');
   }, [newComment, selectedPost]);
@@ -311,14 +318,14 @@ export default function TravelFeedScreen() {
   };
 
   const nextImage = (postId: string, totalImages: number) => {
-    setCurrentImageIndex(prev => ({
+    setCurrentImageIndex((prev) => ({
       ...prev,
       [postId]: ((prev[postId] || 0) + 1) % totalImages,
     }));
   };
 
   const prevImage = (postId: string, totalImages: number) => {
-    setCurrentImageIndex(prev => ({
+    setCurrentImageIndex((prev) => ({
       ...prev,
       [postId]: ((prev[postId] || 0) - 1 + totalImages) % totalImages,
     }));
@@ -342,16 +349,15 @@ export default function TravelFeedScreen() {
               </View>
               <View style={styles.locationRow}>
                 <MapPin size={12} color={colors.textTertiary} />
-                <Text style={styles.location}>{post.destination}, {post.country}</Text>
+                <Text style={styles.location}>
+                  {post.destination}, {post.country}
+                </Text>
               </View>
             </View>
           </Pressable>
           <View style={styles.headerActions}>
             {!post.user.isFollowing && (
-              <Pressable
-                style={styles.followButton}
-                onPress={() => handleFollow(post.user.id)}
-              >
+              <Pressable style={styles.followButton} onPress={() => handleFollow(post.user.id)}>
                 <Text style={styles.followButtonText}>Follow</Text>
               </Pressable>
             )}
@@ -379,10 +385,7 @@ export default function TravelFeedScreen() {
                 {post.images.map((_, idx) => (
                   <View
                     key={idx}
-                    style={[
-                      styles.indicator,
-                      idx === imageIndex && styles.indicatorActive,
-                    ]}
+                    style={[styles.indicator, idx === imageIndex && styles.indicatorActive]}
                   />
                 ))}
               </View>
@@ -400,7 +403,15 @@ export default function TravelFeedScreen() {
             <View style={styles.tripDateBadge}>
               <Calendar size={12} color={colors.textLight} />
               <Text style={styles.tripDateText}>
-                {new Date(post.tripDates.start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(post.tripDates.end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                {new Date(post.tripDates.start).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                })}{' '}
+                -{' '}
+                {new Date(post.tripDates.end).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                })}
               </Text>
             </View>
           )}
@@ -408,10 +419,7 @@ export default function TravelFeedScreen() {
 
         <View style={styles.postActions}>
           <View style={styles.leftActions}>
-            <Pressable
-              style={styles.actionButton}
-              onPress={() => handleLike(post.id)}
-            >
+            <Pressable style={styles.actionButton} onPress={() => handleLike(post.id)}>
               <Heart
                 size={24}
                 color={post.isLiked ? colors.error : colors.text}
@@ -431,10 +439,7 @@ export default function TravelFeedScreen() {
               <Send size={22} color={colors.text} />
             </Pressable>
           </View>
-          <Pressable
-            style={styles.actionButton}
-            onPress={() => handleSave(post.id)}
-          >
+          <Pressable style={styles.actionButton} onPress={() => handleSave(post.id)}>
             <Bookmark
               size={24}
               color={post.isSaved ? colors.primary : colors.text}
@@ -446,8 +451,7 @@ export default function TravelFeedScreen() {
         <View style={styles.postContent}>
           <Text style={styles.likesCount}>{formatNumber(post.likes)} likes</Text>
           <Text style={styles.caption}>
-            <Text style={styles.captionUsername}>{post.user.username}</Text>{' '}
-            {post.caption}
+            <Text style={styles.captionUsername}>{post.user.username}</Text> {post.caption}
           </Text>
           {post.comments.length > 0 && (
             <Pressable
@@ -456,9 +460,7 @@ export default function TravelFeedScreen() {
                 setShowComments(true);
               }}
             >
-              <Text style={styles.viewComments}>
-                View all {post.comments.length} comments
-              </Text>
+              <Text style={styles.viewComments}>View all {post.comments.length} comments</Text>
             </Pressable>
           )}
           <Text style={styles.timestamp}>{formatTimestamp(post.timestamp)}</Text>
@@ -496,7 +498,10 @@ export default function TravelFeedScreen() {
             style={[styles.tab, activeTab === 'following' && styles.tabActive]}
             onPress={() => setActiveTab('following')}
           >
-            <Users size={16} color={activeTab === 'following' ? colors.textLight : 'rgba(255,255,255,0.6)'} />
+            <Users
+              size={16}
+              color={activeTab === 'following' ? colors.textLight : 'rgba(255,255,255,0.6)'}
+            />
             <Text style={[styles.tabText, activeTab === 'following' && styles.tabTextActive]}>
               Following
             </Text>
@@ -505,7 +510,10 @@ export default function TravelFeedScreen() {
             style={[styles.tab, activeTab === 'discover' && styles.tabActive]}
             onPress={() => setActiveTab('discover')}
           >
-            <Globe size={16} color={activeTab === 'discover' ? colors.textLight : 'rgba(255,255,255,0.6)'} />
+            <Globe
+              size={16}
+              color={activeTab === 'discover' ? colors.textLight : 'rgba(255,255,255,0.6)'}
+            />
             <Text style={[styles.tabText, activeTab === 'discover' && styles.tabTextActive]}>
               Discover
             </Text>
@@ -515,20 +523,17 @@ export default function TravelFeedScreen() {
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false }
-          )}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+            useNativeDriver: false,
+          })}
           scrollEventThrottle={16}
         >
           {activeTab === 'discover' && (
             <View style={styles.trendingSection}>
               <Text style={styles.trendingTitle}>Trending Now</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {trendingTopics.map(topic => (
+                {trendingTopics.map((topic) => (
                   <Pressable key={topic.id} style={styles.trendingTag}>
                     <Text style={styles.trendingTagText}>#{topic.tag}</Text>
                     <Text style={styles.trendingTagCount}>{topic.posts} posts</Text>
@@ -539,7 +544,11 @@ export default function TravelFeedScreen() {
           )}
 
           <View style={styles.storySection}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.storyScroll}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.storyScroll}
+            >
               <Pressable style={styles.addStoryButton}>
                 <View style={styles.addStoryCircle}>
                   <LinearGradient
@@ -552,7 +561,7 @@ export default function TravelFeedScreen() {
                 <Text style={styles.storyName}>Share Trip</Text>
               </Pressable>
 
-              {posts.slice(0, 5).map(post => (
+              {posts.slice(0, 5).map((post) => (
                 <Pressable key={`story-${post.id}`} style={styles.storyItem}>
                   <LinearGradient
                     colors={[colors.secondary, colors.warning]}
@@ -568,9 +577,7 @@ export default function TravelFeedScreen() {
             </ScrollView>
           </View>
 
-          <View style={styles.feedContainer}>
-            {posts.map(post => renderPost(post))}
-          </View>
+          <View style={styles.feedContainer}>{posts.map((post) => renderPost(post))}</View>
 
           <View style={styles.endMessage}>
             <Sparkles size={20} color={colors.textTertiary} />
@@ -661,7 +668,7 @@ export default function TravelFeedScreen() {
         <Pressable style={styles.optionsOverlay} onPress={() => setShowOptions(false)}>
           <View style={styles.optionsContainer}>
             <View style={styles.optionsHandle} />
-            
+
             {selectedPost && !selectedPost.user.isFollowing && (
               <Pressable
                 style={styles.optionItem}
@@ -671,7 +678,9 @@ export default function TravelFeedScreen() {
                 }}
               >
                 <UserPlus size={22} color={colors.primary} />
-                <Text style={[styles.optionText, { color: colors.primary }]}>Follow @{selectedPost.user.username}</Text>
+                <Text style={[styles.optionText, { color: colors.primary }]}>
+                  Follow @{selectedPost.user.username}
+                </Text>
               </Pressable>
             )}
 
@@ -703,10 +712,7 @@ export default function TravelFeedScreen() {
               <Text style={[styles.optionText, { color: colors.error }]}>Report</Text>
             </Pressable>
 
-            <Pressable
-              style={styles.cancelButton}
-              onPress={() => setShowOptions(false)}
-            >
+            <Pressable style={styles.cancelButton} onPress={() => setShowOptions(false)}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </Pressable>
           </View>

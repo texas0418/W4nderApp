@@ -12,9 +12,7 @@ export default function NotFoundScreen() {
           <MapPin size={48} color={colors.primary} />
         </View>
         <Text style={styles.title}>Page Not Found</Text>
-        <Text style={styles.description}>
-          Looks like you have wandered off the map!
-        </Text>
+        <Text style={styles.description}>Looks like you have wandered off the map!</Text>
         <Link href="/" style={styles.link}>
           <Text style={styles.linkText}>Go back home</Text>
         </Link>

@@ -77,9 +77,11 @@ class MilestoneSuggestionsService {
   }
 
   // Get insights for an anniversary by ID
-  async getMilestoneInsightsForAnniversary(anniversaryId: string): Promise<MilestoneInsights | null> {
+  async getMilestoneInsightsForAnniversary(
+    anniversaryId: string
+  ): Promise<MilestoneInsights | null> {
     const upcoming = await anniversaryService.getUpcomingAnniversaries(365);
-    const upcomingAnn = upcoming.find(u => u.anniversary.id === anniversaryId);
+    const upcomingAnn = upcoming.find((u) => u.anniversary.id === anniversaryId);
 
     if (!upcomingAnn) {
       const anniversary = await anniversaryService.getAnniversaryById(anniversaryId);
@@ -89,8 +91,10 @@ class MilestoneSuggestionsService {
       const date = new Date(anniversary.date);
       const now = new Date();
       let years = now.getFullYear() - date.getFullYear();
-      if (now.getMonth() < date.getMonth() || 
-          (now.getMonth() === date.getMonth() && now.getDate() < date.getDate())) {
+      if (
+        now.getMonth() < date.getMonth() ||
+        (now.getMonth() === date.getMonth() && now.getDate() < date.getDate())
+      ) {
         years++;
       }
       return this.getMilestoneInsights(years);
@@ -101,7 +105,7 @@ class MilestoneSuggestionsService {
 
   // Filter packages by criteria
   filterPackages(packages: CelebrationPackage[], options: FilterOptions): CelebrationPackage[] {
-    return packages.filter(pkg => {
+    return packages.filter((pkg) => {
       if (options.priceRanges && options.priceRanges.length > 0) {
         if (!options.priceRanges.includes(pkg.priceRange)) return false;
       }
@@ -114,7 +118,7 @@ class MilestoneSuggestionsService {
     suggestions: PersonalizedSuggestion[],
     options: FilterOptions
   ): PersonalizedSuggestion[] {
-    return suggestions.filter(sug => {
+    return suggestions.filter((sug) => {
       if (options.categories && options.categories.length > 0) {
         if (!options.categories.includes(sug.category)) return false;
       }
@@ -191,7 +195,7 @@ class MilestoneSuggestionsService {
 
   // Get featured packages across all milestones
   getFeaturedPackages(): CelebrationPackage[] {
-    return CELEBRATION_PACKAGES.filter(p => p.featured);
+    return CELEBRATION_PACKAGES.filter((p) => p.featured);
   }
 
   // Get all available special milestone years
@@ -200,7 +204,10 @@ class MilestoneSuggestionsService {
   }
 
   // Search packages and suggestions
-  searchIdeas(query: string, yearsCompleting?: number): {
+  searchIdeas(
+    query: string,
+    yearsCompleting?: number
+  ): {
     packages: CelebrationPackage[];
     suggestions: PersonalizedSuggestion[];
     giftIdeas: GiftIdea[];
@@ -219,26 +226,29 @@ class MilestoneSuggestionsService {
     }
 
     // Search in packages
-    const matchedPackages = packages.filter(p =>
-      p.name.toLowerCase().includes(lowerQuery) ||
-      p.description.toLowerCase().includes(lowerQuery) ||
-      p.themes.some(t => t.toLowerCase().includes(lowerQuery)) ||
-      p.highlights.some(h => h.toLowerCase().includes(lowerQuery))
+    const matchedPackages = packages.filter(
+      (p) =>
+        p.name.toLowerCase().includes(lowerQuery) ||
+        p.description.toLowerCase().includes(lowerQuery) ||
+        p.themes.some((t) => t.toLowerCase().includes(lowerQuery)) ||
+        p.highlights.some((h) => h.toLowerCase().includes(lowerQuery))
     );
 
     // Search in suggestions
-    const matchedSuggestions = suggestions.filter(s =>
-      s.title.toLowerCase().includes(lowerQuery) ||
-      s.description.toLowerCase().includes(lowerQuery) ||
-      s.themes.some(t => t.toLowerCase().includes(lowerQuery)) ||
-      s.bestFor.some(b => b.toLowerCase().includes(lowerQuery))
+    const matchedSuggestions = suggestions.filter(
+      (s) =>
+        s.title.toLowerCase().includes(lowerQuery) ||
+        s.description.toLowerCase().includes(lowerQuery) ||
+        s.themes.some((t) => t.toLowerCase().includes(lowerQuery)) ||
+        s.bestFor.some((b) => b.toLowerCase().includes(lowerQuery))
     );
 
     // Search in gift ideas
-    const matchedGifts = giftIdeas.filter(g =>
-      g.name.toLowerCase().includes(lowerQuery) ||
-      g.description.toLowerCase().includes(lowerQuery) ||
-      g.traditionalTie.toLowerCase().includes(lowerQuery)
+    const matchedGifts = giftIdeas.filter(
+      (g) =>
+        g.name.toLowerCase().includes(lowerQuery) ||
+        g.description.toLowerCase().includes(lowerQuery) ||
+        g.traditionalTie.toLowerCase().includes(lowerQuery)
     );
 
     return {
@@ -249,7 +259,10 @@ class MilestoneSuggestionsService {
   }
 
   // Get budget-friendly options
-  getBudgetFriendlyIdeas(yearsCompleting: number, maxPrice: PriceRange = '$$'): {
+  getBudgetFriendlyIdeas(
+    yearsCompleting: number,
+    maxPrice: PriceRange = '$$'
+  ): {
     suggestions: PersonalizedSuggestion[];
     giftIdeas: GiftIdea[];
   } {
@@ -257,11 +270,11 @@ class MilestoneSuggestionsService {
     const maxIndex = priceOrder.indexOf(maxPrice);
 
     const suggestions = getSuggestionsForMilestone(yearsCompleting).filter(
-      s => priceOrder.indexOf(s.priceRange) <= maxIndex
+      (s) => priceOrder.indexOf(s.priceRange) <= maxIndex
     );
 
     const giftIdeas = getGiftIdeasForMilestone(yearsCompleting).filter(
-      g => priceOrder.indexOf(g.priceRange) <= maxIndex
+      (g) => priceOrder.indexOf(g.priceRange) <= maxIndex
     );
 
     return { suggestions, giftIdeas };
@@ -272,16 +285,14 @@ class MilestoneSuggestionsService {
     yearsCompleting: number,
     category: SuggestionCategory
   ): PersonalizedSuggestion[] {
-    return getSuggestionsForMilestone(yearsCompleting).filter(
-      s => s.category === category
-    );
+    return getSuggestionsForMilestone(yearsCompleting).filter((s) => s.category === category);
   }
 
   // Generate a personalized celebration plan
   generateCelebrationPlan(
     yearsCompleting: number,
     budget: PriceRange,
-    preferences: { 
+    preferences: {
       preferAdventure?: boolean;
       preferRelaxation?: boolean;
       preferNostalgia?: boolean;
@@ -296,34 +307,35 @@ class MilestoneSuggestionsService {
     const budgetIndex = priceOrder.indexOf(budget);
 
     // Find matching package
-    const packages = getPackagesForMilestone(yearsCompleting)
-      .filter(p => priceOrder.indexOf(p.priceRange) <= budgetIndex);
+    const packages = getPackagesForMilestone(yearsCompleting).filter(
+      (p) => priceOrder.indexOf(p.priceRange) <= budgetIndex
+    );
 
-    const selectedPackage = packages.length > 0 
-      ? packages[Math.floor(Math.random() * packages.length)]
-      : undefined;
+    const selectedPackage =
+      packages.length > 0 ? packages[Math.floor(Math.random() * packages.length)] : undefined;
 
     // Determine emotional tone preference
-    let preferredTone: 'romantic' | 'adventurous' | 'relaxing' | 'celebratory' | 'nostalgic' = 'celebratory';
+    let preferredTone: 'romantic' | 'adventurous' | 'relaxing' | 'celebratory' | 'nostalgic' =
+      'celebratory';
     if (preferences.preferAdventure) preferredTone = 'adventurous';
     else if (preferences.preferRelaxation) preferredTone = 'relaxing';
     else if (preferences.preferNostalgia) preferredTone = 'nostalgic';
 
     // Find matching suggestions
-    const suggestions = getSuggestionsForMilestone(yearsCompleting)
-      .filter(s => priceOrder.indexOf(s.priceRange) <= budgetIndex);
+    const suggestions = getSuggestionsForMilestone(yearsCompleting).filter(
+      (s) => priceOrder.indexOf(s.priceRange) <= budgetIndex
+    );
 
-    const mainSuggestion = suggestions.find(s => s.emotionalTone === preferredTone) || suggestions[0];
-    const additionalIdeas = suggestions
-      .filter(s => s.id !== mainSuggestion?.id)
-      .slice(0, 3);
+    const mainSuggestion =
+      suggestions.find((s) => s.emotionalTone === preferredTone) || suggestions[0];
+    const additionalIdeas = suggestions.filter((s) => s.id !== mainSuggestion?.id).slice(0, 3);
 
     // Find gift idea
-    const giftIdeas = getGiftIdeasForMilestone(yearsCompleting)
-      .filter(g => priceOrder.indexOf(g.priceRange) <= budgetIndex);
-    const giftIdea = giftIdeas.length > 0
-      ? giftIdeas[Math.floor(Math.random() * giftIdeas.length)]
-      : undefined;
+    const giftIdeas = getGiftIdeasForMilestone(yearsCompleting).filter(
+      (g) => priceOrder.indexOf(g.priceRange) <= budgetIndex
+    );
+    const giftIdea =
+      giftIdeas.length > 0 ? giftIdeas[Math.floor(Math.random() * giftIdeas.length)] : undefined;
 
     return {
       package: selectedPackage,
@@ -334,15 +346,17 @@ class MilestoneSuggestionsService {
   }
 
   // Get upcoming milestones with celebration ideas
-  async getUpcomingMilestoneIdeas(daysAhead: number = 180): Promise<{
-    anniversary: Anniversary;
-    yearsCompleting: number;
-    daysUntil: number;
-    insights: MilestoneInsights;
-  }[]> {
+  async getUpcomingMilestoneIdeas(daysAhead: number = 180): Promise<
+    {
+      anniversary: Anniversary;
+      yearsCompleting: number;
+      daysUntil: number;
+      insights: MilestoneInsights;
+    }[]
+  > {
     const upcoming = await anniversaryService.getUpcomingAnniversaries(daysAhead);
-    
-    return upcoming.map(u => ({
+
+    return upcoming.map((u) => ({
       anniversary: u.anniversary,
       yearsCompleting: u.yearsCompleting,
       daysUntil: u.daysUntil,

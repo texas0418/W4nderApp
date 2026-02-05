@@ -4,7 +4,7 @@
 // Booking Categories & Providers
 // ============================================================================
 
-export type BookingCategory = 
+export type BookingCategory =
   | 'restaurant'
   | 'concert'
   | 'theater'
@@ -56,14 +56,14 @@ export type BookingProvider =
   | 'email';
 
 export type BookingStatus =
-  | 'pending'        // Waiting to be processed
-  | 'processing'     // Currently being booked
-  | 'confirming'     // Waiting for confirmation
-  | 'confirmed'      // Successfully booked
-  | 'failed'         // Booking failed
-  | 'cancelled'      // User cancelled
-  | 'waitlisted'     // On waitlist
-  | 'requires_action'// Needs user input (e.g., select seats)
+  | 'pending' // Waiting to be processed
+  | 'processing' // Currently being booked
+  | 'confirming' // Waiting for confirmation
+  | 'confirmed' // Successfully booked
+  | 'failed' // Booking failed
+  | 'cancelled' // User cancelled
+  | 'waitlisted' // On waitlist
+  | 'requires_action' // Needs user input (e.g., select seats)
   | 'payment_required'; // Needs payment confirmation
 
 export type PaymentStatus =
@@ -85,18 +85,18 @@ export interface BookingRequest {
   category: BookingCategory;
   provider: BookingProvider;
   priority: number; // 1 = highest (book first)
-  
+
   // Booking details
   details: BookingDetails;
-  
+
   // Payment
   estimatedCost: number;
   currency: string;
   paymentMethod?: PaymentMethodInfo;
-  
+
   // Preferences
   preferences: BookingPreferences;
-  
+
   // Fallbacks
   fallbackProviders?: BookingProvider[];
   allowWaitlist: boolean;
@@ -109,17 +109,17 @@ export interface BookingDetails {
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   duration?: number; // minutes
-  
+
   // Location
   venueName: string;
   venueAddress: string;
   venueId?: string; // Provider-specific ID
-  
+
   // Party info
   partySize: number;
   guestNames?: string[];
   specialRequests?: string;
-  
+
   // Category-specific
   restaurantDetails?: RestaurantBookingDetails;
   eventDetails?: EventBookingDetails;
@@ -208,11 +208,11 @@ export interface BookingResult {
   requestId: string;
   status: BookingStatus;
   provider: BookingProvider;
-  
+
   // Confirmation
   confirmationNumber?: string;
   confirmationUrl?: string;
-  
+
   // Actual booking details
   bookedDetails: {
     date: string;
@@ -222,26 +222,26 @@ export interface BookingResult {
     partySize: number;
     notes?: string;
   };
-  
+
   // Payment
   paymentStatus: PaymentStatus;
   finalCost?: number;
   currency: string;
   receiptUrl?: string;
-  
+
   // Tickets/vouchers
   tickets?: TicketInfo[];
   voucher?: VoucherInfo;
-  
+
   // Timing
   createdAt: string;
   confirmedAt?: string;
   expiresAt?: string;
-  
+
   // Issues
   error?: BookingError;
   warnings?: string[];
-  
+
   // Actions needed
   requiredActions?: RequiredAction[];
 }
@@ -287,16 +287,16 @@ export interface BookingSession {
   id: string;
   itineraryId: string;
   itineraryName: string;
-  
+
   // Status
   status: 'preparing' | 'in_progress' | 'completed' | 'failed' | 'partial' | 'cancelled';
   startedAt: string;
   completedAt?: string;
-  
+
   // Requests & Results
   requests: BookingRequest[];
   results: Map<string, BookingResult>; // keyed by request ID
-  
+
   // Progress
   progress: {
     total: number;
@@ -305,7 +305,7 @@ export interface BookingSession {
     pending: number;
     requiresAction: number;
   };
-  
+
   // Payment summary
   paymentSummary: {
     estimatedTotal: number;
@@ -313,7 +313,7 @@ export interface BookingSession {
     currency: string;
     itemizedCosts: { name: string; cost: number }[];
   };
-  
+
   // User
   userId: string;
   paymentMethodId?: string;

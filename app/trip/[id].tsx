@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,10 +22,10 @@ import { useApp } from '@/contexts/AppContext';
 
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', { 
+  return date.toLocaleDateString('en-US', {
     weekday: 'short',
-    month: 'short', 
-    day: 'numeric' 
+    month: 'short',
+    day: 'numeric',
   });
 };
 
@@ -41,8 +35,8 @@ export default function TripDetailsScreen() {
   const { trips, bookings } = useApp();
   const [selectedDay, setSelectedDay] = useState(0);
 
-  const trip = trips.find(t => t.id === id);
-  const tripBookings = bookings.filter(b => b.tripId === id);
+  const trip = trips.find((t) => t.id === id);
+  const tripBookings = bookings.filter((b) => b.tripId === id);
   const budgetProgress = trip ? (trip.spentBudget / trip.totalBudget) * 100 : 0;
   const currentDayItinerary = trip?.itinerary[selectedDay];
 
@@ -63,11 +57,7 @@ export default function TripDetailsScreen() {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: trip.coverImage }}
-        style={styles.coverImage}
-        contentFit="cover"
-      />
+      <Image source={{ uri: trip.coverImage }} style={styles.coverImage} contentFit="cover" />
       <LinearGradient
         colors={['rgba(0,0,0,0.4)', 'transparent', 'rgba(0,0,0,0.8)']}
         style={styles.coverGradient}
@@ -108,9 +98,11 @@ export default function TripDetailsScreen() {
               </View>
             </View>
 
-            <Pressable 
+            <Pressable
               style={styles.budgetSection}
-              onPress={() => router.push({ pathname: '/budget-tracker', params: { tripId: trip.id } })}
+              onPress={() =>
+                router.push({ pathname: '/budget-tracker', params: { tripId: trip.id } })
+              }
             >
               <View style={styles.budgetHeader}>
                 <View style={styles.budgetTitleRow}>
@@ -119,21 +111,26 @@ export default function TripDetailsScreen() {
                 </View>
                 <View style={styles.budgetRight}>
                   <Text style={styles.budgetAmount}>
-                    {trip.currency} {trip.spentBudget.toLocaleString()} / {trip.totalBudget.toLocaleString()}
+                    {trip.currency} {trip.spentBudget.toLocaleString()} /{' '}
+                    {trip.totalBudget.toLocaleString()}
                   </Text>
                   <ChevronRight size={18} color={colors.textTertiary} />
                 </View>
               </View>
               <View style={styles.progressBar}>
-                <View 
+                <View
                   style={[
-                    styles.progressFill, 
-                    { 
+                    styles.progressFill,
+                    {
                       width: `${Math.min(budgetProgress, 100)}%`,
-                      backgroundColor: budgetProgress > 90 ? colors.error : 
-                        budgetProgress > 70 ? colors.warning : colors.success,
-                    }
-                  ]} 
+                      backgroundColor:
+                        budgetProgress > 90
+                          ? colors.error
+                          : budgetProgress > 70
+                            ? colors.warning
+                            : colors.success,
+                    },
+                  ]}
                 />
               </View>
               <Text style={styles.budgetRemaining}>
@@ -150,7 +147,7 @@ export default function TripDetailsScreen() {
                   </Pressable>
                 </View>
                 <View style={styles.bookingsList}>
-                  {tripBookings.slice(0, 3).map(booking => (
+                  {tripBookings.slice(0, 3).map((booking) => (
                     <Pressable
                       key={booking.id}
                       style={styles.bookingItem}
@@ -163,14 +160,26 @@ export default function TripDetailsScreen() {
                         <Text style={styles.bookingName}>{booking.name}</Text>
                         <Text style={styles.bookingDate}>{formatDate(booking.startDate)}</Text>
                       </View>
-                      <View style={[
-                        styles.bookingStatus,
-                        { backgroundColor: booking.status === 'confirmed' ? `${colors.success}15` : `${colors.warning}15` }
-                      ]}>
-                        <Text style={[
-                          styles.bookingStatusText,
-                          { color: booking.status === 'confirmed' ? colors.success : colors.warning }
-                        ]}>
+                      <View
+                        style={[
+                          styles.bookingStatus,
+                          {
+                            backgroundColor:
+                              booking.status === 'confirmed'
+                                ? `${colors.success}15`
+                                : `${colors.warning}15`,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.bookingStatusText,
+                            {
+                              color:
+                                booking.status === 'confirmed' ? colors.success : colors.warning,
+                            },
+                          ]}
+                        >
                           {booking.status}
                         </Text>
                       </View>
@@ -193,25 +202,16 @@ export default function TripDetailsScreen() {
                   {trip.itinerary.map((day, index) => (
                     <Pressable
                       key={day.day}
-                      style={[
-                        styles.dayTab,
-                        selectedDay === index && styles.dayTabActive,
-                      ]}
+                      style={[styles.dayTab, selectedDay === index && styles.dayTabActive]}
                       onPress={() => setSelectedDay(index)}
                     >
                       <Text
-                        style={[
-                          styles.dayNumber,
-                          selectedDay === index && styles.dayNumberActive,
-                        ]}
+                        style={[styles.dayNumber, selectedDay === index && styles.dayNumberActive]}
                       >
                         Day {day.day}
                       </Text>
                       <Text
-                        style={[
-                          styles.dayTitle,
-                          selectedDay === index && styles.dayTitleActive,
-                        ]}
+                        style={[styles.dayTitle, selectedDay === index && styles.dayTitleActive]}
                         numberOfLines={1}
                       >
                         {day.title}
@@ -226,9 +226,7 @@ export default function TripDetailsScreen() {
                       <View key={activity.id} style={styles.activityCard}>
                         <View style={styles.timelineContainer}>
                           <View style={styles.timelineDot}>
-                            {activity.isBooked && (
-                              <Check size={12} color={colors.textLight} />
-                            )}
+                            {activity.isBooked && <Check size={12} color={colors.textLight} />}
                           </View>
                           {index < currentDayItinerary.activities.length - 1 && (
                             <View style={styles.timelineLine} />

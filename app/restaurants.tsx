@@ -41,7 +41,13 @@ import {
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import colors from '@/constants/colors';
-import { restaurants, restaurantReviews, cuisineCategories, timeSlots, occasions } from '@/mocks/restaurants';
+import {
+  restaurants,
+  restaurantReviews,
+  cuisineCategories,
+  timeSlots,
+  occasions,
+} from '@/mocks/restaurants';
 import { Restaurant } from '@/types';
 
 const { width } = Dimensions.get('window');
@@ -84,36 +90,34 @@ export default function RestaurantsScreen() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        rest =>
+        (rest) =>
           rest.name.toLowerCase().includes(query) ||
           rest.city.toLowerCase().includes(query) ||
           rest.country.toLowerCase().includes(query) ||
-          rest.cuisine.some(c => c.toLowerCase().includes(query))
+          rest.cuisine.some((c) => c.toLowerCase().includes(query))
       );
     }
 
     if (selectedCuisine !== 'all') {
-      filtered = filtered.filter(rest =>
-        rest.cuisine.some(c => c.toLowerCase().includes(selectedCuisine.toLowerCase()))
+      filtered = filtered.filter((rest) =>
+        rest.cuisine.some((c) => c.toLowerCase().includes(selectedCuisine.toLowerCase()))
       );
     }
 
-    filtered = filtered.filter(rest => priceFilter.includes(rest.priceRange));
+    filtered = filtered.filter((rest) => priceFilter.includes(rest.priceRange));
 
     return filtered;
   }, [searchQuery, selectedCuisine, priceFilter]);
 
   const featuredRestaurants = useMemo(() => {
-    return restaurants.filter(rest => rest.featured);
+    return restaurants.filter((rest) => rest.featured);
   }, []);
 
   const toggleFavorite = useCallback((id: string) => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setFavorites(prev =>
-      prev.includes(id) ? prev.filter(fId => fId !== id) : [...prev, id]
-    );
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((fId) => fId !== id) : [...prev, id]));
   }, []);
 
   const openRestaurant = useCallback((restaurant: Restaurant) => {
@@ -156,89 +160,87 @@ export default function RestaurantsScreen() {
 
   const reviews = useMemo(() => {
     if (!selectedRestaurant) return [];
-    return restaurantReviews.filter(r => r.restaurantId === selectedRestaurant.id);
+    return restaurantReviews.filter((r) => r.restaurantId === selectedRestaurant.id);
   }, [selectedRestaurant]);
 
   const togglePriceFilter = useCallback((price: number) => {
-    setPriceFilter(prev =>
-      prev.includes(price)
-        ? prev.filter(p => p !== price)
-        : [...prev, price].sort()
+    setPriceFilter((prev) =>
+      prev.includes(price) ? prev.filter((p) => p !== price) : [...prev, price].sort()
     );
   }, []);
 
-  const renderRestaurantCard = useCallback((restaurant: Restaurant, isLarge = false) => {
-    const isFavorite = favorites.includes(restaurant.id);
+  const renderRestaurantCard = useCallback(
+    (restaurant: Restaurant, isLarge = false) => {
+      const isFavorite = favorites.includes(restaurant.id);
 
-    return (
-      <Pressable
-        key={restaurant.id}
-        style={[styles.restaurantCard, isLarge && styles.restaurantCardLarge]}
-        onPress={() => openRestaurant(restaurant)}
-      >
-        <View style={[styles.cardImageContainer, isLarge && styles.cardImageContainerLarge]}>
-          <Image
-            source={{ uri: restaurant.image }}
-            style={styles.cardImage}
-            contentFit="cover"
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.6)']}
-            style={styles.cardGradient}
-          />
-          <Pressable
-            style={styles.favoriteButton}
-            onPress={() => toggleFavorite(restaurant.id)}
-          >
-            <Heart
-              size={20}
-              color={isFavorite ? colors.error : colors.textLight}
-              fill={isFavorite ? colors.error : 'transparent'}
+      return (
+        <Pressable
+          key={restaurant.id}
+          style={[styles.restaurantCard, isLarge && styles.restaurantCardLarge]}
+          onPress={() => openRestaurant(restaurant)}
+        >
+          <View style={[styles.cardImageContainer, isLarge && styles.cardImageContainerLarge]}>
+            <Image source={{ uri: restaurant.image }} style={styles.cardImage} contentFit="cover" />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.6)']}
+              style={styles.cardGradient}
             />
-          </Pressable>
-          {restaurant.instantBook && (
-            <View style={styles.instantBadge}>
-              <Zap size={12} color={colors.warning} fill={colors.warning} />
-              <Text style={styles.instantText}>Instant</Text>
-            </View>
-          )}
-          {restaurant.michelinStars && restaurant.michelinStars > 0 && (
-            <View style={styles.michelinBadge}>
-              <Star size={12} color="#E4002B" fill="#E4002B" />
-              <Text style={styles.michelinText}>{restaurant.michelinStars} Star{restaurant.michelinStars > 1 ? 's' : ''}</Text>
-            </View>
-          )}
-        </View>
-        <View style={styles.cardContent}>
-          <View style={styles.cardHeader}>
-            <View style={styles.ratingContainer}>
-              <Star size={14} color={colors.warning} fill={colors.warning} />
-              <Text style={styles.rating}>{restaurant.rating}</Text>
-              <Text style={styles.reviewCount}>({restaurant.reviewCount})</Text>
-            </View>
-            <Text style={styles.priceRange}>{getPriceLabel(restaurant.priceRange)}</Text>
+            <Pressable style={styles.favoriteButton} onPress={() => toggleFavorite(restaurant.id)}>
+              <Heart
+                size={20}
+                color={isFavorite ? colors.error : colors.textLight}
+                fill={isFavorite ? colors.error : 'transparent'}
+              />
+            </Pressable>
+            {restaurant.instantBook && (
+              <View style={styles.instantBadge}>
+                <Zap size={12} color={colors.warning} fill={colors.warning} />
+                <Text style={styles.instantText}>Instant</Text>
+              </View>
+            )}
+            {restaurant.michelinStars && restaurant.michelinStars > 0 && (
+              <View style={styles.michelinBadge}>
+                <Star size={12} color="#E4002B" fill="#E4002B" />
+                <Text style={styles.michelinText}>
+                  {restaurant.michelinStars} Star{restaurant.michelinStars > 1 ? 's' : ''}
+                </Text>
+              </View>
+            )}
           </View>
-          <Text style={styles.cardTitle} numberOfLines={1}>
-            {restaurant.name}
-          </Text>
-          <Text style={styles.cuisineText} numberOfLines={1}>
-            {restaurant.cuisine.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(' • ')}
-          </Text>
-          <View style={styles.cardMeta}>
-            <View style={styles.metaItem}>
-              <MapPin size={13} color={colors.textTertiary} />
-              <Text style={styles.metaText}>{restaurant.city}</Text>
+          <View style={styles.cardContent}>
+            <View style={styles.cardHeader}>
+              <View style={styles.ratingContainer}>
+                <Star size={14} color={colors.warning} fill={colors.warning} />
+                <Text style={styles.rating}>{restaurant.rating}</Text>
+                <Text style={styles.reviewCount}>({restaurant.reviewCount})</Text>
+              </View>
+              <Text style={styles.priceRange}>{getPriceLabel(restaurant.priceRange)}</Text>
+            </View>
+            <Text style={styles.cardTitle} numberOfLines={1}>
+              {restaurant.name}
+            </Text>
+            <Text style={styles.cuisineText} numberOfLines={1}>
+              {restaurant.cuisine.map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join(' • ')}
+            </Text>
+            <View style={styles.cardMeta}>
+              <View style={styles.metaItem}>
+                <MapPin size={13} color={colors.textTertiary} />
+                <Text style={styles.metaText}>{restaurant.city}</Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Pressable>
-    );
-  }, [favorites, openRestaurant, toggleFavorite]);
+        </Pressable>
+      );
+    },
+    [favorites, openRestaurant, toggleFavorite]
+  );
 
   const renderDetailModal = () => {
     if (!selectedRestaurant) return null;
 
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as keyof typeof selectedRestaurant.hours;
+    const today = new Date()
+      .toLocaleDateString('en-US', { weekday: 'long' })
+      .toLowerCase() as keyof typeof selectedRestaurant.hours;
     const todayHours = selectedRestaurant.hours[today];
 
     return (
@@ -272,7 +274,9 @@ export default function RestaurantsScreen() {
                     <Heart
                       size={22}
                       color={colors.textLight}
-                      fill={favorites.includes(selectedRestaurant.id) ? colors.error : 'transparent'}
+                      fill={
+                        favorites.includes(selectedRestaurant.id) ? colors.error : 'transparent'
+                      }
                     />
                   </Pressable>
                   <Pressable style={styles.modalIconButton}>
@@ -295,7 +299,9 @@ export default function RestaurantsScreen() {
                   )}
                 </View>
                 <Text style={styles.cuisineLabel}>
-                  {selectedRestaurant.cuisine.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(' • ')}
+                  {selectedRestaurant.cuisine
+                    .map((c) => c.charAt(0).toUpperCase() + c.slice(1))
+                    .join(' • ')}
                 </Text>
               </View>
 
@@ -308,7 +314,9 @@ export default function RestaurantsScreen() {
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
                   <DollarSign size={18} color={colors.success} />
-                  <Text style={styles.statValue}>{getPriceLabel(selectedRestaurant.priceRange)}</Text>
+                  <Text style={styles.statValue}>
+                    {getPriceLabel(selectedRestaurant.priceRange)}
+                  </Text>
                 </View>
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
@@ -341,9 +349,7 @@ export default function RestaurantsScreen() {
                     <Text style={styles.locationCity}>
                       {selectedRestaurant.city}, {selectedRestaurant.country}
                     </Text>
-                    <Text style={styles.locationAddress}>
-                      {selectedRestaurant.address}
-                    </Text>
+                    <Text style={styles.locationAddress}>{selectedRestaurant.address}</Text>
                   </View>
                 </View>
                 <View style={styles.hoursCard}>
@@ -405,7 +411,7 @@ export default function RestaurantsScreen() {
               {reviews.length > 0 && (
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>Reviews</Text>
-                  {reviews.slice(0, 3).map(review => (
+                  {reviews.slice(0, 3).map((review) => (
                     <View key={review.id} style={styles.reviewCard}>
                       <View style={styles.reviewHeader}>
                         <Image
@@ -495,7 +501,7 @@ export default function RestaurantsScreen() {
               <View style={styles.guestSelector}>
                 <Pressable
                   style={[styles.guestButton, partySize <= 1 && styles.guestButtonDisabled]}
-                  onPress={() => partySize > 1 && setPartySize(prev => prev - 1)}
+                  onPress={() => partySize > 1 && setPartySize((prev) => prev - 1)}
                   disabled={partySize <= 1}
                 >
                   <Minus size={20} color={partySize <= 1 ? colors.textTertiary : colors.primary} />
@@ -507,7 +513,7 @@ export default function RestaurantsScreen() {
                 </View>
                 <Pressable
                   style={[styles.guestButton, partySize >= 20 && styles.guestButtonDisabled]}
-                  onPress={() => partySize < 20 && setPartySize(prev => prev + 1)}
+                  onPress={() => partySize < 20 && setPartySize((prev) => prev + 1)}
                   disabled={partySize >= 20}
                 >
                   <Plus size={20} color={partySize >= 20 ? colors.textTertiary : colors.primary} />
@@ -522,7 +528,7 @@ export default function RestaurantsScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.dateScrollContent}
               >
-                {availableDates.map(dateStr => {
+                {availableDates.map((dateStr) => {
                   const date = new Date(dateStr);
                   const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
                   const dayNum = date.getDate();
@@ -555,7 +561,7 @@ export default function RestaurantsScreen() {
               <View style={styles.bookingSection}>
                 <Text style={styles.bookingSectionTitle}>Select Time</Text>
                 <View style={styles.timeGrid}>
-                  {timeSlots.map(time => {
+                  {timeSlots.map((time) => {
                     const isSelected = selectedTime === time;
                     return (
                       <Pressable
@@ -576,7 +582,7 @@ export default function RestaurantsScreen() {
             <View style={styles.bookingSection}>
               <Text style={styles.bookingSectionTitle}>Occasion (Optional)</Text>
               <View style={styles.occasionGrid}>
-                {occasions.map(occasion => {
+                {occasions.map((occasion) => {
                   const isSelected = selectedOccasion === occasion;
                   return (
                     <Pressable
@@ -584,7 +590,9 @@ export default function RestaurantsScreen() {
                       style={[styles.occasionCard, isSelected && styles.occasionCardSelected]}
                       onPress={() => setSelectedOccasion(isSelected ? null : occasion)}
                     >
-                      <Text style={[styles.occasionText, isSelected && styles.occasionTextSelected]}>
+                      <Text
+                        style={[styles.occasionText, isSelected && styles.occasionTextSelected]}
+                      >
                         {occasion}
                       </Text>
                     </Pressable>
@@ -653,7 +661,7 @@ export default function RestaurantsScreen() {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Price Range</Text>
               <View style={styles.priceFilterGrid}>
-                {[1, 2, 3, 4].map(price => {
+                {[1, 2, 3, 4].map((price) => {
                   const isSelected = priceFilter.includes(price);
                   return (
                     <Pressable
@@ -661,7 +669,12 @@ export default function RestaurantsScreen() {
                       style={[styles.priceFilterCard, isSelected && styles.priceFilterCardSelected]}
                       onPress={() => togglePriceFilter(price)}
                     >
-                      <Text style={[styles.priceFilterText, isSelected && styles.priceFilterTextSelected]}>
+                      <Text
+                        style={[
+                          styles.priceFilterText,
+                          isSelected && styles.priceFilterTextSelected,
+                        ]}
+                      >
                         {getPriceLabel(price)}
                       </Text>
                     </Pressable>
@@ -673,7 +686,9 @@ export default function RestaurantsScreen() {
 
           <SafeAreaView style={styles.applyFiltersBar} edges={['bottom']}>
             <Pressable style={styles.applyFiltersButton} onPress={() => setShowFilters(false)}>
-              <Text style={styles.applyFiltersText}>Show {filteredRestaurants.length} Restaurants</Text>
+              <Text style={styles.applyFiltersText}>
+                Show {filteredRestaurants.length} Restaurants
+              </Text>
             </Pressable>
           </SafeAreaView>
         </SafeAreaView>
@@ -717,7 +732,7 @@ export default function RestaurantsScreen() {
             style={styles.categoriesScroll}
             contentContainerStyle={styles.categoriesContent}
           >
-            {cuisineCategories.map(cat => {
+            {cuisineCategories.map((cat) => {
               const isSelected = selectedCuisine === cat.id;
               return (
                 <Pressable
@@ -747,7 +762,7 @@ export default function RestaurantsScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.featuredScroll}
               >
-                {featuredRestaurants.map(rest => renderRestaurantCard(rest, true))}
+                {featuredRestaurants.map((rest) => renderRestaurantCard(rest, true))}
               </ScrollView>
             </View>
           )}
@@ -756,14 +771,14 @@ export default function RestaurantsScreen() {
             <Text style={styles.sectionHeader}>
               {selectedCuisine === 'all'
                 ? 'All Restaurants'
-                : cuisineCategories.find(c => c.id === selectedCuisine)?.label || 'Restaurants'}
+                : cuisineCategories.find((c) => c.id === selectedCuisine)?.label || 'Restaurants'}
             </Text>
             <Text style={styles.resultsCount}>
               {filteredRestaurants.length} restaurant
               {filteredRestaurants.length !== 1 ? 's' : ''} available
             </Text>
             <View style={styles.restaurantsGrid}>
-              {filteredRestaurants.map(rest => renderRestaurantCard(rest))}
+              {filteredRestaurants.map((rest) => renderRestaurantCard(rest))}
             </View>
           </View>
 

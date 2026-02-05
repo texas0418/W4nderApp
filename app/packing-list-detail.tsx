@@ -16,11 +16,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useWeatherAware } from '../hooks/useWeatherAware';
-import {
-  PackingSuggestion,
-  WeatherPackingList,
-  WeatherConditionType,
-} from '../types/weather';
+import { PackingSuggestion, WeatherPackingList, WeatherConditionType } from '../types/weather';
 import { weatherService } from '../services/weatherService';
 
 const { width } = Dimensions.get('window');
@@ -41,11 +37,27 @@ interface PackingListScreenProps {
 const CATEGORY_ITEMS: Record<string, { icon: string; items: string[] }> = {
   clothing: {
     icon: '👕',
-    items: ['T-shirts', 'Pants/Shorts', 'Underwear', 'Socks', 'Sleepwear', 'Casual outfit', 'Comfortable walking shoes'],
+    items: [
+      'T-shirts',
+      'Pants/Shorts',
+      'Underwear',
+      'Socks',
+      'Sleepwear',
+      'Casual outfit',
+      'Comfortable walking shoes',
+    ],
   },
   toiletries: {
     icon: '🧴',
-    items: ['Toothbrush & toothpaste', 'Deodorant', 'Shampoo & conditioner', 'Face wash', 'Moisturizer', 'Razor', 'Medications'],
+    items: [
+      'Toothbrush & toothpaste',
+      'Deodorant',
+      'Shampoo & conditioner',
+      'Face wash',
+      'Moisturizer',
+      'Razor',
+      'Medications',
+    ],
   },
   electronics: {
     icon: '📱',
@@ -53,7 +65,13 @@ const CATEGORY_ITEMS: Record<string, { icon: string; items: string[] }> = {
   },
   documents: {
     icon: '📄',
-    items: ['Passport/ID', 'Travel insurance', 'Flight tickets', 'Hotel reservations', 'Emergency contacts'],
+    items: [
+      'Passport/ID',
+      'Travel insurance',
+      'Flight tickets',
+      'Hotel reservations',
+      'Emergency contacts',
+    ],
   },
   misc: {
     icon: '🎒',
@@ -61,27 +79,18 @@ const CATEGORY_ITEMS: Record<string, { icon: string; items: string[] }> = {
   },
 };
 
-export const PackingListScreen: React.FC<PackingListScreenProps> = ({
-  navigation,
-  route,
-}) => {
+export const PackingListScreen: React.FC<PackingListScreenProps> = ({ navigation, route }) => {
   const location = route?.params?.location || { city: 'Barcelona', country: 'Spain' };
   const tripDates = route?.params?.tripDates;
   const tripName = route?.params?.tripName || `Trip to ${location.city}`;
 
-  const {
-    forecast,
-    isLoading,
-    error,
-    refresh,
-    formatTemperature,
-    getWeatherIcon,
-  } = useWeatherAware({
-    location,
-    startDate: tripDates?.start,
-    endDate: tripDates?.end,
-    autoLoad: true,
-  });
+  const { forecast, isLoading, error, refresh, formatTemperature, getWeatherIcon } =
+    useWeatherAware({
+      location,
+      startDate: tripDates?.start,
+      endDate: tripDates?.end,
+      autoLoad: true,
+    });
 
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [showCategories, setShowCategories] = useState<Set<string>>(
@@ -103,7 +112,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
       count += weatherPackingList.recommended.length;
       count += weatherPackingList.optional.length;
     }
-    Object.values(CATEGORY_ITEMS).forEach(cat => {
+    Object.values(CATEGORY_ITEMS).forEach((cat) => {
       count += cat.items.length;
     });
     return count;
@@ -115,7 +124,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
   }, [checkedItems.size, totalItems]);
 
   const toggleItem = useCallback((item: string) => {
-    setCheckedItems(prev => {
+    setCheckedItems((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(item)) {
         newSet.delete(item);
@@ -127,7 +136,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
   }, []);
 
   const toggleCategory = useCallback((category: string) => {
-    setShowCategories(prev => {
+    setShowCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(category)) {
         newSet.delete(category);
@@ -146,19 +155,19 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
     shareText += `🌤️ Weather: ${weatherPackingList.weatherSummary}\n\n`;
 
     shareText += `☁️ Weather Essentials:\n`;
-    weatherPackingList.essentials.forEach(item => {
+    weatherPackingList.essentials.forEach((item) => {
       const checked = checkedItems.has(item.item) ? '✅' : '⬜';
       shareText += `${checked} ${item.icon} ${item.item}\n`;
     });
 
     shareText += `\n👕 Clothing:\n`;
-    CATEGORY_ITEMS.clothing.items.forEach(item => {
+    CATEGORY_ITEMS.clothing.items.forEach((item) => {
       const checked = checkedItems.has(item) ? '✅' : '⬜';
       shareText += `${checked} ${item}\n`;
     });
 
     shareText += `\n📄 Documents:\n`;
-    CATEGORY_ITEMS.documents.items.forEach(item => {
+    CATEGORY_ITEMS.documents.items.forEach((item) => {
       const checked = checkedItems.has(item) ? '✅' : '⬜';
       shareText += `${checked} ${item}\n`;
     });
@@ -175,12 +184,12 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
 
   const handleSaveList = async () => {
     if (!weatherPackingList) return;
-    
+
     setIsSaving(true);
     try {
       const savedLists = await AsyncStorage.getItem(STORAGE_KEY);
       const lists = savedLists ? JSON.parse(savedLists) : [];
-      
+
       const newList = {
         id: Date.now().toString(),
         tripName,
@@ -193,7 +202,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
 
       lists.unshift(newList);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(lists.slice(0, 20)));
-      
+
       // Show success feedback
       alert('Packing list saved!');
     } catch (error) {
@@ -209,31 +218,20 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
     const dominantCondition = forecast.daily[0]?.condition.type || 'sunny';
 
     return (
-      <LinearGradient
-        colors={['#10B981', '#059669', '#047857']}
-        style={styles.header}
-      >
+      <LinearGradient colors={['#10B981', '#059669', '#047857']} style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
           <View style={styles.headerActions}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.saveButton}
               onPress={handleSaveList}
               disabled={isSaving}
             >
-              <Text style={styles.saveButtonText}>
-                {isSaving ? '...' : '💾 Save'}
-              </Text>
+              <Text style={styles.saveButtonText}>{isSaving ? '...' : '💾 Save'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.shareButton}
-              onPress={handleShare}
-            >
+            <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
               <Text style={styles.shareButtonText}>📤 Share</Text>
             </TouchableOpacity>
           </View>
@@ -243,15 +241,11 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
           <Text style={styles.headerIcon}>🎒</Text>
           <Text style={styles.headerTitle}>Packing List</Text>
           <Text style={styles.headerSubtitle}>{tripName}</Text>
-          
+
           {/* Weather Summary */}
           <View style={styles.weatherBadge}>
-            <Text style={styles.weatherBadgeIcon}>
-              {getWeatherIcon(dominantCondition)}
-            </Text>
-            <Text style={styles.weatherBadgeText}>
-              {weatherPackingList.weatherSummary}
-            </Text>
+            <Text style={styles.weatherBadgeIcon}>{getWeatherIcon(dominantCondition)}</Text>
+            <Text style={styles.weatherBadgeText}>{weatherPackingList.weatherSummary}</Text>
           </View>
 
           {/* Progress Ring */}
@@ -261,9 +255,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
               <Text style={styles.progressLabel}>Packed</Text>
             </View>
             <View style={styles.progressStats}>
-              <Text style={styles.progressStat}>
-                ✅ {checkedItems.size} items packed
-              </Text>
+              <Text style={styles.progressStat}>✅ {checkedItems.size} items packed</Text>
               <Text style={styles.progressStat}>
                 📦 {totalItems - checkedItems.size} items remaining
               </Text>
@@ -286,10 +278,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
 
     return (
       <View style={styles.categorySection}>
-        <TouchableOpacity 
-          style={styles.categoryHeader}
-          onPress={() => toggleCategory('weather')}
-        >
+        <TouchableOpacity style={styles.categoryHeader} onPress={() => toggleCategory('weather')}>
           <View style={styles.categoryTitleRow}>
             <View style={[styles.categoryIconContainer, { backgroundColor: '#FEF3C7' }]}>
               <Text style={styles.categoryIcon}>🌤️</Text>
@@ -297,7 +286,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
             <View>
               <Text style={styles.categoryTitle}>Weather Essentials</Text>
               <Text style={styles.categoryCount}>
-                {allItems.filter(i => checkedItems.has(i.item)).length}/{allItems.length} packed
+                {allItems.filter((i) => checkedItems.has(i.item)).length}/{allItems.length} packed
               </Text>
             </View>
           </View>
@@ -316,20 +305,22 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
                     style={styles.packingItem}
                     onPress={() => toggleItem(item.item)}
                   >
-                    <View style={[
-                      styles.checkbox,
-                      checkedItems.has(item.item) && styles.checkboxChecked
-                    ]}>
-                      {checkedItems.has(item.item) && (
-                        <Text style={styles.checkmark}>✓</Text>
-                      )}
+                    <View
+                      style={[
+                        styles.checkbox,
+                        checkedItems.has(item.item) && styles.checkboxChecked,
+                      ]}
+                    >
+                      {checkedItems.has(item.item) && <Text style={styles.checkmark}>✓</Text>}
                     </View>
                     <Text style={styles.itemIcon}>{item.icon}</Text>
                     <View style={styles.itemContent}>
-                      <Text style={[
-                        styles.itemName,
-                        checkedItems.has(item.item) && styles.itemNameChecked
-                      ]}>
+                      <Text
+                        style={[
+                          styles.itemName,
+                          checkedItems.has(item.item) && styles.itemNameChecked,
+                        ]}
+                      >
                         {item.item}
                       </Text>
                       <Text style={styles.itemReason}>{item.reason}</Text>
@@ -349,20 +340,22 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
                     style={styles.packingItem}
                     onPress={() => toggleItem(item.item)}
                   >
-                    <View style={[
-                      styles.checkbox,
-                      checkedItems.has(item.item) && styles.checkboxChecked
-                    ]}>
-                      {checkedItems.has(item.item) && (
-                        <Text style={styles.checkmark}>✓</Text>
-                      )}
+                    <View
+                      style={[
+                        styles.checkbox,
+                        checkedItems.has(item.item) && styles.checkboxChecked,
+                      ]}
+                    >
+                      {checkedItems.has(item.item) && <Text style={styles.checkmark}>✓</Text>}
                     </View>
                     <Text style={styles.itemIcon}>{item.icon}</Text>
                     <View style={styles.itemContent}>
-                      <Text style={[
-                        styles.itemName,
-                        checkedItems.has(item.item) && styles.itemNameChecked
-                      ]}>
+                      <Text
+                        style={[
+                          styles.itemName,
+                          checkedItems.has(item.item) && styles.itemNameChecked,
+                        ]}
+                      >
                         {item.item}
                       </Text>
                       <Text style={styles.itemReason}>{item.reason}</Text>
@@ -382,20 +375,22 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
                     style={styles.packingItem}
                     onPress={() => toggleItem(item.item)}
                   >
-                    <View style={[
-                      styles.checkbox,
-                      checkedItems.has(item.item) && styles.checkboxChecked
-                    ]}>
-                      {checkedItems.has(item.item) && (
-                        <Text style={styles.checkmark}>✓</Text>
-                      )}
+                    <View
+                      style={[
+                        styles.checkbox,
+                        checkedItems.has(item.item) && styles.checkboxChecked,
+                      ]}
+                    >
+                      {checkedItems.has(item.item) && <Text style={styles.checkmark}>✓</Text>}
                     </View>
                     <Text style={styles.itemIcon}>{item.icon}</Text>
                     <View style={styles.itemContent}>
-                      <Text style={[
-                        styles.itemName,
-                        checkedItems.has(item.item) && styles.itemNameChecked
-                      ]}>
+                      <Text
+                        style={[
+                          styles.itemName,
+                          checkedItems.has(item.item) && styles.itemNameChecked,
+                        ]}
+                      >
                         {item.item}
                       </Text>
                       <Text style={styles.itemReason}>{item.reason}</Text>
@@ -415,7 +410,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
     if (!category) return null;
 
     const isExpanded = showCategories.has(categoryKey);
-    const checkedCount = category.items.filter(i => checkedItems.has(i)).length;
+    const checkedCount = category.items.filter((i) => checkedItems.has(i)).length;
 
     const categoryColors: Record<string, string> = {
       clothing: '#E0E7FF',
@@ -435,12 +430,14 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
 
     return (
       <View key={categoryKey} style={styles.categorySection}>
-        <TouchableOpacity 
-          style={styles.categoryHeader}
-          onPress={() => toggleCategory(categoryKey)}
-        >
+        <TouchableOpacity style={styles.categoryHeader} onPress={() => toggleCategory(categoryKey)}>
           <View style={styles.categoryTitleRow}>
-            <View style={[styles.categoryIconContainer, { backgroundColor: categoryColors[categoryKey] }]}>
+            <View
+              style={[
+                styles.categoryIconContainer,
+                { backgroundColor: categoryColors[categoryKey] },
+              ]}
+            >
               <Text style={styles.categoryIcon}>{category.icon}</Text>
             </View>
             <View>
@@ -461,19 +458,11 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
                 style={styles.packingItem}
                 onPress={() => toggleItem(item)}
               >
-                <View style={[
-                  styles.checkbox,
-                  checkedItems.has(item) && styles.checkboxChecked
-                ]}>
-                  {checkedItems.has(item) && (
-                    <Text style={styles.checkmark}>✓</Text>
-                  )}
+                <View style={[styles.checkbox, checkedItems.has(item) && styles.checkboxChecked]}>
+                  {checkedItems.has(item) && <Text style={styles.checkmark}>✓</Text>}
                 </View>
                 <View style={styles.itemContent}>
-                  <Text style={[
-                    styles.itemName,
-                    checkedItems.has(item) && styles.itemNameChecked
-                  ]}>
+                  <Text style={[styles.itemName, checkedItems.has(item) && styles.itemNameChecked]}>
                     {item}
                   </Text>
                 </View>
@@ -493,7 +482,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
           // Check all weather essentials
           if (weatherPackingList) {
             const newChecked = new Set(checkedItems);
-            weatherPackingList.essentials.forEach(i => newChecked.add(i.item));
+            weatherPackingList.essentials.forEach((i) => newChecked.add(i.item));
             setCheckedItems(newChecked);
           }
         }}
@@ -541,9 +530,7 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
         showsVerticalScrollIndicator={false}
       >
         {renderHeader()}
@@ -551,8 +538,8 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
         <View style={styles.content}>
           {renderQuickActions()}
           {renderWeatherItems()}
-          {Object.keys(CATEGORY_ITEMS).map(key => renderCategorySection(key))}
-          
+          {Object.keys(CATEGORY_ITEMS).map((key) => renderCategorySection(key))}
+
           {/* Pro Tips */}
           <View style={styles.tipsSection}>
             <Text style={styles.tipsSectionTitle}>💡 Packing Tips</Text>
@@ -567,27 +554,25 @@ export const PackingListScreen: React.FC<PackingListScreenProps> = ({
               </Text>
             </View>
             <View style={styles.tipCard}>
-              <Text style={styles.tipText}>
-                Keep important documents in a waterproof pouch.
-              </Text>
+              <Text style={styles.tipText}>Keep important documents in a waterproof pouch.</Text>
             </View>
           </View>
 
           {/* View Forecast Button */}
           <TouchableOpacity
             style={styles.viewForecastButton}
-            onPress={() => navigation?.navigate('WeatherForecast', {
-              location,
-              tripDates,
-              tripName,
-            })}
+            onPress={() =>
+              navigation?.navigate('WeatherForecast', {
+                location,
+                tripDates,
+                tripName,
+              })
+            }
           >
             <Text style={styles.viewForecastIcon}>🌤️</Text>
             <View style={styles.viewForecastContent}>
               <Text style={styles.viewForecastTitle}>View Full Weather Forecast</Text>
-              <Text style={styles.viewForecastSubtitle}>
-                See detailed day-by-day forecast
-              </Text>
+              <Text style={styles.viewForecastSubtitle}>See detailed day-by-day forecast</Text>
             </View>
             <Text style={styles.viewForecastArrow}>→</Text>
           </TouchableOpacity>

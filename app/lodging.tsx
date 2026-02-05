@@ -63,16 +63,16 @@ const LODGING_TYPES: { id: LodgingType; label: string; icon: typeof Hotel }[] = 
 ];
 
 const AMENITY_ICONS: Record<string, typeof Wifi> = {
-  'WiFi': Wifi,
-  'Parking': Car,
-  'Restaurant': Utensils,
-  'Gym': Dumbbell,
-  'Pool': Waves,
-  'Spa': Bath,
-  'Breakfast': Coffee,
+  WiFi: Wifi,
+  Parking: Car,
+  Restaurant: Utensils,
+  Gym: Dumbbell,
+  Pool: Waves,
+  Spa: Bath,
+  Breakfast: Coffee,
 };
 
-const PROVIDERS = ['All', ...lodgingProviders.map(p => p.name)];
+const PROVIDERS = ['All', ...lodgingProviders.map((p) => p.name)];
 
 export default function LodgingScreen() {
   const router = useRouter();
@@ -96,30 +96,31 @@ export default function LodgingScreen() {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      results = results.filter(l =>
-        l.name.toLowerCase().includes(query) ||
-        l.location.city.toLowerCase().includes(query) ||
-        l.location.country.toLowerCase().includes(query)
+      results = results.filter(
+        (l) =>
+          l.name.toLowerCase().includes(query) ||
+          l.location.city.toLowerCase().includes(query) ||
+          l.location.country.toLowerCase().includes(query)
       );
     }
 
     if (selectedTypes.length > 0) {
-      results = results.filter(l => selectedTypes.includes(l.type));
+      results = results.filter((l) => selectedTypes.includes(l.type));
     }
 
     if (selectedProvider !== 'All') {
-      results = results.filter(l => l.provider.name === selectedProvider);
+      results = results.filter((l) => l.provider.name === selectedProvider);
     }
 
-    results = results.filter(l => l.minPrice >= priceRange[0] && l.minPrice <= priceRange[1]);
+    results = results.filter((l) => l.minPrice >= priceRange[0] && l.minPrice <= priceRange[1]);
 
     if (instantBookOnly) {
-      results = results.filter(l => l.instantBook);
+      results = results.filter((l) => l.instantBook);
     }
 
     if (freeCancellationOnly) {
-      results = results.filter(l => 
-        l.policies.cancellation === 'free' || l.policies.cancellation === 'flexible'
+      results = results.filter(
+        (l) => l.policies.cancellation === 'free' || l.policies.cancellation === 'flexible'
       );
     }
 
@@ -136,17 +137,23 @@ export default function LodgingScreen() {
     }
 
     return results;
-  }, [searchQuery, selectedTypes, selectedProvider, priceRange, sortBy, instantBookOnly, freeCancellationOnly]);
+  }, [
+    searchQuery,
+    selectedTypes,
+    selectedProvider,
+    priceRange,
+    sortBy,
+    instantBookOnly,
+    freeCancellationOnly,
+  ]);
 
   const toggleFavorite = useCallback((id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-    );
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
   }, []);
 
   const toggleType = useCallback((type: LodgingType) => {
-    setSelectedTypes(prev =>
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    setSelectedTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
   }, []);
 
@@ -184,131 +191,125 @@ export default function LodgingScreen() {
   }, [selectedLodging, selectedRoom, nights]);
 
   const getTypeIcon = (type: LodgingType) => {
-    const found = LODGING_TYPES.find(t => t.id === type);
+    const found = LODGING_TYPES.find((t) => t.id === type);
     return found?.icon || Hotel;
   };
 
-  const renderLodgingCard = useCallback(({ item }: { item: Lodging }) => {
-    const TypeIcon = getTypeIcon(item.type);
-    const isFavorite = favorites.includes(item.id);
+  const renderLodgingCard = useCallback(
+    ({ item }: { item: Lodging }) => {
+      const TypeIcon = getTypeIcon(item.type);
+      const isFavorite = favorites.includes(item.id);
 
-    return (
-      <Pressable
-        style={styles.lodgingCard}
-        onPress={() => openBooking(item)}
-      >
-        <View style={styles.cardImageContainer}>
-          <Image
-            source={{ uri: item.image }}
-            style={styles.cardImage}
-            contentFit="cover"
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.4)']}
-            style={styles.cardGradient}
-          />
-          <Pressable
-            style={styles.favoriteButton}
-            onPress={() => toggleFavorite(item.id)}
-          >
-            <Heart
-              size={20}
-              color={isFavorite ? colors.secondary : colors.textLight}
-              fill={isFavorite ? colors.secondary : 'transparent'}
+      return (
+        <Pressable style={styles.lodgingCard} onPress={() => openBooking(item)}>
+          <View style={styles.cardImageContainer}>
+            <Image source={{ uri: item.image }} style={styles.cardImage} contentFit="cover" />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.4)']}
+              style={styles.cardGradient}
             />
-          </Pressable>
-          {item.isFeatured && (
-            <View style={styles.featuredBadge}>
-              <Sparkles size={12} color={colors.textLight} />
-              <Text style={styles.featuredText}>Featured</Text>
-            </View>
-          )}
-          {item.isNew && (
-            <View style={[styles.featuredBadge, styles.newBadge]}>
-              <Text style={styles.featuredText}>New</Text>
-            </View>
-          )}
-          {item.sustainabilityBadge && (
-            <View style={styles.ecoBadge}>
-              <Leaf size={14} color={colors.success} />
-            </View>
-          )}
-          <View style={styles.typeTag}>
-            <TypeIcon size={12} color={colors.textLight} />
-            <Text style={styles.typeText}>{item.type}</Text>
-          </View>
-        </View>
-
-        <View style={styles.cardContent}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardTitleRow}>
-              <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
-              {item.starRating && (
-                <View style={styles.starRating}>
-                  {[...Array(item.starRating)].map((_, i) => (
-                    <Star key={i} size={10} color="#FFD700" fill="#FFD700" />
-                  ))}
-                </View>
-              )}
-            </View>
-            <View style={styles.ratingContainer}>
-              <Star size={14} color={colors.warning} fill={colors.warning} />
-              <Text style={styles.rating}>{item.rating}</Text>
-              <Text style={styles.reviewCount}>({item.reviewCount})</Text>
+            <Pressable style={styles.favoriteButton} onPress={() => toggleFavorite(item.id)}>
+              <Heart
+                size={20}
+                color={isFavorite ? colors.secondary : colors.textLight}
+                fill={isFavorite ? colors.secondary : 'transparent'}
+              />
+            </Pressable>
+            {item.isFeatured && (
+              <View style={styles.featuredBadge}>
+                <Sparkles size={12} color={colors.textLight} />
+                <Text style={styles.featuredText}>Featured</Text>
+              </View>
+            )}
+            {item.isNew && (
+              <View style={[styles.featuredBadge, styles.newBadge]}>
+                <Text style={styles.featuredText}>New</Text>
+              </View>
+            )}
+            {item.sustainabilityBadge && (
+              <View style={styles.ecoBadge}>
+                <Leaf size={14} color={colors.success} />
+              </View>
+            )}
+            <View style={styles.typeTag}>
+              <TypeIcon size={12} color={colors.textLight} />
+              <Text style={styles.typeText}>{item.type}</Text>
             </View>
           </View>
 
-          <View style={styles.locationRow}>
-            <MapPin size={14} color={colors.textSecondary} />
-            <Text style={styles.locationText} numberOfLines={1}>
-              {item.location.neighborhood ? `${item.location.neighborhood}, ` : ''}{item.location.city}
-            </Text>
-          </View>
-
-          <Text style={styles.shortDescription} numberOfLines={2}>
-            {item.shortDescription}
-          </Text>
-
-          <View style={styles.amenitiesRow}>
-            {item.featuredAmenities.slice(0, 4).map((amenity, index) => {
-              const AmenityIcon = AMENITY_ICONS[amenity] || Sparkles;
-              return (
-                <View key={index} style={styles.amenityChip}>
-                  <AmenityIcon size={12} color={colors.textSecondary} />
-                  <Text style={styles.amenityText}>{amenity}</Text>
-                </View>
-              );
-            })}
-          </View>
-
-          <View style={styles.cardFooter}>
-            <View style={styles.priceContainer}>
-              {item.rooms[0]?.originalPrice && (
-                <Text style={styles.originalPrice}>
-                  ${item.rooms[0].originalPrice}
+          <View style={styles.cardContent}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardTitleRow}>
+                <Text style={styles.cardName} numberOfLines={1}>
+                  {item.name}
                 </Text>
-              )}
-              <Text style={styles.price}>
-                ${item.minPrice}
-                <Text style={styles.perNight}>/night</Text>
+                {item.starRating && (
+                  <View style={styles.starRating}>
+                    {[...Array(item.starRating)].map((_, i) => (
+                      <Star key={i} size={10} color="#FFD700" fill="#FFD700" />
+                    ))}
+                  </View>
+                )}
+              </View>
+              <View style={styles.ratingContainer}>
+                <Star size={14} color={colors.warning} fill={colors.warning} />
+                <Text style={styles.rating}>{item.rating}</Text>
+                <Text style={styles.reviewCount}>({item.reviewCount})</Text>
+              </View>
+            </View>
+
+            <View style={styles.locationRow}>
+              <MapPin size={14} color={colors.textSecondary} />
+              <Text style={styles.locationText} numberOfLines={1}>
+                {item.location.neighborhood ? `${item.location.neighborhood}, ` : ''}
+                {item.location.city}
               </Text>
             </View>
-            <View style={styles.cardActions}>
-              {item.instantBook && (
-                <View style={styles.instantBadge}>
-                  <Zap size={12} color={colors.success} />
-                  <Text style={styles.instantText}>Instant</Text>
-                </View>
-              )}
-              <Pressable style={styles.bookButton} onPress={() => openBooking(item)}>
-                <Text style={styles.bookButtonText}>View</Text>
-              </Pressable>
+
+            <Text style={styles.shortDescription} numberOfLines={2}>
+              {item.shortDescription}
+            </Text>
+
+            <View style={styles.amenitiesRow}>
+              {item.featuredAmenities.slice(0, 4).map((amenity, index) => {
+                const AmenityIcon = AMENITY_ICONS[amenity] || Sparkles;
+                return (
+                  <View key={index} style={styles.amenityChip}>
+                    <AmenityIcon size={12} color={colors.textSecondary} />
+                    <Text style={styles.amenityText}>{amenity}</Text>
+                  </View>
+                );
+              })}
+            </View>
+
+            <View style={styles.cardFooter}>
+              <View style={styles.priceContainer}>
+                {item.rooms[0]?.originalPrice && (
+                  <Text style={styles.originalPrice}>${item.rooms[0].originalPrice}</Text>
+                )}
+                <Text style={styles.price}>
+                  ${item.minPrice}
+                  <Text style={styles.perNight}>/night</Text>
+                </Text>
+              </View>
+              <View style={styles.cardActions}>
+                {item.instantBook && (
+                  <View style={styles.instantBadge}>
+                    <Zap size={12} color={colors.success} />
+                    <Text style={styles.instantText}>Instant</Text>
+                  </View>
+                )}
+                <Pressable style={styles.bookButton} onPress={() => openBooking(item)}>
+                  <Text style={styles.bookButtonText}>View</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
-      </Pressable>
-    );
-  }, [favorites, toggleFavorite, openBooking]);
+        </Pressable>
+      );
+    },
+    [favorites, toggleFavorite, openBooking]
+  );
 
   const renderFilterModal = () => (
     <Modal
@@ -328,7 +329,7 @@ export default function LodgingScreen() {
         <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
           <Text style={styles.filterSectionTitle}>Property Type</Text>
           <View style={styles.typeGrid}>
-            {LODGING_TYPES.map(type => {
+            {LODGING_TYPES.map((type) => {
               const TypeIcon = type.icon;
               const isSelected = selectedTypes.includes(type.id);
               return (
@@ -338,7 +339,9 @@ export default function LodgingScreen() {
                   onPress={() => toggleType(type.id)}
                 >
                   <TypeIcon size={20} color={isSelected ? colors.textLight : colors.text} />
-                  <Text style={[styles.typeButtonText, isSelected && styles.typeButtonTextSelected]}>
+                  <Text
+                    style={[styles.typeButtonText, isSelected && styles.typeButtonTextSelected]}
+                  >
                     {type.label}
                   </Text>
                 </Pressable>
@@ -347,8 +350,12 @@ export default function LodgingScreen() {
           </View>
 
           <Text style={styles.filterSectionTitle}>Provider</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.providerScroll}>
-            {PROVIDERS.map(provider => (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.providerScroll}
+          >
+            {PROVIDERS.map((provider) => (
               <Pressable
                 key={provider}
                 style={[
@@ -357,10 +364,12 @@ export default function LodgingScreen() {
                 ]}
                 onPress={() => setSelectedProvider(provider)}
               >
-                <Text style={[
-                  styles.providerChipText,
-                  selectedProvider === provider && styles.providerChipTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.providerChipText,
+                    selectedProvider === provider && styles.providerChipTextSelected,
+                  ]}
+                >
                   {provider}
                 </Text>
               </Pressable>
@@ -369,16 +378,18 @@ export default function LodgingScreen() {
 
           <Text style={styles.filterSectionTitle}>Sort By</Text>
           <View style={styles.sortOptions}>
-            {(['popularity', 'rating', 'price'] as const).map(option => (
+            {(['popularity', 'rating', 'price'] as const).map((option) => (
               <Pressable
                 key={option}
                 style={[styles.sortOption, sortBy === option && styles.sortOptionSelected]}
                 onPress={() => setSortBy(option)}
               >
-                <Text style={[
-                  styles.sortOptionText,
-                  sortBy === option && styles.sortOptionTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.sortOptionText,
+                    sortBy === option && styles.sortOptionTextSelected,
+                  ]}
+                >
                   {option.charAt(0).toUpperCase() + option.slice(1)}
                 </Text>
                 {sortBy === option && <Check size={16} color={colors.primary} />}
@@ -388,10 +399,18 @@ export default function LodgingScreen() {
 
           <Text style={styles.filterSectionTitle}>Price Range (per night)</Text>
           <View style={styles.priceRangeDisplay}>
-            <Text style={styles.priceRangeText}>${priceRange[0]} - ${priceRange[1]}+</Text>
+            <Text style={styles.priceRangeText}>
+              ${priceRange[0]} - ${priceRange[1]}+
+            </Text>
           </View>
           <View style={styles.priceButtons}>
-            {[[0, 100], [100, 300], [300, 500], [500, 1000], [1000, 5000]].map(([min, max]) => (
+            {[
+              [0, 100],
+              [100, 300],
+              [300, 500],
+              [500, 1000],
+              [1000, 5000],
+            ].map(([min, max]) => (
               <Pressable
                 key={`${min}-${max}`}
                 style={[
@@ -400,10 +419,14 @@ export default function LodgingScreen() {
                 ]}
                 onPress={() => setPriceRange([min, max])}
               >
-                <Text style={[
-                  styles.priceButtonText,
-                  priceRange[0] === min && priceRange[1] === max && styles.priceButtonTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.priceButtonText,
+                    priceRange[0] === min &&
+                      priceRange[1] === max &&
+                      styles.priceButtonTextSelected,
+                  ]}
+                >
                   ${min}-{max === 5000 ? '5k+' : `$${max}`}
                 </Text>
               </Pressable>
@@ -458,13 +481,8 @@ export default function LodgingScreen() {
           >
             <Text style={styles.clearButtonText}>Clear All</Text>
           </Pressable>
-          <Pressable
-            style={styles.applyButton}
-            onPress={() => setShowFilters(false)}
-          >
-            <Text style={styles.applyButtonText}>
-              Show {filteredLodgings.length} Results
-            </Text>
+          <Pressable style={styles.applyButton} onPress={() => setShowFilters(false)}>
+            <Text style={styles.applyButtonText}>Show {filteredLodgings.length} Results</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -520,7 +538,7 @@ export default function LodgingScreen() {
             </View>
 
             <Text style={styles.bookingSectionTitle}>Select Room</Text>
-            {selectedLodging.rooms.map(room => (
+            {selectedLodging.rooms.map((room) => (
               <Pressable
                 key={room.id}
                 style={[
@@ -542,7 +560,9 @@ export default function LodgingScreen() {
                   </Text>
                   <View style={styles.roomAmenities}>
                     {room.amenities.slice(0, 3).map((amenity, i) => (
-                      <Text key={i} style={styles.roomAmenity}>{amenity}</Text>
+                      <Text key={i} style={styles.roomAmenity}>
+                        {amenity}
+                      </Text>
                     ))}
                   </View>
                   <View style={styles.roomPriceRow}>
@@ -552,10 +572,12 @@ export default function LodgingScreen() {
                     <Text style={styles.roomPrice}>${room.pricePerNight}/night</Text>
                   </View>
                 </View>
-                <View style={[
-                  styles.radioButton,
-                  selectedRoom?.id === room.id && styles.radioButtonSelected,
-                ]}>
+                <View
+                  style={[
+                    styles.radioButton,
+                    selectedRoom?.id === room.id && styles.radioButtonSelected,
+                  ]}
+                >
                   {selectedRoom?.id === room.id && <Check size={14} color={colors.textLight} />}
                 </View>
               </Pressable>
@@ -576,10 +598,7 @@ export default function LodgingScreen() {
                     <Text style={styles.stepperButtonText}>-</Text>
                   </Pressable>
                   <Text style={styles.stepperValue}>{nights}</Text>
-                  <Pressable
-                    style={styles.stepperButton}
-                    onPress={() => setNights(nights + 1)}
-                  >
+                  <Pressable style={styles.stepperButton} onPress={() => setNights(nights + 1)}>
                     <Text style={styles.stepperButtonText}>+</Text>
                   </Pressable>
                 </View>
@@ -615,7 +634,9 @@ export default function LodgingScreen() {
                 <View style={styles.stepper}>
                   <Pressable
                     style={styles.stepperButton}
-                    onPress={() => setGuests({ ...guests, children: Math.max(0, guests.children - 1) })}
+                    onPress={() =>
+                      setGuests({ ...guests, children: Math.max(0, guests.children - 1) })
+                    }
                   >
                     <Text style={styles.stepperButtonText}>-</Text>
                   </Pressable>
@@ -655,7 +676,7 @@ export default function LodgingScreen() {
             <View style={styles.policyInfo}>
               <Text style={styles.policyTitle}>Cancellation Policy</Text>
               <Text style={styles.policyText}>
-                {selectedLodging.policies.cancellationDetails || 
+                {selectedLodging.policies.cancellationDetails ||
                   `${selectedLodging.policies.cancellation.charAt(0).toUpperCase() + selectedLodging.policies.cancellation.slice(1)} cancellation`}
               </Text>
             </View>
@@ -734,7 +755,7 @@ export default function LodgingScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.typesScroll}
         >
-          {LODGING_TYPES.map(type => {
+          {LODGING_TYPES.map((type) => {
             const TypeIcon = type.icon;
             const isSelected = selectedTypes.includes(type.id);
             return (
@@ -753,9 +774,7 @@ export default function LodgingScreen() {
         </ScrollView>
 
         <View style={styles.resultsHeader}>
-          <Text style={styles.resultsCount}>
-            {filteredLodgings.length} properties found
-          </Text>
+          <Text style={styles.resultsCount}>{filteredLodgings.length} properties found</Text>
           <Pressable style={styles.sortButton} onPress={() => setShowFilters(true)}>
             <Text style={styles.sortButtonText}>Sort: {sortBy}</Text>
             <ChevronDown size={16} color={colors.primary} />
@@ -765,16 +784,14 @@ export default function LodgingScreen() {
         <FlatList
           data={filteredLodgings}
           renderItem={renderLodgingCard}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Hotel size={48} color={colors.textTertiary} />
               <Text style={styles.emptyTitle}>No Properties Found</Text>
-              <Text style={styles.emptyText}>
-                Try adjusting your filters or search criteria
-              </Text>
+              <Text style={styles.emptyText}>Try adjusting your filters or search criteria</Text>
             </View>
           }
         />

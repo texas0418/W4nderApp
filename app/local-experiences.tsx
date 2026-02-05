@@ -76,32 +76,30 @@ export default function LocalExperiencesScreen() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        exp =>
+        (exp) =>
           exp.title.toLowerCase().includes(query) ||
           exp.location.city.toLowerCase().includes(query) ||
           exp.location.country.toLowerCase().includes(query) ||
-          exp.tags.some(tag => tag.toLowerCase().includes(query))
+          exp.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     }
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(exp => exp.category === selectedCategory);
+      filtered = filtered.filter((exp) => exp.category === selectedCategory);
     }
 
     return filtered;
   }, [searchQuery, selectedCategory]);
 
   const featuredExperiences = useMemo(() => {
-    return localExperiences.filter(exp => exp.featured);
+    return localExperiences.filter((exp) => exp.featured);
   }, []);
 
   const toggleFavorite = useCallback((id: string) => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setFavorites(prev =>
-      prev.includes(id) ? prev.filter(fId => fId !== id) : [...prev, id]
-    );
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((fId) => fId !== id) : [...prev, id]));
   }, []);
 
   const openExperience = useCallback((experience: LocalExperience) => {
@@ -142,82 +140,78 @@ export default function LocalExperiencesScreen() {
 
   const reviews = useMemo(() => {
     if (!selectedExperience) return [];
-    return experienceReviews.filter(r => r.experienceId === selectedExperience.id);
+    return experienceReviews.filter((r) => r.experienceId === selectedExperience.id);
   }, [selectedExperience]);
 
-  const renderExperienceCard = useCallback((experience: LocalExperience, isLarge = false) => {
-    const isFavorite = favorites.includes(experience.id);
+  const renderExperienceCard = useCallback(
+    (experience: LocalExperience, isLarge = false) => {
+      const isFavorite = favorites.includes(experience.id);
 
-    return (
-      <Pressable
-        key={experience.id}
-        style={[styles.experienceCard, isLarge && styles.experienceCardLarge]}
-        onPress={() => openExperience(experience)}
-      >
-        <View style={[styles.cardImageContainer, isLarge && styles.cardImageContainerLarge]}>
-          <Image
-            source={{ uri: experience.image }}
-            style={styles.cardImage}
-            contentFit="cover"
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.6)']}
-            style={styles.cardGradient}
-          />
-          <Pressable
-            style={styles.favoriteButton}
-            onPress={() => toggleFavorite(experience.id)}
-          >
-            <Heart
-              size={20}
-              color={isFavorite ? colors.error : colors.textLight}
-              fill={isFavorite ? colors.error : 'transparent'}
+      return (
+        <Pressable
+          key={experience.id}
+          style={[styles.experienceCard, isLarge && styles.experienceCardLarge]}
+          onPress={() => openExperience(experience)}
+        >
+          <View style={[styles.cardImageContainer, isLarge && styles.cardImageContainerLarge]}>
+            <Image source={{ uri: experience.image }} style={styles.cardImage} contentFit="cover" />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.6)']}
+              style={styles.cardGradient}
             />
-          </Pressable>
-          {experience.instantBook && (
-            <View style={styles.instantBadge}>
-              <Zap size={12} color={colors.warning} fill={colors.warning} />
-              <Text style={styles.instantText}>Instant</Text>
-            </View>
-          )}
-          {experience.host.superhost && (
-            <View style={styles.superhostBadge}>
-              <Award size={12} color={colors.secondary} />
-              <Text style={styles.superhostText}>Superhost</Text>
-            </View>
-          )}
-        </View>
-        <View style={styles.cardContent}>
-          <View style={styles.cardHeader}>
-            <View style={styles.ratingContainer}>
-              <Star size={14} color={colors.warning} fill={colors.warning} />
-              <Text style={styles.rating}>{experience.rating}</Text>
-              <Text style={styles.reviewCount}>({experience.reviewCount})</Text>
-            </View>
+            <Pressable style={styles.favoriteButton} onPress={() => toggleFavorite(experience.id)}>
+              <Heart
+                size={20}
+                color={isFavorite ? colors.error : colors.textLight}
+                fill={isFavorite ? colors.error : 'transparent'}
+              />
+            </Pressable>
+            {experience.instantBook && (
+              <View style={styles.instantBadge}>
+                <Zap size={12} color={colors.warning} fill={colors.warning} />
+                <Text style={styles.instantText}>Instant</Text>
+              </View>
+            )}
+            {experience.host.superhost && (
+              <View style={styles.superhostBadge}>
+                <Award size={12} color={colors.secondary} />
+                <Text style={styles.superhostText}>Superhost</Text>
+              </View>
+            )}
           </View>
-          <Text style={styles.cardTitle} numberOfLines={2}>
-            {experience.title}
-          </Text>
-          <View style={styles.cardMeta}>
-            <View style={styles.metaItem}>
-              <Clock size={13} color={colors.textTertiary} />
-              <Text style={styles.metaText}>{experience.duration}</Text>
+          <View style={styles.cardContent}>
+            <View style={styles.cardHeader}>
+              <View style={styles.ratingContainer}>
+                <Star size={14} color={colors.warning} fill={colors.warning} />
+                <Text style={styles.rating}>{experience.rating}</Text>
+                <Text style={styles.reviewCount}>({experience.reviewCount})</Text>
+              </View>
             </View>
-            <View style={styles.metaItem}>
-              <MapPin size={13} color={colors.textTertiary} />
-              <Text style={styles.metaText}>{experience.location.city}</Text>
-            </View>
-          </View>
-          <View style={styles.priceRow}>
-            <Text style={styles.price}>
-              ${experience.price}
-              <Text style={styles.priceUnit}> / person</Text>
+            <Text style={styles.cardTitle} numberOfLines={2}>
+              {experience.title}
             </Text>
+            <View style={styles.cardMeta}>
+              <View style={styles.metaItem}>
+                <Clock size={13} color={colors.textTertiary} />
+                <Text style={styles.metaText}>{experience.duration}</Text>
+              </View>
+              <View style={styles.metaItem}>
+                <MapPin size={13} color={colors.textTertiary} />
+                <Text style={styles.metaText}>{experience.location.city}</Text>
+              </View>
+            </View>
+            <View style={styles.priceRow}>
+              <Text style={styles.price}>
+                ${experience.price}
+                <Text style={styles.priceUnit}> / person</Text>
+              </Text>
+            </View>
           </View>
-        </View>
-      </Pressable>
-    );
-  }, [favorites, openExperience, toggleFavorite]);
+        </Pressable>
+      );
+    },
+    [favorites, openExperience, toggleFavorite]
+  );
 
   const renderDetailModal = () => {
     if (!selectedExperience) return null;
@@ -253,7 +247,9 @@ export default function LocalExperiencesScreen() {
                     <Heart
                       size={22}
                       color={colors.textLight}
-                      fill={favorites.includes(selectedExperience.id) ? colors.error : 'transparent'}
+                      fill={
+                        favorites.includes(selectedExperience.id) ? colors.error : 'transparent'
+                      }
                     />
                   </Pressable>
                   <Pressable style={styles.modalIconButton}>
@@ -305,9 +301,7 @@ export default function LocalExperiencesScreen() {
                 <View style={styles.statDivider} />
                 <View style={styles.statItem}>
                   <Users size={18} color={colors.primary} />
-                  <Text style={styles.statValue}>
-                    {selectedExperience.groupSize.max} max
-                  </Text>
+                  <Text style={styles.statValue}>{selectedExperience.groupSize.max} max</Text>
                 </View>
               </View>
 
@@ -393,8 +387,8 @@ export default function LocalExperiencesScreen() {
                     {selectedExperience.cancellationPolicy === 'flexible'
                       ? 'Full refund up to 24 hours before the experience'
                       : selectedExperience.cancellationPolicy === 'moderate'
-                      ? 'Full refund up to 5 days before the experience'
-                      : 'Full refund up to 7 days before the experience'}
+                        ? 'Full refund up to 5 days before the experience'
+                        : 'Full refund up to 7 days before the experience'}
                   </Text>
                 </View>
               </View>
@@ -402,7 +396,7 @@ export default function LocalExperiencesScreen() {
               {reviews.length > 0 && (
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>Reviews</Text>
-                  {reviews.slice(0, 3).map(review => (
+                  {reviews.slice(0, 3).map((review) => (
                     <View key={review.id} style={styles.reviewCard}>
                       <View style={styles.reviewHeader}>
                         <Image
@@ -452,7 +446,7 @@ export default function LocalExperiencesScreen() {
     if (!selectedExperience || !showBookingModal) return null;
 
     const availability = selectedExperience.availability;
-    const selectedAvailability = availability.find(a => a.date === selectedDate);
+    const selectedAvailability = availability.find((a) => a.date === selectedDate);
     const totalPrice = selectedExperience.price * guestCount;
 
     return (
@@ -498,7 +492,7 @@ export default function LocalExperiencesScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.dateScrollContent}
               >
-                {availability.map(slot => {
+                {availability.map((slot) => {
                   const date = new Date(slot.date);
                   const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
                   const dayNum = date.getDate();
@@ -536,7 +530,7 @@ export default function LocalExperiencesScreen() {
               <View style={styles.bookingSection}>
                 <Text style={styles.bookingSectionTitle}>Select Time</Text>
                 <View style={styles.timeGrid}>
-                  {selectedAvailability.times.map(time => {
+                  {selectedAvailability.times.map((time) => {
                     const isSelected = selectedTime === time;
                     return (
                       <Pressable
@@ -544,10 +538,7 @@ export default function LocalExperiencesScreen() {
                         style={[styles.timeCard, isSelected && styles.timeCardSelected]}
                         onPress={() => setSelectedTime(time)}
                       >
-                        <Clock
-                          size={16}
-                          color={isSelected ? colors.textLight : colors.primary}
-                        />
+                        <Clock size={16} color={isSelected ? colors.textLight : colors.primary} />
                         <Text style={[styles.timeText, isSelected && styles.timeTextSelected]}>
                           {time}
                         </Text>
@@ -568,7 +559,7 @@ export default function LocalExperiencesScreen() {
                   ]}
                   onPress={() =>
                     guestCount > selectedExperience.groupSize.min &&
-                    setGuestCount(prev => prev - 1)
+                    setGuestCount((prev) => prev - 1)
                   }
                   disabled={guestCount <= selectedExperience.groupSize.min}
                 >
@@ -583,9 +574,7 @@ export default function LocalExperiencesScreen() {
                 </Pressable>
                 <View style={styles.guestCountContainer}>
                   <Text style={styles.guestCount}>{guestCount}</Text>
-                  <Text style={styles.guestLabel}>
-                    guest{guestCount !== 1 ? 's' : ''}
-                  </Text>
+                  <Text style={styles.guestLabel}>guest{guestCount !== 1 ? 's' : ''}</Text>
                 </View>
                 <Pressable
                   style={[
@@ -594,7 +583,7 @@ export default function LocalExperiencesScreen() {
                   ]}
                   onPress={() =>
                     guestCount < selectedExperience.groupSize.max &&
-                    setGuestCount(prev => prev + 1)
+                    setGuestCount((prev) => prev + 1)
                   }
                   disabled={guestCount >= selectedExperience.groupSize.max}
                 >
@@ -686,7 +675,7 @@ export default function LocalExperiencesScreen() {
             style={styles.categoriesScroll}
             contentContainerStyle={styles.categoriesContent}
           >
-            {experienceCategories.map(cat => {
+            {experienceCategories.map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (
                 <Pressable
@@ -721,7 +710,7 @@ export default function LocalExperiencesScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.featuredScroll}
               >
-                {featuredExperiences.map(exp => renderExperienceCard(exp, true))}
+                {featuredExperiences.map((exp) => renderExperienceCard(exp, true))}
               </ScrollView>
             </View>
           )}
@@ -730,14 +719,15 @@ export default function LocalExperiencesScreen() {
             <Text style={styles.sectionHeader}>
               {selectedCategory === 'all'
                 ? 'All Experiences'
-                : experienceCategories.find(c => c.id === selectedCategory)?.label || 'Experiences'}
+                : experienceCategories.find((c) => c.id === selectedCategory)?.label ||
+                  'Experiences'}
             </Text>
             <Text style={styles.resultsCount}>
               {filteredExperiences.length} experience
               {filteredExperiences.length !== 1 ? 's' : ''} available
             </Text>
             <View style={styles.experiencesGrid}>
-              {filteredExperiences.map(exp => renderExperienceCard(exp))}
+              {filteredExperiences.map((exp) => renderExperienceCard(exp))}
             </View>
           </View>
 

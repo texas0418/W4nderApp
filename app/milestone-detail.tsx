@@ -54,11 +54,11 @@ const THEME_GRADIENTS: Record<string, [string, string, string]> = {
 
 // Emoji for price ranges
 const PRICE_EMOJI: Record<PriceRange, string> = {
-  '$': '💰',
-  '$$': '💰💰',
-  '$$$': '💰💰💰',
-  '$$$$': '💰💰💰💰',
-  '$$$$$': '💎',
+  $: '💰',
+  $$: '💰💰',
+  $$$: '💰💰💰',
+  $$$$: '💰💰💰💰',
+  $$$$$: '💎',
 };
 
 export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
@@ -104,7 +104,9 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
   }, [loadData]);
 
   const theme = useMemo(() => {
-    return insights?.theme || MILESTONE_THEMES.find(t => t.milestoneYears.includes(yearsCompleting));
+    return (
+      insights?.theme || MILESTONE_THEMES.find((t) => t.milestoneYears.includes(yearsCompleting))
+    );
   }, [insights, yearsCompleting]);
 
   const gradientColors = useMemo(() => {
@@ -113,15 +115,15 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
 
   const handleToggleSavePackage = async (packageId: string) => {
     const isSaved = await milestoneSuggestionsService.toggleSavePackage(packageId);
-    setSavedPackages(prev =>
-      isSaved ? [...prev, packageId] : prev.filter(id => id !== packageId)
+    setSavedPackages((prev) =>
+      isSaved ? [...prev, packageId] : prev.filter((id) => id !== packageId)
     );
   };
 
   const handleToggleSaveSuggestion = async (suggestionId: string) => {
     const isSaved = await milestoneSuggestionsService.toggleSaveSuggestion(suggestionId);
-    setSavedSuggestions(prev =>
-      isSaved ? [...prev, suggestionId] : prev.filter(id => id !== suggestionId)
+    setSavedSuggestions((prev) =>
+      isSaved ? [...prev, suggestionId] : prev.filter((id) => id !== suggestionId)
     );
   };
 
@@ -157,19 +159,15 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
       <View style={styles.heroContent}>
         <Text style={styles.milestoneEmoji}>{theme?.emoji || '💕'}</Text>
         <Text style={styles.yearsText}>{yearsCompleting}</Text>
-        <Text style={styles.yearsLabel}>
-          {yearsCompleting === 1 ? 'Year' : 'Years'}
-        </Text>
-        
+        <Text style={styles.yearsLabel}>{yearsCompleting === 1 ? 'Year' : 'Years'}</Text>
+
         {theme && (
           <View style={styles.themeTag}>
             <Text style={styles.themeTagText}>{theme.name}</Text>
           </View>
         )}
 
-        {anniversary && (
-          <Text style={styles.anniversaryName}>{anniversary.name}</Text>
-        )}
+        {anniversary && <Text style={styles.anniversaryName}>{anniversary.name}</Text>}
 
         {/* Traditional/Modern Gift Display */}
         {(insights?.traditionalGift || insights?.modernGift) && (
@@ -318,13 +316,20 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
         <View style={styles.suggestionHeader}>
           <View style={styles.categoryBadge}>
             <Text style={styles.categoryBadgeText}>
-              {suggestion.category === 'restaurant' ? '🍽️' :
-               suggestion.category === 'experience' ? '🎯' :
-               suggestion.category === 'getaway' ? '🏝️' :
-               suggestion.category === 'spa' ? '🧘' :
-               suggestion.category === 'activity' ? '🎨' :
-               suggestion.category === 'entertainment' ? '🎭' : '🎁'}
-              {' '}{suggestion.category}
+              {suggestion.category === 'restaurant'
+                ? '🍽️'
+                : suggestion.category === 'experience'
+                  ? '🎯'
+                  : suggestion.category === 'getaway'
+                    ? '🏝️'
+                    : suggestion.category === 'spa'
+                      ? '🧘'
+                      : suggestion.category === 'activity'
+                        ? '🎨'
+                        : suggestion.category === 'entertainment'
+                          ? '🎭'
+                          : '🎁'}{' '}
+              {suggestion.category}
             </Text>
           </View>
           <TouchableOpacity onPress={() => handleToggleSaveSuggestion(suggestion.id)}>
@@ -347,7 +352,9 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
           <Text style={styles.bestForLabel}>Best for:</Text>
           <View style={styles.bestForTags}>
             {suggestion.bestFor.map((item, index) => (
-              <Text key={index} style={styles.bestForTag}>{item}</Text>
+              <Text key={index} style={styles.bestForTag}>
+                {item}
+              </Text>
             ))}
           </View>
         </View>
@@ -356,7 +363,9 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
           <View style={styles.tipsContainer}>
             <Text style={styles.tipsTitle}>💡 Pro Tips</Text>
             {suggestion.tips.map((tip, index) => (
-              <Text key={index} style={styles.tipItem}>• {tip}</Text>
+              <Text key={index} style={styles.tipItem}>
+                • {tip}
+              </Text>
             ))}
           </View>
         )}
@@ -384,9 +393,9 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
         <Text style={styles.giftName}>{gift.name}</Text>
         <Text style={styles.giftPrice}>{gift.priceRange}</Text>
       </View>
-      
+
       <Text style={styles.giftDescription}>{gift.description}</Text>
-      
+
       <View style={styles.giftMeta}>
         <View style={styles.traditionalTie}>
           <Text style={styles.traditionalTieLabel}>Traditional tie:</Text>
@@ -413,7 +422,8 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
           <Text style={styles.emptyEmoji}>📦</Text>
           <Text style={styles.emptyTitle}>No Celebration Packages</Text>
           <Text style={styles.emptySubtitle}>
-            Curated packages are available for special milestone years (1, 5, 10, 15, 20, 25, 30, 40, 50, 60)
+            Curated packages are available for special milestone years (1, 5, 10, 15, 20, 25, 30,
+            40, 50, 60)
           </Text>
           {insights?.nextSpecialMilestone && (
             <View style={styles.nextMilestoneInfo}>
@@ -429,7 +439,7 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
 
     return (
       <View style={styles.packagesContainer}>
-        {insights.packages.map(pkg => renderPackageCard(pkg))}
+        {insights.packages.map((pkg) => renderPackageCard(pkg))}
       </View>
     );
   };
@@ -449,7 +459,7 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
 
     return (
       <View style={styles.ideasContainer}>
-        {insights.suggestions.map(suggestion => renderSuggestionCard(suggestion))}
+        {insights.suggestions.map((suggestion) => renderSuggestionCard(suggestion))}
       </View>
     );
   };
@@ -469,7 +479,7 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
 
     return (
       <View style={styles.giftsContainer}>
-        {insights.giftIdeas.map(gift => renderGiftCard(gift))}
+        {insights.giftIdeas.map((gift) => renderGiftCard(gift))}
       </View>
     );
   };
@@ -506,7 +516,8 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
               <View style={styles.modalMetaItem}>
                 <Text style={styles.modalMetaLabel}>Duration</Text>
                 <Text style={styles.modalMetaValue}>
-                  {selectedPackage.durationDays} {selectedPackage.durationDays === 1 ? 'Day' : 'Days'}
+                  {selectedPackage.durationDays}{' '}
+                  {selectedPackage.durationDays === 1 ? 'Day' : 'Days'}
                 </Text>
               </View>
               <View style={styles.modalMetaItem}>
@@ -526,12 +537,19 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
                 <View key={index} style={styles.inclusionItem}>
                   <View style={styles.inclusionIcon}>
                     <Text style={styles.inclusionIconText}>
-                      {item.category === 'restaurant' ? '🍽️' :
-                       item.category === 'experience' ? '🎯' :
-                       item.category === 'getaway' ? '🏨' :
-                       item.category === 'spa' ? '🧘' :
-                       item.category === 'activity' ? '🎨' :
-                       item.category === 'gift' ? '🎁' : '✨'}
+                      {item.category === 'restaurant'
+                        ? '🍽️'
+                        : item.category === 'experience'
+                          ? '🎯'
+                          : item.category === 'getaway'
+                            ? '🏨'
+                            : item.category === 'spa'
+                              ? '🧘'
+                              : item.category === 'activity'
+                                ? '🎨'
+                                : item.category === 'gift'
+                                  ? '🎁'
+                                  : '✨'}
                     </Text>
                   </View>
                   <View style={styles.inclusionContent}>
@@ -605,10 +623,9 @@ export const MilestoneDetailScreen: React.FC<MilestoneDetailScreenProps> = ({
 
       <Animated.ScrollView
         style={styles.scrollView}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: true,
+        })}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
       >

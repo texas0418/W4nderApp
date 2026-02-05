@@ -15,34 +15,28 @@ export type PreferenceCategory =
   | 'social';
 
 export type PreferenceSource =
-  | 'explicit'      // User directly set
-  | 'inferred'      // Learned from behavior
-  | 'imported'      // From external service
-  | 'companion'     // From travel companion
-  | 'default';      // System default
+  | 'explicit' // User directly set
+  | 'inferred' // Learned from behavior
+  | 'imported' // From external service
+  | 'companion' // From travel companion
+  | 'default'; // System default
 
 export type PreferenceStrength =
-  | 'must_have'     // Non-negotiable
-  | 'strong'        // Highly preferred
-  | 'moderate'      // Nice to have
-  | 'slight'        // Minor preference
-  | 'neutral';      // No preference
+  | 'must_have' // Non-negotiable
+  | 'strong' // Highly preferred
+  | 'moderate' // Nice to have
+  | 'slight' // Minor preference
+  | 'neutral'; // No preference
 
 export type ConflictResolution =
-  | 'user_wins'           // Current user preference takes priority
-  | 'companion_wins'      // Companion preference takes priority
-  | 'strongest_wins'      // Highest strength preference wins
-  | 'average'             // Find middle ground
-  | 'either'              // Accept either option
-  | 'manual';             // Requires user decision
+  | 'user_wins' // Current user preference takes priority
+  | 'companion_wins' // Companion preference takes priority
+  | 'strongest_wins' // Highest strength preference wins
+  | 'average' // Find middle ground
+  | 'either' // Accept either option
+  | 'manual'; // Requires user decision
 
-export type SyncStatus =
-  | 'synced'
-  | 'pending'
-  | 'syncing'
-  | 'conflict'
-  | 'offline'
-  | 'error';
+export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'conflict' | 'offline' | 'error';
 
 // ============================================================================
 // DINING PREFERENCES
@@ -117,7 +111,7 @@ export interface DiningPreferences {
   diningStyles: Array<{ style: DiningStyle; strength: PreferenceStrength }>;
   ambiance: Array<{ type: DiningAmbiance; strength: PreferenceStrength }>;
   priceRange: {
-    min: number;  // 1-4 ($-$$$$)
+    min: number; // 1-4 ($-$$$$)
     max: number;
     strength: PreferenceStrength;
   };
@@ -163,19 +157,14 @@ export type ActivityType =
   | 'local_experiences'
   | 'classes_workshops';
 
-export type PhysicalIntensity =
-  | 'sedentary'
-  | 'light'
-  | 'moderate'
-  | 'vigorous'
-  | 'extreme';
+export type PhysicalIntensity = 'sedentary' | 'light' | 'moderate' | 'vigorous' | 'extreme';
 
 export type GroupSize =
   | 'solo'
   | 'couple'
-  | 'small_group'    // 3-6
-  | 'medium_group'   // 7-15
-  | 'large_group';   // 16+
+  | 'small_group' // 3-6
+  | 'medium_group' // 7-15
+  | 'large_group'; // 16+
 
 export interface ActivityPreferences {
   activityTypes: Array<{ type: ActivityType; strength: PreferenceStrength }>;
@@ -244,14 +233,14 @@ export type AccommodationAmenity =
 export interface AccommodationPreferences {
   types: Array<{ type: AccommodationType; strength: PreferenceStrength }>;
   starRating: {
-    min: number;  // 1-5
+    min: number; // 1-5
     preferred: number;
   };
   mustHaveAmenities: AccommodationAmenity[];
   niceToHaveAmenities: AccommodationAmenity[];
   location: {
-    centralPreference: PreferenceStrength;  // How important is being central
-    maxDistanceFromCenter: number;  // km
+    centralPreference: PreferenceStrength; // How important is being central
+    maxDistanceFromCenter: number; // km
     nearTransport: PreferenceStrength;
     quietArea: PreferenceStrength;
   };
@@ -278,21 +267,17 @@ export type TransportMode =
   | 'private_driver'
   | 'tour_bus';
 
-export type FlightClass =
-  | 'economy'
-  | 'premium_economy'
-  | 'business'
-  | 'first';
+export type FlightClass = 'economy' | 'premium_economy' | 'business' | 'first';
 
 export interface TransportationPreferences {
   localTransport: Array<{ mode: TransportMode; strength: PreferenceStrength }>;
-  maxWalkingDistance: number;  // meters
+  maxWalkingDistance: number; // meters
   flightPreferences: {
     class: FlightClass;
     seatPreference: 'window' | 'aisle' | 'middle' | 'no_preference';
     directFlightsOnly: boolean;
     maxLayovers: number;
-    maxLayoverDuration: number;  // hours
+    maxLayoverDuration: number; // hours
     preferredAirlines: string[];
     avoidAirlines: string[];
   };
@@ -307,12 +292,7 @@ export interface TransportationPreferences {
 // BUDGET PREFERENCES
 // ============================================================================
 
-export type BudgetLevel =
-  | 'budget'
-  | 'moderate'
-  | 'comfortable'
-  | 'luxury'
-  | 'ultra_luxury';
+export type BudgetLevel = 'budget' | 'moderate' | 'comfortable' | 'luxury' | 'ultra_luxury';
 
 export interface BudgetPreferences {
   overallLevel: BudgetLevel;
@@ -328,8 +308,8 @@ export interface BudgetPreferences {
     transportation: { percentage: number; flexibility: 'strict' | 'flexible' | 'very_flexible' };
     shopping: { percentage: number; flexibility: 'strict' | 'flexible' | 'very_flexible' };
   };
-  splurgeCategories: PreferenceCategory[];  // Where user is willing to spend more
-  saveCategories: PreferenceCategory[];     // Where user wants to economize
+  splurgeCategories: PreferenceCategory[]; // Where user is willing to spend more
+  saveCategories: PreferenceCategory[]; // Where user wants to economize
   dealSensitivity: 'always_look' | 'nice_to_have' | 'not_important';
 }
 
@@ -338,17 +318,17 @@ export interface BudgetPreferences {
 // ============================================================================
 
 export type TimeOfDay =
-  | 'early_morning'   // 5-8am
-  | 'morning'         // 8-11am
-  | 'midday'          // 11am-2pm
-  | 'afternoon'       // 2-5pm
-  | 'evening'         // 5-8pm
-  | 'night'           // 8-11pm
-  | 'late_night';     // 11pm-5am
+  | 'early_morning' // 5-8am
+  | 'morning' // 8-11am
+  | 'midday' // 11am-2pm
+  | 'afternoon' // 2-5pm
+  | 'evening' // 5-8pm
+  | 'night' // 8-11pm
+  | 'late_night'; // 11pm-5am
 
 export interface TimingPreferences {
-  wakeUpTime: string;  // HH:mm
-  bedTime: string;     // HH:mm
+  wakeUpTime: string; // HH:mm
+  bedTime: string; // HH:mm
   preferredActivityTimes: Array<{ time: TimeOfDay; strength: PreferenceStrength }>;
   pacingStyle: 'packed' | 'moderate' | 'relaxed' | 'very_relaxed';
   restDaysFrequency: 'never' | 'occasionally' | 'every_few_days' | 'daily_downtime';
@@ -409,9 +389,9 @@ export interface PreferenceValue {
   value: any;
   strength: PreferenceStrength;
   source: PreferenceSource;
-  confidence: number;  // 0-1, how confident we are in this preference
-  lastUpdated: string;  // ISO date
-  learnedFrom?: string[];  // IDs of bookings/interactions that informed this
+  confidence: number; // 0-1, how confident we are in this preference
+  lastUpdated: string; // ISO date
+  learnedFrom?: string[]; // IDs of bookings/interactions that informed this
 }
 
 export interface UserPreferences {
@@ -420,7 +400,7 @@ export interface UserPreferences {
   version: number;
   lastSynced: string;
   syncStatus: SyncStatus;
-  
+
   dining: DiningPreferences;
   activities: ActivityPreferences;
   accommodation: AccommodationPreferences;
@@ -429,7 +409,7 @@ export interface UserPreferences {
   timing: TimingPreferences;
   accessibility: AccessibilityPreferences;
   social: SocialPreferences;
-  
+
   // Metadata for each preference
   metadata: {
     [key: string]: PreferenceValue;
@@ -473,12 +453,12 @@ export interface MergedPreferences {
   participants: Array<{
     userId: string;
     name: string;
-    weight: number;  // How much their preferences count (0-1)
+    weight: number; // How much their preferences count (0-1)
   }>;
   mergedAt: string;
   conflicts: PreferenceConflict[];
   unresolvedConflicts: number;
-  
+
   // The actual merged preferences
   dining: Partial<DiningPreferences>;
   activities: Partial<ActivityPreferences>;
@@ -486,7 +466,7 @@ export interface MergedPreferences {
   transportation: Partial<TransportationPreferences>;
   budget: Partial<BudgetPreferences>;
   timing: Partial<TimingPreferences>;
-  accessibility: AccessibilityPreferences;  // Always union of all requirements
+  accessibility: AccessibilityPreferences; // Always union of all requirements
   social: Partial<SocialPreferences>;
 }
 
@@ -500,28 +480,28 @@ export interface SuggestionMatch {
   matchType: 'exact' | 'partial' | 'related' | 'no_match';
   userPreference: any;
   itemValue: any;
-  score: number;  // 0-100
-  weight: number;  // How important this field is
+  score: number; // 0-100
+  weight: number; // How important this field is
 }
 
 export interface SuggestionScore {
   itemId: string;
   itemType: 'restaurant' | 'activity' | 'hotel' | 'transport';
-  overallScore: number;  // 0-100
+  overallScore: number; // 0-100
   matchBreakdown: SuggestionMatch[];
-  topMatches: string[];     // Best matching preference fields
+  topMatches: string[]; // Best matching preference fields
   potentialIssues: string[]; // Possible mismatches
-  personalized: boolean;     // Whether this was personalized
-  confidence: number;        // How confident we are in the score
+  personalized: boolean; // Whether this was personalized
+  confidence: number; // How confident we are in the score
 }
 
 export interface SuggestionSettings {
   enablePersonalization: boolean;
-  strictFiltering: boolean;  // Only show items that meet must_have preferences
-  showScores: boolean;       // Show match scores to user
-  minScore: number;          // Minimum score to show (0-100)
-  prioritizeNewExperiences: boolean;  // Prefer things user hasn't tried
-  balanceCategories: boolean;  // Mix of preference matches
+  strictFiltering: boolean; // Only show items that meet must_have preferences
+  showScores: boolean; // Show match scores to user
+  minScore: number; // Minimum score to show (0-100)
+  prioritizeNewExperiences: boolean; // Prefer things user hasn't tried
+  balanceCategories: boolean; // Mix of preference matches
 }
 
 // ============================================================================
@@ -537,8 +517,8 @@ export interface PreferenceLearningEvent {
   itemAttributes: Record<string, any>;
   userAction: {
     type: string;
-    value?: number;  // e.g., rating 1-5
-    duration?: number;  // e.g., view time in seconds
+    value?: number; // e.g., rating 1-5
+    duration?: number; // e.g., view time in seconds
   };
   inferredPreferences: Array<{
     category: PreferenceCategory;
@@ -553,7 +533,7 @@ export interface LearningInsight {
   category: PreferenceCategory;
   insight: string;
   confidence: number;
-  basedOn: string[];  // Event IDs
+  basedOn: string[]; // Event IDs
   suggestedUpdate: {
     field: string;
     currentValue: any;

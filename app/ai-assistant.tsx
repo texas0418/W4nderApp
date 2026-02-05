@@ -25,7 +25,7 @@ import {
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
-import React from "react";
+import React from 'react';
 
 // =============================================================================
 // AI INTEGRATION GUIDE
@@ -114,14 +114,14 @@ async function sendMessageToAI(
   // ==========================================================================
   // TODO: Replace this with your AI integration
   // ==========================================================================
-  
+
   // Example: OpenAI integration
   // const response = await openai.chat.completions.create({
   //   model: "gpt-4",
   //   messages: [
-  //     { 
-  //       role: "system", 
-  //       content: `You are a friendly travel assistant. The user's name is ${userContext.name}.` 
+  //     {
+  //       role: "system",
+  //       content: `You are a friendly travel assistant. The user's name is ${userContext.name}.`
   //     },
   //     ...conversationHistory.map(m => ({ role: m.role, content: m.content })),
   //     { role: "user", content: message }
@@ -130,14 +130,14 @@ async function sendMessageToAI(
   // return response.choices[0].message.content;
 
   // Placeholder response for demo purposes
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-  
+  await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+
   const responses = [
     `Great question! I'd love to help you with that. Since you prefer a ${userContext.budgetRange} budget and ${userContext.travelStyle} travel style, here are some thoughts...\n\n**Note:** This is a placeholder response. To enable real AI responses, integrate your preferred AI service (OpenAI, Anthropic, etc.) in the \`sendMessageToAI\` function in \`app/ai-assistant.tsx\`.`,
     `That's an interesting travel topic! Let me think about this...\n\n**Setup Required:** This demo response is a placeholder. Edit \`app/ai-assistant.tsx\` to connect your own AI API for personalized travel recommendations.`,
     `I understand you're looking for travel advice. Based on your preferences...\n\n**Coming Soon:** Replace the placeholder \`sendMessageToAI\` function with your AI provider of choice to get real recommendations!`,
   ];
-  
+
   return responses[Math.floor(Math.random() * responses.length)];
 }
 
@@ -150,49 +150,46 @@ export default function AIAssistantScreen() {
 
   const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
-    
+
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
       content: input.trim(),
       timestamp: new Date(),
     };
-    
-    setMessages(prev => [...prev, userMessage]);
+
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
-    
+
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
 
     try {
-      const response = await sendMessageToAI(
-        userMessage.content,
-        messages,
-        {
-          name: user.name,
-          travelStyle: user.travelStyle,
-          budgetRange: user.budgetRange,
-        }
-      );
-      
+      const response = await sendMessageToAI(userMessage.content, messages, {
+        name: user.name,
+        travelStyle: user.travelStyle,
+        budgetRange: user.budgetRange,
+      });
+
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: response,
         timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, assistantMessage]);
+
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please check your AI integration configuration and try again.',
+        content:
+          'Sorry, I encountered an error. Please check your AI integration configuration and try again.',
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
       setTimeout(() => {
@@ -207,7 +204,7 @@ export default function AIAssistantScreen() {
 
   const renderMessage = useCallback((message: Message) => {
     const isUser = message.role === 'user';
-    
+
     return (
       <View
         key={message.id}
@@ -223,18 +220,8 @@ export default function AIAssistantScreen() {
             </View>
           </View>
         )}
-        <View
-          style={[
-            styles.messageBubble,
-            isUser ? styles.userBubble : styles.assistantBubble,
-          ]}
-        >
-          <Text
-            style={[
-              styles.messageText,
-              isUser ? styles.userText : styles.assistantText,
-            ]}
-          >
+        <View style={[styles.messageBubble, isUser ? styles.userBubble : styles.assistantBubble]}>
+          <Text style={[styles.messageText, isUser ? styles.userText : styles.assistantText]}>
             {message.content}
           </Text>
         </View>
@@ -278,9 +265,10 @@ export default function AIAssistantScreen() {
               </View>
               <Text style={styles.welcomeTitle}>Hi {user.name}! 👋</Text>
               <Text style={styles.welcomeSubtitle}>
-                I'm your AI travel assistant. Ask me anything about destinations, translations, local tips, or help planning your next adventure!
+                I'm your AI travel assistant. Ask me anything about destinations, translations,
+                local tips, or help planning your next adventure!
               </Text>
-              
+
               <Text style={styles.quickPromptsTitle}>Quick Actions</Text>
               <View style={styles.quickPromptsGrid}>
                 {quickPrompts.map((item) => (
@@ -298,7 +286,7 @@ export default function AIAssistantScreen() {
           ) : (
             messages.map(renderMessage)
           )}
-          
+
           {isLoading && messages.length > 0 && (
             <View style={[styles.messageContainer, styles.assistantMessageContainer]}>
               <View style={styles.avatarContainer}>
@@ -332,10 +320,7 @@ export default function AIAssistantScreen() {
               editable={!isLoading}
             />
             <Pressable
-              style={[
-                styles.sendButton,
-                (!input.trim() || isLoading) && styles.sendButtonDisabled,
-              ]}
+              style={[styles.sendButton, (!input.trim() || isLoading) && styles.sendButtonDisabled]}
               onPress={handleSend}
               disabled={!input.trim() || isLoading}
             >

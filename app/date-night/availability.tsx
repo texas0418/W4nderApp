@@ -77,7 +77,7 @@ type ViewMode = 'grid' | 'suggestions';
 
 export default function AvailabilitySyncScreen() {
   const router = useRouter();
-  
+
   // State
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [refreshing, setRefreshing] = useState(false);
@@ -85,7 +85,9 @@ export default function AvailabilitySyncScreen() {
   const [partnerSheetVisible, setPartnerSheetVisible] = useState(false);
   const [selectedCalendars, setSelectedCalendars] = useState<CalendarInfo[]>([]);
   const [userAvailability, setUserAvailability] = useState<UserAvailability>(MOCK_USER);
-  const [partnerAvailability, setPartnerAvailability] = useState<UserAvailability | null>(MOCK_PARTNER);
+  const [partnerAvailability, setPartnerAvailability] = useState<UserAvailability | null>(
+    MOCK_PARTNER
+  );
   const [selectedDate, setSelectedDate] = useState<{
     date: string;
     slots: MutualTimeSlot[];
@@ -107,7 +109,7 @@ export default function AvailabilitySyncScreen() {
   const loadAvailability = useCallback(async () => {
     if (selectedCalendars.length === 0) return;
 
-    const calendarIds = selectedCalendars.map(c => c.id);
+    const calendarIds = selectedCalendars.map((c) => c.id);
     const startDate = new Date();
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 28); // 4 weeks
@@ -121,7 +123,7 @@ export default function AvailabilitySyncScreen() {
         userAvailability.preferences
       );
 
-      setUserAvailability(prev => ({
+      setUserAvailability((prev) => ({
         ...prev,
         windows,
         lastUpdated: new Date().toISOString(),
@@ -137,11 +139,15 @@ export default function AvailabilitySyncScreen() {
       );
 
       if (partnerAvailability) {
-        setPartnerAvailability(prev => prev ? {
-          ...prev,
-          windows: partnerWindows,
-          lastUpdated: new Date().toISOString(),
-        } : null);
+        setPartnerAvailability((prev) =>
+          prev
+            ? {
+                ...prev,
+                windows: partnerWindows,
+                lastUpdated: new Date().toISOString(),
+              }
+            : null
+        );
       }
     } catch (error) {
       console.error('Failed to load availability:', error);
@@ -169,9 +175,9 @@ export default function AvailabilitySyncScreen() {
       partnerAvailability?.preferences || DEFAULT_AVAILABILITY_PREFERENCES
     );
 
-    setUserAvailability(prev => ({ ...prev, windows: userWindows }));
+    setUserAvailability((prev) => ({ ...prev, windows: userWindows }));
     if (partnerAvailability) {
-      setPartnerAvailability(prev => prev ? { ...prev, windows: partnerWindows } : null);
+      setPartnerAvailability((prev) => (prev ? { ...prev, windows: partnerWindows } : null));
     }
   }, []);
 
@@ -182,7 +188,7 @@ export default function AvailabilitySyncScreen() {
   };
 
   const handleSlotPress = (date: string, slot: MutualTimeSlot) => {
-    const dayAvailability = mutualAvailability.find(a => a.date === date);
+    const dayAvailability = mutualAvailability.find((a) => a.date === date);
     if (dayAvailability) {
       setSelectedDate({
         date,
@@ -245,11 +251,8 @@ export default function AvailabilitySyncScreen() {
   };
 
   const isPartnerLinked = !!partnerAvailability;
-  const totalFreeSlots = mutualAvailability.reduce(
-    (sum, day) => sum + day.slots.length,
-    0
-  );
-  const perfectMatches = suggestions.filter(s => s.quality === 'ideal').length;
+  const totalFreeSlots = mutualAvailability.reduce((sum, day) => sum + day.slots.length, 0);
+  const perfectMatches = suggestions.filter((s) => s.quality === 'ideal').length;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -259,10 +262,7 @@ export default function AvailabilitySyncScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
 
@@ -284,35 +284,21 @@ export default function AvailabilitySyncScreen() {
         >
           <CalendarPlus size={18} color={colors.primary} />
           <Text style={styles.quickActionText}>
-            {selectedCalendars.length > 0
-              ? `${selectedCalendars.length} calendars`
-              : 'Connect'}
+            {selectedCalendars.length > 0 ? `${selectedCalendars.length} calendars` : 'Connect'}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.quickActionButton,
-            isPartnerLinked && styles.quickActionButtonActive,
-          ]}
+          style={[styles.quickActionButton, isPartnerLinked && styles.quickActionButtonActive]}
           onPress={() => setPartnerSheetVisible(true)}
         >
-          <Users
-            size={18}
-            color={isPartnerLinked ? colors.success : colors.primary}
-          />
-          <Text style={[
-            styles.quickActionText,
-            isPartnerLinked && { color: colors.success },
-          ]}>
+          <Users size={18} color={isPartnerLinked ? colors.success : colors.primary} />
+          <Text style={[styles.quickActionText, isPartnerLinked && { color: colors.success }]}>
             {isPartnerLinked ? partnerAvailability.userName : 'Link Partner'}
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.quickActionButton}
-          onPress={handleRefresh}
-        >
+        <TouchableOpacity style={styles.quickActionButton} onPress={handleRefresh}>
           <RefreshCw size={18} color={colors.primary} />
           <Text style={styles.quickActionText}>Sync</Text>
         </TouchableOpacity>
@@ -327,9 +313,7 @@ export default function AvailabilitySyncScreen() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.success }]}>
-              {perfectMatches}
-            </Text>
+            <Text style={[styles.statValue, { color: colors.success }]}>{perfectMatches}</Text>
             <Text style={styles.statLabel}>Perfect matches</Text>
           </View>
           <View style={styles.statDivider} />
@@ -343,20 +327,11 @@ export default function AvailabilitySyncScreen() {
       {/* View Mode Toggle */}
       <View style={styles.viewToggle}>
         <TouchableOpacity
-          style={[
-            styles.viewToggleButton,
-            viewMode === 'grid' && styles.viewToggleButtonActive,
-          ]}
+          style={[styles.viewToggleButton, viewMode === 'grid' && styles.viewToggleButtonActive]}
           onPress={() => setViewMode('grid')}
         >
-          <Calendar
-            size={16}
-            color={viewMode === 'grid' ? colors.primary : colors.textSecondary}
-          />
-          <Text style={[
-            styles.viewToggleText,
-            viewMode === 'grid' && styles.viewToggleTextActive,
-          ]}>
+          <Calendar size={16} color={viewMode === 'grid' ? colors.primary : colors.textSecondary} />
+          <Text style={[styles.viewToggleText, viewMode === 'grid' && styles.viewToggleTextActive]}>
             Calendar
           </Text>
         </TouchableOpacity>
@@ -372,10 +347,12 @@ export default function AvailabilitySyncScreen() {
             size={16}
             color={viewMode === 'suggestions' ? colors.primary : colors.textSecondary}
           />
-          <Text style={[
-            styles.viewToggleText,
-            viewMode === 'suggestions' && styles.viewToggleTextActive,
-          ]}>
+          <Text
+            style={[
+              styles.viewToggleText,
+              viewMode === 'suggestions' && styles.viewToggleTextActive,
+            ]}
+          >
             Suggestions
           </Text>
         </TouchableOpacity>
@@ -402,8 +379,8 @@ export default function AvailabilitySyncScreen() {
             </View>
             <Text style={styles.notLinkedTitle}>Connect with Your Partner</Text>
             <Text style={styles.notLinkedText}>
-              Link calendars with your partner to automatically find times when
-              you're both free for date night
+              Link calendars with your partner to automatically find times when you're both free for
+              date night
             </Text>
             <TouchableOpacity
               style={styles.linkButton}
@@ -421,16 +398,23 @@ export default function AvailabilitySyncScreen() {
               userColor={colors.primary}
               partnerColor={colors.secondary}
               onSlotPress={handleSlotPress}
-              selectedSlot={selectedDate ? {
-                date: selectedDate.date,
-                slotStart: selectedDate.slots[0]?.start.getTime() || 0,
-              } : null}
+              selectedSlot={
+                selectedDate
+                  ? {
+                      date: selectedDate.date,
+                      slotStart: selectedDate.slots[0]?.start.getTime() || 0,
+                    }
+                  : null
+              }
             />
 
             {selectedDate && (
               <SlotDetailCard
                 date={selectedDate.date}
-                dayOfWeek={mutualAvailability.find(a => a.date === selectedDate.date)?.dayOfWeek || 'saturday'}
+                dayOfWeek={
+                  mutualAvailability.find((a) => a.date === selectedDate.date)?.dayOfWeek ||
+                  'saturday'
+                }
                 slots={selectedDate.slots}
                 onSlotSelect={handleSlotSelect}
                 onClose={() => setSelectedDate(null)}
@@ -465,7 +449,7 @@ export default function AvailabilitySyncScreen() {
         visible={calendarSheetVisible}
         onClose={() => setCalendarSheetVisible(false)}
         onCalendarsSelected={handleCalendarsSelected}
-        selectedCalendarIds={selectedCalendars.map(c => c.id)}
+        selectedCalendarIds={selectedCalendars.map((c) => c.id)}
       />
 
       {/* Partner Sync Sheet */}

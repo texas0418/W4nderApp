@@ -235,7 +235,7 @@ export function searchAirports(query: string): Airport[] {
   if (!query || query.length < 2) return [];
   const q = query.toLowerCase();
   return POPULAR_AIRPORTS.filter(
-    a =>
+    (a) =>
       a.code.toLowerCase().includes(q) ||
       a.city.toLowerCase().includes(q) ||
       a.name.toLowerCase().includes(q)

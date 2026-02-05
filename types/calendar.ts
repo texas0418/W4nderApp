@@ -39,34 +39,34 @@ export interface CalendarSelection {
 export interface CalendarExportOptions {
   /** Include travel time between activities */
   includeTravelTime: boolean;
-  
+
   /** Add reminder notifications */
   addReminders: boolean;
-  
+
   /** Reminder time in minutes before event */
   reminderMinutes: number[];
-  
+
   /** Include booking confirmation details in notes */
   includeBookingDetails: boolean;
-  
+
   /** Include location/address information */
   includeLocation: boolean;
-  
+
   /** Include cost information in notes */
   includeCosts: boolean;
-  
+
   /** Add links to bookings/confirmations */
   includeLinks: boolean;
-  
+
   /** Color code by activity category */
   colorByCategory: boolean;
-  
+
   /** Create all-day event for each day overview */
   createDayOverview: boolean;
-  
+
   /** Prefix for event titles */
   titlePrefix?: string;
-  
+
   /** Custom timezone (defaults to device) */
   timezone?: string;
 }
@@ -154,7 +154,13 @@ export type CalendarErrorCode =
 // ============================================================================
 
 export interface CalendarExportProgress {
-  status: 'idle' | 'requesting_permission' | 'selecting_calendar' | 'exporting' | 'complete' | 'error';
+  status:
+    | 'idle'
+    | 'requesting_permission'
+    | 'selecting_calendar'
+    | 'exporting'
+    | 'complete'
+    | 'error';
   currentDay?: number;
   totalDays?: number;
   currentActivity?: string;
@@ -180,17 +186,17 @@ export interface ActivityEventMapping {
 // ============================================================================
 
 export const CATEGORY_COLORS: Record<string, string> = {
-  'Sightseeing': '#4CAF50',
-  'Dining': '#FF9800',
-  'Cultural': '#9C27B0',
-  'Entertainment': '#E91E63',
-  'Transport': '#607D8B',
-  'Adventure': '#F44336',
-  'Relaxation': '#00BCD4',
-  'Shopping': '#795548',
-  'Nightlife': '#3F51B5',
-  'Tours': '#8BC34A',
-  'default': '#2196F3',
+  Sightseeing: '#4CAF50',
+  Dining: '#FF9800',
+  Cultural: '#9C27B0',
+  Entertainment: '#E91E63',
+  Transport: '#607D8B',
+  Adventure: '#F44336',
+  Relaxation: '#00BCD4',
+  Shopping: '#795548',
+  Nightlife: '#3F51B5',
+  Tours: '#8BC34A',
+  default: '#2196F3',
 };
 
 // ============================================================================

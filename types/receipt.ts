@@ -66,15 +66,15 @@ export interface ReceiptExtractionResult {
   merchant: ExtractedMerchant | null;
   date: ExtractedDate | null;
   total: ExtractedAmount | null;
-  
+
   // Additional amounts
   subtotal: ExtractedAmount | null;
   tax: ExtractedAmount | null;
   tip: ExtractedAmount | null;
-  
+
   // Line items
   lineItems: ExtractedLineItem[];
-  
+
   // Payment info
   paymentMethod: {
     type: 'cash' | 'card' | 'mobile' | 'unknown';
@@ -82,24 +82,24 @@ export interface ReceiptExtractionResult {
     cardType?: string;
     confidence: number;
   } | null;
-  
+
   // Metadata
   currency: {
     code: string;
     confidence: number;
     detectedSymbol: string;
   };
-  
+
   // Category suggestion
   suggestedCategory: {
     category: string;
     confidence: number;
     reason: string;
   } | null;
-  
+
   // Raw OCR
   rawOCR: OCRResult;
-  
+
   // Overall confidence
   overallConfidence: number;
   extractedAt: string;
@@ -109,14 +109,14 @@ export interface ReceiptExtractionResult {
 // RECEIPT
 // ============================================================================
 
-export type ReceiptStatus = 
-  | 'capturing'    // Taking photo
-  | 'processing'   // Running OCR
-  | 'reviewing'    // User reviewing extracted data
-  | 'confirmed'    // User confirmed, ready to import
-  | 'imported'     // Imported to expense tracker
-  | 'failed'       // OCR or processing failed
-  | 'discarded';   // User discarded
+export type ReceiptStatus =
+  | 'capturing' // Taking photo
+  | 'processing' // Running OCR
+  | 'reviewing' // User reviewing extracted data
+  | 'confirmed' // User confirmed, ready to import
+  | 'imported' // Imported to expense tracker
+  | 'failed' // OCR or processing failed
+  | 'discarded'; // User discarded
 
 export interface ReceiptImage {
   uri: string;
@@ -129,17 +129,17 @@ export interface ReceiptImage {
 
 export interface Receipt {
   id: string;
-  
+
   // Image
   image: ReceiptImage;
   thumbnailUri?: string;
-  
+
   // Status
   status: ReceiptStatus;
-  
+
   // Extraction results
   extraction: ReceiptExtractionResult | null;
-  
+
   // User corrections (overrides extraction)
   userCorrections: {
     merchant?: string;
@@ -150,7 +150,7 @@ export interface Receipt {
     description?: string;
     paymentMethod?: 'cash' | 'card' | 'mobile' | 'other';
   };
-  
+
   // Final values (extraction + corrections)
   finalData: {
     merchant: string;
@@ -161,11 +161,11 @@ export interface Receipt {
     description: string;
     paymentMethod: 'cash' | 'card' | 'mobile' | 'other';
   } | null;
-  
+
   // Link to expense
   expenseId?: string;
   tripId?: string;
-  
+
   // Metadata
   createdAt: string;
   updatedAt: string;
@@ -198,20 +198,20 @@ export interface ReceiptScannerSettings {
   autoDetectCurrency: boolean;
   autoDetectCategory: boolean;
   autoDetectPaymentMethod: boolean;
-  
+
   // Default values
   defaultCurrency: string;
   defaultCategory: string;
   defaultPaymentMethod: 'cash' | 'card' | 'mobile' | 'other';
-  
+
   // Processing
   saveOriginalImage: boolean;
   generateThumbnail: boolean;
   thumbnailSize: number;
-  
+
   // Quality
   minimumConfidence: number; // 0-1, below this show warning
-  
+
   // Storage
   maxStoredReceipts: number;
   autoDeleteAfterDays: number;
@@ -256,22 +256,22 @@ export interface BatchScanResult {
 export interface ReceiptScannerState {
   // Current receipt being processed
   currentReceipt: Receipt | null;
-  
+
   // Processing
   isProcessing: boolean;
   processingProgress: ProcessingProgress | null;
   processingError: ProcessingError | null;
-  
+
   // All receipts
   receipts: Receipt[];
-  
+
   // Settings
   settings: ReceiptScannerSettings;
-  
+
   // Camera
   isCameraReady: boolean;
   flashMode: 'on' | 'off' | 'auto';
-  
+
   // UI
   isLoading: boolean;
   error: string | null;

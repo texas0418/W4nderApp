@@ -43,16 +43,20 @@ export default function RestaurantSearchScreen() {
 
   // Search params
   const [searchQuery, setSearchQuery] = useState('');
-  const [date, setDate] = useState(params.date as string || new Date().toISOString().split('T')[0]);
-  const [time, setTime] = useState(params.time as string || '19:00');
+  const [date, setDate] = useState(
+    (params.date as string) || new Date().toISOString().split('T')[0]
+  );
+  const [time, setTime] = useState((params.time as string) || '19:00');
   const [partySize, setPartySize] = useState(parseInt(params.partySize as string) || 2);
-  
+
   // Filters
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<number[]>([]);
   const [minRating, setMinRating] = useState<number | undefined>();
-  const [sortBy, setSortBy] = useState<'relevance' | 'rating' | 'distance' | 'price_low' | 'price_high'>('relevance');
+  const [sortBy, setSortBy] = useState<
+    'relevance' | 'rating' | 'distance' | 'price_low' | 'price_high'
+  >('relevance');
 
   // Results
   const [restaurants, setRestaurants] = useState<RestaurantWithAvailability[]>([]);
@@ -62,48 +66,54 @@ export default function RestaurantSearchScreen() {
   const [page, setPage] = useState(1);
 
   // Booking modal
-  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantWithAvailability | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantWithAvailability | null>(
+    null
+  );
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
   // Search
-  const search = useCallback(async (isRefresh = false) => {
-    if (isRefresh) {
-      setIsRefreshing(true);
-      setPage(1);
-    } else {
-      setIsLoading(true);
-    }
-
-    try {
-      const searchParams: RestaurantSearchParams = {
-        date,
-        time,
-        partySize,
-        cuisineTypes: selectedCuisines.length > 0 ? selectedCuisines : undefined,
-        priceRange: selectedPriceRange.length > 0 ? selectedPriceRange as (1 | 2 | 3 | 4)[] : undefined,
-        minRating,
-        sortBy,
-        page: isRefresh ? 1 : page,
-        limit: 20,
-      };
-
-      const result = await restaurantBookingService.searchRestaurants(searchParams);
-      
-      if (isRefresh || page === 1) {
-        setRestaurants(result.restaurants);
+  const search = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) {
+        setIsRefreshing(true);
+        setPage(1);
       } else {
-        setRestaurants(prev => [...prev, ...result.restaurants]);
+        setIsLoading(true);
       }
-      
-      setHasMore(result.hasMore);
-    } catch (error) {
-      console.error('Search failed:', error);
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [date, time, partySize, selectedCuisines, selectedPriceRange, minRating, sortBy, page]);
+
+      try {
+        const searchParams: RestaurantSearchParams = {
+          date,
+          time,
+          partySize,
+          cuisineTypes: selectedCuisines.length > 0 ? selectedCuisines : undefined,
+          priceRange:
+            selectedPriceRange.length > 0 ? (selectedPriceRange as (1 | 2 | 3 | 4)[]) : undefined,
+          minRating,
+          sortBy,
+          page: isRefresh ? 1 : page,
+          limit: 20,
+        };
+
+        const result = await restaurantBookingService.searchRestaurants(searchParams);
+
+        if (isRefresh || page === 1) {
+          setRestaurants(result.restaurants);
+        } else {
+          setRestaurants((prev) => [...prev, ...result.restaurants]);
+        }
+
+        setHasMore(result.hasMore);
+      } catch (error) {
+        console.error('Search failed:', error);
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [date, time, partySize, selectedCuisines, selectedPriceRange, minRating, sortBy, page]
+  );
 
   useEffect(() => {
     search();
@@ -111,7 +121,7 @@ export default function RestaurantSearchScreen() {
 
   const loadMore = () => {
     if (hasMore && !isLoading) {
-      setPage(prev => prev + 1);
+      setPage((prev) => prev + 1);
     }
   };
 
@@ -139,19 +149,15 @@ export default function RestaurantSearchScreen() {
   };
 
   const toggleCuisine = (cuisine: string) => {
-    setSelectedCuisines(prev =>
-      prev.includes(cuisine)
-        ? prev.filter(c => c !== cuisine)
-        : [...prev, cuisine]
+    setSelectedCuisines((prev) =>
+      prev.includes(cuisine) ? prev.filter((c) => c !== cuisine) : [...prev, cuisine]
     );
     setPage(1);
   };
 
   const togglePriceRange = (price: number) => {
-    setSelectedPriceRange(prev =>
-      prev.includes(price)
-        ? prev.filter(p => p !== price)
-        : [...prev, price]
+    setSelectedPriceRange((prev) =>
+      prev.includes(price) ? prev.filter((p) => p !== price) : [...prev, price]
     );
     setPage(1);
   };
@@ -164,7 +170,8 @@ export default function RestaurantSearchScreen() {
     setPage(1);
   };
 
-  const hasActiveFilters = selectedCuisines.length > 0 || selectedPriceRange.length > 0 || minRating;
+  const hasActiveFilters =
+    selectedCuisines.length > 0 || selectedPriceRange.length > 0 || minRating;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -240,7 +247,7 @@ export default function RestaurantSearchScreen() {
           {/* Price range */}
           <Text style={styles.filterLabel}>Price Range</Text>
           <View style={styles.priceOptions}>
-            {[1, 2, 3, 4].map(price => (
+            {[1, 2, 3, 4].map((price) => (
               <TouchableOpacity
                 key={price}
                 style={[
@@ -268,7 +275,7 @@ export default function RestaurantSearchScreen() {
             showsHorizontalScrollIndicator={false}
             style={styles.cuisineScroll}
           >
-            {CUISINE_TYPES.slice(0, 15).map(cuisine => (
+            {CUISINE_TYPES.slice(0, 15).map((cuisine) => (
               <TouchableOpacity
                 key={cuisine}
                 style={[
@@ -297,13 +304,10 @@ export default function RestaurantSearchScreen() {
               { value: 'rating', label: 'Highest Rated' },
               { value: 'distance', label: 'Nearest' },
               { value: 'price_low', label: 'Price: Low' },
-            ].map(option => (
+            ].map((option) => (
               <TouchableOpacity
                 key={option.value}
-                style={[
-                  styles.sortOption,
-                  sortBy === option.value && styles.sortOptionSelected,
-                ]}
+                style={[styles.sortOption, sortBy === option.value && styles.sortOptionSelected]}
                 onPress={() => {
                   setSortBy(option.value as any);
                   setPage(1);

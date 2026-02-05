@@ -33,7 +33,7 @@ const RESOLUTION_OPTIONS: Array<{
   description: string;
 }> = [
   { value: 'user_wins', label: 'My Preference', description: 'Use your preference' },
-  { value: 'companion_wins', label: 'Their Preference', description: 'Use companion\'s preference' },
+  { value: 'companion_wins', label: 'Their Preference', description: "Use companion's preference" },
   { value: 'strongest_wins', label: 'Strongest', description: 'Use whoever feels more strongly' },
   { value: 'average', label: 'Middle Ground', description: 'Find a compromise' },
   { value: 'either', label: 'Either Works', description: 'Accept both options' },
@@ -65,11 +65,11 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
   const [weights, setWeights] = useState<Record<string, number>>({});
 
   const syncedCompanions = useMemo(() => {
-    return companions.filter(c => c.syncEnabled && c.preferences);
+    return companions.filter((c) => c.syncEnabled && c.preferences);
   }, [companions]);
 
   const toggleCompanion = useCallback((companionId: string) => {
-    setSelectedCompanions(prev => {
+    setSelectedCompanions((prev) => {
       const next = new Set(prev);
       if (next.has(companionId)) {
         next.delete(companionId);
@@ -82,27 +82,26 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
 
   const handleMerge = useCallback(async () => {
     if (selectedCompanions.size === 0) {
-      Alert.alert('Select Companions', 'Please select at least one companion to merge preferences with.');
+      Alert.alert(
+        'Select Companions',
+        'Please select at least one companion to merge preferences with.'
+      );
       return;
     }
 
     setIsMerging(true);
     try {
       const companionIds = Array.from(selectedCompanions);
-      const weightValues = equalWeight 
-        ? undefined 
-        : companionIds.map(id => weights[id] || 0.5);
-      
+      const weightValues = equalWeight ? undefined : companionIds.map((id) => weights[id] || 0.5);
+
       const merged = await mergeWithCompanions(companionIds, weightValues);
-      
+
       if (merged) {
         setShowConflicts(true);
         if (merged.unresolvedConflicts === 0) {
-          Alert.alert(
-            'Merge Complete',
-            'Preferences merged successfully with no conflicts!',
-            [{ text: 'OK' }]
-          );
+          Alert.alert('Merge Complete', 'Preferences merged successfully with no conflicts!', [
+            { text: 'OK' },
+          ]);
         }
       }
     } catch (error) {
@@ -111,12 +110,12 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
     setIsMerging(false);
   }, [selectedCompanions, equalWeight, weights, mergeWithCompanions]);
 
-  const handleResolveConflict = useCallback(async (
-    conflictId: string,
-    resolution: ConflictResolution
-  ) => {
-    await resolveConflict(conflictId, resolution);
-  }, [resolveConflict]);
+  const handleResolveConflict = useCallback(
+    async (conflictId: string, resolution: ConflictResolution) => {
+      await resolveConflict(conflictId, resolution);
+    },
+    [resolveConflict]
+  );
 
   const handleComplete = useCallback(() => {
     if (mergedPreferences) {
@@ -126,7 +125,7 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
   }, [mergedPreferences, onMergeComplete, navigation]);
 
   const unresolvedCount = useMemo(() => {
-    return displayConflicts.filter(c => !c.resolvedValue).length;
+    return displayConflicts.filter((c) => !c.resolvedValue).length;
   }, [displayConflicts]);
 
   const renderCompanionCard = (companion: Companion) => {
@@ -146,15 +145,10 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
         activeOpacity={0.7}
       >
         <View style={styles.companionLeft}>
-          <View style={[
-            styles.companionAvatar,
-            isSelected && styles.companionAvatarSelected,
-          ]}>
-            <Text style={styles.companionAvatarText}>
-              {companion.name.charAt(0).toUpperCase()}
-            </Text>
+          <View style={[styles.companionAvatar, isSelected && styles.companionAvatarSelected]}>
+            <Text style={styles.companionAvatarText}>{companion.name.charAt(0).toUpperCase()}</Text>
           </View>
-          
+
           <View style={styles.companionInfo}>
             <Text style={styles.companionName}>{companion.name}</Text>
             <Text style={styles.companionRelation}>{companion.relationship}</Text>
@@ -168,14 +162,8 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
 
         <View style={styles.companionRight}>
           {hasSyncedPrefs ? (
-            <View style={[
-              styles.syncBadge,
-              isSelected && styles.syncBadgeSelected,
-            ]}>
-              <Text style={[
-                styles.syncBadgeText,
-                isSelected && styles.syncBadgeTextSelected,
-              ]}>
+            <View style={[styles.syncBadge, isSelected && styles.syncBadgeSelected]}>
+              <Text style={[styles.syncBadgeText, isSelected && styles.syncBadgeTextSelected]}>
                 {isSelected ? '✓ Selected' : 'Synced'}
               </Text>
             </View>
@@ -191,19 +179,21 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
 
   const renderWeightSlider = (companion: Companion) => {
     if (!selectedCompanions.has(companion.id) || equalWeight) return null;
-    
+
     const weight = weights[companion.id] || 0.5;
-    
+
     return (
       <View style={styles.weightContainer}>
         <Text style={styles.weightLabel}>{companion.name}'s weight:</Text>
         <View style={styles.weightSlider}>
           <TouchableOpacity
             style={styles.weightBtn}
-            onPress={() => setWeights(prev => ({
-              ...prev,
-              [companion.id]: Math.max(0.1, (prev[companion.id] || 0.5) - 0.1),
-            }))}
+            onPress={() =>
+              setWeights((prev) => ({
+                ...prev,
+                [companion.id]: Math.max(0.1, (prev[companion.id] || 0.5) - 0.1),
+              }))
+            }
           >
             <Text style={styles.weightBtnText}>−</Text>
           </TouchableOpacity>
@@ -212,10 +202,12 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
           </View>
           <TouchableOpacity
             style={styles.weightBtn}
-            onPress={() => setWeights(prev => ({
-              ...prev,
-              [companion.id]: Math.min(1, (prev[companion.id] || 0.5) + 0.1),
-            }))}
+            onPress={() =>
+              setWeights((prev) => ({
+                ...prev,
+                [companion.id]: Math.min(1, (prev[companion.id] || 0.5) + 0.1),
+              }))
+            }
           >
             <Text style={styles.weightBtnText}>+</Text>
           </TouchableOpacity>
@@ -231,16 +223,11 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
     return (
       <View
         key={conflict.id}
-        style={[
-          styles.conflictCard,
-          isResolved && styles.conflictCardResolved,
-        ]}
+        style={[styles.conflictCard, isResolved && styles.conflictCardResolved]}
       >
         <View style={styles.conflictHeader}>
           <View style={styles.conflictIcon}>
-            <Text style={styles.conflictIconText}>
-              {isResolved ? '✓' : '⚠️'}
-            </Text>
+            <Text style={styles.conflictIconText}>{isResolved ? '✓' : '⚠️'}</Text>
           </View>
           <View style={styles.conflictInfo}>
             <Text style={styles.conflictTitle}>{conflict.displayName}</Text>
@@ -256,30 +243,30 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
         <View style={styles.conflictComparison}>
           <View style={styles.conflictSide}>
             <Text style={styles.conflictSideLabel}>You</Text>
-            <Text style={styles.conflictValue}>
-              {formatConflictValue(conflict.userValue)}
-            </Text>
-            <View style={[
-              styles.strengthBadge,
-              { backgroundColor: getStrengthColor(conflict.userStrength) },
-            ]}>
+            <Text style={styles.conflictValue}>{formatConflictValue(conflict.userValue)}</Text>
+            <View
+              style={[
+                styles.strengthBadge,
+                { backgroundColor: getStrengthColor(conflict.userStrength) },
+              ]}
+            >
               <Text style={styles.strengthBadgeText}>{conflict.userStrength}</Text>
             </View>
           </View>
-          
+
           <View style={styles.conflictVs}>
             <Text style={styles.conflictVsText}>vs</Text>
           </View>
-          
+
           <View style={styles.conflictSide}>
             <Text style={styles.conflictSideLabel}>{conflict.companionName}</Text>
-            <Text style={styles.conflictValue}>
-              {formatConflictValue(conflict.companionValue)}
-            </Text>
-            <View style={[
-              styles.strengthBadge,
-              { backgroundColor: getStrengthColor(conflict.companionStrength) },
-            ]}>
+            <Text style={styles.conflictValue}>{formatConflictValue(conflict.companionValue)}</Text>
+            <View
+              style={[
+                styles.strengthBadge,
+                { backgroundColor: getStrengthColor(conflict.companionStrength) },
+              ]}
+            >
               <Text style={styles.strengthBadgeText}>{conflict.companionStrength}</Text>
             </View>
           </View>
@@ -287,7 +274,7 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
 
         {!isResolved && (
           <View style={styles.resolutionOptions}>
-            {RESOLUTION_OPTIONS.slice(0, 3).map(option => (
+            {RESOLUTION_OPTIONS.slice(0, 3).map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={styles.resolutionBtn}
@@ -306,7 +293,7 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
     if (typeof value === 'string') return value;
     if (typeof value === 'number') return value.toString();
     if (Array.isArray(value)) {
-      return value.map(v => v.type || v.style || v).join(', ');
+      return value.map((v) => v.type || v.style || v).join(', ');
     }
     if (value?.min !== undefined && value?.max !== undefined) {
       return `${value.min} - ${value.max}`;
@@ -328,21 +315,13 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Merge Preferences</Text>
-          <Text style={styles.headerSubtitle}>
-            Combine preferences for group travel
-          </Text>
+          <Text style={styles.headerSubtitle}>Combine preferences for group travel</Text>
         </View>
       </LinearGradient>
 
@@ -355,13 +334,13 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
               <Text style={styles.sectionSubtitle}>
                 Choose companions to merge preferences with
               </Text>
-              
+
               {syncedCompanions.length === 0 ? (
                 <View style={styles.emptyState}>
                   <Text style={styles.emptyIcon}>👥</Text>
                   <Text style={styles.emptyText}>
-                    No companions have synced their preferences yet.
-                    Invite them to sync for better group planning!
+                    No companions have synced their preferences yet. Invite them to sync for better
+                    group planning!
                   </Text>
                 </View>
               ) : (
@@ -370,11 +349,11 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
             </View>
 
             {/* Not Synced Companions */}
-            {companions.filter(c => !c.syncEnabled || !c.preferences).length > 0 && (
+            {companions.filter((c) => !c.syncEnabled || !c.preferences).length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Invite to Sync</Text>
                 {companions
-                  .filter(c => !c.syncEnabled || !c.preferences)
+                  .filter((c) => !c.syncEnabled || !c.preferences)
                   .map(renderCompanionCard)}
               </View>
             )}
@@ -414,7 +393,8 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.mergeButtonText}>
-                  Merge {selectedCompanions.size > 0 
+                  Merge{' '}
+                  {selectedCompanions.size > 0
                     ? `with ${selectedCompanions.size} companion${selectedCompanions.size > 1 ? 's' : ''}`
                     : 'Preferences'}
                 </Text>
@@ -431,7 +411,7 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
                 </Text>
                 <View>
                   <Text style={styles.conflictSummaryTitle}>
-                    {unresolvedCount === 0 
+                    {unresolvedCount === 0
                       ? 'All Conflicts Resolved!'
                       : `${unresolvedCount} Conflict${unresolvedCount > 1 ? 's' : ''} to Resolve`}
                   </Text>
@@ -458,12 +438,9 @@ const CompanionMergeScreen: React.FC<CompanionMergeScreenProps> = ({
               >
                 <Text style={styles.secondaryButtonText}>Back</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
-                style={[
-                  styles.primaryButton,
-                  unresolvedCount > 0 && styles.primaryButtonDisabled,
-                ]}
+                style={[styles.primaryButton, unresolvedCount > 0 && styles.primaryButtonDisabled]}
                 onPress={handleComplete}
                 disabled={unresolvedCount > 0}
               >

@@ -11,7 +11,7 @@ export interface ParkingLocation {
   name: string;
   type: ParkingType;
   operator?: string;
-  
+
   // Location
   address: string;
   city: string;
@@ -19,37 +19,37 @@ export interface ParkingLocation {
     lat: number;
     lng: number;
   };
-  
+
   // Distance (populated during search)
   distance?: number; // miles
   distanceText?: string;
   walkingTime?: number; // minutes to destination
-  
+
   // Capacity & Availability
   totalSpaces: number;
   availableSpaces?: number; // Real-time if available
   availabilityStatus: AvailabilityStatus;
   lastUpdated?: Date;
-  
+
   // Pricing
   pricing: ParkingPricing;
-  
+
   // Hours
   hours: ParkingHours;
   is24Hours: boolean;
   isOpen: boolean;
-  
+
   // Features
   features: ParkingFeature[];
-  
+
   // Ratings & Reviews
   rating?: number;
   reviewCount?: number;
-  
+
   // Vehicle restrictions
   heightLimit?: number; // feet
   vehicleTypes: VehicleType[];
-  
+
   // Contact & Booking
   phone?: string;
   website?: string;
@@ -57,16 +57,16 @@ export interface ParkingLocation {
   reservationUrl?: string;
   canReserve: boolean;
   reservationProvider?: ReservationProvider;
-  
+
   // Images
   images?: string[];
-  
+
   // Special notes
   notes?: string;
   accessInstructions?: string;
 }
 
-export type ParkingType = 
+export type ParkingType =
   | 'garage'
   | 'surface_lot'
   | 'street'
@@ -75,21 +75,15 @@ export type ParkingType =
   | 'airport'
   | 'event';
 
-export type AvailabilityStatus = 
-  | 'available'      // Green - plenty of spaces
-  | 'limited'        // Yellow - filling up
-  | 'full'           // Red - no spaces
-  | 'unknown';       // Gray - no real-time data
+export type AvailabilityStatus =
+  | 'available' // Green - plenty of spaces
+  | 'limited' // Yellow - filling up
+  | 'full' // Red - no spaces
+  | 'unknown'; // Gray - no real-time data
 
-export type VehicleType = 
-  | 'car'
-  | 'suv'
-  | 'truck'
-  | 'motorcycle'
-  | 'rv'
-  | 'oversized';
+export type VehicleType = 'car' | 'suv' | 'truck' | 'motorcycle' | 'rv' | 'oversized';
 
-export type ParkingFeature = 
+export type ParkingFeature =
   | 'covered'
   | 'indoor'
   | 'outdoor'
@@ -109,7 +103,7 @@ export type ParkingFeature =
   | 'car_wash'
   | 'shuttle';
 
-export type ReservationProvider = 
+export type ReservationProvider =
   | 'spothero'
   | 'parkwhiz'
   | 'parkme'
@@ -123,29 +117,29 @@ export type ReservationProvider =
 
 export interface ParkingPricing {
   currency: string;
-  
+
   // Hourly rates
   hourlyRate?: number;
   firstHourRate?: number;
   additionalHourRate?: number;
-  
+
   // Flat rates
   dailyMax?: number;
-  earlyBirdRate?: number;       // Before certain time
-  earlyBirdEndTime?: string;    // e.g., "10:00 AM"
-  eveningRate?: number;         // After certain time
-  eveningStartTime?: string;    // e.g., "5:00 PM"
+  earlyBirdRate?: number; // Before certain time
+  earlyBirdEndTime?: string; // e.g., "10:00 AM"
+  eveningRate?: number; // After certain time
+  eveningStartTime?: string; // e.g., "5:00 PM"
   weekendRate?: number;
-  
+
   // Event pricing
   eventRate?: number;
-  
+
   // Validation
   validationAvailable: boolean;
-  validationDiscount?: string;  // e.g., "2 hours free with validation"
-  
+  validationDiscount?: string; // e.g., "2 hours free with validation"
+
   // Display
-  displayPrice: string;         // e.g., "$5/hr" or "$25/day"
+  displayPrice: string; // e.g., "$5/hr" or "$25/day"
   priceCategory: PriceCategory;
 }
 
@@ -168,7 +162,7 @@ export interface ParkingHours {
 
 export interface DayHours {
   isOpen: boolean;
-  openTime?: string;  // "HH:mm"
+  openTime?: string; // "HH:mm"
   closeTime?: string; // "HH:mm"
 }
 
@@ -183,15 +177,15 @@ export interface ParkingSearchParams {
     lng: number;
   };
   destinationName?: string;
-  
+
   // Radius
   radiusMiles: number;
-  
+
   // Time
   arrivalTime?: Date;
   departureTime?: Date;
   duration?: number; // hours
-  
+
   // Filters
   types?: ParkingType[];
   maxPrice?: number;
@@ -200,17 +194,12 @@ export interface ParkingSearchParams {
   vehicleType?: VehicleType;
   mustBeOpen?: boolean;
   reservableOnly?: boolean;
-  
+
   // Sorting
   sortBy: ParkingSortOption;
 }
 
-export type ParkingSortOption = 
-  | 'distance'
-  | 'price_low'
-  | 'price_high'
-  | 'availability'
-  | 'rating';
+export type ParkingSortOption = 'distance' | 'price_low' | 'price_high' | 'availability' | 'rating';
 
 export interface ParkingSearchResult {
   locations: ParkingLocation[];
@@ -233,19 +222,19 @@ export interface ParkingFilterOptions {
     label: string;
     icon: string;
   }[];
-  
+
   priceRanges: {
     id: string;
     label: string;
     maxHourly?: number;
   }[];
-  
+
   features: {
     id: ParkingFeature;
     label: string;
     icon: string;
   }[];
-  
+
   sortOptions: {
     id: ParkingSortOption;
     label: string;
@@ -259,14 +248,14 @@ export const PARKING_FILTER_OPTIONS: ParkingFilterOptions = {
     { id: 'street', label: 'Street Parking', icon: '🛣️' },
     { id: 'valet', label: 'Valet', icon: '🚗' },
   ],
-  
+
   priceRanges: [
     { id: 'free', label: 'Free', maxHourly: 0 },
     { id: 'budget', label: 'Under $5/hr', maxHourly: 5 },
     { id: 'moderate', label: '$5-10/hr', maxHourly: 10 },
     { id: 'any', label: 'Any Price' },
   ],
-  
+
   features: [
     { id: 'covered', label: 'Covered', icon: '🏠' },
     { id: 'ev_charging', label: 'EV Charging', icon: '⚡' },
@@ -275,7 +264,7 @@ export const PARKING_FILTER_OPTIONS: ParkingFilterOptions = {
     { id: 'attendant', label: 'Attendant', icon: '👤' },
     { id: 'valet_available', label: 'Valet Available', icon: '🎩' },
   ],
-  
+
   sortOptions: [
     { id: 'distance', label: 'Nearest' },
     { id: 'price_low', label: 'Price: Low to High' },
@@ -343,10 +332,10 @@ export const PARKING_TYPE_LABELS: Record<ParkingType, string> = {
 };
 
 export const AVAILABILITY_COLORS: Record<AvailabilityStatus, string> = {
-  available: '#22C55E',  // Green
-  limited: '#F59E0B',    // Amber
-  full: '#EF4444',       // Red
-  unknown: '#9CA3AF',    // Gray
+  available: '#22C55E', // Green
+  limited: '#F59E0B', // Amber
+  full: '#EF4444', // Red
+  unknown: '#9CA3AF', // Gray
 };
 
 export const AVAILABILITY_LABELS: Record<AvailabilityStatus, string> = {

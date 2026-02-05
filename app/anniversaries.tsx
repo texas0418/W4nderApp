@@ -59,7 +59,7 @@ const { width } = Dimensions.get('window');
 
 export default function AnniversaryTrackerScreen() {
   const router = useRouter();
-  
+
   const {
     anniversaries,
     isLoading,
@@ -107,7 +107,7 @@ export default function AnniversaryTrackerScreen() {
     }
 
     const typeConfig = getAnniversaryTypeConfig(formData.type);
-    
+
     await addAnniversary({
       name: formData.name || typeConfig.defaultName,
       date: formData.date.toISOString(),
@@ -121,18 +121,14 @@ export default function AnniversaryTrackerScreen() {
   };
 
   const handleDelete = (anniversary: Anniversary) => {
-    Alert.alert(
-      'Delete Anniversary?',
-      `Are you sure you want to delete "${anniversary.name}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
-          style: 'destructive',
-          onPress: () => deleteAnniversary(anniversary.id),
-        },
-      ]
-    );
+    Alert.alert('Delete Anniversary?', `Are you sure you want to delete "${anniversary.name}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => deleteAnniversary(anniversary.id),
+      },
+    ]);
   };
 
   const openDetails = (upcoming: UpcomingAnniversary) => {
@@ -169,7 +165,7 @@ export default function AnniversaryTrackerScreen() {
           <Text style={styles.cardMeta}>
             {formatMilestone(yearsTotal)} • {formatDaysUntil(daysUntil)}
           </Text>
-          
+
           {milestone?.traditionalGift && (
             <View style={styles.giftHint}>
               <Gift size={12} color={colors.primary} />
@@ -221,7 +217,7 @@ export default function AnniversaryTrackerScreen() {
                   key={type.id}
                   style={[
                     styles.typeOption,
-                    formData.type === type.id && { 
+                    formData.type === type.id && {
                       backgroundColor: type.color,
                       borderColor: type.color,
                     },
@@ -229,10 +225,12 @@ export default function AnniversaryTrackerScreen() {
                   onPress={() => setFormData({ ...formData, type: type.id })}
                 >
                   <Text style={styles.typeEmoji}>{type.emoji}</Text>
-                  <Text style={[
-                    styles.typeLabel,
-                    formData.type === type.id && styles.typeLabelSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.typeLabel,
+                      formData.type === type.id && styles.typeLabelSelected,
+                    ]}
+                  >
                     {type.label}
                   </Text>
                 </Pressable>
@@ -243,10 +241,7 @@ export default function AnniversaryTrackerScreen() {
           {/* Date */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Date</Text>
-            <Pressable 
-              style={styles.dateButton}
-              onPress={() => setShowDatePicker(true)}
-            >
+            <Pressable style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
               <Calendar size={20} color={colors.primary} />
               <Text style={styles.dateButtonText}>
                 {formData.date.toLocaleDateString('en-US', {
@@ -257,7 +252,7 @@ export default function AnniversaryTrackerScreen() {
                 })}
               </Text>
             </Pressable>
-            
+
             {showDatePicker && (
               <DateTimePicker
                 value={formData.date}
@@ -341,17 +336,14 @@ export default function AnniversaryTrackerScreen() {
               colors={[typeConfig.color, typeConfig.color + 'CC']}
               style={styles.detailsHero}
             >
-              <Pressable 
-                style={styles.detailsCloseBtn}
-                onPress={() => setShowDetailsModal(false)}
-              >
+              <Pressable style={styles.detailsCloseBtn} onPress={() => setShowDetailsModal(false)}>
                 <X size={24} color="#fff" />
               </Pressable>
 
               <View style={styles.detailsHeroContent}>
                 <Text style={styles.detailsEmoji}>{anniversary.emoji || typeConfig.emoji}</Text>
                 <Text style={styles.detailsName}>{anniversary.name}</Text>
-                
+
                 {anniversary.partnerName && (
                   <Text style={styles.detailsPartner}>with {anniversary.partnerName}</Text>
                 )}
@@ -374,7 +366,9 @@ export default function AnniversaryTrackerScreen() {
                 <View style={styles.countdownBadge}>
                   <Clock size={14} color="#fff" />
                   <Text style={styles.countdownText}>
-                    {isToday ? '🎉 Today!' : `${daysUntil} days until ${yearsTotal} year anniversary`}
+                    {isToday
+                      ? '🎉 Today!'
+                      : `${daysUntil} days until ${yearsTotal} year anniversary`}
                   </Text>
                 </View>
               </View>
@@ -387,7 +381,7 @@ export default function AnniversaryTrackerScreen() {
                   <Text style={styles.sectionTitle}>
                     <Gem size={18} color={colors.primary} /> Year {yearsTotal} Gifts
                   </Text>
-                  
+
                   <View style={styles.giftsGrid}>
                     {gifts.traditional && (
                       <View style={styles.giftCard}>
@@ -460,7 +454,7 @@ export default function AnniversaryTrackerScreen() {
               {/* Actions */}
               <View style={styles.section}>
                 {!isToday && (
-                  <Pressable 
+                  <Pressable
                     style={styles.actionBtn}
                     onPress={() => {
                       // Navigate to create date night
@@ -474,7 +468,7 @@ export default function AnniversaryTrackerScreen() {
                 )}
 
                 {isToday && (
-                  <Pressable 
+                  <Pressable
                     style={[styles.actionBtn, { backgroundColor: colors.success }]}
                     onPress={() => {
                       markCelebrated(anniversary.id);
@@ -486,7 +480,7 @@ export default function AnniversaryTrackerScreen() {
                   </Pressable>
                 )}
 
-                <Pressable 
+                <Pressable
                   style={styles.dangerBtn}
                   onPress={() => {
                     setShowDetailsModal(false);
@@ -511,7 +505,7 @@ export default function AnniversaryTrackerScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
@@ -527,18 +521,14 @@ export default function AnniversaryTrackerScreen() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Hero Stats */}
           {stats.nextAnniversary && (
-            <LinearGradient
-              colors={[colors.primary, '#FF6B9D']}
-              style={styles.heroCard}
-            >
+            <LinearGradient colors={[colors.primary, '#FF6B9D']} style={styles.heroCard}>
               <View style={styles.heroContent}>
                 <Heart size={24} color="#fff" fill="#fff" />
                 <Text style={styles.heroLabel}>Next Anniversary</Text>
-                <Text style={styles.heroTitle}>
-                  {stats.nextAnniversary.anniversary.name}
-                </Text>
+                <Text style={styles.heroTitle}>{stats.nextAnniversary.anniversary.name}</Text>
                 <Text style={styles.heroSubtitle}>
-                  {formatDaysUntil(stats.nextAnniversary.daysUntil)} • {stats.nextAnniversary.yearsTotal} years
+                  {formatDaysUntil(stats.nextAnniversary.daysUntil)} •{' '}
+                  {stats.nextAnniversary.yearsTotal} years
                 </Text>
               </View>
             </LinearGradient>
@@ -581,10 +571,7 @@ export default function AnniversaryTrackerScreen() {
                 <Text style={styles.emptySubtitle}>
                   Add your special dates to get reminders and celebration ideas
                 </Text>
-                <Pressable 
-                  style={styles.emptyBtn}
-                  onPress={() => setShowAddModal(true)}
-                >
+                <Pressable style={styles.emptyBtn} onPress={() => setShowAddModal(true)}>
                   <Plus size={18} color="#fff" />
                   <Text style={styles.emptyBtnText}>Add Anniversary</Text>
                 </Pressable>

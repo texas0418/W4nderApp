@@ -73,7 +73,7 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
       setExpense(initialExpense);
       populateForm(initialExpense);
     } else if (expenseId) {
-      const found = expenses.find(e => e.id === expenseId);
+      const found = expenses.find((e) => e.id === expenseId);
       if (found) {
         setExpense(found);
         populateForm(found);
@@ -96,7 +96,7 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
   };
 
   const handleFieldChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     setHasChanges(true);
   };
 
@@ -131,7 +131,7 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
         onSave?.(updated);
         setHasChanges(false);
         Alert.alert('Saved', 'Expense updated successfully.', [
-          { text: 'OK', onPress: () => navigation?.goBack() }
+          { text: 'OK', onPress: () => navigation?.goBack() },
         ]);
       }
     } catch (error) {
@@ -166,26 +166,24 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
 
   const handleBack = useCallback(() => {
     if (hasChanges) {
-      Alert.alert(
-        'Unsaved Changes',
-        'You have unsaved changes. Discard them?',
-        [
-          { text: 'Keep Editing', style: 'cancel' },
-          { 
-            text: 'Discard', 
-            style: 'destructive',
-            onPress: () => navigation?.goBack()
-          },
-        ]
-      );
+      Alert.alert('Unsaved Changes', 'You have unsaved changes. Discard them?', [
+        { text: 'Keep Editing', style: 'cancel' },
+        {
+          text: 'Discard',
+          style: 'destructive',
+          onPress: () => navigation?.goBack(),
+        },
+      ]);
     } else {
       navigation?.goBack();
     }
   }, [hasChanges, navigation]);
 
   const getCategoryInfo = (categoryId: string) => {
-    return EXPENSE_CATEGORIES.find(c => c.id === categoryId) || 
-           EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+    return (
+      EXPENSE_CATEGORIES.find((c) => c.id === categoryId) ||
+      EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1]
+    );
   };
 
   const formatDateDisplay = (dateStr: string): string => {
@@ -214,22 +212,16 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
   const categoryInfo = getCategoryInfo(formData.category);
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Expense</Text>
-        <TouchableOpacity 
-          style={styles.deleteButton} 
-          onPress={handleDelete}
-        >
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Text style={styles.deleteButtonText}>🗑️</Text>
         </TouchableOpacity>
       </LinearGradient>
@@ -341,7 +333,7 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
               { value: 'cash', label: 'Cash', icon: '💵' },
               { value: 'mobile', label: 'Mobile', icon: '📱' },
               { value: 'other', label: 'Other', icon: '📝' },
-            ].map(method => (
+            ].map((method) => (
               <TouchableOpacity
                 key={method.value}
                 style={[
@@ -351,10 +343,12 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
                 onPress={() => handleFieldChange('paymentMethod', method.value)}
               >
                 <Text style={styles.paymentIcon}>{method.icon}</Text>
-                <Text style={[
-                  styles.paymentLabel,
-                  formData.paymentMethod === method.value && styles.paymentLabelActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.paymentLabel,
+                    formData.paymentMethod === method.value && styles.paymentLabelActive,
+                  ]}
+                >
                   {method.label}
                 </Text>
               </TouchableOpacity>
@@ -396,15 +390,11 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
             <TouchableOpacity
               style={styles.addTagButton}
               onPress={() => {
-                Alert.prompt(
-                  'Add Tag',
-                  'Enter a tag for this expense',
-                  (text) => {
-                    if (text?.trim()) {
-                      handleFieldChange('tags', [...formData.tags, text.trim()]);
-                    }
+                Alert.prompt('Add Tag', 'Enter a tag for this expense', (text) => {
+                  if (text?.trim()) {
+                    handleFieldChange('tags', [...formData.tags, text.trim()]);
                   }
-                );
+                });
               }}
             >
               <Text style={styles.addTagText}>+ Add Tag</Text>
@@ -415,9 +405,7 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
         {/* Metadata */}
         <View style={styles.metadataSection}>
           <Text style={styles.metadataLabel}>Created</Text>
-          <Text style={styles.metadataValue}>
-            {new Date(expense.createdAt).toLocaleString()}
-          </Text>
+          <Text style={styles.metadataValue}>{new Date(expense.createdAt).toLocaleString()}</Text>
           {expense.updatedAt !== expense.createdAt && (
             <>
               <Text style={styles.metadataLabel}>Last Updated</Text>
@@ -457,9 +445,15 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.pickerList}>
-              {[homeCurrency, ...favoriteCurrencies.filter(c => c !== homeCurrency), ...recentCurrencies.filter(c => c !== homeCurrency && !favoriteCurrencies.includes(c))]
+              {[
+                homeCurrency,
+                ...favoriteCurrencies.filter((c) => c !== homeCurrency),
+                ...recentCurrencies.filter(
+                  (c) => c !== homeCurrency && !favoriteCurrencies.includes(c)
+                ),
+              ]
                 .slice(0, 10)
-                .map(code => {
+                .map((code) => {
                   const currency = getCurrency(code);
                   return (
                     <TouchableOpacity
@@ -498,7 +492,7 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.pickerList}>
-              {EXPENSE_CATEGORIES.map(cat => (
+              {EXPENSE_CATEGORIES.map((cat) => (
                 <TouchableOpacity
                   key={cat.id}
                   style={[
@@ -514,9 +508,7 @@ const ExpenseEditScreen: React.FC<ExpenseEditScreenProps> = ({
                     <Text>{cat.icon}</Text>
                   </View>
                   <Text style={styles.pickerCategoryName}>{cat.name}</Text>
-                  {formData.category === cat.id && (
-                    <Text style={styles.pickerOptionCheck}>✓</Text>
-                  )}
+                  {formData.category === cat.id && <Text style={styles.pickerOptionCheck}>✓</Text>}
                 </TouchableOpacity>
               ))}
             </ScrollView>

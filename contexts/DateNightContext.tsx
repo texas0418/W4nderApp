@@ -14,7 +14,7 @@ interface DateNightContextType {
   // User profile
   userProfile: UserDateProfile | null;
   setUserPreferences: (preferences: DatePreferences) => void;
-  
+
   // Partner management
   partners: PartnerProfile[];
   addPartner: (partner: Omit<PartnerProfile, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -22,26 +22,37 @@ interface DateNightContextType {
   removePartner: (partnerId: string) => void;
   selectedPartner: PartnerProfile | null;
   setSelectedPartner: (partner: PartnerProfile | null) => void;
-  
+
   // Itineraries
   itineraries: DateItinerary[];
   currentItinerary: DateItinerary | null;
-  createItinerary: (itinerary: Omit<DateItinerary, 'id' | 'createdAt' | 'updatedAt'>) => DateItinerary;
+  createItinerary: (
+    itinerary: Omit<DateItinerary, 'id' | 'createdAt' | 'updatedAt'>
+  ) => DateItinerary;
   updateItinerary: (itineraryId: string, updates: Partial<DateItinerary>) => void;
   deleteItinerary: (itineraryId: string) => void;
   setCurrentItinerary: (itinerary: DateItinerary | null) => void;
-  
+
   // Activity management within itinerary
   addActivity: (itineraryId: string, activity: Omit<ItineraryActivity, 'id'>) => void;
-  updateActivity: (itineraryId: string, activityId: string, updates: Partial<ItineraryActivity>) => void;
+  updateActivity: (
+    itineraryId: string,
+    activityId: string,
+    updates: Partial<ItineraryActivity>
+  ) => void;
   removeActivity: (itineraryId: string, activityId: string) => void;
   reorderActivities: (itineraryId: string, activityIds: string[]) => void;
-  
+
   // Suggestions
   suggestions: DateSuggestion[];
-  generateSuggestions: (partnerId: string, budget: BudgetTier, date: string, tripScope: TripScope) => Promise<void>;
+  generateSuggestions: (
+    partnerId: string,
+    budget: BudgetTier,
+    date: string,
+    tripScope: TripScope
+  ) => Promise<void>;
   isGenerating: boolean;
-  
+
   // UI State
   isLoading: boolean;
 }
@@ -66,7 +77,8 @@ const mockSuggestions: DateSuggestion[] = [
   {
     id: '1',
     title: 'Romantic Dinner & Stargazing',
-    description: 'An intimate evening starting with a candlelit dinner followed by stargazing at a scenic overlook.',
+    description:
+      'An intimate evening starting with a candlelit dinner followed by stargazing at a scenic overlook.',
     tripScope: 'local',
     activities: [
       {
@@ -374,7 +386,7 @@ const mockSuggestions: DateSuggestion[] = [
       },
       {
         name: 'Multi-Course Dinner',
-        description: 'Chef\'s tasting menu with wine pairing',
+        description: "Chef's tasting menu with wine pairing",
         type: 'dining',
         location: { name: 'Altitude', address: '1 Tower Plaza, 41st Floor' },
         startTime: '7:30 PM',
@@ -414,7 +426,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Vineyard Tour & Tasting',
         description: 'Private tour with premium wine tasting',
         type: 'cultural',
-        location: { name: 'Silver Oak Winery', address: 'Oakville, CA', city: 'Oakville', country: 'USA' },
+        location: {
+          name: 'Silver Oak Winery',
+          address: 'Oakville, CA',
+          city: 'Oakville',
+          country: 'USA',
+        },
         startTime: '11:30 AM',
         endTime: '1:30 PM',
         estimatedCost: '$$$',
@@ -425,7 +442,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Farm-to-Table Dinner',
         description: 'Gourmet dinner at a renowned restaurant',
         type: 'dining',
-        location: { name: 'The French Laundry', address: 'Yountville, CA', city: 'Yountville', country: 'USA' },
+        location: {
+          name: 'The French Laundry',
+          address: 'Yountville, CA',
+          city: 'Yountville',
+          country: 'USA',
+        },
         startTime: '7:00 PM',
         endTime: '10:00 PM',
         estimatedCost: '$$$$',
@@ -436,7 +458,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Boutique Hotel Stay',
         description: 'Overnight at a charming boutique hotel',
         type: 'accommodation',
-        location: { name: 'Meadowood Resort', address: 'St. Helena, CA', city: 'St. Helena', country: 'USA' },
+        location: {
+          name: 'Meadowood Resort',
+          address: 'St. Helena, CA',
+          city: 'St. Helena',
+          country: 'USA',
+        },
         startTime: 'Check-in 4 PM',
         endTime: 'Next Day',
         estimatedCost: '$$$$',
@@ -472,7 +499,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Beach Day at South Beach',
         description: 'Relax on the iconic South Beach',
         type: 'relaxed',
-        location: { name: 'South Beach', address: 'Ocean Drive', city: 'Miami Beach', country: 'USA' },
+        location: {
+          name: 'South Beach',
+          address: 'Ocean Drive',
+          city: 'Miami Beach',
+          country: 'USA',
+        },
         startTime: '2:00 PM',
         endTime: '6:00 PM',
         estimatedCost: '$',
@@ -483,7 +515,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Sunset Dinner',
         description: 'Oceanfront dining with sunset views',
         type: 'dining',
-        location: { name: 'Smith & Wollensky', address: 'South Pointe Park', city: 'Miami Beach', country: 'USA' },
+        location: {
+          name: 'Smith & Wollensky',
+          address: 'South Pointe Park',
+          city: 'Miami Beach',
+          country: 'USA',
+        },
         startTime: '7:30 PM',
         endTime: '10:00 PM',
         estimatedCost: '$$$',
@@ -510,7 +547,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Drive to the Mountains',
         description: 'Scenic drive through the Blue Ridge',
         type: 'transportation',
-        location: { name: 'Blue Ridge Parkway', address: 'Asheville, NC', city: 'Asheville', country: 'USA' },
+        location: {
+          name: 'Blue Ridge Parkway',
+          address: 'Asheville, NC',
+          city: 'Asheville',
+          country: 'USA',
+        },
         startTime: 'Day 1 - 10:00 AM',
         endTime: '1:00 PM',
         estimatedCost: '$',
@@ -521,7 +563,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Waterfall Hike',
         description: 'Easy trail to a stunning waterfall',
         type: 'active',
-        location: { name: 'Looking Glass Falls', address: 'Pisgah Forest', city: 'Brevard', country: 'USA' },
+        location: {
+          name: 'Looking Glass Falls',
+          address: 'Pisgah Forest',
+          city: 'Brevard',
+          country: 'USA',
+        },
         startTime: '2:00 PM',
         endTime: '4:00 PM',
         estimatedCost: '$',
@@ -532,7 +579,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Cabin Evening',
         description: 'Cook dinner together and relax in the hot tub',
         type: 'intimate',
-        location: { name: 'Mountain View Cabin', address: 'Asheville, NC', city: 'Asheville', country: 'USA' },
+        location: {
+          name: 'Mountain View Cabin',
+          address: 'Asheville, NC',
+          city: 'Asheville',
+          country: 'USA',
+        },
         startTime: '6:00 PM',
         endTime: '10:00 PM',
         estimatedCost: '$$',
@@ -568,7 +620,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Eiffel Tower Sunset',
         description: 'Private champagne experience at the summit',
         type: 'romantic',
-        location: { name: 'Eiffel Tower', address: 'Champ de Mars', city: 'Paris', country: 'France' },
+        location: {
+          name: 'Eiffel Tower',
+          address: 'Champ de Mars',
+          city: 'Paris',
+          country: 'France',
+        },
         startTime: '6:00 PM',
         endTime: '8:00 PM',
         estimatedCost: '$$$',
@@ -579,7 +636,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Michelin Star Dinner',
         description: 'Exquisite French cuisine with city views',
         type: 'dining',
-        location: { name: 'Le Jules Verne', address: 'Eiffel Tower', city: 'Paris', country: 'France' },
+        location: {
+          name: 'Le Jules Verne',
+          address: 'Eiffel Tower',
+          city: 'Paris',
+          country: 'France',
+        },
         startTime: '8:30 PM',
         endTime: '11:00 PM',
         estimatedCost: '$$$$',
@@ -590,7 +652,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Seine River Cruise',
         description: 'Romantic moonlit cruise along the Seine',
         type: 'romantic',
-        location: { name: 'Bateaux Mouches', address: 'Port de la Conférence', city: 'Paris', country: 'France' },
+        location: {
+          name: 'Bateaux Mouches',
+          address: 'Port de la Conférence',
+          city: 'Paris',
+          country: 'France',
+        },
         startTime: 'Day 2 - 9:00 PM',
         endTime: '11:00 PM',
         estimatedCost: '$$',
@@ -635,7 +702,7 @@ const mockSuggestions: DateSuggestion[] = [
       },
       {
         name: 'Senso-ji Temple',
-        description: 'Visit Tokyo\'s oldest Buddhist temple',
+        description: "Visit Tokyo's oldest Buddhist temple",
         type: 'cultural',
         location: { name: 'Senso-ji', address: 'Asakusa', city: 'Tokyo', country: 'Japan' },
         startTime: '10:00 AM',
@@ -646,7 +713,7 @@ const mockSuggestions: DateSuggestion[] = [
       },
       {
         name: 'Omakase Dinner',
-        description: 'Chef\'s choice sushi experience',
+        description: "Chef's choice sushi experience",
         type: 'dining',
         location: { name: 'Sukiyabashi Jiro', address: 'Ginza', city: 'Tokyo', country: 'Japan' },
         startTime: '7:00 PM',
@@ -673,7 +740,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Flight to Santorini',
         description: 'Fly into Santorini International Airport',
         type: 'transportation',
-        location: { name: 'JTR Airport', address: 'Santorini', city: 'Santorini', country: 'Greece' },
+        location: {
+          name: 'JTR Airport',
+          address: 'Santorini',
+          city: 'Santorini',
+          country: 'Greece',
+        },
         startTime: 'Day 1',
         endTime: 'Day 1',
         estimatedCost: '$$$',
@@ -695,7 +767,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Cliffside Dinner',
         description: 'Romantic dinner overlooking the caldera',
         type: 'dining',
-        location: { name: 'Lycabettus Restaurant', address: 'Oia', city: 'Santorini', country: 'Greece' },
+        location: {
+          name: 'Lycabettus Restaurant',
+          address: 'Oia',
+          city: 'Santorini',
+          country: 'Greece',
+        },
         startTime: '8:30 PM',
         endTime: '10:30 PM',
         estimatedCost: '$$$',
@@ -720,7 +797,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Flight to CDMX',
         description: 'Short flight to Mexico City',
         type: 'transportation',
-        location: { name: 'MEX Airport', address: 'Mexico City', city: 'Mexico City', country: 'Mexico' },
+        location: {
+          name: 'MEX Airport',
+          address: 'Mexico City',
+          city: 'Mexico City',
+          country: 'Mexico',
+        },
         startTime: 'Day 1',
         endTime: 'Day 1',
         estimatedCost: '$$',
@@ -731,7 +813,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Street Food Tour',
         description: 'Guided walking tour through the best taco stands and markets',
         type: 'dining',
-        location: { name: 'Roma Norte', address: 'Colonia Roma', city: 'Mexico City', country: 'Mexico' },
+        location: {
+          name: 'Roma Norte',
+          address: 'Colonia Roma',
+          city: 'Mexico City',
+          country: 'Mexico',
+        },
         startTime: 'Day 2 - 11:00 AM',
         endTime: '2:00 PM',
         estimatedCost: '$',
@@ -742,7 +829,12 @@ const mockSuggestions: DateSuggestion[] = [
         name: 'Frida Kahlo Museum',
         description: 'Visit the iconic Casa Azul',
         type: 'cultural',
-        location: { name: 'Casa Azul', address: 'Coyoacán', city: 'Mexico City', country: 'Mexico' },
+        location: {
+          name: 'Casa Azul',
+          address: 'Coyoacán',
+          city: 'Mexico City',
+          country: 'Mexico',
+        },
         startTime: '3:00 PM',
         endTime: '5:00 PM',
         estimatedCost: '$',
@@ -772,7 +864,7 @@ const mockSuggestions: DateSuggestion[] = [
 export function DateNightProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   const [userProfile, setUserProfile] = useState<UserDateProfile>({
     id: generateId(),
     preferences: defaultPreferences,
@@ -781,7 +873,7 @@ export function DateNightProvider({ children }: { children: ReactNode }) {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   });
-  
+
   const [partners, setPartners] = useState<PartnerProfile[]>([]);
   const [selectedPartner, setSelectedPartner] = useState<PartnerProfile | null>(null);
   const [itineraries, setItineraries] = useState<DateItinerary[]>([]);
@@ -789,126 +881,172 @@ export function DateNightProvider({ children }: { children: ReactNode }) {
   const [suggestions, setSuggestions] = useState<DateSuggestion[]>([]);
 
   const setUserPreferences = useCallback((preferences: DatePreferences) => {
-    setUserProfile(prev => ({
+    setUserProfile((prev) => ({
       ...prev,
       preferences,
       updatedAt: new Date().toISOString(),
     }));
   }, []);
 
-  const addPartner = useCallback((partner: Omit<PartnerProfile, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newPartner: PartnerProfile = {
-      ...partner,
-      id: generateId(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setPartners(prev => [...prev, newPartner]);
-    return newPartner;
-  }, []);
+  const addPartner = useCallback(
+    (partner: Omit<PartnerProfile, 'id' | 'createdAt' | 'updatedAt'>) => {
+      const newPartner: PartnerProfile = {
+        ...partner,
+        id: generateId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setPartners((prev) => [...prev, newPartner]);
+      return newPartner;
+    },
+    []
+  );
 
   const updatePartner = useCallback((partnerId: string, updates: Partial<PartnerProfile>) => {
-    setPartners(prev => prev.map(p => 
-      p.id === partnerId 
-        ? { ...p, ...updates, updatedAt: new Date().toISOString() }
-        : p
-    ));
+    setPartners((prev) =>
+      prev.map((p) =>
+        p.id === partnerId ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p
+      )
+    );
   }, []);
 
-  const removePartner = useCallback((partnerId: string) => {
-    setPartners(prev => prev.filter(p => p.id !== partnerId));
-    if (selectedPartner?.id === partnerId) {
-      setSelectedPartner(null);
-    }
-  }, [selectedPartner]);
+  const removePartner = useCallback(
+    (partnerId: string) => {
+      setPartners((prev) => prev.filter((p) => p.id !== partnerId));
+      if (selectedPartner?.id === partnerId) {
+        setSelectedPartner(null);
+      }
+    },
+    [selectedPartner]
+  );
 
-  const createItinerary = useCallback((itinerary: Omit<DateItinerary, 'id' | 'createdAt' | 'updatedAt'>): DateItinerary => {
-    const newItinerary: DateItinerary = {
-      ...itinerary,
-      id: generateId(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setItineraries(prev => [...prev, newItinerary]);
-    return newItinerary;
-  }, []);
+  const createItinerary = useCallback(
+    (itinerary: Omit<DateItinerary, 'id' | 'createdAt' | 'updatedAt'>): DateItinerary => {
+      const newItinerary: DateItinerary = {
+        ...itinerary,
+        id: generateId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setItineraries((prev) => [...prev, newItinerary]);
+      return newItinerary;
+    },
+    []
+  );
 
-  const updateItinerary = useCallback((itineraryId: string, updates: Partial<DateItinerary>) => {
-    setItineraries(prev => prev.map(i => 
-      i.id === itineraryId 
-        ? { ...i, ...updates, updatedAt: new Date().toISOString() }
-        : i
-    ));
-    if (currentItinerary?.id === itineraryId) {
-      setCurrentItinerary(prev => prev ? { ...prev, ...updates, updatedAt: new Date().toISOString() } : null);
-    }
-  }, [currentItinerary]);
+  const updateItinerary = useCallback(
+    (itineraryId: string, updates: Partial<DateItinerary>) => {
+      setItineraries((prev) =>
+        prev.map((i) =>
+          i.id === itineraryId ? { ...i, ...updates, updatedAt: new Date().toISOString() } : i
+        )
+      );
+      if (currentItinerary?.id === itineraryId) {
+        setCurrentItinerary((prev) =>
+          prev ? { ...prev, ...updates, updatedAt: new Date().toISOString() } : null
+        );
+      }
+    },
+    [currentItinerary]
+  );
 
-  const deleteItinerary = useCallback((itineraryId: string) => {
-    setItineraries(prev => prev.filter(i => i.id !== itineraryId));
-    if (currentItinerary?.id === itineraryId) {
-      setCurrentItinerary(null);
-    }
-  }, [currentItinerary]);
+  const deleteItinerary = useCallback(
+    (itineraryId: string) => {
+      setItineraries((prev) => prev.filter((i) => i.id !== itineraryId));
+      if (currentItinerary?.id === itineraryId) {
+        setCurrentItinerary(null);
+      }
+    },
+    [currentItinerary]
+  );
 
-  const addActivity = useCallback((itineraryId: string, activity: Omit<ItineraryActivity, 'id'>) => {
-    const newActivity: ItineraryActivity = {
-      ...activity,
-      id: generateId(),
-    };
-    setItineraries(prev => prev.map(i => 
-      i.id === itineraryId 
-        ? { ...i, activities: [...i.activities, newActivity], updatedAt: new Date().toISOString() }
-        : i
-    ));
-  }, []);
+  const addActivity = useCallback(
+    (itineraryId: string, activity: Omit<ItineraryActivity, 'id'>) => {
+      const newActivity: ItineraryActivity = {
+        ...activity,
+        id: generateId(),
+      };
+      setItineraries((prev) =>
+        prev.map((i) =>
+          i.id === itineraryId
+            ? {
+                ...i,
+                activities: [...i.activities, newActivity],
+                updatedAt: new Date().toISOString(),
+              }
+            : i
+        )
+      );
+    },
+    []
+  );
 
-  const updateActivity = useCallback((itineraryId: string, activityId: string, updates: Partial<ItineraryActivity>) => {
-    setItineraries(prev => prev.map(i => 
-      i.id === itineraryId 
-        ? { 
-            ...i, 
-            activities: i.activities.map(a => a.id === activityId ? { ...a, ...updates } : a),
-            updatedAt: new Date().toISOString() 
-          }
-        : i
-    ));
-  }, []);
+  const updateActivity = useCallback(
+    (itineraryId: string, activityId: string, updates: Partial<ItineraryActivity>) => {
+      setItineraries((prev) =>
+        prev.map((i) =>
+          i.id === itineraryId
+            ? {
+                ...i,
+                activities: i.activities.map((a) =>
+                  a.id === activityId ? { ...a, ...updates } : a
+                ),
+                updatedAt: new Date().toISOString(),
+              }
+            : i
+        )
+      );
+    },
+    []
+  );
 
   const removeActivity = useCallback((itineraryId: string, activityId: string) => {
-    setItineraries(prev => prev.map(i => 
-      i.id === itineraryId 
-        ? { ...i, activities: i.activities.filter(a => a.id !== activityId), updatedAt: new Date().toISOString() }
-        : i
-    ));
+    setItineraries((prev) =>
+      prev.map((i) =>
+        i.id === itineraryId
+          ? {
+              ...i,
+              activities: i.activities.filter((a) => a.id !== activityId),
+              updatedAt: new Date().toISOString(),
+            }
+          : i
+      )
+    );
   }, []);
 
   const reorderActivities = useCallback((itineraryId: string, activityIds: string[]) => {
-    setItineraries(prev => prev.map(i => {
-      if (i.id !== itineraryId) return i;
-      const reordered = activityIds.map(id => i.activities.find(a => a.id === id)!).filter(Boolean);
-      return { ...i, activities: reordered, updatedAt: new Date().toISOString() };
-    }));
+    setItineraries((prev) =>
+      prev.map((i) => {
+        if (i.id !== itineraryId) return i;
+        const reordered = activityIds
+          .map((id) => i.activities.find((a) => a.id === id)!)
+          .filter(Boolean);
+        return { ...i, activities: reordered, updatedAt: new Date().toISOString() };
+      })
+    );
   }, []);
 
-  const generateSuggestions = useCallback(async (partnerId: string, budget: BudgetTier, date: string, tripScope: TripScope) => {
-    setIsGenerating(true);
-    
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Filter suggestions by trip scope and budget (allow one tier above for variety)
-    const budgetOrder = ['$', '$$', '$$$', '$$$$'];
-    const maxBudgetIndex = Math.min(budgetOrder.indexOf(budget) + 1, budgetOrder.length - 1);
-    
-    const filteredSuggestions = mockSuggestions.filter(s => 
-      s.tripScope === tripScope && 
-      budgetOrder.indexOf(s.estimatedTotalCost) <= maxBudgetIndex
-    );
-    
-    setSuggestions(filteredSuggestions);
-    setIsGenerating(false);
-  }, []);
+  const generateSuggestions = useCallback(
+    async (partnerId: string, budget: BudgetTier, date: string, tripScope: TripScope) => {
+      setIsGenerating(true);
+
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Filter suggestions by trip scope and budget (allow one tier above for variety)
+      const budgetOrder = ['$', '$$', '$$$', '$$$$'];
+      const maxBudgetIndex = Math.min(budgetOrder.indexOf(budget) + 1, budgetOrder.length - 1);
+
+      const filteredSuggestions = mockSuggestions.filter(
+        (s) =>
+          s.tripScope === tripScope && budgetOrder.indexOf(s.estimatedTotalCost) <= maxBudgetIndex
+      );
+
+      setSuggestions(filteredSuggestions);
+      setIsGenerating(false);
+    },
+    []
+  );
 
   const value: DateNightContextType = {
     userProfile,
@@ -935,11 +1073,7 @@ export function DateNightProvider({ children }: { children: ReactNode }) {
     isLoading,
   };
 
-  return (
-    <DateNightContext.Provider value={value}>
-      {children}
-    </DateNightContext.Provider>
-  );
+  return <DateNightContext.Provider value={value}>{children}</DateNightContext.Provider>;
 }
 
 export function useDateNight() {

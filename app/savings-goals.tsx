@@ -77,12 +77,12 @@ const GOAL_TEMPLATES = [
 
 export default function SavingsGoalsScreen() {
   const router = useRouter();
-  
+
   // State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showContributeModal, setShowContributeModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<SavingsGoal | null>(null);
-  
+
   // Form state
   const [newGoal, setNewGoal] = useState({
     name: '',
@@ -92,7 +92,7 @@ export default function SavingsGoalsScreen() {
     color: colors.primary,
   });
   const [contributionAmount, setContributionAmount] = useState('');
-  
+
   // Hook
   const {
     goals,
@@ -117,7 +117,7 @@ export default function SavingsGoalsScreen() {
       Alert.alert('Enter Amount', 'Please enter a target amount');
       return;
     }
-    
+
     createGoal({
       name: newGoal.name,
       targetAmount: parseFloat(newGoal.targetAmount),
@@ -125,7 +125,7 @@ export default function SavingsGoalsScreen() {
       description: newGoal.description || undefined,
       color: newGoal.color,
     });
-    
+
     setShowCreateModal(false);
     setNewGoal({
       name: '',
@@ -138,20 +138,20 @@ export default function SavingsGoalsScreen() {
 
   const handleContribute = useCallback(() => {
     if (!selectedGoal) return;
-    
+
     const amount = parseFloat(contributionAmount);
     if (!amount || amount <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid amount');
       return;
     }
-    
+
     addContribution(selectedGoal.id, amount);
     setShowContributeModal(false);
     setContributionAmount('');
     setSelectedGoal(null);
   }, [selectedGoal, contributionAmount, addContribution]);
 
-  const handleSelectTemplate = useCallback((template: typeof GOAL_TEMPLATES[0]) => {
+  const handleSelectTemplate = useCallback((template: (typeof GOAL_TEMPLATES)[0]) => {
     setNewGoal({
       name: template.name,
       targetAmount: template.suggestedAmount.toString(),
@@ -171,14 +171,16 @@ export default function SavingsGoalsScreen() {
   // ============================================================================
 
   const renderGoalCard = (goal: SavingsGoal) => {
-    const daysRemaining = goal.targetDate 
+    const daysRemaining = goal.targetDate
       ? Math.ceil((new Date(goal.targetDate).getTime() - Date.now()) / (24 * 60 * 60 * 1000))
       : null;
-    
+
     return (
       <View key={goal.id} style={styles.goalCard}>
         <View style={styles.goalHeader}>
-          <View style={[styles.goalIcon, { backgroundColor: (goal.color || colors.primary) + '20' }]}>
+          <View
+            style={[styles.goalIcon, { backgroundColor: (goal.color || colors.primary) + '20' }]}
+          >
             <Target size={20} color={goal.color || colors.primary} />
           </View>
           <View style={styles.goalInfo}>
@@ -189,37 +191,30 @@ export default function SavingsGoalsScreen() {
               </Text>
             )}
           </View>
-          <Pressable 
-            style={styles.deleteButton}
-            onPress={() => deleteGoal(goal.id)}
-          >
+          <Pressable style={styles.deleteButton} onPress={() => deleteGoal(goal.id)}>
             <Trash2 size={18} color={colors.textTertiary} />
           </Pressable>
         </View>
-        
+
         {/* Progress */}
         <View style={styles.goalProgress}>
           <View style={styles.progressBar}>
-            <View 
+            <View
               style={[
                 styles.progressFill,
-                { 
+                {
                   width: `${goal.percentComplete}%`,
                   backgroundColor: goal.color || colors.primary,
                 },
-              ]} 
+              ]}
             />
           </View>
           <View style={styles.progressLabels}>
-            <Text style={styles.progressAmount}>
-              ${goal.currentAmount.toFixed(0)}
-            </Text>
-            <Text style={styles.progressTarget}>
-              of ${goal.targetAmount.toFixed(0)}
-            </Text>
+            <Text style={styles.progressAmount}>${goal.currentAmount.toFixed(0)}</Text>
+            <Text style={styles.progressTarget}>of ${goal.targetAmount.toFixed(0)}</Text>
           </View>
         </View>
-        
+
         {/* Stats */}
         <View style={styles.goalStats}>
           <View style={styles.stat}>
@@ -239,7 +234,7 @@ export default function SavingsGoalsScreen() {
             </View>
           )}
         </View>
-        
+
         {/* Weekly suggestion */}
         {goal.suggestedWeeklyAmount && goal.status === 'active' && (
           <View style={styles.suggestionBox}>
@@ -249,17 +244,14 @@ export default function SavingsGoalsScreen() {
             </Text>
           </View>
         )}
-        
+
         {/* Actions */}
         <View style={styles.goalActions}>
-          <Pressable 
-            style={styles.contributeBtn}
-            onPress={() => openContributeModal(goal)}
-          >
+          <Pressable style={styles.contributeBtn} onPress={() => openContributeModal(goal)}>
             <Plus size={16} color="#fff" />
             <Text style={styles.contributeBtnText}>Add Money</Text>
           </Pressable>
-          
+
           {goal.contributions.length > 0 && (
             <Pressable style={styles.historyBtn}>
               <Text style={styles.historyBtnText}>
@@ -294,26 +286,29 @@ export default function SavingsGoalsScreen() {
             <Check size={24} color={colors.primary} />
           </Pressable>
         </View>
-        
+
         <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
           {/* Templates */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Quick Start</Text>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.templates}
             >
               {GOAL_TEMPLATES.map((template) => {
                 const Icon = template.icon;
                 const isSelected = newGoal.name === template.name;
-                
+
                 return (
                   <Pressable
                     key={template.id}
                     style={[
                       styles.templateCard,
-                      isSelected && { borderColor: template.color, backgroundColor: template.color + '10' },
+                      isSelected && {
+                        borderColor: template.color,
+                        backgroundColor: template.color + '10',
+                      },
                     ]}
                     onPress={() => handleSelectTemplate(template)}
                   >
@@ -327,11 +322,11 @@ export default function SavingsGoalsScreen() {
               })}
             </ScrollView>
           </View>
-          
+
           {/* Custom Goal Form */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Or Create Custom</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Goal Name</Text>
               <TextInput
@@ -342,7 +337,7 @@ export default function SavingsGoalsScreen() {
                 onChangeText={(text) => setNewGoal({ ...newGoal, name: text })}
               />
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Target Amount</Text>
               <View style={styles.amountInput}>
@@ -357,17 +352,15 @@ export default function SavingsGoalsScreen() {
                 />
               </View>
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Target Date (Optional)</Text>
               <Pressable style={styles.dateInput}>
                 <Calendar size={18} color={colors.textTertiary} />
-                <Text style={styles.dateInputText}>
-                  {newGoal.targetDate || 'Select date'}
-                </Text>
+                <Text style={styles.dateInputText}>{newGoal.targetDate || 'Select date'}</Text>
               </Pressable>
             </View>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Description (Optional)</Text>
               <TextInput
@@ -381,7 +374,7 @@ export default function SavingsGoalsScreen() {
                 textAlignVertical="top"
               />
             </View>
-            
+
             {/* Color picker */}
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Color</Text>
@@ -396,9 +389,7 @@ export default function SavingsGoalsScreen() {
                     ]}
                     onPress={() => setNewGoal({ ...newGoal, color })}
                   >
-                    {newGoal.color === color && (
-                      <Check size={16} color="#fff" />
-                    )}
+                    {newGoal.color === color && <Check size={16} color="#fff" />}
                   </Pressable>
                 ))}
               </View>
@@ -428,7 +419,7 @@ export default function SavingsGoalsScreen() {
               <X size={24} color={colors.text} />
             </Pressable>
           </View>
-          
+
           <View style={styles.contributeContent}>
             <View style={styles.amountInputLarge}>
               <Text style={styles.currencySymbolLarge}>$</Text>
@@ -442,7 +433,7 @@ export default function SavingsGoalsScreen() {
                 autoFocus
               />
             </View>
-            
+
             {/* Quick amounts */}
             <View style={styles.quickAmounts}>
               {[10, 25, 50, 100].map((amount) => (
@@ -455,13 +446,13 @@ export default function SavingsGoalsScreen() {
                 </Pressable>
               ))}
             </View>
-            
+
             {selectedGoal && (
               <Text style={styles.contributeHint}>
                 ${selectedGoal.remainingAmount.toFixed(0)} remaining to reach your goal
               </Text>
             )}
-            
+
             <Pressable style={styles.confirmContributeBtn} onPress={handleContribute}>
               <Text style={styles.confirmContributeBtnText}>Add Money</Text>
             </Pressable>
@@ -488,8 +479,8 @@ export default function SavingsGoalsScreen() {
             <Plus size={22} color={colors.primary} />
           </Pressable>
         </View>
-        
-        <ScrollView 
+
+        <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
@@ -507,14 +498,12 @@ export default function SavingsGoalsScreen() {
               </Text>
             </View>
           </View>
-          
+
           {/* Active Goals */}
           {activeGoals.length > 0 ? (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Active Goals</Text>
-              <View style={styles.goalsList}>
-                {activeGoals.map(renderGoalCard)}
-              </View>
+              <View style={styles.goalsList}>{activeGoals.map(renderGoalCard)}</View>
             </View>
           ) : (
             <View style={styles.emptyState}>
@@ -523,16 +512,13 @@ export default function SavingsGoalsScreen() {
               <Text style={styles.emptyText}>
                 Start saving for your dream date nights and adventures!
               </Text>
-              <Pressable 
-                style={styles.emptyButton}
-                onPress={() => setShowCreateModal(true)}
-              >
+              <Pressable style={styles.emptyButton} onPress={() => setShowCreateModal(true)}>
                 <Plus size={18} color="#fff" />
                 <Text style={styles.emptyButtonText}>Create Your First Goal</Text>
               </Pressable>
             </View>
           )}
-          
+
           {/* Completed Goals */}
           {completedGoals.length > 0 && (
             <View style={styles.section}>
@@ -558,7 +544,7 @@ export default function SavingsGoalsScreen() {
           )}
         </ScrollView>
       </SafeAreaView>
-      
+
       {/* Modals */}
       {renderCreateModal()}
       {renderContributeModal()}
@@ -609,7 +595,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 32,
   },
-  
+
   // Total Card
   totalCard: {
     flexDirection: 'row',
@@ -644,7 +630,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
   },
-  
+
   // Section
   section: {
     marginBottom: 24,
@@ -655,7 +641,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 12,
   },
-  
+
   // Goals List
   goalsList: {
     gap: 12,
@@ -697,7 +683,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 8,
   },
-  
+
   // Progress
   goalProgress: {
     marginBottom: 12,
@@ -727,7 +713,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginLeft: 4,
   },
-  
+
   // Stats
   goalStats: {
     flexDirection: 'row',
@@ -744,7 +730,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
   },
-  
+
   // Suggestion
   suggestionBox: {
     flexDirection: 'row',
@@ -760,7 +746,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.primary,
   },
-  
+
   // Actions
   goalActions: {
     flexDirection: 'row',
@@ -795,7 +781,7 @@ const styles = StyleSheet.create({
     color: colors.success,
     marginTop: 2,
   },
-  
+
   // Empty State
   emptyState: {
     alignItems: 'center',
@@ -829,7 +815,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
   },
-  
+
   // Modal
   modalContainer: {
     flex: 1,
@@ -853,7 +839,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  
+
   // Templates
   templates: {
     gap: 12,
@@ -887,7 +873,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 2,
   },
-  
+
   // Form
   inputGroup: {
     marginBottom: 20,
@@ -968,7 +954,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  
+
   // Contribute Modal
   contributeOverlay: {
     flex: 1,

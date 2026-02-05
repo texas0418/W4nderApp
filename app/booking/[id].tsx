@@ -1,14 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-  Share,
-  Linking,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share, Linking } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -85,7 +76,7 @@ export default function BookingDetailsScreen() {
   const [showCancelSheet, setShowCancelSheet] = useState(false);
   const [cancellationResult, setCancellationResult] = useState<any>(null);
 
-  const booking = bookings.find(b => b.id === id);
+  const booking = bookings.find((b) => b.id === id);
 
   // Use cancellation management hook
   const cancellationManager = useCancellationManagement({
@@ -130,21 +121,31 @@ export default function BookingDetailsScreen() {
   // Helpers
   const getStatusColor = (status: Booking['status']) => {
     switch (status) {
-      case 'confirmed': return colors.success;
-      case 'pending': return colors.warning;
-      case 'cancelled': return colors.error;
-      case 'completed': return colors.textSecondary;
-      default: return colors.textTertiary;
+      case 'confirmed':
+        return colors.success;
+      case 'pending':
+        return colors.warning;
+      case 'cancelled':
+        return colors.error;
+      case 'completed':
+        return colors.textSecondary;
+      default:
+        return colors.textTertiary;
     }
   };
 
   const getStatusLabel = (status: Booking['status']) => {
     switch (status) {
-      case 'confirmed': return 'Confirmed';
-      case 'pending': return 'Pending';
-      case 'cancelled': return 'Cancelled';
-      case 'completed': return 'Completed';
-      default: return status;
+      case 'confirmed':
+        return 'Confirmed';
+      case 'pending':
+        return 'Pending';
+      case 'cancelled':
+        return 'Cancelled';
+      case 'completed':
+        return 'Completed';
+      default:
+        return status;
     }
   };
 
@@ -216,9 +217,7 @@ export default function BookingDetailsScreen() {
           {details.departure.terminal && (
             <Text style={styles.terminal}>Terminal {details.departure.terminal}</Text>
           )}
-          {details.departure.gate && (
-            <Text style={styles.gate}>Gate {details.departure.gate}</Text>
-          )}
+          {details.departure.gate && <Text style={styles.gate}>Gate {details.departure.gate}</Text>}
         </View>
         <View style={styles.flightLine}>
           <Plane size={20} color={colors.primary} />
@@ -317,11 +316,7 @@ export default function BookingDetailsScreen() {
       {/* Cover Image */}
       {booking.image && (
         <>
-          <Image
-            source={{ uri: booking.image }}
-            style={styles.coverImage}
-            contentFit="cover"
-          />
+          <Image source={{ uri: booking.image }} style={styles.coverImage} contentFit="cover" />
           <LinearGradient
             colors={['rgba(0,0,0,0.4)', 'transparent', 'rgba(0,0,0,0.6)']}
             style={styles.coverGradient}
@@ -357,8 +352,15 @@ export default function BookingDetailsScreen() {
                   {bookingTypeLabels[booking.type] || 'Booking'}
                 </Text>
               </View>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(booking.status) + '20' }]}>
-                <View style={[styles.statusDot, { backgroundColor: getStatusColor(booking.status) }]} />
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: getStatusColor(booking.status) + '20' },
+                ]}
+              >
+                <View
+                  style={[styles.statusDot, { backgroundColor: getStatusColor(booking.status) }]}
+                />
                 <Text style={[styles.statusText, { color: getStatusColor(booking.status) }]}>
                   {getStatusLabel(booking.status)}
                 </Text>
@@ -427,24 +429,27 @@ export default function BookingDetailsScreen() {
               <Text style={styles.policyDescription}>
                 {cancellationManager.cancellationPolicy.description}
               </Text>
-              {cancellationManager.timeUntilDeadline && 
-               cancellationManager.cancellationPolicy.type === 'free' && (
-                <View style={styles.deadlineNotice}>
-                  <Clock size={14} color={colors.warning} />
-                  <Text style={styles.deadlineText}>
-                    {cancellationManager.timeUntilDeadline} for free cancellation
-                  </Text>
-                </View>
-              )}
+              {cancellationManager.timeUntilDeadline &&
+                cancellationManager.cancellationPolicy.type === 'free' && (
+                  <View style={styles.deadlineNotice}>
+                    <Clock size={14} color={colors.warning} />
+                    <Text style={styles.deadlineText}>
+                      {cancellationManager.timeUntilDeadline} for free cancellation
+                    </Text>
+                  </View>
+                )}
             </View>
           )}
 
           {/* Type-specific Details */}
-          {booking.details && booking.type === 'flight' && 
+          {booking.details &&
+            booking.type === 'flight' &&
             renderFlightDetails(booking.details as FlightDetails)}
-          {booking.details && booking.type === 'hotel' && 
+          {booking.details &&
+            booking.type === 'hotel' &&
             renderHotelDetails(booking.details as HotelDetails)}
-          {booking.details && booking.type === 'restaurant' && 
+          {booking.details &&
+            booking.type === 'restaurant' &&
             renderRestaurantDetails(booking.details as RestaurantDetails)}
 
           {/* Price Section */}
@@ -468,7 +473,7 @@ export default function BookingDetailsScreen() {
           {booking.status === 'confirmed' && (
             <View style={styles.managementSection}>
               <Text style={styles.managementTitle}>Manage Booking</Text>
-              
+
               {cancellationManager.canModify && (
                 <Pressable style={styles.managementButton} onPress={handleModifyPress}>
                   <View style={styles.managementButtonIcon}>
@@ -497,16 +502,16 @@ export default function BookingDetailsScreen() {
                       {cancellationManager.cancellationPolicy.type === 'free'
                         ? 'Full refund available'
                         : cancellationManager.cancellationPolicy.type === 'partial'
-                        ? 'Partial refund available'
-                        : 'No refund available'}
+                          ? 'Partial refund available'
+                          : 'No refund available'}
                     </Text>
                   </View>
                   <ChevronRight size={20} color={colors.textTertiary} />
                 </Pressable>
               )}
 
-              <Pressable 
-                style={styles.managementButton} 
+              <Pressable
+                style={styles.managementButton}
                 onPress={cancellationManager.contactSupport}
               >
                 <View style={styles.managementButtonIcon}>
@@ -529,13 +534,10 @@ export default function BookingDetailsScreen() {
               <XCircle size={32} color={colors.error} />
               <Text style={styles.cancelledTitle}>Booking Cancelled</Text>
               <Text style={styles.cancelledDescription}>
-                This booking has been cancelled. If you're expecting a refund, it will be
-                processed within 5-7 business days.
+                This booking has been cancelled. If you're expecting a refund, it will be processed
+                within 5-7 business days.
               </Text>
-              <Pressable 
-                style={styles.rebookButton}
-                onPress={() => router.push('/plan-trip')}
-              >
+              <Pressable style={styles.rebookButton} onPress={() => router.push('/plan-trip')}>
                 <RefreshCw size={18} color={colors.primary} />
                 <Text style={styles.rebookButtonText}>Book Again</Text>
               </Pressable>

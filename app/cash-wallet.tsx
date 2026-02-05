@@ -76,7 +76,10 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
       } else if (modalType === 'spend') {
         const balance = getCashBalance(formData.currency);
         if (amount > balance) {
-          Alert.alert('Insufficient Cash', `You only have ${format(balance, formData.currency)} in ${formData.currency}`);
+          Alert.alert(
+            'Insufficient Cash',
+            `You only have ${format(balance, formData.currency)} in ${formData.currency}`
+          );
           return;
         }
         await spendCash(formData.currency, amount, formData.description || 'Cash expense');
@@ -124,11 +127,9 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
     return (
       <View key={transaction.id} style={styles.transactionCard}>
         <View style={styles.transactionIcon}>
-          <Text style={styles.transactionIconText}>
-            {getTransactionIcon(transaction.type)}
-          </Text>
+          <Text style={styles.transactionIconText}>{getTransactionIcon(transaction.type)}</Text>
         </View>
-        
+
         <View style={styles.transactionInfo}>
           <Text style={styles.transactionDesc}>{transaction.description}</Text>
           <Text style={styles.transactionMeta}>
@@ -147,11 +148,14 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
               </Text>
             </>
           ) : (
-            <Text style={[
-              styles.transactionValue,
-              isPositive ? styles.transactionPositive : styles.transactionNegative,
-            ]}>
-              {isPositive ? '+' : '-'}{format(transaction.amount, transaction.currency)}
+            <Text
+              style={[
+                styles.transactionValue,
+                isPositive ? styles.transactionPositive : styles.transactionNegative,
+              ]}
+            >
+              {isPositive ? '+' : '-'}
+              {format(transaction.amount, transaction.currency)}
             </Text>
           )}
         </View>
@@ -164,8 +168,11 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
           <Text style={styles.modalTitle}>
-            {modalType === 'withdraw' ? '🏧 Withdraw Cash' : 
-             modalType === 'spend' ? '💸 Spend Cash' : '🔄 Exchange Currency'}
+            {modalType === 'withdraw'
+              ? '🏧 Withdraw Cash'
+              : modalType === 'spend'
+                ? '💸 Spend Cash'
+                : '🔄 Exchange Currency'}
           </Text>
           <TouchableOpacity onPress={() => setShowAddModal(false)}>
             <Text style={styles.modalClose}>✕</Text>
@@ -174,16 +181,17 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
 
         <ScrollView style={styles.modalContent}>
           {/* From Amount & Currency */}
-          <Text style={styles.formLabel}>
-            {modalType === 'exchange' ? 'From' : 'Amount'}
-          </Text>
+          <Text style={styles.formLabel}>{modalType === 'exchange' ? 'From' : 'Amount'}</Text>
           <View style={styles.amountRow}>
             <TouchableOpacity
               style={styles.currencyPicker}
               onPress={() => {
-                const currencies = [homeCurrency, ...recentCurrencies.filter(c => c !== homeCurrency)];
+                const currencies = [
+                  homeCurrency,
+                  ...recentCurrencies.filter((c) => c !== homeCurrency),
+                ];
                 const idx = currencies.indexOf(formData.currency);
-                setFormData(prev => ({
+                setFormData((prev) => ({
                   ...prev,
                   currency: currencies[(idx + 1) % currencies.length],
                 }));
@@ -196,7 +204,7 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
             <TextInput
               style={styles.amountInput}
               value={formData.amount}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, amount: text }))}
+              onChangeText={(text) => setFormData((prev) => ({ ...prev, amount: text }))}
               keyboardType="decimal-pad"
               placeholder="0.00"
               placeholderTextColor="#999"
@@ -219,10 +227,10 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
                   style={styles.currencyPicker}
                   onPress={() => {
                     const currencies = getPopularCurrencies()
-                      .map(c => c.code)
-                      .filter(c => c !== formData.currency);
+                      .map((c) => c.code)
+                      .filter((c) => c !== formData.currency);
                     const idx = currencies.indexOf(formData.toCurrency);
-                    setFormData(prev => ({
+                    setFormData((prev) => ({
                       ...prev,
                       toCurrency: currencies[(idx + 1) % currencies.length] as CurrencyCode,
                     }));
@@ -235,7 +243,7 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
                 <TextInput
                   style={styles.amountInput}
                   value={formData.toAmount}
-                  onChangeText={(text) => setFormData(prev => ({ ...prev, toAmount: text }))}
+                  onChangeText={(text) => setFormData((prev) => ({ ...prev, toAmount: text }))}
                   keyboardType="decimal-pad"
                   placeholder="0.00"
                   placeholderTextColor="#999"
@@ -245,7 +253,9 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
               {/* Show exchange rate */}
               {formData.amount && formData.toAmount && (
                 <Text style={styles.rateHint}>
-                  Rate: 1 {formData.currency} = {(parseFloat(formData.toAmount) / parseFloat(formData.amount)).toFixed(4)} {formData.toCurrency}
+                  Rate: 1 {formData.currency} ={' '}
+                  {(parseFloat(formData.toAmount) / parseFloat(formData.amount)).toFixed(4)}{' '}
+                  {formData.toCurrency}
                 </Text>
               )}
             </>
@@ -256,11 +266,13 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
           <TextInput
             style={styles.textInput}
             value={formData.description}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
+            onChangeText={(text) => setFormData((prev) => ({ ...prev, description: text }))}
             placeholder={
-              modalType === 'withdraw' ? 'ATM location...' :
-              modalType === 'spend' ? 'What did you buy?' :
-              'Exchange location...'
+              modalType === 'withdraw'
+                ? 'ATM location...'
+                : modalType === 'spend'
+                  ? 'What did you buy?'
+                  : 'Exchange location...'
             }
             placeholderTextColor="#999"
           />
@@ -278,7 +290,7 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
                 <TextInput
                   style={styles.amountInput}
                   value={formData.fees}
-                  onChangeText={(text) => setFormData(prev => ({ ...prev, fees: text }))}
+                  onChangeText={(text) => setFormData((prev) => ({ ...prev, fees: text }))}
                   keyboardType="decimal-pad"
                   placeholder="0.00"
                   placeholderTextColor="#999"
@@ -290,8 +302,11 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>
-            {modalType === 'withdraw' ? 'Add Cash' :
-             modalType === 'spend' ? 'Record Expense' : 'Exchange'}
+            {modalType === 'withdraw'
+              ? 'Add Cash'
+              : modalType === 'spend'
+                ? 'Record Expense'
+                : 'Exchange'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -300,22 +315,14 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#34C759', '#30D158']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#34C759', '#30D158']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
-        
+
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Cash Wallet</Text>
-          <Text style={styles.totalAmount}>
-            {format(cashTotalInHomeCurrency, homeCurrency)}
-          </Text>
+          <Text style={styles.totalAmount}>{format(cashTotalInHomeCurrency, homeCurrency)}</Text>
           <Text style={styles.totalLabel}>Total in {homeCurrency}</Text>
         </View>
       </LinearGradient>
@@ -325,19 +332,21 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Cash on Hand</Text>
           <View style={styles.balancesGrid}>
-            {cashWallet?.balances.filter(b => b.amount > 0).map(balance => {
-              const currencyData = getCurrency(balance.currency);
-              return (
-                <View key={balance.currency} style={styles.balanceCard}>
-                  <Text style={styles.balanceFlag}>{currencyData?.flag}</Text>
-                  <Text style={styles.balanceAmount}>
-                    {format(balance.amount, balance.currency)}
-                  </Text>
-                  <Text style={styles.balanceCurrency}>{currencyData?.name}</Text>
-                </View>
-              );
-            })}
-            {(!cashWallet?.balances.length || !cashWallet.balances.some(b => b.amount > 0)) && (
+            {cashWallet?.balances
+              .filter((b) => b.amount > 0)
+              .map((balance) => {
+                const currencyData = getCurrency(balance.currency);
+                return (
+                  <View key={balance.currency} style={styles.balanceCard}>
+                    <Text style={styles.balanceFlag}>{currencyData?.flag}</Text>
+                    <Text style={styles.balanceAmount}>
+                      {format(balance.amount, balance.currency)}
+                    </Text>
+                    <Text style={styles.balanceCurrency}>{currencyData?.name}</Text>
+                  </View>
+                );
+              })}
+            {(!cashWallet?.balances.length || !cashWallet.balances.some((b) => b.amount > 0)) && (
               <View style={styles.emptyBalances}>
                 <Text style={styles.emptyIcon}>💵</Text>
                 <Text style={styles.emptyText}>No cash recorded</Text>
@@ -357,10 +366,7 @@ const CashWalletScreen: React.FC<CashWalletScreenProps> = ({ navigation }) => {
               <Text style={styles.actionIcon}>🏧</Text>
               <Text style={styles.actionLabel}>Withdraw</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => handleOpenModal('spend')}
-            >
+            <TouchableOpacity style={styles.actionButton} onPress={() => handleOpenModal('spend')}>
               <Text style={styles.actionIcon}>💸</Text>
               <Text style={styles.actionLabel}>Spend</Text>
             </TouchableOpacity>

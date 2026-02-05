@@ -36,8 +36,6 @@ import { travelStyles, foodPreferences } from '@/mocks/preferences';
 import { TravelStyle, Trip, DayItinerary, Activity } from '@/types';
 import { useApp } from '@/contexts/AppContext';
 
-
-
 const BUDGET_OPTIONS = [
   { id: 'budget', label: 'Budget', range: '$500 - $1,000', value: 750 },
   { id: 'moderate', label: 'Moderate', range: '$1,000 - $2,500', value: 1750 },
@@ -46,22 +44,70 @@ const BUDGET_OPTIONS = [
   { id: 'ultra', label: 'Ultra Luxury', range: '$10,000+', value: 15000 },
 ];
 
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const ACTIVITY_TEMPLATES = [
-  { name: 'Morning Exploration', category: 'Sightseeing', time: '09:00', duration: '2 hours', icon: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400' },
-  { name: 'Local Cuisine Experience', category: 'Dining', time: '12:00', duration: '1.5 hours', icon: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400' },
-  { name: 'Cultural Discovery', category: 'Cultural', time: '14:30', duration: '2 hours', icon: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400' },
-  { name: 'Sunset Experience', category: 'Entertainment', time: '18:00', duration: '2 hours', icon: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400' },
-  { name: 'Evening Dinner', category: 'Dining', time: '20:00', duration: '2 hours', icon: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400' },
+  {
+    name: 'Morning Exploration',
+    category: 'Sightseeing',
+    time: '09:00',
+    duration: '2 hours',
+    icon: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400',
+  },
+  {
+    name: 'Local Cuisine Experience',
+    category: 'Dining',
+    time: '12:00',
+    duration: '1.5 hours',
+    icon: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400',
+  },
+  {
+    name: 'Cultural Discovery',
+    category: 'Cultural',
+    time: '14:30',
+    duration: '2 hours',
+    icon: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400',
+  },
+  {
+    name: 'Sunset Experience',
+    category: 'Entertainment',
+    time: '18:00',
+    duration: '2 hours',
+    icon: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+  },
+  {
+    name: 'Evening Dinner',
+    category: 'Dining',
+    time: '20:00',
+    duration: '2 hours',
+    icon: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400',
+  },
 ];
 
-const generateItinerary = (destination: typeof destinations[0], startDate: Date, endDate: Date, budget: number): DayItinerary[] => {
+const generateItinerary = (
+  destination: (typeof destinations)[0],
+  startDate: Date,
+  endDate: Date,
+  budget: number
+): DayItinerary[] => {
   const days: DayItinerary[] = [];
   const currentDate = new Date(startDate);
   let dayNum = 1;
-  
+
   while (currentDate <= endDate) {
     const dayTitles = [
       `Arrival & ${destination.name} Discovery`,
@@ -72,8 +118,16 @@ const generateItinerary = (destination: typeof destinations[0], startDate: Date,
       `Relaxation & Local Life`,
       `Departure Day`,
     ];
-    
-    const activities: Activity[] = ACTIVITY_TEMPLATES.slice(0, dayNum === 1 ? 3 : dayNum === Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1 ? 2 : 4).map((template, idx) => ({
+
+    const activities: Activity[] = ACTIVITY_TEMPLATES.slice(
+      0,
+      dayNum === 1
+        ? 3
+        : dayNum ===
+            Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+          ? 2
+          : 4
+    ).map((template, idx) => ({
       id: `gen-${dayNum}-${idx}-${Date.now()}`,
       name: template.name,
       description: `Experience ${template.name.toLowerCase()} in ${destination.name}`,
@@ -87,18 +141,18 @@ const generateItinerary = (destination: typeof destinations[0], startDate: Date,
       location: destination.name,
       isBooked: false,
     }));
-    
+
     days.push({
       day: dayNum,
       date: currentDate.toISOString().split('T')[0],
       title: dayTitles[(dayNum - 1) % dayTitles.length],
       activities,
     });
-    
+
     currentDate.setDate(currentDate.getDate() + 1);
     dayNum++;
   }
-  
+
   return days;
 };
 
@@ -108,15 +162,15 @@ export default function PlanTripScreen() {
   const [destination, setDestination] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [travelers, setTravelers] = useState(2);
-  const [selectedDest, setSelectedDest] = useState<typeof destinations[0] | null>(null);
-  
+  const [selectedDest, setSelectedDest] = useState<(typeof destinations)[0] | null>(null);
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
-  
+
   const [showBudgetPicker, setShowBudgetPicker] = useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<typeof BUDGET_OPTIONS[0] | null>(null);
+  const [selectedBudget, setSelectedBudget] = useState<(typeof BUDGET_OPTIONS)[0] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showTravelStylePicker, setShowTravelStylePicker] = useState(false);
   const [selectedTravelStyle, setSelectedTravelStyle] = useState<TravelStyle | null>(null);
@@ -127,11 +181,16 @@ export default function PlanTripScreen() {
     const iconColor = isSelected ? colors.textLight : colors.primary;
     const size = 24;
     switch (iconName) {
-      case 'User': return <User size={size} color={iconColor} />;
-      case 'Heart': return <Heart size={size} color={iconColor} />;
-      case 'Users': return <Users size={size} color={iconColor} />;
-      case 'UsersRound': return <UsersRound size={size} color={iconColor} />;
-      default: return <User size={size} color={iconColor} />;
+      case 'User':
+        return <User size={size} color={iconColor} />;
+      case 'Heart':
+        return <Heart size={size} color={iconColor} />;
+      case 'Users':
+        return <Users size={size} color={iconColor} />;
+      case 'UsersRound':
+        return <UsersRound size={size} color={iconColor} />;
+      default:
+        return <User size={size} color={iconColor} />;
     }
   };
 
@@ -154,7 +213,7 @@ export default function PlanTripScreen() {
 
   const handleDateSelect = (day: number) => {
     const selected = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
-    
+
     if (!startDate || (startDate && endDate)) {
       setStartDate(selected);
       setEndDate(null);
@@ -189,16 +248,16 @@ export default function PlanTripScreen() {
   };
 
   const navigateMonth = (direction: number) => {
-    setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + direction, 1));
+    setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + direction, 1));
   };
 
   const filteredDestinations = destinations.filter(
-    d =>
+    (d) =>
       d.name.toLowerCase().includes(destination.toLowerCase()) ||
       d.country.toLowerCase().includes(destination.toLowerCase())
   );
 
-  const selectDestination = (dest: typeof destinations[0]) => {
+  const selectDestination = (dest: (typeof destinations)[0]) => {
     setSelectedDest(dest);
     setDestination(dest.name);
     setShowSuggestions(false);
@@ -221,12 +280,12 @@ export default function PlanTripScreen() {
     }
 
     setIsGenerating(true);
-    
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const itinerary = generateItinerary(selectedDest, startDate, endDate, selectedBudget.value);
-      
+
       const newTrip: Trip = {
         id: `trip-${Date.now()}`,
         destination: selectedDest,
@@ -240,10 +299,10 @@ export default function PlanTripScreen() {
         itinerary,
         coverImage: selectedDest.image,
       };
-      
+
       addTrip(newTrip);
       console.log('Trip created:', newTrip.id);
-      
+
       router.replace(`/trip/${newTrip.id}`);
     } catch (error) {
       console.log('Error generating itinerary:', error);
@@ -254,23 +313,22 @@ export default function PlanTripScreen() {
   };
 
   const toggleFoodPreference = (id: string) => {
-    setSelectedFoodPreferences(prev => 
-      prev.includes(id) 
-        ? prev.filter(p => p !== id)
-        : [...prev, id]
+    setSelectedFoodPreferences((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
     );
   };
 
   const getSelectedFoodNames = () => {
     if (selectedFoodPreferences.length === 0) return null;
-    const names = selectedFoodPreferences.map(id => 
-      foodPreferences.find(f => f.id === id)?.name
-    ).filter(Boolean);
+    const names = selectedFoodPreferences
+      .map((id) => foodPreferences.find((f) => f.id === id)?.name)
+      .filter(Boolean);
     if (names.length <= 2) return names.join(', ');
     return `${names.slice(0, 2).join(', ')} +${names.length - 2}`;
   };
 
-  const isFormComplete = selectedDest && startDate && endDate && selectedBudget && selectedTravelStyle;
+  const isFormComplete =
+    selectedDest && startDate && endDate && selectedBudget && selectedTravelStyle;
 
   return (
     <View style={styles.container}>
@@ -286,9 +344,7 @@ export default function PlanTripScreen() {
             </View>
             <View style={styles.headerText}>
               <Text style={styles.headerTitle}>Plan with AI</Text>
-              <Text style={styles.headerSubtitle}>
-                Tell us about your dream trip
-              </Text>
+              <Text style={styles.headerSubtitle}>Tell us about your dream trip</Text>
             </View>
           </View>
           <Pressable style={styles.closeButton} onPress={() => router.back()}>
@@ -296,8 +352,8 @@ export default function PlanTripScreen() {
           </Pressable>
         </View>
 
-        <ScrollView 
-          style={styles.content} 
+        <ScrollView
+          style={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -310,7 +366,7 @@ export default function PlanTripScreen() {
                 placeholder="Search destinations..."
                 placeholderTextColor={colors.textTertiary}
                 value={destination}
-                onChangeText={text => {
+                onChangeText={(text) => {
                   setDestination(text);
                   setShowSuggestions(text.length > 0);
                   if (!text) setSelectedDest(null);
@@ -318,10 +374,12 @@ export default function PlanTripScreen() {
                 onFocus={() => setShowSuggestions(destination.length > 0)}
               />
               {destination.length > 0 && (
-                <Pressable onPress={() => {
-                  setDestination('');
-                  setSelectedDest(null);
-                }}>
+                <Pressable
+                  onPress={() => {
+                    setDestination('');
+                    setSelectedDest(null);
+                  }}
+                >
                   <X size={18} color={colors.textTertiary} />
                 </Pressable>
               )}
@@ -329,7 +387,7 @@ export default function PlanTripScreen() {
 
             {showSuggestions && filteredDestinations.length > 0 && (
               <View style={styles.suggestions}>
-                {filteredDestinations.slice(0, 4).map(dest => (
+                {filteredDestinations.slice(0, 4).map((dest) => (
                   <Pressable
                     key={dest.id}
                     style={styles.suggestionItem}
@@ -353,12 +411,12 @@ export default function PlanTripScreen() {
             {!destination && (
               <View style={styles.quickPicks}>
                 <Text style={styles.quickPicksLabel}>Popular choices</Text>
-                <ScrollView 
-                  horizontal 
+                <ScrollView
+                  horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.quickPicksContent}
                 >
-                  {suggestedDestinations.map(dest => (
+                  {suggestedDestinations.map((dest) => (
                     <Pressable
                       key={dest.id}
                       style={styles.quickPickCard}
@@ -423,10 +481,7 @@ export default function PlanTripScreen() {
                   <Text style={styles.controlButtonText}>-</Text>
                 </Pressable>
                 <Text style={styles.travelersCount}>{travelers}</Text>
-                <Pressable
-                  style={styles.controlButton}
-                  onPress={() => setTravelers(travelers + 1)}
-                >
+                <Pressable style={styles.controlButton} onPress={() => setTravelers(travelers + 1)}>
                   <Text style={styles.controlButtonText}>+</Text>
                 </Pressable>
               </View>
@@ -438,7 +493,9 @@ export default function PlanTripScreen() {
             <Pressable style={styles.inputContainer} onPress={() => setShowBudgetPicker(true)}>
               <DollarSign size={20} color={selectedBudget ? colors.primary : colors.textTertiary} />
               <Text style={selectedBudget ? styles.inputText : styles.placeholderText}>
-                {selectedBudget ? `${selectedBudget.label} (${selectedBudget.range})` : 'Set your budget'}
+                {selectedBudget
+                  ? `${selectedBudget.label} (${selectedBudget.range})`
+                  : 'Set your budget'}
               </Text>
               <ChevronRight size={18} color={colors.textTertiary} />
             </Pressable>
@@ -447,8 +504,15 @@ export default function PlanTripScreen() {
           <View style={styles.formSection}>
             <Text style={styles.sectionLabel}>Food preferences</Text>
             <Pressable style={styles.inputContainer} onPress={() => setShowFoodPicker(true)}>
-              <UtensilsCrossed size={20} color={selectedFoodPreferences.length > 0 ? colors.primary : colors.textTertiary} />
-              <Text style={selectedFoodPreferences.length > 0 ? styles.inputText : styles.placeholderText}>
+              <UtensilsCrossed
+                size={20}
+                color={selectedFoodPreferences.length > 0 ? colors.primary : colors.textTertiary}
+              />
+              <Text
+                style={
+                  selectedFoodPreferences.length > 0 ? styles.inputText : styles.placeholderText
+                }
+              >
                 {getSelectedFoodNames() || 'Select cuisines you enjoy'}
               </Text>
               <ChevronRight size={18} color={colors.textTertiary} />
@@ -458,7 +522,8 @@ export default function PlanTripScreen() {
           <View style={styles.aiNote}>
             <Sparkles size={16} color={colors.primaryLight} />
             <Text style={styles.aiNoteText}>
-              Our AI will create a personalized itinerary based on your preferences and travel style.
+              Our AI will create a personalized itinerary based on your preferences and travel
+              style.
             </Text>
           </View>
 
@@ -479,7 +544,7 @@ export default function PlanTripScreen() {
                   <X size={24} color={colors.text} />
                 </Pressable>
               </View>
-              
+
               <View style={styles.calendarNav}>
                 <Pressable onPress={() => navigateMonth(-1)} style={styles.navButton}>
                   <ChevronLeft size={24} color={colors.text} />
@@ -493,8 +558,10 @@ export default function PlanTripScreen() {
               </View>
 
               <View style={styles.calendarDays}>
-                {DAYS.map(day => (
-                  <Text key={day} style={styles.dayLabel}>{day}</Text>
+                {DAYS.map((day) => (
+                  <Text key={day} style={styles.dayLabel}>
+                    {day}
+                  </Text>
                 ))}
               </View>
 
@@ -521,11 +588,13 @@ export default function PlanTripScreen() {
                         onPress={() => !past && handleDateSelect(day)}
                         disabled={past}
                       >
-                        <Text style={[
-                          styles.dayText,
-                          past && styles.dayTextPast,
-                          selected && styles.dayTextSelected,
-                        ]}>
+                        <Text
+                          style={[
+                            styles.dayText,
+                            past && styles.dayTextPast,
+                            selected && styles.dayTextSelected,
+                          ]}
+                        >
                           {day}
                         </Text>
                       </Pressable>
@@ -539,14 +608,26 @@ export default function PlanTripScreen() {
                 <View style={styles.datePreviewItem}>
                   <Text style={styles.datePreviewLabel}>Start</Text>
                   <Text style={styles.datePreviewValue}>
-                    {startDate ? startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not selected'}
+                    {startDate
+                      ? startDate.toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })
+                      : 'Not selected'}
                   </Text>
                 </View>
                 <View style={styles.datePreviewDivider} />
                 <View style={styles.datePreviewItem}>
                   <Text style={styles.datePreviewLabel}>End</Text>
                   <Text style={styles.datePreviewValue}>
-                    {endDate ? endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not selected'}
+                    {endDate
+                      ? endDate.toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })
+                      : 'Not selected'}
                   </Text>
                 </View>
               </View>
@@ -576,11 +657,11 @@ export default function PlanTripScreen() {
                   <X size={24} color={colors.text} />
                 </Pressable>
               </View>
-              
+
               <Text style={styles.budgetSubtitle}>This helps us tailor your itinerary</Text>
 
               <View style={styles.travelStyleOptions}>
-                {travelStyles.map(style => {
+                {travelStyles.map((style) => {
                   const isSelected = selectedTravelStyle?.id === style.id;
                   return (
                     <Pressable
@@ -588,11 +669,21 @@ export default function PlanTripScreen() {
                       style={[styles.travelStyleCard, isSelected && styles.travelStyleCardSelected]}
                       onPress={() => setSelectedTravelStyle(style)}
                     >
-                      <View style={[styles.travelStyleIcon, isSelected && styles.travelStyleIconSelected]}>
+                      <View
+                        style={[
+                          styles.travelStyleIcon,
+                          isSelected && styles.travelStyleIconSelected,
+                        ]}
+                      >
                         {getTravelStyleIcon(style.icon, isSelected)}
                       </View>
                       <View style={styles.travelStyleInfo}>
-                        <Text style={[styles.travelStyleName, isSelected && styles.travelStyleNameSelected]}>
+                        <Text
+                          style={[
+                            styles.travelStyleName,
+                            isSelected && styles.travelStyleNameSelected,
+                          ]}
+                        >
                           {style.name}
                         </Text>
                         <Text style={styles.travelStyleDesc}>{style.description}</Text>
@@ -632,11 +723,11 @@ export default function PlanTripScreen() {
                   <X size={24} color={colors.text} />
                 </Pressable>
               </View>
-              
+
               <Text style={styles.budgetSubtitle}>Per person, for the entire trip</Text>
 
               <View style={styles.budgetOptions}>
-                {BUDGET_OPTIONS.map(option => (
+                {BUDGET_OPTIONS.map((option) => (
                   <Pressable
                     key={option.id}
                     style={[
@@ -646,22 +737,24 @@ export default function PlanTripScreen() {
                     onPress={() => setSelectedBudget(option)}
                   >
                     <View style={styles.budgetOptionContent}>
-                      <Text style={[
-                        styles.budgetOptionLabel,
-                        selectedBudget?.id === option.id && styles.budgetOptionLabelSelected,
-                      ]}>
+                      <Text
+                        style={[
+                          styles.budgetOptionLabel,
+                          selectedBudget?.id === option.id && styles.budgetOptionLabelSelected,
+                        ]}
+                      >
                         {option.label}
                       </Text>
-                      <Text style={[
-                        styles.budgetOptionRange,
-                        selectedBudget?.id === option.id && styles.budgetOptionRangeSelected,
-                      ]}>
+                      <Text
+                        style={[
+                          styles.budgetOptionRange,
+                          selectedBudget?.id === option.id && styles.budgetOptionRangeSelected,
+                        ]}
+                      >
                         {option.range}
                       </Text>
                     </View>
-                    {selectedBudget?.id === option.id && (
-                      <Check size={20} color={colors.primary} />
-                    )}
+                    {selectedBudget?.id === option.id && <Check size={20} color={colors.primary} />}
                   </Pressable>
                 ))}
               </View>
@@ -691,15 +784,17 @@ export default function PlanTripScreen() {
                   <X size={24} color={colors.text} />
                 </Pressable>
               </View>
-              
-              <Text style={styles.budgetSubtitle}>Select cuisines you would like to experience</Text>
 
-              <ScrollView 
+              <Text style={styles.budgetSubtitle}>
+                Select cuisines you would like to experience
+              </Text>
+
+              <ScrollView
                 style={styles.foodScrollView}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.foodGrid}
               >
-                {foodPreferences.map(food => {
+                {foodPreferences.map((food) => {
                   const isSelected = selectedFoodPreferences.includes(food.id);
                   return (
                     <Pressable
@@ -708,7 +803,9 @@ export default function PlanTripScreen() {
                       onPress={() => toggleFoodPreference(food.id)}
                     >
                       <Text style={styles.foodEmoji}>{food.emoji}</Text>
-                      <Text style={[styles.foodChipText, isSelected && styles.foodChipTextSelected]}>
+                      <Text
+                        style={[styles.foodChipText, isSelected && styles.foodChipTextSelected]}
+                      >
                         {food.name}
                       </Text>
                       {isSelected && (
@@ -725,10 +822,7 @@ export default function PlanTripScreen() {
                 <Text style={styles.foodSelectedCount}>
                   {selectedFoodPreferences.length} selected
                 </Text>
-                <Pressable
-                  style={styles.modalButton}
-                  onPress={() => setShowFoodPicker(false)}
-                >
+                <Pressable style={styles.modalButton} onPress={() => setShowFoodPicker(false)}>
                   <Text style={styles.modalButtonText}>Done</Text>
                 </Pressable>
               </View>

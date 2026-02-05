@@ -90,7 +90,7 @@ class WeatherService {
 
   async getWeatherForecast(request: WeatherForecastRequest): Promise<WeatherForecastResponse> {
     const cacheKey = this.getCacheKey(request);
-    
+
     // Check memory cache
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
@@ -113,7 +113,7 @@ class WeatherService {
 
     // Fetch new data (in production, call actual weather API)
     const forecast = await this.fetchForecast(request);
-    
+
     // Update caches
     this.cache.set(cacheKey, { data: forecast, timestamp: Date.now() });
     this.persistCache();
@@ -173,16 +173,25 @@ class WeatherService {
   private generateAlerts(startDate: string, endDate: string): WeatherAlert[] {
     // In production, these would come from the weather API
     const alerts: WeatherAlert[] = [];
-    
+
     // Check if any forecast day has severe weather
     const forecasts = this.generateDailyForecasts(startDate, endDate);
-    forecasts.forEach(forecast => {
-      if (['thunderstorm', 'heavy_rain', 'extreme_heat', 'extreme_cold'].includes(forecast.condition.type)) {
+    forecasts.forEach((forecast) => {
+      if (
+        ['thunderstorm', 'heavy_rain', 'extreme_heat', 'extreme_cold'].includes(
+          forecast.condition.type
+        )
+      ) {
         alerts.push({
           id: `alert-${forecast.date}`,
-          type: forecast.condition.type === 'thunderstorm' ? 'thunderstorm' : 
-                forecast.condition.type === 'extreme_heat' ? 'heat' : 
-                forecast.condition.type === 'extreme_cold' ? 'cold' : 'other',
+          type:
+            forecast.condition.type === 'thunderstorm'
+              ? 'thunderstorm'
+              : forecast.condition.type === 'extreme_heat'
+                ? 'heat'
+                : forecast.condition.type === 'extreme_cold'
+                  ? 'cold'
+                  : 'other',
           severity: 'warning',
           title: this.getAlertTitle(forecast.condition.type),
           description: this.getAlertDescription(forecast.condition.type),
@@ -212,7 +221,8 @@ class WeatherService {
   private getAlertDescription(condition: WeatherConditionType): string {
     const descriptions: Partial<Record<WeatherConditionType, string>> = {
       thunderstorm: 'Severe thunderstorms expected. Avoid outdoor activities and seek shelter.',
-      heavy_rain: 'Heavy rainfall may cause flooding and poor visibility. Plan indoor alternatives.',
+      heavy_rain:
+        'Heavy rainfall may cause flooding and poor visibility. Plan indoor alternatives.',
       extreme_heat: 'Dangerously high temperatures. Stay hydrated and limit outdoor exposure.',
       extreme_cold: 'Dangerously cold temperatures. Dress in layers and limit outdoor exposure.',
       hail: 'Hail expected. Stay indoors and protect vehicles.',
@@ -231,9 +241,7 @@ class WeatherService {
     timeSlot?: string
   ): WeatherSuitability {
     const requirements = activity.weatherRequirements;
-    const condition = timeSlot 
-      ? this.getHourlyCondition(forecast, timeSlot) 
-      : forecast.condition;
+    const condition = timeSlot ? this.getHourlyCondition(forecast, timeSlot) : forecast.condition;
 
     let score = 100;
     const warnings: string[] = [];
@@ -245,8 +253,10 @@ class WeatherService {
       // Check unsuitable conditions
       if (requirements.unsuitableConditions.includes(condition.type)) {
         score -= 60;
-        warnings.push(`${CONDITION_ICONS[condition.type]} Weather not suitable for this outdoor activity`);
-        
+        warnings.push(
+          `${CONDITION_ICONS[condition.type]} Weather not suitable for this outdoor activity`
+        );
+
         if (requirements.hasIndoorOption) {
           tips.push('Consider the indoor option for this activity');
         } else {
@@ -259,9 +269,11 @@ class WeatherService {
         }
       }
       // Check suitable but not ideal
-      else if (requirements.suitableConditions.includes(condition.type) && 
-               requirements.idealConditions && 
-               !requirements.idealConditions.includes(condition.type)) {
+      else if (
+        requirements.suitableConditions.includes(condition.type) &&
+        requirements.idealConditions &&
+        !requirements.idealConditions.includes(condition.type)
+      ) {
         score -= 15;
         tips.push('Conditions are acceptable but not ideal');
       }
@@ -271,7 +283,9 @@ class WeatherService {
     if (requirements.minTemp !== undefined && condition.temperature < requirements.minTemp) {
       const diff = requirements.minTemp - condition.temperature;
       score -= Math.min(diff * 3, 30);
-      warnings.push(`Temperature (${condition.temperature}°C) below recommended minimum (${requirements.minTemp}°C)`);
+      warnings.push(
+        `Temperature (${condition.temperature}°C) below recommended minimum (${requirements.minTemp}°C)`
+      );
       adjustments.push({
         type: 'bring_layers',
         description: 'Dress warmly in layers',
@@ -283,7 +297,9 @@ class WeatherService {
     if (requirements.maxTemp !== undefined && condition.temperature > requirements.maxTemp) {
       const diff = condition.temperature - requirements.maxTemp;
       score -= Math.min(diff * 3, 30);
-      warnings.push(`Temperature (${condition.temperature}°C) above recommended maximum (${requirements.maxTemp}°C)`);
+      warnings.push(
+        `Temperature (${condition.temperature}°C) above recommended maximum (${requirements.maxTemp}°C)`
+      );
       adjustments.push({
         type: 'bring_water',
         description: 'Stay hydrated - bring plenty of water',
@@ -313,7 +329,10 @@ class WeatherService {
     }
 
     // Precipitation check
-    if (requirements.maxPrecipitationChance && condition.precipitation > requirements.maxPrecipitationChance) {
+    if (
+      requirements.maxPrecipitationChance &&
+      condition.precipitation > requirements.maxPrecipitationChance
+    ) {
       score -= (condition.precipitation - requirements.maxPrecipitationChance) * 0.5;
       if (condition.precipitation > 50) {
         warnings.push(`${condition.precipitation}% chance of rain`);
@@ -351,8 +370,7 @@ class WeatherService {
     }
 
     // Clear skies requirement
-    if (requirements.requiresClearSkies && 
-        !['sunny', 'partly_cloudy'].includes(condition.type)) {
+    if (requirements.requiresClearSkies && !['sunny', 'partly_cloudy'].includes(condition.type)) {
       score -= 40;
       warnings.push('This activity requires clear skies for the best experience');
     }
@@ -383,7 +401,7 @@ class WeatherService {
   }
 
   private getHourlyCondition(forecast: DailyForecast, timeSlot: string): WeatherCondition {
-    const hourly = forecast.hourlyForecast.find(h => h.time === timeSlot);
+    const hourly = forecast.hourlyForecast.find((h) => h.time === timeSlot);
     if (hourly) {
       return hourly.condition;
     }
@@ -397,7 +415,7 @@ class WeatherService {
     const recommendations: TimeSlotRecommendation[] = [];
 
     for (const slot of activity.availableTimeSlots) {
-      const hourly = forecast.hourlyForecast.find(h => h.time === slot);
+      const hourly = forecast.hourlyForecast.find((h) => h.time === slot);
       if (!hourly) continue;
 
       const miniSuitability = this.assessActivityWeather(
@@ -452,21 +470,18 @@ class WeatherService {
   // Indoor Alternatives
   // ============================================================================
 
-  getIndoorAlternatives(
-    activityId: string,
-    category: ActivityCategory
-  ): IndoorAlternative[] {
+  getIndoorAlternatives(activityId: string, category: ActivityCategory): IndoorAlternative[] {
     // Get pre-mapped alternatives
     const mapped = INDOOR_ALTERNATIVES_MAP[activityId] || [];
-    
+
     // Also suggest general indoor activities for the category
-    const categoryAlternatives = MOCK_ACTIVITIES
-      .filter(a => 
-        !a.weatherRequirements.isOutdoor && 
+    const categoryAlternatives = MOCK_ACTIVITIES.filter(
+      (a) =>
+        !a.weatherRequirements.isOutdoor &&
         (a.category === category || this.isSimilarCategory(a.category, category))
-      )
+    )
       .slice(0, 3)
-      .map(a => ({
+      .map((a) => ({
         originalActivityId: activityId,
         alternativeId: a.id,
         alternativeName: a.name,
@@ -488,8 +503,8 @@ class WeatherService {
       ['food_drink', 'nightlife'],
       ['wellness', 'shopping'],
     ];
-    
-    return groups.some(group => group.includes(cat1) && group.includes(cat2));
+
+    return groups.some((group) => group.includes(cat1) && group.includes(cat2));
   }
 
   private calculateMatchScore(original: ActivityCategory, alternative: ActivityCategory): number {
@@ -509,8 +524,8 @@ class WeatherService {
     const impacts: ItineraryWeatherImpact[] = [];
 
     for (const dailyForecast of forecast.daily) {
-      const dayActivities = activities.filter(a => 
-        a.availableTimeSlots.length > 0 // Activities scheduled for this day
+      const dayActivities = activities.filter(
+        (a) => a.availableTimeSlots.length > 0 // Activities scheduled for this day
       );
 
       const affectedActivities: AffectedActivity[] = [];
@@ -543,8 +558,9 @@ class WeatherService {
         overallScore: dayScore,
         affectedActivities,
         recommendations,
-        alerts: forecast.alerts.filter(a => 
-          a.startTime.startsWith(dailyForecast.date) || a.endTime.startsWith(dailyForecast.date)
+        alerts: forecast.alerts.filter(
+          (a) =>
+            a.startTime.startsWith(dailyForecast.date) || a.endTime.startsWith(dailyForecast.date)
         ),
       });
     }
@@ -566,7 +582,7 @@ class WeatherService {
         priority: 'high',
         title: 'Consider Rescheduling Outdoor Activities',
         description: `Weather conditions on ${forecast.dayName} look challenging. Consider moving outdoor activities to a different day.`,
-        affectedActivityIds: affected.map(a => a.activityId),
+        affectedActivityIds: affected.map((a) => a.activityId),
       });
     }
 
@@ -637,13 +653,15 @@ class WeatherService {
     const optional: PackingSuggestion[] = [];
 
     // Analyze all days
-    const conditions = forecast.daily.map(d => d.condition);
-    const hasRain = conditions.some(c => ['light_rain', 'rainy', 'heavy_rain', 'thunderstorm'].includes(c.type));
-    const hasHeat = conditions.some(c => c.temperature > 28 || c.uvIndex > 6);
-    const hasCold = conditions.some(c => c.temperature < 15);
-    const hasWind = conditions.some(c => c.windSpeed > 25);
-    const maxTemp = Math.max(...conditions.map(c => c.temperature));
-    const minTemp = Math.min(...conditions.map(c => c.temperature));
+    const conditions = forecast.daily.map((d) => d.condition);
+    const hasRain = conditions.some((c) =>
+      ['light_rain', 'rainy', 'heavy_rain', 'thunderstorm'].includes(c.type)
+    );
+    const hasHeat = conditions.some((c) => c.temperature > 28 || c.uvIndex > 6);
+    const hasCold = conditions.some((c) => c.temperature < 15);
+    const hasWind = conditions.some((c) => c.windSpeed > 25);
+    const maxTemp = Math.max(...conditions.map((c) => c.temperature));
+    const minTemp = Math.min(...conditions.map((c) => c.temperature));
 
     // Rain gear
     if (hasRain) {
@@ -668,7 +686,7 @@ class WeatherService {
       essentials.push({
         item: 'Sunscreen SPF 50+',
         icon: '🧴',
-        reason: `High UV index (up to ${Math.max(...conditions.map(c => c.uvIndex))}) expected`,
+        reason: `High UV index (up to ${Math.max(...conditions.map((c) => c.uvIndex))}) expected`,
         priority: 'essential',
         forConditions: ['sunny', 'partly_cloudy'],
       });
@@ -758,12 +776,12 @@ class WeatherService {
     hasRain: boolean
   ): string {
     const days = forecast.daily.length;
-    const sunnyDays = forecast.daily.filter(d => 
+    const sunnyDays = forecast.daily.filter((d) =>
       ['sunny', 'partly_cloudy'].includes(d.condition.type)
     ).length;
 
     let summary = `Expect temperatures between ${minTemp}°C and ${maxTemp}°C during your ${days}-day trip to ${forecast.location.name}. `;
-    
+
     if (sunnyDays === days) {
       summary += 'Beautiful weather with plenty of sunshine expected!';
     } else if (sunnyDays >= days * 0.7) {
@@ -807,10 +825,7 @@ class WeatherService {
 
   async saveWeatherPreferences(preferences: WeatherPreferences): Promise<void> {
     try {
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.WEATHER_PREFERENCES,
-        JSON.stringify(preferences)
-      );
+      await AsyncStorage.setItem(STORAGE_KEYS.WEATHER_PREFERENCES, JSON.stringify(preferences));
     } catch (error) {
       console.error('Error saving weather preferences:', error);
     }
@@ -830,14 +845,15 @@ class WeatherService {
 
   formatTemperature(celsius: number, unit: 'celsius' | 'fahrenheit'): string {
     if (unit === 'fahrenheit') {
-      return `${Math.round(celsius * 9/5 + 32)}°F`;
+      return `${Math.round((celsius * 9) / 5 + 32)}°F`;
     }
     return `${Math.round(celsius)}°C`;
   }
 
   private getCacheKey(request: WeatherForecastRequest): string {
-    const loc = request.location.city || 
-                `${request.location.coordinates?.lat},${request.location.coordinates?.lng}`;
+    const loc =
+      request.location.city ||
+      `${request.location.coordinates?.lat},${request.location.coordinates?.lng}`;
     return `${loc}_${request.startDate}_${request.endDate}`;
   }
 
@@ -854,7 +870,7 @@ class WeatherService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   clearCache(): void {

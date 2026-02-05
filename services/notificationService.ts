@@ -228,9 +228,10 @@ class NotificationService {
       };
 
       // Build notification content
-      const template = minutesBefore <= 30 
-        ? NOTIFICATION_TEMPLATES.activity_reminder_30min 
-        : NOTIFICATION_TEMPLATES.activity_reminder_1hour;
+      const template =
+        minutesBefore <= 30
+          ? NOTIFICATION_TEMPLATES.activity_reminder_30min
+          : NOTIFICATION_TEMPLATES.activity_reminder_1hour;
 
       const title = this.interpolateTemplate(template.titleTemplate, {
         activityName: activity.name,
@@ -292,7 +293,15 @@ class NotificationService {
   // ============================================================================
 
   async startTravelAlertMonitoring(
-    alert: Omit<TravelAlert, 'id' | 'currentEstimatedDuration' | 'trafficCondition' | 'delayMinutes' | 'lastUpdated' | 'isActive'>
+    alert: Omit<
+      TravelAlert,
+      | 'id'
+      | 'currentEstimatedDuration'
+      | 'trafficCondition'
+      | 'delayMinutes'
+      | 'lastUpdated'
+      | 'isActive'
+    >
   ): Promise<TravelAlert> {
     const travelAlert: TravelAlert = {
       id: `travel-${Date.now()}`,
@@ -335,8 +344,8 @@ class NotificationService {
 
     // Calculate when to leave
     const requiredDepartureTime = new Date(
-      alert.targetArrivalTime.getTime() - 
-      (alert.currentEstimatedDuration + alert.bufferMinutes) * 60000
+      alert.targetArrivalTime.getTime() -
+        (alert.currentEstimatedDuration + alert.bufferMinutes) * 60000
     );
 
     alert.suggestedDepartureTime = requiredDepartureTime;
@@ -381,9 +390,10 @@ class NotificationService {
     const body = this.interpolateTemplate(template.bodyTemplate, {
       duration: `${alert.currentEstimatedDuration} min`,
       destination: alert.toLocation.name,
-      trafficInfo: alert.trafficCondition === 'light' 
-        ? 'Traffic is light.' 
-        : `${alert.trafficCondition.charAt(0).toUpperCase() + alert.trafficCondition.slice(1)} traffic.`,
+      trafficInfo:
+        alert.trafficCondition === 'light'
+          ? 'Traffic is light.'
+          : `${alert.trafficCondition.charAt(0).toUpperCase() + alert.trafficCondition.slice(1)} traffic.`,
     });
 
     await Notifications.scheduleNotificationAsync({
@@ -545,11 +555,12 @@ class NotificationService {
   private async sendToPartnerDevice(notification: PartnerNotification) {
     // In production, this would call your backend API to send a push notification
     // to the partner's device via FCM (Android) or APNs (iOS)
-    
+
     console.log('Sending partner notification:', notification);
 
     // For demo purposes, we'll show a local notification as if received
-    const template = NOTIFICATION_TEMPLATES[notification.type] || NOTIFICATION_TEMPLATES.itinerary_shared;
+    const template =
+      NOTIFICATION_TEMPLATES[notification.type] || NOTIFICATION_TEMPLATES.itinerary_shared;
 
     const title = this.interpolateTemplate(template.titleTemplate, {
       partnerName: notification.senderName,
@@ -587,7 +598,9 @@ class NotificationService {
   // ============================================================================
 
   enableSurpriseMode(itineraryId: string) {
-    if (!this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.includes(itineraryId)) {
+    if (
+      !this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.includes(itineraryId)
+    ) {
       this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.push(itineraryId);
     }
     this.preferences.partnerNotifications.surpriseMode.enabled = true;
@@ -595,19 +608,23 @@ class NotificationService {
 
   disableSurpriseMode(itineraryId?: string) {
     if (itineraryId) {
-      this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds = 
-        this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.filter(id => id !== itineraryId);
+      this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds =
+        this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.filter(
+          (id) => id !== itineraryId
+        );
     } else {
       this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds = [];
     }
-    
+
     if (this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.length === 0) {
       this.preferences.partnerNotifications.surpriseMode.enabled = false;
     }
   }
 
   isInSurpriseMode(itineraryId: string): boolean {
-    return this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.includes(itineraryId);
+    return this.preferences.partnerNotifications.surpriseMode.hiddenItineraryIds.includes(
+      itineraryId
+    );
   }
 
   // ============================================================================
@@ -700,7 +717,7 @@ class NotificationService {
     const time = date.getHours() * 60 + date.getMinutes();
     const [startHour, startMin] = this.preferences.quietHours.startTime.split(':').map(Number);
     const [endHour, endMin] = this.preferences.quietHours.endTime.split(':').map(Number);
-    
+
     const start = startHour * 60 + startMin;
     const end = endHour * 60 + endMin;
 
@@ -727,6 +744,9 @@ class NotificationService {
 export const notificationService = new NotificationService();
 
 // Export convenience functions
-export const scheduleActivityReminder = notificationService.scheduleActivityReminder.bind(notificationService);
-export const startTravelAlertMonitoring = notificationService.startTravelAlertMonitoring.bind(notificationService);
-export const sendPartnerNotification = notificationService.sendPartnerNotification.bind(notificationService);
+export const scheduleActivityReminder =
+  notificationService.scheduleActivityReminder.bind(notificationService);
+export const startTravelAlertMonitoring =
+  notificationService.startTravelAlertMonitoring.bind(notificationService);
+export const sendPartnerNotification =
+  notificationService.sendPartnerNotification.bind(notificationService);

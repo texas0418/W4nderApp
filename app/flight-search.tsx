@@ -86,7 +86,11 @@ function FlightCard({ flight, onPress, passengers }: FlightCardProps) {
     best_value: { bg: `${colors.success}15`, color: colors.success, label: 'Best Value' },
     cheapest: { bg: `${colors.primary}15`, color: colors.primary, label: 'Cheapest' },
     fastest: { bg: `${colors.warning}15`, color: colors.warning, label: 'Fastest' },
-    recommended: { bg: `${colors.primaryLight}15`, color: colors.primaryLight, label: 'Recommended' },
+    recommended: {
+      bg: `${colors.primaryLight}15`,
+      color: colors.primaryLight,
+      label: 'Recommended',
+    },
     early_bird: { bg: '#FFF3E015', color: '#E65100', label: 'Early Bird' },
     red_eye: { bg: '#E8EAF615', color: '#283593', label: 'Red Eye' },
   };
@@ -96,7 +100,7 @@ function FlightCard({ flight, onPress, passengers }: FlightCardProps) {
       {/* Tags */}
       {flight.tags.length > 0 && (
         <View style={styles.tagRow}>
-          {flight.tags.slice(0, 2).map(tag => {
+          {flight.tags.slice(0, 2).map((tag) => {
             const cfg = tagConfig[tag];
             if (!cfg) return null;
             return (
@@ -137,13 +141,18 @@ function FlightCard({ flight, onPress, passengers }: FlightCardProps) {
                   <Circle size={6} color={colors.warning} fill={colors.warning} />
                 </View>
               )}
-              <Plane size={14} color={colors.primary} style={{ transform: [{ rotate: '90deg' }] }} />
+              <Plane
+                size={14}
+                color={colors.primary}
+                style={{ transform: [{ rotate: '90deg' }] }}
+              />
             </View>
             <Text style={[styles.stopsText, outbound.stops === 0 && styles.nonstopText]}>
               {getStopsLabel(outbound.stops)}
               {outbound.stops > 0 && outbound.layoverDurations && (
                 <Text style={styles.layoverText}>
-                  {' '}({formatDuration(outbound.layoverDurations[0])})
+                  {' '}
+                  ({formatDuration(outbound.layoverDurations[0])})
                 </Text>
               )}
             </Text>
@@ -178,10 +187,12 @@ function FlightCard({ flight, onPress, passengers }: FlightCardProps) {
             ) : (
               <BriefcaseBusiness size={12} color={colors.textTertiary} />
             )}
-            <Text style={[
-              styles.baggageText,
-              flight.baggage.carryOn.included ? styles.baggageIncluded : styles.baggagePaid
-            ]}>
+            <Text
+              style={[
+                styles.baggageText,
+                flight.baggage.carryOn.included ? styles.baggageIncluded : styles.baggagePaid,
+              ]}
+            >
               {flight.baggage.carryOn.included ? 'Carry-on incl.' : 'No carry-on'}
             </Text>
           </View>
@@ -196,14 +207,10 @@ function FlightCard({ flight, onPress, passengers }: FlightCardProps) {
 
       {/* Price */}
       <View style={styles.priceSection}>
-        {flight.originalPrice && (
-          <Text style={styles.originalPrice}>${flight.originalPrice}</Text>
-        )}
+        {flight.originalPrice && <Text style={styles.originalPrice}>${flight.originalPrice}</Text>}
         <Text style={styles.price}>${flight.price}</Text>
         <Text style={styles.priceLabel}>per person</Text>
-        {passengers > 1 && (
-          <Text style={styles.totalLabel}>${flight.totalPrice} total</Text>
-        )}
+        {passengers > 1 && <Text style={styles.totalLabel}>${flight.totalPrice} total</Text>}
         <Text style={styles.fareClass}>{flight.fareClass}</Text>
       </View>
     </Pressable>
@@ -226,7 +233,12 @@ function AirportPicker({ visible, onClose, onSelect, title }: AirportPickerProps
   const results = query.length >= 2 ? searchAirports(query) : POPULAR_AIRPORTS.slice(0, 12);
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
       <SafeAreaView style={styles.pickerContainer}>
         <View style={styles.pickerHeader}>
           <Text style={styles.pickerTitle}>{title}</Text>
@@ -250,9 +262,7 @@ function AirportPicker({ visible, onClose, onSelect, title }: AirportPickerProps
             </Pressable>
           )}
         </View>
-        {query.length < 2 && (
-          <Text style={styles.pickerSectionLabel}>Popular Airports</Text>
-        )}
+        {query.length < 2 && <Text style={styles.pickerSectionLabel}>Popular Airports</Text>}
         <FlatList
           data={results}
           keyExtractor={(item) => item.code}
@@ -304,7 +314,12 @@ function FlightDetailModal({ visible, flight, onClose, onBook, passengers }: Fli
   const outbound = flight.outbound;
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
       <SafeAreaView style={styles.detailContainer}>
         <View style={styles.detailHeader}>
           <Pressable onPress={onClose}>
@@ -355,7 +370,9 @@ function FlightDetailModal({ visible, flight, onClose, onBook, passengers }: Fli
                         {seg.departure.airport.code} - {seg.departure.airport.city}
                       </Text>
                       {seg.departure.terminal && (
-                        <Text style={styles.segmentTerminal}>Terminal {seg.departure.terminal}</Text>
+                        <Text style={styles.segmentTerminal}>
+                          Terminal {seg.departure.terminal}
+                        </Text>
                       )}
                     </View>
                     <View style={styles.segmentDuration}>
@@ -374,7 +391,8 @@ function FlightDetailModal({ visible, flight, onClose, onBook, passengers }: Fli
                   <View style={styles.layoverCard}>
                     <Clock size={14} color={colors.warning} />
                     <Text style={styles.layoverCardText}>
-                      {formatDuration(outbound.layoverDurations[idx])} layover in {outbound.segments[idx].arrival.airport.city}
+                      {formatDuration(outbound.layoverDurations[idx])} layover in{' '}
+                      {outbound.segments[idx].arrival.airport.city}
                     </Text>
                   </View>
                 )}
@@ -391,9 +409,17 @@ function FlightDetailModal({ visible, flight, onClose, onBook, passengers }: Fli
                 { icon: Zap, label: 'Power Outlets', available: outbound.segments[0].power },
                 { icon: Tv, label: 'Entertainment', available: outbound.segments[0].entertainment },
               ].map(({ icon: Icon, label, available }) => (
-                <View key={label} style={[styles.amenityGridItem, !available && styles.amenityUnavailable]}>
+                <View
+                  key={label}
+                  style={[styles.amenityGridItem, !available && styles.amenityUnavailable]}
+                >
                   <Icon size={18} color={available ? colors.primary : colors.textTertiary} />
-                  <Text style={[styles.amenityGridText, !available && styles.amenityGridTextUnavailable]}>
+                  <Text
+                    style={[
+                      styles.amenityGridText,
+                      !available && styles.amenityGridTextUnavailable,
+                    ]}
+                  >
                     {label}
                   </Text>
                 </View>
@@ -406,23 +432,49 @@ function FlightDetailModal({ visible, flight, onClose, onBook, passengers }: Fli
             <Text style={styles.detailSectionTitle}>Baggage</Text>
             <View style={styles.baggageGrid}>
               <View style={styles.baggageItem}>
-                <BriefcaseBusiness size={18} color={flight.baggage.personal.included ? colors.success : colors.error} />
+                <BriefcaseBusiness
+                  size={18}
+                  color={flight.baggage.personal.included ? colors.success : colors.error}
+                />
                 <Text style={styles.baggageLabel}>Personal Item</Text>
-                <Text style={[styles.baggageStatus, { color: flight.baggage.personal.included ? colors.success : colors.error }]}>
+                <Text
+                  style={[
+                    styles.baggageStatus,
+                    { color: flight.baggage.personal.included ? colors.success : colors.error },
+                  ]}
+                >
                   {flight.baggage.personal.included ? 'Included' : 'Not included'}
                 </Text>
               </View>
               <View style={styles.baggageItem}>
-                <Luggage size={18} color={flight.baggage.carryOn.included ? colors.success : colors.warning} />
+                <Luggage
+                  size={18}
+                  color={flight.baggage.carryOn.included ? colors.success : colors.warning}
+                />
                 <Text style={styles.baggageLabel}>Carry-on</Text>
-                <Text style={[styles.baggageStatus, { color: flight.baggage.carryOn.included ? colors.success : colors.warning }]}>
-                  {flight.baggage.carryOn.included ? 'Included' : `$${flight.baggage.checked.fee || 35}`}
+                <Text
+                  style={[
+                    styles.baggageStatus,
+                    { color: flight.baggage.carryOn.included ? colors.success : colors.warning },
+                  ]}
+                >
+                  {flight.baggage.carryOn.included
+                    ? 'Included'
+                    : `$${flight.baggage.checked.fee || 35}`}
                 </Text>
               </View>
               <View style={styles.baggageItem}>
-                <Luggage size={18} color={flight.baggage.checked.included ? colors.success : colors.warning} />
+                <Luggage
+                  size={18}
+                  color={flight.baggage.checked.included ? colors.success : colors.warning}
+                />
                 <Text style={styles.baggageLabel}>Checked Bag</Text>
-                <Text style={[styles.baggageStatus, { color: flight.baggage.checked.included ? colors.success : colors.warning }]}>
+                <Text
+                  style={[
+                    styles.baggageStatus,
+                    { color: flight.baggage.checked.included ? colors.success : colors.warning },
+                  ]}
+                >
                   {flight.baggage.checked.included
                     ? `${flight.baggage.checked.pieces} bag${flight.baggage.checked.pieces > 1 ? 's' : ''} incl.`
                     : `$${flight.baggage.checked.fee || 35}/bag`}
@@ -437,15 +489,27 @@ function FlightDetailModal({ visible, flight, onClose, onBook, passengers }: Fli
             <View style={styles.fareRulesGrid}>
               <View style={styles.fareRule}>
                 <Text style={styles.fareRuleLabel}>Changes</Text>
-                <Text style={[styles.fareRuleValue, { color: flight.fareRules.changeable ? colors.success : colors.error }]}>
+                <Text
+                  style={[
+                    styles.fareRuleValue,
+                    { color: flight.fareRules.changeable ? colors.success : colors.error },
+                  ]}
+                >
                   {flight.fareRules.changeable
-                    ? flight.fareRules.changeFee === 0 ? 'Free changes' : `$${flight.fareRules.changeFee} fee`
+                    ? flight.fareRules.changeFee === 0
+                      ? 'Free changes'
+                      : `$${flight.fareRules.changeFee} fee`
                     : 'Not allowed'}
                 </Text>
               </View>
               <View style={styles.fareRule}>
                 <Text style={styles.fareRuleLabel}>Cancellation</Text>
-                <Text style={[styles.fareRuleValue, { color: flight.fareRules.refundable ? colors.success : colors.error }]}>
+                <Text
+                  style={[
+                    styles.fareRuleValue,
+                    { color: flight.fareRules.refundable ? colors.success : colors.error },
+                  ]}
+                >
                   {flight.fareRules.refundable ? 'Full refund' : 'Non-refundable'}
                 </Text>
               </View>
@@ -540,14 +604,14 @@ export default function FlightSearchScreen() {
     setHasSearched(true);
 
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const mockResults = generateMockFlights(
       origin,
       destination,
       departDate,
       tripType === 'round_trip' ? returnDate : undefined,
-      totalPassengers,
+      totalPassengers
     );
 
     setResults(mockResults);
@@ -559,16 +623,16 @@ export default function FlightSearchScreen() {
     let filtered = [...results];
 
     // Stop filter
-    if (stopFilter === 'nonstop') filtered = filtered.filter(f => f.outbound.stops === 0);
-    else if (stopFilter === '1_stop') filtered = filtered.filter(f => f.outbound.stops <= 1);
-    else if (stopFilter === '2_plus') filtered = filtered.filter(f => f.outbound.stops >= 2);
+    if (stopFilter === 'nonstop') filtered = filtered.filter((f) => f.outbound.stops === 0);
+    else if (stopFilter === '1_stop') filtered = filtered.filter((f) => f.outbound.stops <= 1);
+    else if (stopFilter === '2_plus') filtered = filtered.filter((f) => f.outbound.stops >= 2);
 
     // Refundable
-    if (refundableOnly) filtered = filtered.filter(f => f.fareRules.refundable);
+    if (refundableOnly) filtered = filtered.filter((f) => f.fareRules.refundable);
 
     // Airlines
     if (selectedAirlines.length > 0) {
-      filtered = filtered.filter(f =>
+      filtered = filtered.filter((f) =>
         selectedAirlines.includes(f.outbound.segments[0].airline.code)
       );
     }
@@ -582,15 +646,17 @@ export default function FlightSearchScreen() {
         filtered.sort((a, b) => a.outbound.totalDuration - b.outbound.totalDuration);
         break;
       case 'earliest':
-        filtered.sort((a, b) =>
-          new Date(a.outbound.segments[0].departure.time).getTime() -
-          new Date(b.outbound.segments[0].departure.time).getTime()
+        filtered.sort(
+          (a, b) =>
+            new Date(a.outbound.segments[0].departure.time).getTime() -
+            new Date(b.outbound.segments[0].departure.time).getTime()
         );
         break;
       case 'latest':
-        filtered.sort((a, b) =>
-          new Date(b.outbound.segments[0].departure.time).getTime() -
-          new Date(a.outbound.segments[0].departure.time).getTime()
+        filtered.sort(
+          (a, b) =>
+            new Date(b.outbound.segments[0].departure.time).getTime() -
+            new Date(a.outbound.segments[0].departure.time).getTime()
         );
         break;
       case 'best':
@@ -604,8 +670,10 @@ export default function FlightSearchScreen() {
 
   // Available airlines in results
   const availableAirlines = useMemo(() => {
-    const codes = new Set(results.map(f => f.outbound.segments[0].airline.code));
-    return Array.from(codes).map(code => AIRLINES[code]).filter(Boolean);
+    const codes = new Set(results.map((f) => f.outbound.segments[0].airline.code));
+    return Array.from(codes)
+      .map((code) => AIRLINES[code])
+      .filter(Boolean);
   }, [results]);
 
   // Book flight
@@ -638,7 +706,7 @@ export default function FlightSearchScreen() {
   };
 
   const updatePassenger = (type: 'adults' | 'children' | 'infants', delta: number) => {
-    setPassengers(prev => ({
+    setPassengers((prev) => ({
       ...prev,
       [type]: Math.max(type === 'adults' ? 1 : 0, prev[type] + delta),
     }));
@@ -665,13 +733,15 @@ export default function FlightSearchScreen() {
           <View style={styles.searchForm}>
             {/* Trip Type */}
             <View style={styles.tripTypeRow}>
-              {(['round_trip', 'one_way'] as TripType[]).map(type => (
+              {(['round_trip', 'one_way'] as TripType[]).map((type) => (
                 <Pressable
                   key={type}
                   style={[styles.tripTypeButton, tripType === type && styles.tripTypeActive]}
                   onPress={() => setTripType(type)}
                 >
-                  <Text style={[styles.tripTypeText, tripType === type && styles.tripTypeTextActive]}>
+                  <Text
+                    style={[styles.tripTypeText, tripType === type && styles.tripTypeTextActive]}
+                  >
                     {type === 'round_trip' ? 'Round Trip' : 'One Way'}
                   </Text>
                 </Pressable>
@@ -682,12 +752,18 @@ export default function FlightSearchScreen() {
             <View style={styles.airportFields}>
               <Pressable style={styles.airportField} onPress={() => setShowOriginPicker(true)}>
                 <View style={[styles.fieldIcon, { backgroundColor: `${colors.success}15` }]}>
-                  <Plane size={18} color={colors.success} style={{ transform: [{ rotate: '-45deg' }] }} />
+                  <Plane
+                    size={18}
+                    color={colors.success}
+                    style={{ transform: [{ rotate: '-45deg' }] }}
+                  />
                 </View>
                 <View style={styles.fieldContent}>
                   <Text style={styles.fieldLabel}>From</Text>
                   {origin ? (
-                    <Text style={styles.fieldValue}>{origin.city} ({origin.code})</Text>
+                    <Text style={styles.fieldValue}>
+                      {origin.city} ({origin.code})
+                    </Text>
                   ) : (
                     <Text style={styles.fieldPlaceholder}>Select origin</Text>
                   )}
@@ -700,12 +776,18 @@ export default function FlightSearchScreen() {
 
               <Pressable style={styles.airportField} onPress={() => setShowDestPicker(true)}>
                 <View style={[styles.fieldIcon, { backgroundColor: `${colors.error}15` }]}>
-                  <Plane size={18} color={colors.error} style={{ transform: [{ rotate: '45deg' }] }} />
+                  <Plane
+                    size={18}
+                    color={colors.error}
+                    style={{ transform: [{ rotate: '45deg' }] }}
+                  />
                 </View>
                 <View style={styles.fieldContent}>
                   <Text style={styles.fieldLabel}>To</Text>
                   {destination ? (
-                    <Text style={styles.fieldValue}>{destination.city} ({destination.code})</Text>
+                    <Text style={styles.fieldValue}>
+                      {destination.city} ({destination.code})
+                    </Text>
                   ) : (
                     <Text style={styles.fieldPlaceholder}>Select destination</Text>
                   )}
@@ -755,7 +837,10 @@ export default function FlightSearchScreen() {
 
             {/* Search Button */}
             <Pressable
-              style={[styles.searchButton, (!origin || !destination) && styles.searchButtonDisabled]}
+              style={[
+                styles.searchButton,
+                (!origin || !destination) && styles.searchButtonDisabled,
+              ]}
               onPress={handleSearch}
               disabled={isSearching}
             >
@@ -792,18 +877,22 @@ export default function FlightSearchScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.sortChips}
               >
-                {([
-                  { key: 'best', label: 'Best' },
-                  { key: 'cheapest', label: 'Cheapest' },
-                  { key: 'fastest', label: 'Fastest' },
-                  { key: 'earliest', label: 'Earliest' },
-                ] as { key: SortOption; label: string }[]).map(opt => (
+                {(
+                  [
+                    { key: 'best', label: 'Best' },
+                    { key: 'cheapest', label: 'Cheapest' },
+                    { key: 'fastest', label: 'Fastest' },
+                    { key: 'earliest', label: 'Earliest' },
+                  ] as { key: SortOption; label: string }[]
+                ).map((opt) => (
                   <Pressable
                     key={opt.key}
                     style={[styles.sortChip, sortBy === opt.key && styles.sortChipActive]}
                     onPress={() => setSortBy(opt.key)}
                   >
-                    <Text style={[styles.sortChipText, sortBy === opt.key && styles.sortChipTextActive]}>
+                    <Text
+                      style={[styles.sortChipText, sortBy === opt.key && styles.sortChipTextActive]}
+                    >
                       {opt.label}
                     </Text>
                   </Pressable>
@@ -812,7 +901,12 @@ export default function FlightSearchScreen() {
                   style={[styles.sortChip, stopFilter === 'nonstop' && styles.sortChipActive]}
                   onPress={() => setStopFilter(stopFilter === 'nonstop' ? 'any' : 'nonstop')}
                 >
-                  <Text style={[styles.sortChipText, stopFilter === 'nonstop' && styles.sortChipTextActive]}>
+                  <Text
+                    style={[
+                      styles.sortChipText,
+                      stopFilter === 'nonstop' && styles.sortChipTextActive,
+                    ]}
+                  >
                     Nonstop only
                   </Text>
                 </Pressable>
@@ -843,7 +937,7 @@ export default function FlightSearchScreen() {
                   </Pressable>
                 </View>
               ) : (
-                filteredResults.map(flight => (
+                filteredResults.map((flight) => (
                   <FlightCard
                     key={flight.id}
                     flight={flight}
@@ -866,7 +960,8 @@ export default function FlightSearchScreen() {
               </View>
               <Text style={styles.preSearchTitle}>Find your perfect flight</Text>
               <Text style={styles.preSearchText}>
-                Search across multiple airlines and compare prices, times, and amenities to find the best option for your trip.
+                Search across multiple airlines and compare prices, times, and amenities to find the
+                best option for your trip.
               </Text>
             </View>
           )}
@@ -890,7 +985,12 @@ export default function FlightSearchScreen() {
       />
 
       {/* Passengers Modal */}
-      <Modal visible={showPassengers} animationType="slide" presentationStyle="pageSheet" transparent>
+      <Modal
+        visible={showPassengers}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        transparent
+      >
         <View style={styles.sheetOverlay}>
           <View style={styles.sheetContent}>
             <View style={styles.sheetHeader}>
@@ -911,10 +1011,20 @@ export default function FlightSearchScreen() {
                 </View>
                 <View style={styles.stepper}>
                   <Pressable
-                    style={[styles.stepperButton, passengers[key] <= (key === 'adults' ? 1 : 0) && styles.stepperDisabled]}
+                    style={[
+                      styles.stepperButton,
+                      passengers[key] <= (key === 'adults' ? 1 : 0) && styles.stepperDisabled,
+                    ]}
                     onPress={() => updatePassenger(key, -1)}
                   >
-                    <Minus size={16} color={passengers[key] <= (key === 'adults' ? 1 : 0) ? colors.textTertiary : colors.primary} />
+                    <Minus
+                      size={16}
+                      color={
+                        passengers[key] <= (key === 'adults' ? 1 : 0)
+                          ? colors.textTertiary
+                          : colors.primary
+                      }
+                    />
                   </Pressable>
                   <Text style={styles.stepperValue}>{passengers[key]}</Text>
                   <Pressable style={styles.stepperButton} onPress={() => updatePassenger(key, 1)}>
@@ -931,7 +1041,12 @@ export default function FlightSearchScreen() {
       </Modal>
 
       {/* Cabin Class Modal */}
-      <Modal visible={showCabinPicker} animationType="slide" presentationStyle="pageSheet" transparent>
+      <Modal
+        visible={showCabinPicker}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        transparent
+      >
         <View style={styles.sheetOverlay}>
           <View style={styles.sheetContent}>
             <View style={styles.sheetHeader}>
@@ -940,7 +1055,7 @@ export default function FlightSearchScreen() {
                 <X size={24} color={colors.text} />
               </Pressable>
             </View>
-            {(['economy', 'premium_economy', 'business', 'first'] as CabinClass[]).map(cls => (
+            {(['economy', 'premium_economy', 'business', 'first'] as CabinClass[]).map((cls) => (
               <Pressable
                 key={cls}
                 style={[styles.cabinOption, cabinClass === cls && styles.cabinOptionActive]}
@@ -949,7 +1064,12 @@ export default function FlightSearchScreen() {
                   setShowCabinPicker(false);
                 }}
               >
-                <Text style={[styles.cabinOptionText, cabinClass === cls && styles.cabinOptionTextActive]}>
+                <Text
+                  style={[
+                    styles.cabinOptionText,
+                    cabinClass === cls && styles.cabinOptionTextActive,
+                  ]}
+                >
                   {CABIN_CLASS_CONFIG[cls].label}
                 </Text>
                 {cabinClass === cls && <Check size={20} color={colors.primary} />}
@@ -960,7 +1080,12 @@ export default function FlightSearchScreen() {
       </Modal>
 
       {/* Filters Modal */}
-      <Modal visible={showFilters} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowFilters(false)}>
+      <Modal
+        visible={showFilters}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowFilters(false)}
+      >
         <SafeAreaView style={styles.filterContainer}>
           <View style={styles.filterHeader}>
             <Text style={styles.filterTitle}>Filter & Sort</Text>
@@ -972,19 +1097,26 @@ export default function FlightSearchScreen() {
             {/* Sort */}
             <Text style={styles.filterSectionTitle}>Sort By</Text>
             <View style={styles.filterChipGrid}>
-              {([
-                { key: 'best', label: 'Best Match' },
-                { key: 'cheapest', label: 'Cheapest First' },
-                { key: 'fastest', label: 'Fastest' },
-                { key: 'earliest', label: 'Earliest Departure' },
-                { key: 'latest', label: 'Latest Departure' },
-              ] as { key: SortOption; label: string }[]).map(opt => (
+              {(
+                [
+                  { key: 'best', label: 'Best Match' },
+                  { key: 'cheapest', label: 'Cheapest First' },
+                  { key: 'fastest', label: 'Fastest' },
+                  { key: 'earliest', label: 'Earliest Departure' },
+                  { key: 'latest', label: 'Latest Departure' },
+                ] as { key: SortOption; label: string }[]
+              ).map((opt) => (
                 <Pressable
                   key={opt.key}
                   style={[styles.filterChip, sortBy === opt.key && styles.filterChipActive]}
                   onPress={() => setSortBy(opt.key)}
                 >
-                  <Text style={[styles.filterChipText, sortBy === opt.key && styles.filterChipTextActive]}>
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      sortBy === opt.key && styles.filterChipTextActive,
+                    ]}
+                  >
                     {opt.label}
                   </Text>
                 </Pressable>
@@ -994,17 +1126,24 @@ export default function FlightSearchScreen() {
             {/* Stops */}
             <Text style={styles.filterSectionTitle}>Stops</Text>
             <View style={styles.filterChipGrid}>
-              {([
-                { key: 'any', label: 'Any' },
-                { key: 'nonstop', label: 'Nonstop' },
-                { key: '1_stop', label: '1 Stop or Less' },
-              ] as { key: StopFilter; label: string }[]).map(opt => (
+              {(
+                [
+                  { key: 'any', label: 'Any' },
+                  { key: 'nonstop', label: 'Nonstop' },
+                  { key: '1_stop', label: '1 Stop or Less' },
+                ] as { key: StopFilter; label: string }[]
+              ).map((opt) => (
                 <Pressable
                   key={opt.key}
                   style={[styles.filterChip, stopFilter === opt.key && styles.filterChipActive]}
                   onPress={() => setStopFilter(opt.key)}
                 >
-                  <Text style={[styles.filterChipText, stopFilter === opt.key && styles.filterChipTextActive]}>
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      stopFilter === opt.key && styles.filterChipTextActive,
+                    ]}
+                  >
                     {opt.label}
                   </Text>
                 </Pressable>
@@ -1015,22 +1154,24 @@ export default function FlightSearchScreen() {
             {availableAirlines.length > 0 && (
               <>
                 <Text style={styles.filterSectionTitle}>Airlines</Text>
-                {availableAirlines.map(airline => (
+                {availableAirlines.map((airline) => (
                   <Pressable
                     key={airline.code}
                     style={styles.airlineFilterRow}
                     onPress={() => {
-                      setSelectedAirlines(prev =>
+                      setSelectedAirlines((prev) =>
                         prev.includes(airline.code)
-                          ? prev.filter(c => c !== airline.code)
+                          ? prev.filter((c) => c !== airline.code)
                           : [...prev, airline.code]
                       );
                     }}
                   >
-                    <View style={[
-                      styles.checkbox,
-                      selectedAirlines.includes(airline.code) && styles.checkboxActive,
-                    ]}>
+                    <View
+                      style={[
+                        styles.checkbox,
+                        selectedAirlines.includes(airline.code) && styles.checkboxActive,
+                      ]}
+                    >
                       {selectedAirlines.includes(airline.code) && (
                         <Check size={14} color={colors.textLight} />
                       )}
@@ -1107,26 +1248,42 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   backButton: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface,
-    alignItems: 'center', justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
 
   // Search Form
   searchForm: {
-    margin: 16, padding: 20, backgroundColor: colors.surface,
-    borderRadius: 20, gap: 16,
-    shadowColor: colors.cardShadow, shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1, shadowRadius: 8, elevation: 3,
+    margin: 16,
+    padding: 20,
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    gap: 16,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   tripTypeRow: { flexDirection: 'row', gap: 8 },
   tripTypeButton: {
-    flex: 1, paddingVertical: 10, borderRadius: 10,
-    backgroundColor: colors.surfaceSecondary, alignItems: 'center',
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: colors.surfaceSecondary,
+    alignItems: 'center',
   },
   tripTypeActive: { backgroundColor: colors.primary },
   tripTypeText: { fontSize: 14, fontWeight: '600', color: colors.textSecondary },
@@ -1135,36 +1292,65 @@ const styles = StyleSheet.create({
   // Airport Fields
   airportFields: { gap: 12, position: 'relative' },
   airportField: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    padding: 14, backgroundColor: colors.surfaceSecondary, borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: 14,
   },
   fieldIcon: {
-    width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   fieldContent: { flex: 1 },
   fieldLabel: { fontSize: 12, color: colors.textTertiary, marginBottom: 2 },
   fieldValue: { fontSize: 16, fontWeight: '600', color: colors.text },
   fieldPlaceholder: { fontSize: 16, color: colors.textTertiary },
   swapButton: {
-    position: 'absolute', right: 16, top: '50%', marginTop: -18,
-    width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surface,
-    alignItems: 'center', justifyContent: 'center', zIndex: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1, shadowRadius: 4, elevation: 3,
-    borderWidth: 1, borderColor: colors.borderLight,
+    position: 'absolute',
+    right: 16,
+    top: '50%',
+    marginTop: -18,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
 
   // Date Row
   dateRow: { flexDirection: 'row', gap: 12 },
   dateField: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10,
-    padding: 14, backgroundColor: colors.surfaceSecondary, borderRadius: 14,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 14,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: 14,
   },
 
   // Search Button
   searchButton: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 8, backgroundColor: colors.primary, borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.primary,
+    borderRadius: 14,
     paddingVertical: 16,
   },
   searchButtonDisabled: { opacity: 0.5 },
@@ -1173,23 +1359,33 @@ const styles = StyleSheet.create({
   // Results
   resultsSection: { paddingHorizontal: 16, paddingTop: 8 },
   resultsHeader: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   resultsCount: { fontSize: 15, fontWeight: '600', color: colors.text },
   resultsActions: { flexDirection: 'row', gap: 8 },
   sortButton: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 12, paddingVertical: 8,
-    backgroundColor: `${colors.primary}10`, borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: `${colors.primary}10`,
+    borderRadius: 8,
   },
   sortButtonText: { fontSize: 13, fontWeight: '600', color: colors.primary },
 
   // Sort Chips
   sortChips: { paddingBottom: 16, gap: 8 },
   sortChip: {
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   sortChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   sortChipText: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
@@ -1197,8 +1393,12 @@ const styles = StyleSheet.create({
 
   // Flight Card
   flightCard: {
-    backgroundColor: colors.surface, borderRadius: 16, padding: 16,
-    marginBottom: 12, borderWidth: 1, borderColor: colors.borderLight,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   tagRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
   tag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
@@ -1206,8 +1406,12 @@ const styles = StyleSheet.create({
   flightMain: { gap: 12 },
   airlineSection: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   airlineLogo: {
-    width: 32, height: 32, borderRadius: 8, backgroundColor: `${colors.primary}10`,
-    alignItems: 'center', justifyContent: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: `${colors.primary}10`,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   airlineName: { fontSize: 14, fontWeight: '600', color: colors.text },
   flightNumber: { fontSize: 12, color: colors.textTertiary },
@@ -1220,7 +1424,10 @@ const styles = StyleSheet.create({
   routeLine: { flex: 1, alignItems: 'center', paddingHorizontal: 8 },
   duration: { fontSize: 11, color: colors.textTertiary, marginBottom: 4 },
   lineContainer: {
-    flexDirection: 'row', alignItems: 'center', width: '100%', height: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    height: 16,
   },
   line: { flex: 1, height: 1.5, backgroundColor: colors.border },
   stopDot: { marginHorizontal: -3 },
@@ -1231,27 +1438,40 @@ const styles = StyleSheet.create({
   // Amenities
   amenitiesRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   amenityIcon: {
-    width: 24, height: 24, borderRadius: 6, backgroundColor: colors.surfaceSecondary,
-    alignItems: 'center', justifyContent: 'center',
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    backgroundColor: colors.surfaceSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   baggageInfo: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   baggageText: { fontSize: 11 },
   baggageIncluded: { color: colors.success },
   baggagePaid: { color: colors.textTertiary },
   refundBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 3,
-    paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
     backgroundColor: `${colors.success}10`,
   },
   refundText: { fontSize: 10, fontWeight: '600', color: colors.success },
 
   // Price
   priceSection: {
-    alignItems: 'flex-end', paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.borderLight,
+    alignItems: 'flex-end',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
     marginTop: 12,
   },
   originalPrice: {
-    fontSize: 13, color: colors.textTertiary, textDecorationLine: 'line-through',
+    fontSize: 13,
+    color: colors.textTertiary,
+    textDecorationLine: 'line-through',
   },
   price: { fontSize: 24, fontWeight: '800', color: colors.primary },
   priceLabel: { fontSize: 11, color: colors.textSecondary },
@@ -1267,17 +1487,27 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 17, fontWeight: '600', color: colors.text },
   emptyText: { fontSize: 14, color: colors.textSecondary },
   clearFiltersButton: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    marginTop: 12, paddingHorizontal: 16, paddingVertical: 10,
-    backgroundColor: `${colors.primary}10`, borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: `${colors.primary}10`,
+    borderRadius: 10,
   },
   clearFiltersText: { fontSize: 14, fontWeight: '600', color: colors.primary },
 
   // Pre-search
   preSearchSection: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 32, gap: 12 },
   preSearchIcon: {
-    width: 72, height: 72, borderRadius: 36, backgroundColor: `${colors.primary}10`,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 8,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: `${colors.primary}10`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
   },
   preSearchTitle: { fontSize: 20, fontWeight: '700', color: colors.text },
   preSearchText: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', lineHeight: 22 },
@@ -1285,27 +1515,47 @@ const styles = StyleSheet.create({
   // Airport Picker
   pickerContainer: { flex: 1, backgroundColor: colors.background },
   pickerHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    padding: 16, borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   pickerTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
   pickerSearch: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, margin: 16,
-    padding: 14, backgroundColor: colors.surfaceSecondary, borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    margin: 16,
+    padding: 14,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: 12,
   },
   pickerInput: { flex: 1, fontSize: 16, color: colors.text },
   pickerSectionLabel: {
-    fontSize: 13, fontWeight: '600', color: colors.textSecondary,
-    paddingHorizontal: 16, paddingVertical: 8,
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   airportRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingHorizontal: 16, paddingVertical: 14,
-    borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   airportIcon: {
-    width: 40, height: 40, borderRadius: 12, backgroundColor: `${colors.primary}10`,
-    alignItems: 'center', justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: `${colors.primary}10`,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   airportInfo: { flex: 1 },
   airportCity: { fontSize: 15, fontWeight: '600', color: colors.text },
@@ -1316,40 +1566,66 @@ const styles = StyleSheet.create({
 
   // Sheet
   sheetOverlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.4)',
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
   },
   sheetContent: {
-    backgroundColor: colors.surface, borderTopLeftRadius: 24,
-    borderTopRightRadius: 24, padding: 24, paddingBottom: 40,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
   },
   sheetHeader: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', marginBottom: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   sheetTitle: { fontSize: 20, fontWeight: '700', color: colors.text },
   passengerRow: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', paddingVertical: 16,
-    borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   passengerLabel: { fontSize: 16, fontWeight: '600', color: colors.text },
   passengerDesc: { fontSize: 13, color: colors.textTertiary, marginTop: 2 },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   stepperButton: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surfaceSecondary,
-    alignItems: 'center', justifyContent: 'center',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.surfaceSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   stepperDisabled: { opacity: 0.4 },
-  stepperValue: { fontSize: 18, fontWeight: '700', color: colors.text, minWidth: 20, textAlign: 'center' },
+  stepperValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    minWidth: 20,
+    textAlign: 'center',
+  },
   sheetDoneButton: {
-    marginTop: 24, backgroundColor: colors.primary, borderRadius: 14,
-    paddingVertical: 16, alignItems: 'center',
+    marginTop: 24,
+    backgroundColor: colors.primary,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
   },
   sheetDoneText: { fontSize: 16, fontWeight: '700', color: colors.textLight },
   cabinOption: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   cabinOptionActive: {},
   cabinOptionText: { fontSize: 16, color: colors.text },
@@ -1358,26 +1634,44 @@ const styles = StyleSheet.create({
   // Detail Modal
   detailContainer: { flex: 1, backgroundColor: colors.background },
   detailHeader: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   detailTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
   detailContent: { flex: 1, paddingHorizontal: 16 },
   detailAirline: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    padding: 16, backgroundColor: colors.surface, borderRadius: 16, marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    marginBottom: 16,
   },
   detailAirlineLogo: {
-    width: 48, height: 48, borderRadius: 14, backgroundColor: `${colors.primary}10`,
-    alignItems: 'center', justifyContent: 'center',
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: `${colors.primary}10`,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   detailAirlineName: { fontSize: 17, fontWeight: '700', color: colors.text },
   detailFlightRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   detailFlightNum: { fontSize: 13, color: colors.textSecondary },
   detailAircraft: { fontSize: 13, color: colors.textTertiary },
   ratingBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 'auto',
-    backgroundColor: '#FEF9C3', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: 'auto',
+    backgroundColor: '#FEF9C3',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   ratingText: { fontSize: 13, fontWeight: '700', color: '#92400E' },
 
@@ -1385,12 +1679,18 @@ const styles = StyleSheet.create({
   segmentSection: { marginBottom: 16 },
   segmentSectionTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginBottom: 12 },
   segmentCard: {
-    flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 14,
-    padding: 16, gap: 12,
+    flexDirection: 'row',
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    gap: 12,
   },
   segmentTimeline: { alignItems: 'center', width: 20, paddingVertical: 4 },
   timelineDotFilled: {
-    width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
   },
   timelineBar: { flex: 1, width: 2, backgroundColor: colors.border, marginVertical: 4 },
   segmentDetails: { flex: 1, gap: 12 },
@@ -1401,55 +1701,86 @@ const styles = StyleSheet.create({
   segmentDuration: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4 },
   segmentDurationText: { fontSize: 12, color: colors.textTertiary },
   layoverCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    padding: 12, marginVertical: 8, backgroundColor: `${colors.warning}10`,
-    borderRadius: 10, borderLeftWidth: 3, borderLeftColor: colors.warning,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 12,
+    marginVertical: 8,
+    backgroundColor: `${colors.warning}10`,
+    borderRadius: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.warning,
   },
   layoverCardText: { fontSize: 13, color: colors.warning, fontWeight: '500' },
 
   // Detail Sections
   detailSection: {
-    backgroundColor: colors.surface, borderRadius: 14, padding: 16, marginBottom: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
   },
   detailSectionTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginBottom: 12 },
   amenityGrid: { flexDirection: 'row', gap: 12 },
   amenityGridItem: {
-    flex: 1, alignItems: 'center', gap: 6, padding: 12,
-    backgroundColor: `${colors.primary}08`, borderRadius: 10,
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+    padding: 12,
+    backgroundColor: `${colors.primary}08`,
+    borderRadius: 10,
   },
   amenityUnavailable: { backgroundColor: colors.surfaceSecondary, opacity: 0.5 },
   amenityGridText: { fontSize: 12, fontWeight: '500', color: colors.text },
   amenityGridTextUnavailable: { color: colors.textTertiary },
   baggageGrid: { gap: 12 },
   baggageItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   baggageLabel: { flex: 1, fontSize: 14, color: colors.text },
   baggageStatus: { fontSize: 13, fontWeight: '600' },
   fareRulesGrid: { gap: 10 },
   fareRule: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   fareRuleLabel: { fontSize: 14, color: colors.textSecondary },
   fareRuleValue: { fontSize: 14, fontWeight: '600', color: colors.text },
 
   // Booking Footer
   bookingFooter: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 20, paddingVertical: 16,
-    backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.borderLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
   },
   bookingPriceSection: {},
   bookingOriginalPrice: {
-    fontSize: 13, color: colors.textTertiary, textDecorationLine: 'line-through',
+    fontSize: 13,
+    color: colors.textTertiary,
+    textDecorationLine: 'line-through',
   },
   bookingPrice: { fontSize: 24, fontWeight: '800', color: colors.primary },
   bookingPriceLabel: { fontSize: 12, color: colors.textSecondary },
   bookButton: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
     borderRadius: 14,
   },
   bookButtonText: { fontSize: 16, fontWeight: '700', color: colors.textLight },
@@ -1457,54 +1788,85 @@ const styles = StyleSheet.create({
   // Filter Modal
   filterContainer: { flex: 1, backgroundColor: colors.background },
   filterHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    padding: 16, borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   filterTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
   filterContent: { flex: 1, padding: 16 },
   filterSectionTitle: {
-    fontSize: 15, fontWeight: '700', color: colors.text,
-    marginBottom: 12, marginTop: 20,
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 12,
+    marginTop: 20,
   },
   filterChipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   filterChip: {
-    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10,
-    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   filterChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   filterChipText: { fontSize: 13, fontWeight: '500', color: colors.textSecondary },
   filterChipTextActive: { color: colors.textLight },
   airlineFilterRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
   checkbox: {
-    width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: colors.border,
-    alignItems: 'center', justifyContent: 'center',
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   checkboxActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   airlineFilterName: { flex: 1, fontSize: 15, color: colors.text },
   airlineRating: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   airlineRatingText: { fontSize: 13, color: colors.textSecondary },
   toggleRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 12,
   },
   toggleInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   toggleLabel: { fontSize: 15, fontWeight: '600', color: colors.text },
   toggleDesc: { fontSize: 12, color: colors.textTertiary, marginTop: 2 },
   filterFooter: {
-    flexDirection: 'row', gap: 12, padding: 16,
-    borderTopWidth: 1, borderTopColor: colors.borderLight,
+    flexDirection: 'row',
+    gap: 12,
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
   },
   clearButton: {
-    flex: 1, paddingVertical: 14, borderRadius: 12,
-    backgroundColor: colors.surfaceSecondary, alignItems: 'center',
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceSecondary,
+    alignItems: 'center',
   },
   clearButtonText: { fontSize: 15, fontWeight: '600', color: colors.textSecondary },
   applyButton: {
-    flex: 2, paddingVertical: 14, borderRadius: 12,
-    backgroundColor: colors.primary, alignItems: 'center',
+    flex: 2,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
   },
   applyButtonText: { fontSize: 15, fontWeight: '700', color: colors.textLight },
 });

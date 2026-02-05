@@ -22,10 +22,7 @@ interface PlaceDetailScreenProps {
   route?: { params?: { placeId?: string } };
 }
 
-const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ navigation, route }) => {
   const placeId = route?.params?.placeId;
 
   const {
@@ -65,12 +62,15 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
     if (updated) setPlace(updated);
   }, [place, toggleFavorite, getPlace]);
 
-  const handleUpdateRating = useCallback(async (rating: number) => {
-    if (!place) return;
-    await updatePlace(place.id, { rating });
-    const updated = getPlace(place.id);
-    if (updated) setPlace(updated);
-  }, [place, updatePlace, getPlace]);
+  const handleUpdateRating = useCallback(
+    async (rating: number) => {
+      if (!place) return;
+      await updatePlace(place.id, { rating });
+      const updated = getPlace(place.id);
+      if (updated) setPlace(updated);
+    },
+    [place, updatePlace, getPlace]
+  );
 
   const handleSaveNotes = useCallback(async () => {
     if (!place) return;
@@ -88,20 +88,26 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
     setNewTag('');
   }, [place, newTag, addTag, getPlace]);
 
-  const handleRemoveTag = useCallback(async (tag: string) => {
-    if (!place) return;
-    await removeTag(place.id, tag);
-    const updated = getPlace(place.id);
-    if (updated) setPlace(updated);
-  }, [place, removeTag, getPlace]);
+  const handleRemoveTag = useCallback(
+    async (tag: string) => {
+      if (!place) return;
+      await removeTag(place.id, tag);
+      const updated = getPlace(place.id);
+      if (updated) setPlace(updated);
+    },
+    [place, removeTag, getPlace]
+  );
 
-  const handleAddToCollection = useCallback(async (collectionId: string) => {
-    if (!place) return;
-    await addToCollection(place.id, collectionId);
-    const updated = getPlace(place.id);
-    if (updated) setPlace(updated);
-    setShowCollectionPicker(false);
-  }, [place, addToCollection, getPlace]);
+  const handleAddToCollection = useCallback(
+    async (collectionId: string) => {
+      if (!place) return;
+      await addToCollection(place.id, collectionId);
+      const updated = getPlace(place.id);
+      if (updated) setPlace(updated);
+      setShowCollectionPicker(false);
+    },
+    [place, addToCollection, getPlace]
+  );
 
   const handleAddVisit = useCallback(async () => {
     if (!place) return;
@@ -115,12 +121,10 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
     setShowAddVisit(false);
   }, [place, addVisit, getPlace]);
 
-  const handleDeleteVisit = useCallback(async (visitId: string) => {
-    if (!place) return;
-    Alert.alert(
-      'Delete Visit',
-      'Are you sure you want to delete this visit?',
-      [
+  const handleDeleteVisit = useCallback(
+    async (visitId: string) => {
+      if (!place) return;
+      Alert.alert('Delete Visit', 'Are you sure you want to delete this visit?', [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
@@ -131,9 +135,10 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
             if (updated) setPlace(updated);
           },
         },
-      ]
-    );
-  }, [place, deleteVisit, getPlace]);
+      ]);
+    },
+    [place, deleteVisit, getPlace]
+  );
 
   const handleOpenMaps = useCallback(() => {
     if (!place) return;
@@ -155,11 +160,14 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
   }, [place]);
 
   const getCategoryInfo = (categoryId: string) => {
-    return PLACE_CATEGORIES.find(c => c.id === categoryId) || PLACE_CATEGORIES[PLACE_CATEGORIES.length - 1];
+    return (
+      PLACE_CATEGORIES.find((c) => c.id === categoryId) ||
+      PLACE_CATEGORIES[PLACE_CATEGORIES.length - 1]
+    );
   };
 
   const getPriceInfo = (priceLevel: string) => {
-    return PRICE_LEVELS.find(p => p.id === priceLevel);
+    return PRICE_LEVELS.find((p) => p.id === priceLevel);
   };
 
   const formatDate = (dateStr: string): string => {
@@ -181,7 +189,7 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
 
   const categoryInfo = getCategoryInfo(place.category);
   const priceInfo = place.priceLevel ? getPriceInfo(place.priceLevel) : null;
-  const coverPhoto = place.photos.find(p => p.id === place.coverPhotoId) || place.photos[0];
+  const coverPhoto = place.photos.find((p) => p.id === place.coverPhotoId) || place.photos[0];
 
   return (
     <View style={styles.container}>
@@ -194,16 +202,14 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={(e) => {
-                const index = Math.round(e.nativeEvent.contentOffset.x / e.nativeEvent.layoutMeasurement.width);
+                const index = Math.round(
+                  e.nativeEvent.contentOffset.x / e.nativeEvent.layoutMeasurement.width
+                );
                 setActivePhotoIndex(index);
               }}
             >
               {place.photos.map((photo, index) => (
-                <Image
-                  key={photo.id}
-                  source={{ uri: photo.uri }}
-                  style={styles.headerPhoto}
-                />
+                <Image key={photo.id} source={{ uri: photo.uri }} style={styles.headerPhoto} />
               ))}
             </ScrollView>
             {place.photos.length > 1 && (
@@ -230,10 +236,7 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
         )}
 
         {/* Back button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
 
@@ -262,8 +265,8 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
             <TouchableOpacity style={styles.locationRow} onPress={handleOpenMaps}>
               <Text style={styles.locationIcon}>📍</Text>
               <Text style={styles.locationText}>
-                {place.location.formattedAddress || 
-                 `${place.location.city}${place.location.country ? `, ${place.location.country}` : ''}`}
+                {place.location.formattedAddress ||
+                  `${place.location.city}${place.location.country ? `, ${place.location.country}` : ''}`}
               </Text>
               <Text style={styles.locationArrow}>→</Text>
             </TouchableOpacity>
@@ -273,14 +276,9 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingLabel}>Your Rating</Text>
             <View style={styles.ratingStars}>
-              {[1, 2, 3, 4, 5].map(star => (
-                <TouchableOpacity
-                  key={star}
-                  onPress={() => handleUpdateRating(star)}
-                >
-                  <Text style={styles.ratingStar}>
-                    {star <= place.rating ? '⭐' : '☆'}
-                  </Text>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity key={star} onPress={() => handleUpdateRating(star)}>
+                  <Text style={styles.ratingStar}>{star <= place.rating ? '⭐' : '☆'}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -290,7 +288,9 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
           {priceInfo && (
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>Price Level:</Text>
-              <Text style={styles.priceValue}>{priceInfo.symbol} {priceInfo.label}</Text>
+              <Text style={styles.priceValue}>
+                {priceInfo.symbol} {priceInfo.label}
+              </Text>
             </View>
           )}
         </View>
@@ -307,7 +307,7 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tags</Text>
           <View style={styles.tagsContainer}>
-            {place.tags.map(tag => (
+            {place.tags.map((tag) => (
               <TouchableOpacity
                 key={tag}
                 style={styles.tag}
@@ -378,9 +378,12 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
           </View>
           <View style={styles.collectionsContainer}>
             {collections
-              .filter(c => place.collectionIds.includes(c.id))
-              .map(collection => (
-                <View key={collection.id} style={[styles.collectionBadge, { borderColor: collection.color }]}>
+              .filter((c) => place.collectionIds.includes(c.id))
+              .map((collection) => (
+                <View
+                  key={collection.id}
+                  style={[styles.collectionBadge, { borderColor: collection.color }]}
+                >
                   <Text style={styles.collectionEmoji}>{collection.emoji}</Text>
                   <Text style={styles.collectionName}>{collection.name}</Text>
                 </View>
@@ -391,18 +394,16 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
         {/* Visit History */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
-              Visits ({place.visitCount})
-            </Text>
+            <Text style={styles.sectionTitle}>Visits ({place.visitCount})</Text>
             <TouchableOpacity onPress={handleAddVisit}>
               <Text style={styles.addButton}>+ Add Visit</Text>
             </TouchableOpacity>
           </View>
-          
+
           {place.visits.length === 0 ? (
             <Text style={styles.emptyVisits}>No visits recorded yet</Text>
           ) : (
-            place.visits.map(visit => (
+            place.visits.map((visit) => (
               <TouchableOpacity
                 key={visit.id}
                 style={styles.visitCard}
@@ -410,13 +411,9 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
               >
                 <View style={styles.visitInfo}>
                   <Text style={styles.visitDate}>{formatDate(visit.date)}</Text>
-                  {visit.tripName && (
-                    <Text style={styles.visitTrip}>🧳 {visit.tripName}</Text>
-                  )}
+                  {visit.tripName && <Text style={styles.visitTrip}>🧳 {visit.tripName}</Text>}
                 </View>
-                {visit.rating && (
-                  <Text style={styles.visitRating}>⭐ {visit.rating}</Text>
-                )}
+                {visit.rating && <Text style={styles.visitRating}>⭐ {visit.rating}</Text>}
               </TouchableOpacity>
             ))
           )}
@@ -471,8 +468,8 @@ const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({
             </View>
             <ScrollView style={styles.modalContent}>
               {collections
-                .filter(c => !place.collectionIds.includes(c.id))
-                .map(collection => (
+                .filter((c) => !place.collectionIds.includes(c.id))
+                .map((collection) => (
                   <TouchableOpacity
                     key={collection.id}
                     style={styles.modalOption}

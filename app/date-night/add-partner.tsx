@@ -106,7 +106,7 @@ export default function AddPartnerScreen() {
   const [partnerName, setPartnerName] = useState('');
   const [linkEmail, setLinkEmail] = useState('');
   const [step, setStep] = useState(1);
-  
+
   const [preferences, setPreferences] = useState<DatePreferences>({
     cuisineTypes: [],
     dietaryRestrictions: ['none'],
@@ -119,14 +119,14 @@ export default function AddPartnerScreen() {
 
   const toggleArrayItem = <T extends string>(array: T[], item: T): T[] => {
     if (array.includes(item)) {
-      return array.filter(i => i !== item);
+      return array.filter((i) => i !== item);
     }
     return [...array, item];
   };
 
   const handleLinkPartner = () => {
     if (!linkEmail.trim()) {
-      Alert.alert('Enter Email', 'Please enter your partner\'s email address.');
+      Alert.alert('Enter Email', "Please enter your partner's email address.");
       return;
     }
     // In a real app, this would send an invite
@@ -139,7 +139,7 @@ export default function AddPartnerScreen() {
 
   const handleSavePartner = () => {
     if (!partnerName.trim()) {
-      Alert.alert('Enter Name', 'Please enter your partner\'s name.');
+      Alert.alert('Enter Name', "Please enter your partner's name.");
       return;
     }
     if (preferences.activityTypes.length === 0) {
@@ -154,7 +154,7 @@ export default function AddPartnerScreen() {
     });
 
     setSelectedPartner(newPartner);
-    
+
     Alert.alert(
       'Partner Added!',
       `${partnerName} has been added. You can now plan dates together!`,
@@ -165,11 +165,8 @@ export default function AddPartnerScreen() {
   const renderMethodSelection = () => (
     <View style={styles.methodContainer}>
       <Text style={styles.methodTitle}>How would you like to add a partner?</Text>
-      
-      <Pressable 
-        style={styles.methodCard}
-        onPress={() => setAddMethod('manual')}
-      >
+
+      <Pressable style={styles.methodCard} onPress={() => setAddMethod('manual')}>
         <View style={[styles.methodIcon, { backgroundColor: `${colors.secondary}15` }]}>
           <UserPlus size={28} color={colors.secondary} />
         </View>
@@ -182,10 +179,7 @@ export default function AddPartnerScreen() {
         <ChevronRight size={20} color={colors.textTertiary} />
       </Pressable>
 
-      <Pressable 
-        style={styles.methodCard}
-        onPress={() => setAddMethod('link')}
-      >
+      <Pressable style={styles.methodCard} onPress={() => setAddMethod('link')}>
         <View style={[styles.methodIcon, { backgroundColor: `${colors.primary}15` }]}>
           <LinkIcon size={28} color={colors.primary} />
         </View>
@@ -208,7 +202,8 @@ export default function AddPartnerScreen() {
         </View>
         <Text style={styles.linkTitle}>Link Partner Account</Text>
         <Text style={styles.linkDescription}>
-          Enter your partner's email to send them an invite. Once they accept, their preferences will sync automatically.
+          Enter your partner's email to send them an invite. Once they accept, their preferences
+          will sync automatically.
         </Text>
       </View>
 
@@ -249,27 +244,29 @@ export default function AddPartnerScreen() {
           <Activity size={20} color={colors.primary} />
           <Text style={styles.sectionTitle}>Activity Preferences</Text>
         </View>
-        <Text style={styles.sectionDescription}>
-          What activities do they enjoy?
-        </Text>
+        <Text style={styles.sectionDescription}>What activities do they enjoy?</Text>
         <View style={styles.chipsContainer}>
-          {activityOptions.map(option => (
+          {activityOptions.map((option) => (
             <Pressable
               key={option.value}
               style={[
                 styles.chip,
                 preferences.activityTypes.includes(option.value) && styles.chipSelected,
               ]}
-              onPress={() => setPreferences(prev => ({
-                ...prev,
-                activityTypes: toggleArrayItem(prev.activityTypes, option.value),
-              }))}
+              onPress={() =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  activityTypes: toggleArrayItem(prev.activityTypes, option.value),
+                }))
+              }
             >
               <Text style={styles.chipEmoji}>{option.emoji}</Text>
-              <Text style={[
-                styles.chipText,
-                preferences.activityTypes.includes(option.value) && styles.chipTextSelected,
-              ]}>
+              <Text
+                style={[
+                  styles.chipText,
+                  preferences.activityTypes.includes(option.value) && styles.chipTextSelected,
+                ]}
+              >
                 {option.label}
               </Text>
             </Pressable>
@@ -283,22 +280,26 @@ export default function AddPartnerScreen() {
           <Text style={styles.sectionTitle}>Environment</Text>
         </View>
         <View style={styles.segmentedControl}>
-          {environmentOptions.map(option => (
+          {environmentOptions.map((option) => (
             <Pressable
               key={option.value}
               style={[
                 styles.segmentButton,
                 preferences.environmentPreference === option.value && styles.segmentButtonSelected,
               ]}
-              onPress={() => setPreferences(prev => ({
-                ...prev,
-                environmentPreference: option.value,
-              }))}
+              onPress={() =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  environmentPreference: option.value,
+                }))
+              }
             >
-              <Text style={[
-                styles.segmentText,
-                preferences.environmentPreference === option.value && styles.segmentTextSelected,
-              ]}>
+              <Text
+                style={[
+                  styles.segmentText,
+                  preferences.environmentPreference === option.value && styles.segmentTextSelected,
+                ]}
+              >
                 {option.label}
               </Text>
             </Pressable>
@@ -306,11 +307,11 @@ export default function AddPartnerScreen() {
         </View>
       </View>
 
-      <Pressable 
-        style={styles.primaryButton} 
+      <Pressable
+        style={styles.primaryButton}
         onPress={() => {
           if (!partnerName.trim()) {
-            Alert.alert('Enter Name', 'Please enter your partner\'s name.');
+            Alert.alert('Enter Name', "Please enter your partner's name.");
             return;
           }
           setStep(2);
@@ -329,22 +330,26 @@ export default function AddPartnerScreen() {
           <Text style={styles.sectionTitle}>Cuisine Preferences</Text>
         </View>
         <View style={styles.chipsContainer}>
-          {cuisineOptions.map(option => (
+          {cuisineOptions.map((option) => (
             <Pressable
               key={option.value}
               style={[
                 styles.chipSmall,
                 preferences.cuisineTypes.includes(option.value) && styles.chipSelected,
               ]}
-              onPress={() => setPreferences(prev => ({
-                ...prev,
-                cuisineTypes: toggleArrayItem(prev.cuisineTypes, option.value),
-              }))}
+              onPress={() =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  cuisineTypes: toggleArrayItem(prev.cuisineTypes, option.value),
+                }))
+              }
             >
-              <Text style={[
-                styles.chipText,
-                preferences.cuisineTypes.includes(option.value) && styles.chipTextSelected,
-              ]}>
+              <Text
+                style={[
+                  styles.chipText,
+                  preferences.cuisineTypes.includes(option.value) && styles.chipTextSelected,
+                ]}
+              >
                 {option.label}
               </Text>
             </Pressable>
@@ -358,7 +363,7 @@ export default function AddPartnerScreen() {
           <Text style={styles.sectionTitle}>Dietary Restrictions</Text>
         </View>
         <View style={styles.chipsContainer}>
-          {dietaryOptions.map(option => (
+          {dietaryOptions.map((option) => (
             <Pressable
               key={option.value}
               style={[
@@ -367,25 +372,27 @@ export default function AddPartnerScreen() {
               ]}
               onPress={() => {
                 if (option.value === 'none') {
-                  setPreferences(prev => ({
+                  setPreferences((prev) => ({
                     ...prev,
                     dietaryRestrictions: ['none'],
                   }));
                 } else {
-                  setPreferences(prev => ({
+                  setPreferences((prev) => ({
                     ...prev,
                     dietaryRestrictions: toggleArrayItem(
-                      prev.dietaryRestrictions.filter(d => d !== 'none'),
+                      prev.dietaryRestrictions.filter((d) => d !== 'none'),
                       option.value
                     ),
                   }));
                 }
               }}
             >
-              <Text style={[
-                styles.chipText,
-                preferences.dietaryRestrictions.includes(option.value) && styles.chipTextSelected,
-              ]}>
+              <Text
+                style={[
+                  styles.chipText,
+                  preferences.dietaryRestrictions.includes(option.value) && styles.chipTextSelected,
+                ]}
+              >
                 {option.label}
               </Text>
             </Pressable>
@@ -399,22 +406,26 @@ export default function AddPartnerScreen() {
           <Text style={styles.sectionTitle}>Budget Preference</Text>
         </View>
         <View style={styles.budgetContainer}>
-          {budgetOptions.map(option => (
+          {budgetOptions.map((option) => (
             <Pressable
               key={option.value}
               style={[
                 styles.budgetOption,
                 preferences.budgetTier === option.value && styles.budgetOptionSelected,
               ]}
-              onPress={() => setPreferences(prev => ({
-                ...prev,
-                budgetTier: option.value,
-              }))}
+              onPress={() =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  budgetTier: option.value,
+                }))
+              }
             >
-              <Text style={[
-                styles.budgetLabel,
-                preferences.budgetTier === option.value && styles.budgetLabelSelected,
-              ]}>
+              <Text
+                style={[
+                  styles.budgetLabel,
+                  preferences.budgetTier === option.value && styles.budgetLabelSelected,
+                ]}
+              >
                 {option.label}
               </Text>
             </Pressable>
@@ -441,8 +452,8 @@ export default function AddPartnerScreen() {
       />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <Pressable 
-            style={styles.backButton} 
+          <Pressable
+            style={styles.backButton}
             onPress={() => {
               if (addMethod && step > 1) {
                 setStep(1);
@@ -456,7 +467,11 @@ export default function AddPartnerScreen() {
             <ArrowLeft size={22} color={colors.textLight} />
           </Pressable>
           <Text style={styles.headerTitle}>
-            {!addMethod ? 'Add Partner' : addMethod === 'link' ? 'Link Account' : `Add ${partnerName || 'Partner'}`}
+            {!addMethod
+              ? 'Add Partner'
+              : addMethod === 'link'
+                ? 'Link Account'
+                : `Add ${partnerName || 'Partner'}`}
           </Text>
           <View style={styles.placeholder} />
         </View>
@@ -469,11 +484,11 @@ export default function AddPartnerScreen() {
           </View>
         )}
 
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
         >
-          <ScrollView 
+          <ScrollView
             style={styles.content}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.contentContainer}

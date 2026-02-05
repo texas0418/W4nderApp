@@ -54,18 +54,18 @@ export interface Activity {
     airbnb?: string;
   };
   provider: ActivityProvider;
-  
+
   // Basic info
   title: string;
   shortDescription: string;
   fullDescription?: string;
   highlights?: string[];
-  
+
   // Category
   category: ActivityCategory;
   subcategories: string[];
   tags: string[];
-  
+
   // Location
   location: {
     city: string;
@@ -78,33 +78,33 @@ export interface Activity {
       lng: number;
     };
   };
-  
+
   // Media
   images: string[];
   thumbnailUrl?: string;
   videoUrl?: string;
-  
+
   // Ratings
   rating: number;
   reviewCount: number;
-  
+
   // Pricing
   pricing: ActivityPricing;
-  
+
   // Duration
   duration: ActivityDuration;
-  
+
   // Availability
   availableDays?: DayOfWeek[];
   nextAvailableDate?: string;
-  
+
   // Details
   included?: string[];
   notIncluded?: string[];
   requirements?: string[];
   accessibility?: AccessibilityInfo;
   cancellationPolicy: CancellationPolicy;
-  
+
   // Booking info
   instantConfirmation: boolean;
   mobileTicket: boolean;
@@ -112,10 +112,10 @@ export interface Activity {
   privateOption?: boolean;
   maxGroupSize?: number;
   minParticipants?: number;
-  
+
   // Languages
   languages?: string[];
-  
+
   // Special flags
   isBestseller?: boolean;
   isNew?: boolean;
@@ -140,7 +140,14 @@ export type ActivityCategory =
   | 'sports'
   | 'romantic';
 
-export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export type DayOfWeek =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
 
 export interface ActivityPricing {
   currency: string;
@@ -202,19 +209,19 @@ export interface ActivitySearchParams {
     lng: number;
   };
   radius?: number; // km
-  
+
   // Date
   date?: string; // YYYY-MM-DD
   dateRange?: {
     start: string;
     end: string;
   };
-  
+
   // Participants
   adults: number;
   children?: number;
   infants?: number;
-  
+
   // Filters
   categories?: ActivityCategory[];
   priceRange?: {
@@ -229,14 +236,14 @@ export interface ActivitySearchParams {
   languages?: string[];
   features?: ActivityFeature[];
   minRating?: number;
-  
+
   // Sorting
   sortBy?: 'relevance' | 'price_low' | 'price_high' | 'rating' | 'popularity' | 'duration';
-  
+
   // Pagination
   page?: number;
   limit?: number;
-  
+
   // Provider preference
   providers?: ActivityProvider[];
 }
@@ -286,11 +293,11 @@ export interface AvailabilitySlot {
   startTime: string; // HH:mm
   endTime?: string;
   displayTime: string; // "9:00 AM"
-  
+
   // Availability
   available: boolean;
   spotsLeft?: number;
-  
+
   // Pricing for this slot
   pricing: {
     adultPrice: number;
@@ -299,10 +306,10 @@ export interface AvailabilitySlot {
     totalPrice: number;
     currency: string;
   };
-  
+
   // Options
   options?: SlotOption[];
-  
+
   // Booking token
   bookingToken: string;
 }
@@ -331,36 +338,36 @@ export interface ActivityBookingRequest {
   // Activity
   activityId: string;
   provider: ActivityProvider;
-  
+
   // Slot
   slotId: string;
   bookingToken: string;
   date: string;
   startTime: string;
-  
+
   // Participants
   participants: {
     adults: number;
     children?: number;
     infants?: number;
   };
-  
+
   // Lead traveler
   leadTraveler: TravelerInfo;
   additionalTravelers?: TravelerInfo[];
-  
+
   // Options
   selectedOptions?: string[];
-  
+
   // Special requests
   specialRequests?: string;
   pickupLocation?: string;
   hotelName?: string;
-  
+
   // Contact
   email: string;
   phone: string;
-  
+
   // Payment
   paymentMethodId?: string;
 }
@@ -377,14 +384,14 @@ export interface TravelerInfo {
 
 export interface ActivityBooking {
   id: string;
-  
+
   // External IDs
   providerBookingId: string;
   provider: ActivityProvider;
-  
+
   // Status
   status: BookingStatus;
-  
+
   // Activity
   activity: {
     id: string;
@@ -394,13 +401,13 @@ export interface ActivityBooking {
     location: string;
     duration: string;
   };
-  
+
   // Booking details
   date: string;
   displayDate: string;
   startTime: string;
   endTime?: string;
-  
+
   // Participants
   participants: {
     adults: number;
@@ -408,7 +415,7 @@ export interface ActivityBooking {
     infants?: number;
     total: number;
   };
-  
+
   // Pricing
   pricing: {
     subtotal: number;
@@ -418,36 +425,36 @@ export interface ActivityBooking {
     total: number;
     currency: string;
   };
-  
+
   // Lead traveler
   leadTraveler: TravelerInfo;
-  
+
   // Confirmation
   confirmationNumber: string;
   voucherUrl?: string;
   qrCode?: string;
-  
+
   // Meeting info
   meetingPoint?: string;
   meetingInstructions?: string;
   pickupLocation?: string;
   pickupTime?: string;
-  
+
   // Contact
   operatorPhone?: string;
   operatorEmail?: string;
   emergencyContact?: string;
-  
+
   // Timestamps
   createdAt: Date;
   confirmedAt?: Date;
   cancelledAt?: Date;
-  
+
   // Cancellation
   canCancel: boolean;
   cancelDeadline?: Date;
   refundAmount?: number;
-  
+
   // Integration
   addedToItinerary?: boolean;
   itineraryId?: string;
@@ -518,11 +525,11 @@ export function formatDuration(duration: ActivityDuration): string {
 }
 
 export function getCategoryIcon(category: ActivityCategory): string {
-  return ACTIVITY_CATEGORIES.find(c => c.id === category)?.icon || 'Activity';
+  return ACTIVITY_CATEGORIES.find((c) => c.id === category)?.icon || 'Activity';
 }
 
 export function getCategoryLabel(category: ActivityCategory): string {
-  return ACTIVITY_CATEGORIES.find(c => c.id === category)?.label || category;
+  return ACTIVITY_CATEGORIES.find((c) => c.id === category)?.label || category;
 }
 
 export function getProviderColor(provider: ActivityProvider): string {
@@ -536,7 +543,7 @@ export function getProviderName(provider: ActivityProvider): string {
 export function getCancellationLabel(policy: CancellationPolicy): string {
   switch (policy.type) {
     case 'free':
-      return policy.freeCancellationUntil 
+      return policy.freeCancellationUntil
         ? `Free cancellation up to ${policy.freeCancellationUntil}h before`
         : 'Free cancellation';
     case 'moderate':

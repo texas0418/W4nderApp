@@ -45,7 +45,7 @@ import {
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { TravelDocument } from '@/types';
-import React from "react";
+import React from 'react';
 
 const { width } = Dimensions.get('window');
 
@@ -60,14 +60,62 @@ interface DocumentCategory {
 }
 
 const documentCategories: DocumentCategory[] = [
-  { id: 'passport', name: 'Passport', icon: <Globe size={20} color="#1B4965" />, color: '#1B4965', bgColor: '#E8F4F8' },
-  { id: 'visa', name: 'Visa', icon: <FileText size={20} color="#6B21A8" />, color: '#6B21A8', bgColor: '#F3E8FF' },
-  { id: 'insurance', name: 'Insurance', icon: <Shield size={20} color="#059669" />, color: '#059669', bgColor: '#D1FAE5' },
-  { id: 'boarding_pass', name: 'Boarding Pass', icon: <Plane size={20} color="#EA580C" />, color: '#EA580C', bgColor: '#FFEDD5' },
-  { id: 'vaccination', name: 'Vaccination', icon: <Syringe size={20} color="#DC2626" />, color: '#DC2626', bgColor: '#FEE2E2' },
-  { id: 'drivers_license', name: "Driver's License", icon: <Car size={20} color="#0284C7" />, color: '#0284C7', bgColor: '#E0F2FE' },
-  { id: 'id_card', name: 'ID Card', icon: <CreditCard size={20} color="#7C3AED" />, color: '#7C3AED', bgColor: '#EDE9FE' },
-  { id: 'other', name: 'Other', icon: <MoreHorizontal size={20} color="#64748B" />, color: '#64748B', bgColor: '#F1F5F9' },
+  {
+    id: 'passport',
+    name: 'Passport',
+    icon: <Globe size={20} color="#1B4965" />,
+    color: '#1B4965',
+    bgColor: '#E8F4F8',
+  },
+  {
+    id: 'visa',
+    name: 'Visa',
+    icon: <FileText size={20} color="#6B21A8" />,
+    color: '#6B21A8',
+    bgColor: '#F3E8FF',
+  },
+  {
+    id: 'insurance',
+    name: 'Insurance',
+    icon: <Shield size={20} color="#059669" />,
+    color: '#059669',
+    bgColor: '#D1FAE5',
+  },
+  {
+    id: 'boarding_pass',
+    name: 'Boarding Pass',
+    icon: <Plane size={20} color="#EA580C" />,
+    color: '#EA580C',
+    bgColor: '#FFEDD5',
+  },
+  {
+    id: 'vaccination',
+    name: 'Vaccination',
+    icon: <Syringe size={20} color="#DC2626" />,
+    color: '#DC2626',
+    bgColor: '#FEE2E2',
+  },
+  {
+    id: 'drivers_license',
+    name: "Driver's License",
+    icon: <Car size={20} color="#0284C7" />,
+    color: '#0284C7',
+    bgColor: '#E0F2FE',
+  },
+  {
+    id: 'id_card',
+    name: 'ID Card',
+    icon: <CreditCard size={20} color="#7C3AED" />,
+    color: '#7C3AED',
+    bgColor: '#EDE9FE',
+  },
+  {
+    id: 'other',
+    name: 'Other',
+    icon: <MoreHorizontal size={20} color="#64748B" />,
+    color: '#64748B',
+    bgColor: '#F1F5F9',
+  },
 ];
 
 const mockDocuments: TravelDocument[] = [
@@ -175,7 +223,7 @@ export default function DocumentWalletScreen() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        doc =>
+        (doc) =>
           doc.name.toLowerCase().includes(query) ||
           doc.documentNumber?.toLowerCase().includes(query) ||
           doc.issuingCountry?.toLowerCase().includes(query)
@@ -183,7 +231,7 @@ export default function DocumentWalletScreen() {
     }
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(doc => doc.type === selectedCategory);
+      filtered = filtered.filter((doc) => doc.type === selectedCategory);
     }
 
     filtered = [...filtered].sort((a, b) => {
@@ -197,17 +245,17 @@ export default function DocumentWalletScreen() {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-    const favorites = filtered.filter(doc => doc.isFavorite);
-    const nonFavorites = filtered.filter(doc => !doc.isFavorite);
-    
+    const favorites = filtered.filter((doc) => doc.isFavorite);
+    const nonFavorites = filtered.filter((doc) => !doc.isFavorite);
+
     return [...favorites, ...nonFavorites];
   }, [documents, searchQuery, selectedCategory, sortBy]);
 
   const expiringDocuments = useMemo(() => {
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-    
-    return documents.filter(doc => {
+
+    return documents.filter((doc) => {
       if (!doc.expiryDate) return false;
       const expiryDate = new Date(doc.expiryDate);
       return expiryDate <= thirtyDaysFromNow && expiryDate >= new Date();
@@ -215,15 +263,15 @@ export default function DocumentWalletScreen() {
   }, [documents]);
 
   const getDocumentCategory = (type: DocumentType) => {
-    return documentCategories.find(cat => cat.id === type) || documentCategories[7];
+    return documentCategories.find((cat) => cat.id === type) || documentCategories[7];
   };
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
   };
 
@@ -242,7 +290,7 @@ export default function DocumentWalletScreen() {
 
   const toggleSensitiveInfo = (docId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setShowSensitiveInfo(prev => ({
+    setShowSensitiveInfo((prev) => ({
       ...prev,
       [docId]: !prev[docId],
     }));
@@ -256,10 +304,8 @@ export default function DocumentWalletScreen() {
 
   const toggleFavorite = (docId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setDocuments(prev =>
-      prev.map(doc =>
-        doc.id === docId ? { ...doc, isFavorite: !doc.isFavorite } : doc
-      )
+    setDocuments((prev) =>
+      prev.map((doc) => (doc.id === docId ? { ...doc, isFavorite: !doc.isFavorite } : doc))
     );
   };
 
@@ -274,7 +320,7 @@ export default function DocumentWalletScreen() {
           style: 'destructive',
           onPress: () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            setDocuments(prev => prev.filter(doc => doc.id !== docId));
+            setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
             setShowDetailModal(false);
             setSelectedDocument(null);
           },
@@ -304,7 +350,7 @@ export default function DocumentWalletScreen() {
     };
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setDocuments(prev => [document, ...prev]);
+    setDocuments((prev) => [document, ...prev]);
     setShowAddModal(false);
     setNewDocument({
       type: 'passport',
@@ -331,33 +377,26 @@ export default function DocumentWalletScreen() {
     const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
 
     return (
-      <Pressable
-        key={doc.id}
-        style={styles.documentCard}
-        onPress={() => openDocumentDetail(doc)}
-      >
+      <Pressable key={doc.id} style={styles.documentCard} onPress={() => openDocumentDetail(doc)}>
         <View style={[styles.documentIconContainer, { backgroundColor: category.bgColor }]}>
           {category.icon}
         </View>
         <View style={styles.documentInfo}>
           <View style={styles.documentHeader}>
-            <Text style={styles.documentName} numberOfLines={1}>{doc.name}</Text>
-            {doc.isFavorite && (
-              <Star size={14} color={colors.warning} fill={colors.warning} />
-            )}
+            <Text style={styles.documentName} numberOfLines={1}>
+              {doc.name}
+            </Text>
+            {doc.isFavorite && <Star size={14} color={colors.warning} fill={colors.warning} />}
           </View>
           <Text style={styles.documentType}>{category.name}</Text>
           {doc.documentNumber && (
             <View style={styles.documentNumberRow}>
               <Text style={styles.documentNumber}>
-                {showSensitiveInfo[doc.id] 
-                  ? doc.documentNumber 
+                {showSensitiveInfo[doc.id]
+                  ? doc.documentNumber
                   : maskDocumentNumber(doc.documentNumber)}
               </Text>
-              <Pressable 
-                onPress={() => toggleSensitiveInfo(doc.id)}
-                hitSlop={8}
-              >
+              <Pressable onPress={() => toggleSensitiveInfo(doc.id)} hitSlop={8}>
                 {showSensitiveInfo[doc.id] ? (
                   <EyeOff size={14} color={colors.textTertiary} />
                 ) : (
@@ -379,9 +418,7 @@ export default function DocumentWalletScreen() {
               <Text style={styles.expiringText}>{daysUntilExpiry}d</Text>
             </View>
           ) : doc.expiryDate ? (
-            <Text style={styles.expiryDateText}>
-              Exp: {formatDate(doc.expiryDate)}
-            </Text>
+            <Text style={styles.expiryDateText}>Exp: {formatDate(doc.expiryDate)}</Text>
           ) : null}
           <ChevronRight size={18} color={colors.textTertiary} />
         </View>
@@ -403,17 +440,11 @@ export default function DocumentWalletScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <Pressable
-              style={styles.backButton}
-              onPress={() => router.back()}
-            >
+            <Pressable style={styles.backButton} onPress={() => router.back()}>
               <ArrowLeft size={24} color={colors.textLight} />
             </Pressable>
             <Text style={styles.headerTitle}>Document Wallet</Text>
-            <Pressable
-              style={styles.addButton}
-              onPress={() => setShowAddModal(true)}
-            >
+            <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
               <Plus size={24} color={colors.textLight} />
             </Pressable>
           </View>
@@ -435,22 +466,17 @@ export default function DocumentWalletScreen() {
           </View>
         </View>
 
-        <ScrollView 
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             {expiringDocuments.length > 0 && (
               <View style={styles.alertCard}>
-                <LinearGradient
-                  colors={['#FEF3C7', '#FDE68A']}
-                  style={styles.alertGradient}
-                >
+                <LinearGradient colors={['#FEF3C7', '#FDE68A']} style={styles.alertGradient}>
                   <AlertTriangle size={24} color="#D97706" />
                   <View style={styles.alertContent}>
                     <Text style={styles.alertTitle}>Expiring Soon</Text>
                     <Text style={styles.alertText}>
-                      {expiringDocuments.length} document{expiringDocuments.length > 1 ? 's' : ''} expiring within 30 days
+                      {expiringDocuments.length} document{expiringDocuments.length > 1 ? 's' : ''}{' '}
+                      expiring within 30 days
                     </Text>
                   </View>
                   <ChevronRight size={20} color="#D97706" />
@@ -479,8 +505,8 @@ export default function DocumentWalletScreen() {
                   All ({documents.length})
                 </Text>
               </Pressable>
-              {documentCategories.map(cat => {
-                const count = documents.filter(d => d.type === cat.id).length;
+              {documentCategories.map((cat) => {
+                const count = documents.filter((d) => d.type === cat.id).length;
                 if (count === 0) return null;
                 return (
                   <Pressable
@@ -508,7 +534,7 @@ export default function DocumentWalletScreen() {
               <Text style={styles.resultsText}>
                 {filteredDocuments.length} document{filteredDocuments.length !== 1 ? 's' : ''}
               </Text>
-              <Pressable 
+              <Pressable
                 style={styles.sortButton}
                 onPress={() => {
                   const sortOptions: Array<'date' | 'name' | 'expiry'> = ['date', 'name', 'expiry'];
@@ -533,15 +559,12 @@ export default function DocumentWalletScreen() {
                   </View>
                   <Text style={styles.emptyTitle}>No Documents Found</Text>
                   <Text style={styles.emptyText}>
-                    {searchQuery 
+                    {searchQuery
                       ? 'Try adjusting your search or filters'
                       : 'Add your first travel document to get started'}
                   </Text>
                   {!searchQuery && (
-                    <Pressable
-                      style={styles.emptyButton}
-                      onPress={() => setShowAddModal(true)}
-                    >
+                    <Pressable style={styles.emptyButton} onPress={() => setShowAddModal(true)}>
                       <Plus size={18} color={colors.textLight} />
                       <Text style={styles.emptyButtonText}>Add Document</Text>
                     </Pressable>
@@ -570,19 +593,19 @@ export default function DocumentWalletScreen() {
           <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
             <Text style={styles.inputLabel}>Document Type *</Text>
             <View style={styles.typeGrid}>
-              {documentCategories.map(cat => (
+              {documentCategories.map((cat) => (
                 <Pressable
                   key={cat.id}
                   style={[
                     styles.typeOption,
                     newDocument.type === cat.id && styles.typeOptionActive,
                   ]}
-                  onPress={() => setNewDocument(prev => ({ ...prev, type: cat.id }))}
+                  onPress={() => setNewDocument((prev) => ({ ...prev, type: cat.id }))}
                 >
                   <View style={[styles.typeIconContainer, { backgroundColor: cat.bgColor }]}>
                     {cat.icon}
                   </View>
-                  <Text 
+                  <Text
                     style={[
                       styles.typeOptionText,
                       newDocument.type === cat.id && styles.typeOptionTextActive,
@@ -600,7 +623,7 @@ export default function DocumentWalletScreen() {
               placeholder="e.g., US Passport"
               placeholderTextColor={colors.textTertiary}
               value={newDocument.name}
-              onChangeText={text => setNewDocument(prev => ({ ...prev, name: text }))}
+              onChangeText={(text) => setNewDocument((prev) => ({ ...prev, name: text }))}
             />
 
             <Text style={styles.inputLabel}>Document Number</Text>
@@ -609,7 +632,7 @@ export default function DocumentWalletScreen() {
               placeholder="e.g., XX1234567"
               placeholderTextColor={colors.textTertiary}
               value={newDocument.documentNumber}
-              onChangeText={text => setNewDocument(prev => ({ ...prev, documentNumber: text }))}
+              onChangeText={(text) => setNewDocument((prev) => ({ ...prev, documentNumber: text }))}
             />
 
             <Text style={styles.inputLabel}>Issuing Country</Text>
@@ -618,7 +641,7 @@ export default function DocumentWalletScreen() {
               placeholder="e.g., United States"
               placeholderTextColor={colors.textTertiary}
               value={newDocument.issuingCountry}
-              onChangeText={text => setNewDocument(prev => ({ ...prev, issuingCountry: text }))}
+              onChangeText={(text) => setNewDocument((prev) => ({ ...prev, issuingCountry: text }))}
             />
 
             <View style={styles.dateRow}>
@@ -629,7 +652,7 @@ export default function DocumentWalletScreen() {
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor={colors.textTertiary}
                   value={newDocument.issueDate}
-                  onChangeText={text => setNewDocument(prev => ({ ...prev, issueDate: text }))}
+                  onChangeText={(text) => setNewDocument((prev) => ({ ...prev, issueDate: text }))}
                 />
               </View>
               <View style={styles.dateField}>
@@ -639,7 +662,7 @@ export default function DocumentWalletScreen() {
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor={colors.textTertiary}
                   value={newDocument.expiryDate}
-                  onChangeText={text => setNewDocument(prev => ({ ...prev, expiryDate: text }))}
+                  onChangeText={(text) => setNewDocument((prev) => ({ ...prev, expiryDate: text }))}
                 />
               </View>
             </View>
@@ -650,7 +673,7 @@ export default function DocumentWalletScreen() {
               placeholder="Add any additional notes..."
               placeholderTextColor={colors.textTertiary}
               value={newDocument.notes}
-              onChangeText={text => setNewDocument(prev => ({ ...prev, notes: text }))}
+              onChangeText={(text) => setNewDocument((prev) => ({ ...prev, notes: text }))}
               multiline
               numberOfLines={4}
             />
@@ -679,10 +702,12 @@ export default function DocumentWalletScreen() {
 
             <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
               <View style={styles.detailHeader}>
-                <View style={[
-                  styles.detailIconContainer, 
-                  { backgroundColor: getDocumentCategory(selectedDocument.type).bgColor }
-                ]}>
+                <View
+                  style={[
+                    styles.detailIconContainer,
+                    { backgroundColor: getDocumentCategory(selectedDocument.type).bgColor },
+                  ]}
+                >
                   {getDocumentCategory(selectedDocument.type).icon}
                 </View>
                 <View style={styles.detailHeaderInfo}>
@@ -695,8 +720,8 @@ export default function DocumentWalletScreen() {
                   style={styles.favoriteButton}
                   onPress={() => toggleFavorite(selectedDocument.id)}
                 >
-                  <Star 
-                    size={24} 
+                  <Star
+                    size={24}
                     color={selectedDocument.isFavorite ? colors.warning : colors.textTertiary}
                     fill={selectedDocument.isFavorite ? colors.warning : 'transparent'}
                   />
@@ -719,7 +744,7 @@ export default function DocumentWalletScreen() {
                         <Eye size={18} color={colors.textTertiary} />
                       )}
                     </Pressable>
-                    <Pressable 
+                    <Pressable
                       onPress={() => copyToClipboard(selectedDocument.documentNumber!, 'number')}
                     >
                       {copiedField === 'number' ? (
@@ -750,22 +775,28 @@ export default function DocumentWalletScreen() {
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Expiry Date</Text>
                   <View style={styles.expiryDetailRow}>
-                    <Text style={styles.detailValue}>{formatDate(selectedDocument.expiryDate)}</Text>
+                    <Text style={styles.detailValue}>
+                      {formatDate(selectedDocument.expiryDate)}
+                    </Text>
                     {getDaysUntilExpiry(selectedDocument.expiryDate) <= 30 && (
-                      <View style={[
-                        styles.expiryBadge,
-                        getDaysUntilExpiry(selectedDocument.expiryDate) <= 0 
-                          ? styles.expiredBadgeDetail 
-                          : styles.expiringBadgeDetail
-                      ]}>
-                        <Text style={[
-                          styles.expiryBadgeText,
-                          getDaysUntilExpiry(selectedDocument.expiryDate) <= 0 
-                            ? styles.expiredBadgeTextDetail 
-                            : styles.expiringBadgeTextDetail
-                        ]}>
-                          {getDaysUntilExpiry(selectedDocument.expiryDate) <= 0 
-                            ? 'Expired' 
+                      <View
+                        style={[
+                          styles.expiryBadge,
+                          getDaysUntilExpiry(selectedDocument.expiryDate) <= 0
+                            ? styles.expiredBadgeDetail
+                            : styles.expiringBadgeDetail,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.expiryBadgeText,
+                            getDaysUntilExpiry(selectedDocument.expiryDate) <= 0
+                              ? styles.expiredBadgeTextDetail
+                              : styles.expiringBadgeTextDetail,
+                          ]}
+                        >
+                          {getDaysUntilExpiry(selectedDocument.expiryDate) <= 0
+                            ? 'Expired'
                             : `${getDaysUntilExpiry(selectedDocument.expiryDate)} days left`}
                         </Text>
                       </View>
@@ -782,14 +813,12 @@ export default function DocumentWalletScreen() {
               )}
 
               <View style={styles.detailActions}>
-                <Pressable 
+                <Pressable
                   style={styles.actionButton}
                   onPress={() => deleteDocument(selectedDocument.id)}
                 >
                   <Trash2 size={20} color={colors.error} />
-                  <Text style={[styles.actionButtonText, { color: colors.error }]}>
-                    Delete
-                  </Text>
+                  <Text style={[styles.actionButtonText, { color: colors.error }]}>Delete</Text>
                 </Pressable>
               </View>
             </ScrollView>

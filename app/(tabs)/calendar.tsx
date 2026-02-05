@@ -1,12 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -30,8 +23,18 @@ const DAY_WIDTH = (SCREEN_WIDTH - 40 - 12) / 7;
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 // Generic itinerary type that works for all sources
@@ -57,20 +60,20 @@ interface CalendarDay {
 
 export default function CalendarScreen() {
   const router = useRouter();
-  
+
   // Get date night itineraries
   const { itineraries: dateNightItineraries } = useDateNight();
-  
+
   // TODO: Add other itinerary sources
   // const { trips } = useTrips();
-  
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [filterType, setFilterType] = useState<'all' | 'date-night' | 'trip' | 'business'>('all');
 
   // Convert all itineraries to generic format
   const allItineraries = useMemo((): GenericItinerary[] => {
-    const dateNights: GenericItinerary[] = dateNightItineraries.map(i => ({
+    const dateNights: GenericItinerary[] = dateNightItineraries.map((i) => ({
       id: i.id,
       name: i.name,
       date: i.date,
@@ -82,42 +85,45 @@ export default function CalendarScreen() {
       isSurprise: i.isSurprise,
       totalEstimatedCost: i.totalEstimatedCost,
     }));
-    
+
     // TODO: Add other types here
-    
+
     return [...dateNights];
   }, [dateNightItineraries]);
 
   // Filter by type
   const filteredItineraries = useMemo(() => {
     if (filterType === 'all') return allItineraries;
-    return allItineraries.filter(i => i.type === filterType);
+    return allItineraries.filter((i) => i.type === filterType);
   }, [allItineraries, filterType]);
 
-  const getItinerariesForDate = useCallback((date: Date): GenericItinerary[] => {
-    return filteredItineraries.filter(itinerary => {
-      const itineraryDate = new Date(itinerary.date);
-      return (
-        itineraryDate.getFullYear() === date.getFullYear() &&
-        itineraryDate.getMonth() === date.getMonth() &&
-        itineraryDate.getDate() === date.getDate()
-      );
-    });
-  }, [filteredItineraries]);
+  const getItinerariesForDate = useCallback(
+    (date: Date): GenericItinerary[] => {
+      return filteredItineraries.filter((itinerary) => {
+        const itineraryDate = new Date(itinerary.date);
+        return (
+          itineraryDate.getFullYear() === date.getFullYear() &&
+          itineraryDate.getMonth() === date.getMonth() &&
+          itineraryDate.getDate() === date.getDate()
+        );
+      });
+    },
+    [filteredItineraries]
+  );
 
   const calendarDays = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    
+
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const startingDayOfWeek = firstDayOfMonth.getDay();
     const daysInMonth = lastDayOfMonth.getDate();
-    
+
     const days: CalendarDay[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     // Previous month
     const prevMonth = new Date(year, month, 0);
     const prevMonthDays = prevMonth.getDate();
@@ -130,7 +136,7 @@ export default function CalendarScreen() {
         itineraries: getItinerariesForDate(date),
       });
     }
-    
+
     // Current month
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
@@ -142,7 +148,7 @@ export default function CalendarScreen() {
         itineraries: getItinerariesForDate(date),
       });
     }
-    
+
     // Next month
     const remainingDays = 42 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
@@ -154,7 +160,7 @@ export default function CalendarScreen() {
         itineraries: getItinerariesForDate(date),
       });
     }
-    
+
     return days;
   }, [currentDate, getItinerariesForDate]);
 
@@ -164,11 +170,11 @@ export default function CalendarScreen() {
   }, [selectedDate, getItinerariesForDate]);
 
   const goToPreviousMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
   const goToToday = () => {
@@ -186,14 +192,14 @@ export default function CalendarScreen() {
     today.setHours(0, 0, 0, 0);
     const selected = new Date(date);
     selected.setHours(0, 0, 0, 0);
-    
+
     const diffTime = selected.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
     if (diffDays === -1) return 'Yesterday';
-    
+
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',
@@ -203,34 +209,46 @@ export default function CalendarScreen() {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'date-night': return Heart;
-      case 'trip': return Plane;
-      case 'business': return Briefcase;
-      default: return CalendarIcon;
+      case 'date-night':
+        return Heart;
+      case 'trip':
+        return Plane;
+      case 'business':
+        return Briefcase;
+      default:
+        return CalendarIcon;
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'date-night': return colors.secondary;
-      case 'trip': return colors.primary;
-      case 'business': return '#6366F1';
-      default: return colors.textSecondary;
+      case 'date-night':
+        return colors.secondary;
+      case 'trip':
+        return colors.primary;
+      case 'business':
+        return '#6366F1';
+      default:
+        return colors.textSecondary;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return colors.success;
-      case 'cancelled': return colors.error;
-      case 'draft': return colors.textTertiary;
-      default: return colors.secondary;
+      case 'completed':
+        return colors.success;
+      case 'cancelled':
+        return colors.error;
+      case 'draft':
+        return colors.textTertiary;
+      default:
+        return colors.secondary;
     }
   };
 
   const getDotColors = (dayItineraries: GenericItinerary[]) => {
     if (dayItineraries.length === 0) return [];
-    const types = [...new Set(dayItineraries.map(i => i.type))];
+    const types = [...new Set(dayItineraries.map((i) => i.type))];
     return types.map(getTypeColor).slice(0, 3);
   };
 
@@ -268,13 +286,13 @@ export default function CalendarScreen() {
 
         <View style={styles.content}>
           {/* Filter Tabs */}
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.filterScroll}
             contentContainerStyle={styles.filterContent}
           >
-            {filterOptions.map(option => {
+            {filterOptions.map((option) => {
               const IconComponent = option.icon;
               const isActive = filterType === option.value;
               return (
@@ -283,14 +301,11 @@ export default function CalendarScreen() {
                   style={[styles.filterTab, isActive && styles.filterTabActive]}
                   onPress={() => setFilterType(option.value)}
                 >
-                  <IconComponent 
-                    size={16} 
-                    color={isActive ? colors.textLight : colors.textSecondary} 
+                  <IconComponent
+                    size={16}
+                    color={isActive ? colors.textLight : colors.textSecondary}
                   />
-                  <Text style={[
-                    styles.filterText,
-                    isActive && styles.filterTextActive
-                  ]}>
+                  <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
                     {option.label}
                   </Text>
                 </Pressable>
@@ -313,7 +328,7 @@ export default function CalendarScreen() {
 
           {/* Weekday Headers */}
           <View style={styles.weekdayHeader}>
-            {WEEKDAYS.map(day => (
+            {WEEKDAYS.map((day) => (
               <View key={day} style={styles.weekdayCell}>
                 <Text style={styles.weekdayText}>{day}</Text>
               </View>
@@ -323,10 +338,10 @@ export default function CalendarScreen() {
           {/* Calendar Grid */}
           <View style={styles.calendarGrid}>
             {calendarDays.map((day, index) => {
-              const isSelected = selectedDate && 
-                day.date.toDateString() === selectedDate.toDateString();
+              const isSelected =
+                selectedDate && day.date.toDateString() === selectedDate.toDateString();
               const dotColors = getDotColors(day.itineraries);
-              
+
               return (
                 <Pressable
                   key={index}
@@ -337,21 +352,20 @@ export default function CalendarScreen() {
                   ]}
                   onPress={() => handleDayPress(day)}
                 >
-                  <Text style={[
-                    styles.dayNumber,
-                    !day.isCurrentMonth && styles.dayNumberOtherMonth,
-                    isSelected && styles.dayNumberSelected,
-                    day.isToday && !isSelected && styles.dayNumberToday,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.dayNumber,
+                      !day.isCurrentMonth && styles.dayNumberOtherMonth,
+                      isSelected && styles.dayNumberSelected,
+                      day.isToday && !isSelected && styles.dayNumberToday,
+                    ]}
+                  >
                     {day.date.getDate()}
                   </Text>
                   {dotColors.length > 0 && (
                     <View style={styles.dotContainer}>
                       {dotColors.map((color, i) => (
-                        <View 
-                          key={i} 
-                          style={[styles.dot, { backgroundColor: color }]} 
-                        />
+                        <View key={i} style={[styles.dot, { backgroundColor: color }]} />
                       ))}
                     </View>
                   )}
@@ -369,7 +383,7 @@ export default function CalendarScreen() {
               </Text>
             </View>
 
-            <ScrollView 
+            <ScrollView
               style={styles.itinerariesList}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.itinerariesContent}
@@ -378,10 +392,8 @@ export default function CalendarScreen() {
                 <View style={styles.emptyState}>
                   <CalendarIcon size={40} color={colors.textTertiary} />
                   <Text style={styles.emptyTitle}>No plans</Text>
-                  <Text style={styles.emptyDescription}>
-                    Nothing scheduled for this day
-                  </Text>
-                  <Pressable 
+                  <Text style={styles.emptyDescription}>Nothing scheduled for this day</Text>
+                  <Pressable
                     style={styles.addButton}
                     onPress={() => router.push('/date-night/generate-plan')}
                   >
@@ -390,10 +402,10 @@ export default function CalendarScreen() {
                   </Pressable>
                 </View>
               ) : (
-                selectedDateItineraries.map(itinerary => {
+                selectedDateItineraries.map((itinerary) => {
                   const TypeIcon = getTypeIcon(itinerary.type);
                   const typeColor = getTypeColor(itinerary.type);
-                  
+
                   return (
                     <Pressable
                       key={itinerary.id}
@@ -401,35 +413,36 @@ export default function CalendarScreen() {
                       onPress={() => handleItineraryPress(itinerary)}
                     >
                       <View style={styles.itineraryHeader}>
-                        <View style={[
-                          styles.typeBadge,
-                          { backgroundColor: `${typeColor}15` }
-                        ]}>
+                        <View style={[styles.typeBadge, { backgroundColor: `${typeColor}15` }]}>
                           <TypeIcon size={14} color={typeColor} />
                           <Text style={[styles.typeText, { color: typeColor }]}>
-                            {itinerary.type === 'date-night' ? 'Date Night' : 
-                             itinerary.type.charAt(0).toUpperCase() + itinerary.type.slice(1)}
+                            {itinerary.type === 'date-night'
+                              ? 'Date Night'
+                              : itinerary.type.charAt(0).toUpperCase() + itinerary.type.slice(1)}
                           </Text>
                         </View>
-                        <View style={[
-                          styles.statusBadge,
-                          { backgroundColor: `${getStatusColor(itinerary.status)}15` }
-                        ]}>
-                          <View style={[
-                            styles.statusDot,
-                            { backgroundColor: getStatusColor(itinerary.status) }
-                          ]} />
-                          <Text style={[
-                            styles.statusText,
-                            { color: getStatusColor(itinerary.status) }
-                          ]}>
+                        <View
+                          style={[
+                            styles.statusBadge,
+                            { backgroundColor: `${getStatusColor(itinerary.status)}15` },
+                          ]}
+                        >
+                          <View
+                            style={[
+                              styles.statusDot,
+                              { backgroundColor: getStatusColor(itinerary.status) },
+                            ]}
+                          />
+                          <Text
+                            style={[styles.statusText, { color: getStatusColor(itinerary.status) }]}
+                          >
                             {itinerary.status.charAt(0).toUpperCase() + itinerary.status.slice(1)}
                           </Text>
                         </View>
                       </View>
 
                       <Text style={styles.itineraryName}>{itinerary.name}</Text>
-                      
+
                       <View style={styles.itineraryMeta}>
                         {itinerary.partnerName && (
                           <View style={styles.metaItem}>

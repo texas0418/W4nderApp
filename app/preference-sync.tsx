@@ -15,15 +15,8 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { usePreferenceSync } from '../hooks/usePreferenceSync';
-import {
-  PreferenceCategory,
-  LearningInsight,
-} from '../types/preferences';
-import {
-  PREFERENCE_CATEGORIES,
-  STRENGTH_COLORS,
-  SOURCE_LABELS,
-} from '../mocks/mockPreferenceData';
+import { PreferenceCategory, LearningInsight } from '../types/preferences';
+import { PREFERENCE_CATEGORIES, STRENGTH_COLORS, SOURCE_LABELS } from '../mocks/mockPreferenceData';
 
 interface PreferenceSyncScreenProps {
   navigation?: any;
@@ -62,8 +55,14 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
   const overallCompleteness = useMemo(() => {
     if (!isReady) return 0;
     const categories: PreferenceCategory[] = [
-      'dining', 'activities', 'accommodation', 'transportation',
-      'budget', 'timing', 'accessibility', 'social'
+      'dining',
+      'activities',
+      'accommodation',
+      'transportation',
+      'budget',
+      'timing',
+      'accessibility',
+      'social',
     ];
     const total = categories.reduce((sum, cat) => sum + getCategoryCompleteness(cat), 0);
     return Math.round(total / categories.length);
@@ -100,16 +99,22 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
     }
   }, [exportPreferences]);
 
-  const handleApplyInsight = useCallback(async (insightId: string) => {
-    const success = await applyInsight(insightId);
-    if (success) {
-      Alert.alert('Applied', 'Preference updated based on your activity.');
-    }
-  }, [applyInsight]);
+  const handleApplyInsight = useCallback(
+    async (insightId: string) => {
+      const success = await applyInsight(insightId);
+      if (success) {
+        Alert.alert('Applied', 'Preference updated based on your activity.');
+      }
+    },
+    [applyInsight]
+  );
 
-  const handleRejectInsight = useCallback(async (insightId: string) => {
-    await rejectInsight(insightId);
-  }, [rejectInsight]);
+  const handleRejectInsight = useCallback(
+    async (insightId: string) => {
+      await rejectInsight(insightId);
+    },
+    [rejectInsight]
+  );
 
   const formatLastSync = useCallback((timestamp: string | null) => {
     if (!timestamp) return 'Never';
@@ -117,7 +122,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
@@ -126,11 +131,16 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
 
   const getSyncStatusColor = useCallback((status: string) => {
     switch (status) {
-      case 'synced': return '#34C759';
-      case 'pending': return '#FF9500';
-      case 'syncing': return '#007AFF';
-      case 'error': return '#FF3B30';
-      default: return '#8E8E93';
+      case 'synced':
+        return '#34C759';
+      case 'pending':
+        return '#FF9500';
+      case 'syncing':
+        return '#007AFF';
+      case 'error':
+        return '#FF3B30';
+      default:
+        return '#8E8E93';
     }
   }, []);
 
@@ -143,15 +153,17 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
     >
       <View style={styles.headerContent}>
         <Text style={styles.headerTitle}>Preference Sync</Text>
-        <Text style={styles.headerSubtitle}>
-          Personalize your travel experience
-        </Text>
-        
+        <Text style={styles.headerSubtitle}>Personalize your travel experience</Text>
+
         {/* Sync Status Badge */}
         <View style={styles.syncBadge}>
           <View style={[styles.syncDot, { backgroundColor: getSyncStatusColor(syncStatus) }]} />
           <Text style={styles.syncText}>
-            {syncStatus === 'synced' ? 'Synced' : syncStatus === 'pending' ? 'Changes pending' : syncStatus}
+            {syncStatus === 'synced'
+              ? 'Synced'
+              : syncStatus === 'pending'
+                ? 'Changes pending'
+                : syncStatus}
           </Text>
           <Text style={styles.syncTime}>• {formatLastSync(lastSyncTime)}</Text>
         </View>
@@ -181,7 +193,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
         )}
         <Text style={styles.quickActionText}>Sync Now</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={styles.quickAction}
         onPress={onMergeCompanions || (() => navigation?.navigate('CompanionMerge'))}
@@ -194,7 +206,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
           </View>
         )}
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         style={styles.quickAction}
         onPress={onViewSuggestionSettings || (() => navigation?.navigate('SuggestionSettings'))}
@@ -202,7 +214,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
         <Text style={styles.quickActionIcon}>⚙️</Text>
         <Text style={styles.quickActionText}>Settings</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity style={styles.quickAction} onPress={handleExport}>
         <Text style={styles.quickActionIcon}>📤</Text>
         <Text style={styles.quickActionText}>Export</Text>
@@ -212,7 +224,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
 
   const renderInsightCard = (insight: LearningInsight) => {
     const isExpanded = expandedInsight === insight.id;
-    
+
     return (
       <TouchableOpacity
         key={insight.id}
@@ -235,14 +247,14 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
             </View>
           </View>
         </View>
-        
+
         {isExpanded && (
           <View style={styles.insightExpanded}>
             <Text style={styles.insightSuggestion}>
               Suggested: Update {insight.suggestedUpdate.field} preference
             </Text>
             <Text style={styles.insightReason}>{insight.suggestedUpdate.reason}</Text>
-            
+
             <View style={styles.insightActions}>
               <TouchableOpacity
                 style={styles.insightApply}
@@ -265,7 +277,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
 
   const renderLearningInsights = () => {
     if (pendingInsights.length === 0) return null;
-    
+
     return (
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
@@ -274,7 +286,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
             <Text style={styles.insightCountText}>{pendingInsights.length} new</Text>
           </View>
         </View>
-        
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -286,41 +298,38 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
     );
   };
 
-  const renderCategoryCard = (category: typeof PREFERENCE_CATEGORIES[0]) => {
+  const renderCategoryCard = (category: (typeof PREFERENCE_CATEGORIES)[0]) => {
     const completeness = getCategoryCompleteness(category.id as PreferenceCategory);
-    
+
     return (
       <TouchableOpacity
         key={category.id}
         style={styles.categoryCard}
-        onPress={() => onEditCategory?.(category.id as PreferenceCategory) || 
-          navigation?.navigate('PreferenceEditor', { category: category.id })}
+        onPress={() =>
+          onEditCategory?.(category.id as PreferenceCategory) ||
+          navigation?.navigate('PreferenceEditor', { category: category.id })
+        }
         activeOpacity={0.7}
       >
         <View style={styles.categoryIcon}>
           <Text style={styles.categoryIconText}>{category.icon}</Text>
         </View>
-        
+
         <View style={styles.categoryContent}>
           <Text style={styles.categoryName}>{category.name}</Text>
           <Text style={styles.categoryDescription} numberOfLines={1}>
             {category.description}
           </Text>
-          
+
           {/* Progress bar */}
           <View style={styles.categoryProgress}>
             <View style={styles.categoryProgressBg}>
-              <View
-                style={[
-                  styles.categoryProgressFill,
-                  { width: `${completeness}%` },
-                ]}
-              />
+              <View style={[styles.categoryProgressFill, { width: `${completeness}%` }]} />
             </View>
             <Text style={styles.categoryProgressText}>{completeness}%</Text>
           </View>
         </View>
-        
+
         <Text style={styles.categoryChevron}>›</Text>
       </TouchableOpacity>
     );
@@ -331,10 +340,8 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Preference Categories</Text>
       </View>
-      
-      <View style={styles.categoriesGrid}>
-        {PREFERENCE_CATEGORIES.map(renderCategoryCard)}
-      </View>
+
+      <View style={styles.categoriesGrid}>{PREFERENCE_CATEGORIES.map(renderCategoryCard)}</View>
     </View>
   );
 
@@ -349,7 +356,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
           <Text style={styles.addCompanionText}>+ Add</Text>
         </TouchableOpacity>
       </View>
-      
+
       {companions.length === 0 ? (
         <View style={styles.emptyCompanions}>
           <Text style={styles.emptyCompanionsIcon}>👥</Text>
@@ -363,7 +370,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.companionsScroll}
         >
-          {companions.map(companion => (
+          {companions.map((companion) => (
             <TouchableOpacity
               key={companion.id}
               style={styles.companionCard}
@@ -397,14 +404,16 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Your Stats</Text>
       </View>
-      
+
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>{learningInsights.filter(i => i.status === 'accepted').length}</Text>
+          <Text style={styles.statValue}>
+            {learningInsights.filter((i) => i.status === 'accepted').length}
+          </Text>
           <Text style={styles.statLabel}>Insights Applied</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>{companions.filter(c => c.syncEnabled).length}</Text>
+          <Text style={styles.statValue}>{companions.filter((c) => c.syncEnabled).length}</Text>
           <Text style={styles.statLabel}>Synced Companions</Text>
         </View>
         <View style={styles.statCard}>
@@ -427,9 +436,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
     >
       {renderHeader()}
       {renderQuickActions()}
@@ -437,7 +444,7 @@ const PreferenceSyncScreen: React.FC<PreferenceSyncScreenProps> = ({
       {renderCategories()}
       {renderCompanions()}
       {renderStats()}
-      
+
       <View style={styles.bottomPadding} />
     </ScrollView>
   );

@@ -108,7 +108,7 @@ const LOCAL_DESTINATIONS: Destination[] = [
     avgPrice: 160,
     currency: 'USD',
     bestSeason: 'March - May, September - November',
-    coordinates: { lat: 34.8697, lng: -111.7610 },
+    coordinates: { lat: 34.8697, lng: -111.761 },
   },
   {
     id: 'local-4',
@@ -136,7 +136,7 @@ const LOCAL_DESTINATIONS: Destination[] = [
     avgPrice: 120,
     currency: 'USD',
     bestSeason: 'October - May',
-    coordinates: { lat: 33.8734, lng: -115.9010 },
+    coordinates: { lat: 33.8734, lng: -115.901 },
   },
 ];
 
@@ -254,7 +254,7 @@ const INTERNATIONAL_DESTINATIONS: Destination[] = [
     avgPrice: 100,
     currency: 'USD',
     bestSeason: 'December - April',
-    coordinates: { lat: 10.3910, lng: -75.4794 },
+    coordinates: { lat: 10.391, lng: -75.4794 },
   },
   {
     id: 'intl-4',
@@ -268,7 +268,7 @@ const INTERNATIONAL_DESTINATIONS: Destination[] = [
     avgPrice: 60,
     currency: 'USD',
     bestSeason: 'February - April',
-    coordinates: { lat: 15.8801, lng: 108.3380 },
+    coordinates: { lat: 15.8801, lng: 108.338 },
   },
   {
     id: 'intl-5',
@@ -303,8 +303,11 @@ const generateTripOption = (destination: Destination, budget: number, days: numb
   for (let day = 1; day <= days; day++) {
     const dayDate = new Date(startDate);
     dayDate.setDate(dayDate.getDate() + day - 1);
-    
-    const activities: Activity[] = ACTIVITY_TEMPLATES.slice(0, day === 1 || day === days ? 2 : 3).map((template, idx) => ({
+
+    const activities: Activity[] = ACTIVITY_TEMPLATES.slice(
+      0,
+      day === 1 || day === days ? 2 : 3
+    ).map((template, idx) => ({
       id: `${destination.id}-day${day}-${idx}`,
       name: template.name,
       description: `Experience ${template.name.toLowerCase()} in ${destination.name}`,
@@ -322,7 +325,12 @@ const generateTripOption = (destination: Destination, budget: number, days: numb
     itinerary.push({
       day,
       date: dayDate.toISOString().split('T')[0],
-      title: day === 1 ? `Arrival in ${destination.name}` : day === days ? 'Departure Day' : `Day ${day} Adventures`,
+      title:
+        day === 1
+          ? `Arrival in ${destination.name}`
+          : day === days
+            ? 'Departure Day'
+            : `Day ${day} Adventures`,
       activities,
     });
   }
@@ -395,13 +403,13 @@ export default function SurpriseTripScreen() {
     setIsGenerating(true);
     console.log('Generating surprise trip options for scope:', selectedScope);
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const destinations = getDestinationsForScope(selectedScope);
     const shuffled = [...destinations].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 5);
-    
-    const options = selected.map(dest => {
+
+    const options = selected.map((dest) => {
       const days = getDaysForScope(selectedScope);
       return generateTripOption(dest, budget, days);
     });
@@ -451,9 +459,7 @@ export default function SurpriseTripScreen() {
               </View>
               <View style={styles.headerText}>
                 <Text style={styles.headerTitle}>Your Options</Text>
-                <Text style={styles.headerSubtitle}>
-                  Curated trips based on your budget
-                </Text>
+                <Text style={styles.headerSubtitle}>Curated trips based on your budget</Text>
               </View>
             </View>
             <Pressable style={styles.closeButton} onPress={() => router.back()}>
@@ -461,7 +467,7 @@ export default function SurpriseTripScreen() {
             </Pressable>
           </View>
 
-          <ScrollView 
+          <ScrollView
             style={styles.optionsContainer}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.optionsContent}
@@ -549,9 +555,7 @@ export default function SurpriseTripScreen() {
             </View>
             <View style={styles.headerText}>
               <Text style={styles.headerTitle}>Surprise Me</Text>
-              <Text style={styles.headerSubtitle}>
-                Let us plan your next adventure
-              </Text>
+              <Text style={styles.headerSubtitle}>Let us plan your next adventure</Text>
             </View>
           </View>
           <Pressable style={styles.closeButton} onPress={() => router.back()}>
@@ -559,15 +563,12 @@ export default function SurpriseTripScreen() {
           </Pressable>
         </View>
 
-        <ScrollView 
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.introSection}>
             <Text style={styles.introTitle}>Where do you want to explore?</Text>
             <Text style={styles.introText}>
-              Choose your travel scope and we'll create personalized trip options 
-              based on your preferences and budget.
+              Choose your travel scope and we'll create personalized trip options based on your
+              preferences and budget.
             </Text>
           </View>
 
@@ -609,7 +610,8 @@ export default function SurpriseTripScreen() {
             <View style={styles.budgetPreviewInfo}>
               <Text style={styles.budgetPreviewLabel}>Your Budget</Text>
               <Text style={styles.budgetPreviewValue}>
-                {userBudget.charAt(0).toUpperCase() + userBudget.slice(1)} (~${budget.toLocaleString()})
+                {userBudget.charAt(0).toUpperCase() + userBudget.slice(1)} (~$
+                {budget.toLocaleString()})
               </Text>
             </View>
           </View>
@@ -617,8 +619,8 @@ export default function SurpriseTripScreen() {
           <View style={styles.noteSection}>
             <Sparkles size={18} color={colors.secondaryDark} />
             <Text style={styles.noteText}>
-              We'll generate 5 unique trip options tailored to your budget and travel style. 
-              Pick your favorite and start planning!
+              We'll generate 5 unique trip options tailored to your budget and travel style. Pick
+              your favorite and start planning!
             </Text>
           </View>
 

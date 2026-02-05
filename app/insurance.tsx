@@ -105,11 +105,7 @@ const insurancePlans: InsurancePlan[] = [
       'Emergency evacuation',
       '24/7 assistance hotline',
     ],
-    exclusions: [
-      'Pre-existing conditions',
-      'Adventure sports',
-      'Mental health treatment',
-    ],
+    exclusions: ['Pre-existing conditions', 'Adventure sports', 'Mental health treatment'],
     highlights: ['Quick approval', 'Easy claims'],
     processingTime: 'Instant',
     support24h: true,
@@ -144,10 +140,7 @@ const insurancePlans: InsurancePlan[] = [
       'Rental car damage',
       '24/7 global assistance',
     ],
-    exclusions: [
-      'Extreme sports',
-      'War zones',
-    ],
+    exclusions: ['Extreme sports', 'War zones'],
     highlights: ['Best value', 'Fast claims'],
     processingTime: 'Instant',
     support24h: true,
@@ -185,10 +178,7 @@ const insurancePlans: InsurancePlan[] = [
       'Concierge services',
       'Pre-existing condition waiver',
     ],
-    exclusions: [
-      'War zones',
-      'Professional sports',
-    ],
+    exclusions: ['War zones', 'Professional sports'],
     highlights: ['Pre-existing coverage', 'Adventure sports'],
     processingTime: 'Instant',
     support24h: true,
@@ -201,7 +191,8 @@ const insurancePlans: InsurancePlan[] = [
   {
     id: '4',
     provider: 'NomadSafe',
-    providerLogo: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=100&h=100&fit=crop',
+    providerLogo:
+      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=100&h=100&fit=crop',
     name: 'Digital Nomad',
     tier: 'premium',
     price: 199,
@@ -226,9 +217,7 @@ const insurancePlans: InsurancePlan[] = [
       'Pet travel coverage',
       'Flexible cancellation',
     ],
-    exclusions: [
-      'Sanctioned countries',
-    ],
+    exclusions: ['Sanctioned countries'],
     highlights: ['Annual coverage', 'Remote work friendly'],
     processingTime: 'Instant',
     support24h: true,
@@ -241,7 +230,8 @@ const insurancePlans: InsurancePlan[] = [
   {
     id: '5',
     provider: 'FamilyFirst Travel',
-    providerLogo: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=100&h=100&fit=crop',
+    providerLogo:
+      'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=100&h=100&fit=crop',
     name: 'Family Adventure',
     tier: 'comprehensive',
     price: 249,
@@ -264,9 +254,7 @@ const insurancePlans: InsurancePlan[] = [
       'Child-friendly claims',
       'Family reunion coverage',
     ],
-    exclusions: [
-      'Extreme sports for minors',
-    ],
+    exclusions: ['Extreme sports for minors'],
     highlights: ['Family coverage', 'Kids activities'],
     processingTime: 'Instant',
     support24h: true,
@@ -312,18 +300,21 @@ export default function InsuranceMarketplaceScreen() {
 
   const detailsAnimation = useRef(new Animated.Value(0)).current;
 
-  const handleSelectPlan = useCallback((plan: InsurancePlan) => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setSelectedPlan(plan);
-    Animated.spring(detailsAnimation, {
-      toValue: 1,
-      useNativeDriver: true,
-      tension: 50,
-      friction: 8,
-    }).start();
-  }, [detailsAnimation]);
+  const handleSelectPlan = useCallback(
+    (plan: InsurancePlan) => {
+      if (Platform.OS !== 'web') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+      setSelectedPlan(plan);
+      Animated.spring(detailsAnimation, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 50,
+        friction: 8,
+      }).start();
+    },
+    [detailsAnimation]
+  );
 
   const handleCloseDetails = useCallback(() => {
     Animated.timing(detailsAnimation, {
@@ -333,37 +324,40 @@ export default function InsuranceMarketplaceScreen() {
     }).start(() => setSelectedPlan(null));
   }, [detailsAnimation]);
 
-  const handlePurchase = useCallback((plan: InsurancePlan) => {
-    if (Platform.OS !== 'web') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-    const totalPrice = (plan.pricePerDay * tripDuration * travelers).toFixed(2);
-    Alert.alert(
-      'Confirm Purchase',
-      `You're about to purchase ${plan.name} by ${plan.provider} for $${totalPrice} (${travelers} traveler${travelers > 1 ? 's' : ''}, ${tripDuration} days).`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Purchase',
-          onPress: () => {
-            Alert.alert(
-              'Success!',
-              'Your travel insurance has been purchased. Policy documents will be sent to your email.',
-              [{ text: 'OK', onPress: () => setSelectedPlan(null) }]
-            );
+  const handlePurchase = useCallback(
+    (plan: InsurancePlan) => {
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      const totalPrice = (plan.pricePerDay * tripDuration * travelers).toFixed(2);
+      Alert.alert(
+        'Confirm Purchase',
+        `You're about to purchase ${plan.name} by ${plan.provider} for $${totalPrice} (${travelers} traveler${travelers > 1 ? 's' : ''}, ${tripDuration} days).`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Purchase',
+            onPress: () => {
+              Alert.alert(
+                'Success!',
+                'Your travel insurance has been purchased. Policy documents will be sent to your email.',
+                [{ text: 'OK', onPress: () => setSelectedPlan(null) }]
+              );
+            },
           },
-        },
-      ]
-    );
-  }, [tripDuration, travelers]);
+        ]
+      );
+    },
+    [tripDuration, travelers]
+  );
 
   const toggleCompare = useCallback((planId: string) => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setComparePlans(prev => {
+    setComparePlans((prev) => {
       if (prev.includes(planId)) {
-        return prev.filter(id => id !== planId);
+        return prev.filter((id) => id !== planId);
       }
       if (prev.length >= 3) {
         Alert.alert('Compare Limit', 'You can compare up to 3 plans at once.');
@@ -374,18 +368,18 @@ export default function InsuranceMarketplaceScreen() {
   }, []);
 
   const filteredPlans = insurancePlans
-    .filter(plan => {
+    .filter((plan) => {
       if (selectedCategory !== 'all' && plan.tier !== selectedCategory) return false;
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
           plan.name.toLowerCase().includes(query) ||
           plan.provider.toLowerCase().includes(query) ||
-          plan.features.some(f => f.toLowerCase().includes(query))
+          plan.features.some((f) => f.toLowerCase().includes(query))
         );
       }
       if (filters.features.length > 0) {
-        const hasAllFeatures = filters.features.every(feature => {
+        const hasAllFeatures = filters.features.every((feature) => {
           if (feature === 'adventureSports') return plan.adventureSports;
           if (feature === 'preExistingConditions') return plan.preExistingConditions;
           if (feature === 'familyPlan') return plan.familyPlan;
@@ -411,21 +405,31 @@ export default function InsuranceMarketplaceScreen() {
 
   const getTierColor = (tier: InsurancePlan['tier']) => {
     switch (tier) {
-      case 'basic': return '#64748B';
-      case 'standard': return colors.primary;
-      case 'comprehensive': return colors.secondary;
-      case 'premium': return '#8B5CF6';
-      default: return colors.textSecondary;
+      case 'basic':
+        return '#64748B';
+      case 'standard':
+        return colors.primary;
+      case 'comprehensive':
+        return colors.secondary;
+      case 'premium':
+        return '#8B5CF6';
+      default:
+        return colors.textSecondary;
     }
   };
 
   const getTierLabel = (tier: InsurancePlan['tier']) => {
     switch (tier) {
-      case 'basic': return 'Basic';
-      case 'standard': return 'Standard';
-      case 'comprehensive': return 'Comprehensive';
-      case 'premium': return 'Premium';
-      default: return tier;
+      case 'basic':
+        return 'Basic';
+      case 'standard':
+        return 'Standard';
+      case 'comprehensive':
+        return 'Comprehensive';
+      case 'premium':
+        return 'Premium';
+      default:
+        return tier;
     }
   };
 
@@ -454,7 +458,7 @@ export default function InsuranceMarketplaceScreen() {
             <Text style={styles.popularText}>Most Popular</Text>
           </View>
         )}
-        
+
         <View style={styles.planHeader}>
           <Image source={{ uri: plan.providerLogo }} style={styles.providerLogo} />
           <View style={styles.planTitleContainer}>
@@ -570,7 +574,7 @@ export default function InsuranceMarketplaceScreen() {
         <Pressable style={styles.detailsBackdrop} onPress={handleCloseDetails} />
         <View style={styles.detailsContainer}>
           <View style={styles.detailsHandle} />
-          
+
           <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.detailsHeader}>
               <Image source={{ uri: selectedPlan.providerLogo }} style={styles.detailsLogo} />
@@ -700,9 +704,7 @@ export default function InsuranceMarketplaceScreen() {
             <View style={styles.additionalInfo}>
               <View style={styles.infoRow}>
                 <Clock size={18} color={colors.textSecondary} />
-                <Text style={styles.infoText}>
-                  Processing: {selectedPlan.processingTime}
-                </Text>
+                <Text style={styles.infoText}>Processing: {selectedPlan.processingTime}</Text>
               </View>
               {selectedPlan.support24h && (
                 <View style={styles.infoRow}>
@@ -728,11 +730,8 @@ export default function InsuranceMarketplaceScreen() {
                   </Text>
                 </View>
               </View>
-              
-              <Pressable
-                style={styles.purchaseButton}
-                onPress={() => handlePurchase(selectedPlan)}
-              >
+
+              <Pressable style={styles.purchaseButton} onPress={() => handlePurchase(selectedPlan)}>
                 <LinearGradient
                   colors={[colors.secondary, colors.secondaryLight]}
                   start={{ x: 0, y: 0 }}
@@ -745,8 +744,8 @@ export default function InsuranceMarketplaceScreen() {
               </Pressable>
 
               <Text style={styles.disclaimer}>
-                By purchasing, you agree to the policy terms and conditions. 
-                Coverage begins on your specified travel start date.
+                By purchasing, you agree to the policy terms and conditions. Coverage begins on your
+                specified travel start date.
               </Text>
             </View>
           </ScrollView>
@@ -767,7 +766,10 @@ export default function InsuranceMarketplaceScreen() {
           </Pressable>
         </View>
         <Pressable
-          style={[styles.compareNowButton, comparePlans.length < 2 && styles.compareNowButtonDisabled]}
+          style={[
+            styles.compareNowButton,
+            comparePlans.length < 2 && styles.compareNowButtonDisabled,
+          ]}
           onPress={() => {
             if (comparePlans.length >= 2) {
               setShowCompare(true);
@@ -792,19 +794,14 @@ export default function InsuranceMarketplaceScreen() {
         }}
       />
 
-      <LinearGradient
-        colors={[colors.primary, colors.primaryLight]}
-        style={styles.headerGradient}
-      >
+      <LinearGradient colors={[colors.primary, colors.primaryLight]} style={styles.headerGradient}>
         <SafeAreaView edges={['top']}>
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <ShieldCheck size={32} color={colors.textLight} />
               <View style={styles.headerTextContainer}>
                 <Text style={styles.headerTitle}>Insurance Marketplace</Text>
-                <Text style={styles.headerSubtitle}>
-                  Compare & purchase travel coverage
-                </Text>
+                <Text style={styles.headerSubtitle}>Compare & purchase travel coverage</Text>
               </View>
             </View>
 
@@ -829,7 +826,7 @@ export default function InsuranceMarketplaceScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoriesScroll}
           >
-            {coverageCategories.map(category => {
+            {coverageCategories.map((category) => {
               const Icon = category.icon;
               const isSelected = selectedCategory === category.id;
               return (
@@ -849,10 +846,7 @@ export default function InsuranceMarketplaceScreen() {
         </View>
 
         <View style={styles.filtersRow}>
-          <Pressable
-            style={styles.filterButton}
-            onPress={() => setShowFilters(!showFilters)}
-          >
+          <Pressable style={styles.filterButton} onPress={() => setShowFilters(!showFilters)}>
             <Filter size={16} color={colors.textSecondary} />
             <Text style={styles.filterButtonText}>Filters</Text>
           </Pressable>
@@ -860,7 +854,11 @@ export default function InsuranceMarketplaceScreen() {
           <Pressable
             style={styles.sortButton}
             onPress={() => {
-              const options: Array<'price' | 'rating' | 'coverage'> = ['price', 'rating', 'coverage'];
+              const options: Array<'price' | 'rating' | 'coverage'> = [
+                'price',
+                'rating',
+                'coverage',
+              ];
               const currentIndex = options.indexOf(sortBy);
               setSortBy(options[(currentIndex + 1) % options.length]);
             }}
@@ -876,23 +874,25 @@ export default function InsuranceMarketplaceScreen() {
           <View style={styles.filtersPanel}>
             <Text style={styles.filtersPanelTitle}>Filter by Features</Text>
             <View style={styles.featureFilters}>
-              {featureFilters.map(filter => {
+              {featureFilters.map((filter) => {
                 const isSelected = filters.features.includes(filter.id);
                 return (
                   <Pressable
                     key={filter.id}
                     style={[styles.featureChip, isSelected && styles.featureChipSelected]}
                     onPress={() => {
-                      setFilters(prev => ({
+                      setFilters((prev) => ({
                         ...prev,
                         features: isSelected
-                          ? prev.features.filter(f => f !== filter.id)
+                          ? prev.features.filter((f) => f !== filter.id)
                           : [...prev.features, filter.id],
                       }));
                     }}
                   >
                     {isSelected && <Check size={14} color={colors.textLight} />}
-                    <Text style={[styles.featureChipText, isSelected && styles.featureChipTextSelected]}>
+                    <Text
+                      style={[styles.featureChipText, isSelected && styles.featureChipTextSelected]}
+                    >
                       {filter.label}
                     </Text>
                   </Pressable>
@@ -908,9 +908,7 @@ export default function InsuranceMarketplaceScreen() {
           </Text>
         </View>
 
-        <View style={styles.plansList}>
-          {filteredPlans.map(renderPlanCard)}
-        </View>
+        <View style={styles.plansList}>{filteredPlans.map(renderPlanCard)}</View>
 
         <View style={styles.trustSection}>
           <Text style={styles.trustTitle}>Why Buy Through Us?</Text>

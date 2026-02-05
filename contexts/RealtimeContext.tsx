@@ -34,12 +34,12 @@ interface RealtimeContextValue {
   isConnected: boolean;
   isConnecting: boolean;
   error: Error | null;
-  
+
   // Actions
   connect: (authToken?: string, userId?: string) => void;
   disconnect: () => void;
   reconnect: () => void;
-  
+
   // Subscriptions
   subscribe: (
     channel: ChannelType,
@@ -47,15 +47,15 @@ interface RealtimeContextValue {
     handler: (message: BaseMessage) => void
   ) => string;
   unsubscribe: (subscriptionId: string) => void;
-  
+
   // Presence
   presence: Map<string, UserPresence>;
   setMyPresence: (activity?: string) => void;
-  
+
   // Notifications
   unreadCount: number;
   markAllRead: () => void;
-  
+
   // Debug
   lastMessage: BaseMessage | null;
   messageLog: BaseMessage[];
@@ -69,19 +69,19 @@ const RealtimeContext = createContext<RealtimeContextValue | null>(null);
 
 interface RealtimeProviderProps {
   children: ReactNode;
-  
+
   // Auth
   authToken?: string;
   userId?: string;
-  
+
   // Config
   config?: Partial<WebSocketConfig>;
-  
+
   // Options
   autoConnect?: boolean;
   persistConnection?: boolean;
   debug?: boolean;
-  
+
   // Callbacks
   onConnect?: () => void;
   onDisconnect?: () => void;
@@ -109,7 +109,7 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
   // ─────────────────────────────────────────────────────────────────────────
   // State
   // ─────────────────────────────────────────────────────────────────────────
-  
+
   const [status, setStatus] = useState<ConnectionStatus>('disconnected');
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo>({
     status: 'disconnected',
@@ -124,7 +124,7 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
   // ─────────────────────────────────────────────────────────────────────────
   // Connection Management
   // ─────────────────────────────────────────────────────────────────────────
-  
+
   useEffect(() => {
     // Set up event handlers
     webSocketService.setEventHandlers({
@@ -152,13 +152,13 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
       onMessage: (message) => {
         setLastMessage(message);
         if (debug) {
-          setMessageLog(prev => [message, ...prev].slice(0, 100));
+          setMessageLog((prev) => [message, ...prev].slice(0, 100));
         }
         onMessage?.(message);
-        
+
         // Handle notification messages
         if (message.type === 'notification') {
-          setUnreadCount(prev => prev + 1);
+          setUnreadCount((prev) => prev + 1);
         }
       },
     });
@@ -194,12 +194,12 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
   // ─────────────────────────────────────────────────────────────────────────
   // Presence Updates
   // ─────────────────────────────────────────────────────────────────────────
-  
+
   useEffect(() => {
     if (status !== 'connected') return;
 
     const unsubPresence = webSocketService.on('presence_update', (msg: any) => {
-      setPresence(prev => {
+      setPresence((prev) => {
         const next = new Map(prev);
         next.set(msg.payload.userId, {
           userId: msg.payload.userId,
@@ -213,7 +213,7 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
     });
 
     const unsubOnline = webSocketService.on('user_online', (msg: any) => {
-      setPresence(prev => {
+      setPresence((prev) => {
         const next = new Map(prev);
         const existing = next.get(msg.payload.userId);
         next.set(msg.payload.userId, {
@@ -228,7 +228,7 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
     });
 
     const unsubOffline = webSocketService.on('user_offline', (msg: any) => {
-      setPresence(prev => {
+      setPresence((prev) => {
         const next = new Map(prev);
         const existing = next.get(msg.payload.userId);
         if (existing) {
@@ -252,10 +252,13 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
   // ─────────────────────────────────────────────────────────────────────────
   // Actions
   // ─────────────────────────────────────────────────────────────────────────
-  
-  const connect = useCallback((token?: string, user?: string) => {
-    webSocketService.connect(token || authToken, user || userId);
-  }, [authToken, userId]);
+
+  const connect = useCallback(
+    (token?: string, user?: string) => {
+      webSocketService.connect(token || authToken, user || userId);
+    },
+    [authToken, userId]
+  );
 
   const disconnect = useCallback(() => {
     webSocketService.disconnect();
@@ -265,13 +268,12 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
     webSocketService.reconnect();
   }, []);
 
-  const subscribe = useCallback((
-    channel: ChannelType,
-    resourceId: string,
-    handler: (message: BaseMessage) => void
-  ) => {
-    return webSocketService.subscribe(channel, resourceId, handler);
-  }, []);
+  const subscribe = useCallback(
+    (channel: ChannelType, resourceId: string, handler: (message: BaseMessage) => void) => {
+      return webSocketService.subscribe(channel, resourceId, handler);
+    },
+    []
+  );
 
   const unsubscribe = useCallback((subscriptionId: string) => {
     webSocketService.unsubscribe(subscriptionId);
@@ -288,57 +290,56 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
   // ─────────────────────────────────────────────────────────────────────────
   // Context Value
   // ─────────────────────────────────────────────────────────────────────────
-  
-  const contextValue = useMemo<RealtimeContextValue>(() => ({
-    // Connection
-    status,
-    connectionInfo,
-    isConnected: status === 'connected',
-    isConnecting: status === 'connecting' || status === 'reconnecting',
-    error,
-    
-    // Actions
-    connect,
-    disconnect,
-    reconnect,
-    
-    // Subscriptions
-    subscribe,
-    unsubscribe,
-    
-    // Presence
-    presence,
-    setMyPresence,
-    
-    // Notifications
-    unreadCount,
-    markAllRead,
-    
-    // Debug
-    lastMessage,
-    messageLog,
-  }), [
-    status,
-    connectionInfo,
-    error,
-    connect,
-    disconnect,
-    reconnect,
-    subscribe,
-    unsubscribe,
-    presence,
-    setMyPresence,
-    unreadCount,
-    markAllRead,
-    lastMessage,
-    messageLog,
-  ]);
 
-  return (
-    <RealtimeContext.Provider value={contextValue}>
-      {children}
-    </RealtimeContext.Provider>
+  const contextValue = useMemo<RealtimeContextValue>(
+    () => ({
+      // Connection
+      status,
+      connectionInfo,
+      isConnected: status === 'connected',
+      isConnecting: status === 'connecting' || status === 'reconnecting',
+      error,
+
+      // Actions
+      connect,
+      disconnect,
+      reconnect,
+
+      // Subscriptions
+      subscribe,
+      unsubscribe,
+
+      // Presence
+      presence,
+      setMyPresence,
+
+      // Notifications
+      unreadCount,
+      markAllRead,
+
+      // Debug
+      lastMessage,
+      messageLog,
+    }),
+    [
+      status,
+      connectionInfo,
+      error,
+      connect,
+      disconnect,
+      reconnect,
+      subscribe,
+      unsubscribe,
+      presence,
+      setMyPresence,
+      unreadCount,
+      markAllRead,
+      lastMessage,
+      messageLog,
+    ]
   );
+
+  return <RealtimeContext.Provider value={contextValue}>{children}</RealtimeContext.Provider>;
 };
 
 // ============================================================================
@@ -347,11 +348,11 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
 
 export function useRealtimeContext(): RealtimeContextValue {
   const context = useContext(RealtimeContext);
-  
+
   if (!context) {
     throw new Error('useRealtimeContext must be used within a RealtimeProvider');
   }
-  
+
   return context;
 }
 

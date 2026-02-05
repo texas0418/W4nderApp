@@ -32,9 +32,19 @@ import {
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { useDateNight } from '@/contexts/DateNightContext';
-import { ItineraryActivity, BudgetTier, ActivityType, PartnerProfile, TripScope } from '@/types/date-night';
+import {
+  ItineraryActivity,
+  BudgetTier,
+  ActivityType,
+  PartnerProfile,
+  TripScope,
+} from '@/types/date-night';
 
-const activityTypes: { value: ActivityType | 'dining' | 'drinks' | 'dessert' | 'transportation' | 'accommodation'; label: string; emoji: string }[] = [
+const activityTypes: {
+  value: ActivityType | 'dining' | 'drinks' | 'dessert' | 'transportation' | 'accommodation';
+  label: string;
+  emoji: string;
+}[] = [
   { value: 'dining', label: 'Dining', emoji: '🍽️' },
   { value: 'drinks', label: 'Drinks', emoji: '🍸' },
   { value: 'dessert', label: 'Dessert', emoji: '🍰' },
@@ -142,11 +152,13 @@ export default function BuildItineraryScreen() {
     }
 
     if (editingActivityId) {
-      setActivities(prev => prev.map(a => 
-        a.id === editingActivityId ? { ...activityForm, id: editingActivityId } : a
-      ));
+      setActivities((prev) =>
+        prev.map((a) =>
+          a.id === editingActivityId ? { ...activityForm, id: editingActivityId } : a
+        )
+      );
     } else {
-      setActivities(prev => [...prev, { ...activityForm, id: generateId() }]);
+      setActivities((prev) => [...prev, { ...activityForm, id: generateId() }]);
     }
 
     setShowActivityModal(false);
@@ -155,18 +167,14 @@ export default function BuildItineraryScreen() {
   };
 
   const handleDeleteActivity = (id: string) => {
-    Alert.alert(
-      'Remove Activity',
-      'Are you sure you want to remove this activity?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => setActivities(prev => prev.filter(a => a.id !== id)),
-        },
-      ]
-    );
+    Alert.alert('Remove Activity', 'Are you sure you want to remove this activity?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => setActivities((prev) => prev.filter((a) => a.id !== id)),
+      },
+    ]);
   };
 
   const handleMoveActivity = (index: number, direction: 'up' | 'down') => {
@@ -175,7 +183,10 @@ export default function BuildItineraryScreen() {
 
     const newActivities = [...activities];
     const swapIndex = direction === 'up' ? index - 1 : index + 1;
-    [newActivities[index], newActivities[swapIndex]] = [newActivities[swapIndex], newActivities[index]];
+    [newActivities[index], newActivities[swapIndex]] = [
+      newActivities[swapIndex],
+      newActivities[index],
+    ];
     setActivities(newActivities);
   };
 
@@ -197,7 +208,7 @@ export default function BuildItineraryScreen() {
       return;
     }
 
-    const itineraryActivities: ItineraryActivity[] = activities.map(a => ({
+    const itineraryActivities: ItineraryActivity[] = activities.map((a) => ({
       id: a.id,
       name: a.name,
       description: a.description,
@@ -229,11 +240,9 @@ export default function BuildItineraryScreen() {
 
     setCurrentItinerary(itinerary);
 
-    Alert.alert(
-      'Date Created! 🎉',
-      `Your date "${itineraryName}" has been saved.`,
-      [{ text: 'OK', onPress: () => router.push('/(tabs)/date-night') }]
-    );
+    Alert.alert('Date Created! 🎉', `Your date "${itineraryName}" has been saved.`, [
+      { text: 'OK', onPress: () => router.push('/(tabs)/date-night') },
+    ]);
   };
 
   return (
@@ -251,7 +260,7 @@ export default function BuildItineraryScreen() {
           <View style={styles.placeholder} />
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
@@ -259,7 +268,7 @@ export default function BuildItineraryScreen() {
           {/* Date Details Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Date Details</Text>
-            
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Date Name *</Text>
               <TextInput
@@ -272,7 +281,7 @@ export default function BuildItineraryScreen() {
             </View>
 
             <View style={styles.row}>
-              <Pressable 
+              <Pressable
                 style={[styles.selectButton, { flex: 1 }]}
                 onPress={() => setShowPartnerModal(true)}
               >
@@ -283,14 +292,12 @@ export default function BuildItineraryScreen() {
                 <ChevronDown size={18} color={colors.textTertiary} />
               </Pressable>
 
-              <Pressable 
+              <Pressable
                 style={[styles.selectButton, { flex: 1 }]}
                 onPress={() => setShowDateModal(true)}
               >
                 <Calendar size={18} color={colors.primary} />
-                <Text style={styles.selectButtonText}>
-                  {formatDate(selectedDate)}
-                </Text>
+                <Text style={styles.selectButtonText}>{formatDate(selectedDate)}</Text>
                 <ChevronDown size={18} color={colors.textTertiary} />
               </Pressable>
             </View>
@@ -300,22 +307,18 @@ export default function BuildItineraryScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Trip Type</Text>
             <View style={styles.tripScopeContainer}>
-              {tripScopeOptions.map(option => {
+              {tripScopeOptions.map((option) => {
                 const isSelected = tripScope === option.value;
                 return (
                   <Pressable
                     key={option.value}
-                    style={[
-                      styles.tripScopeOption,
-                      isSelected && styles.tripScopeOptionSelected,
-                    ]}
+                    style={[styles.tripScopeOption, isSelected && styles.tripScopeOptionSelected]}
                     onPress={() => setTripScope(option.value)}
                   >
                     <Text style={styles.tripScopeEmoji}>{option.emoji}</Text>
-                    <Text style={[
-                      styles.tripScopeLabel,
-                      isSelected && styles.tripScopeLabelSelected,
-                    ]}>
+                    <Text
+                      style={[styles.tripScopeLabel, isSelected && styles.tripScopeLabelSelected]}
+                    >
                       {option.label}
                     </Text>
                     {isSelected && (
@@ -338,7 +341,11 @@ export default function BuildItineraryScreen() {
                   style={styles.textInput}
                   value={destination}
                   onChangeText={setDestination}
-                  placeholder={tripScope === 'domestic' ? 'e.g., Napa Valley, Miami Beach' : 'e.g., Paris, France'}
+                  placeholder={
+                    tripScope === 'domestic'
+                      ? 'e.g., Napa Valley, Miami Beach'
+                      : 'e.g., Paris, France'
+                  }
                   placeholderTextColor={colors.textTertiary}
                 />
               </View>
@@ -348,7 +355,7 @@ export default function BuildItineraryScreen() {
           {/* Budget & Options */}
           <View style={styles.section}>
             <View style={styles.row}>
-              <Pressable 
+              <Pressable
                 style={[styles.optionCard, isSurprise && styles.optionCardActive]}
                 onPress={() => setIsSurprise(!isSurprise)}
               >
@@ -360,19 +367,18 @@ export default function BuildItineraryScreen() {
 
               <View style={styles.budgetSelector}>
                 <Text style={styles.budgetLabel}>Budget:</Text>
-                {budgetTiers.map(tier => (
+                {budgetTiers.map((tier) => (
                   <Pressable
                     key={tier}
-                    style={[
-                      styles.budgetChip,
-                      overallBudget === tier && styles.budgetChipActive,
-                    ]}
+                    style={[styles.budgetChip, overallBudget === tier && styles.budgetChipActive]}
                     onPress={() => setOverallBudget(tier)}
                   >
-                    <Text style={[
-                      styles.budgetChipText,
-                      overallBudget === tier && styles.budgetChipTextActive,
-                    ]}>
+                    <Text
+                      style={[
+                        styles.budgetChipText,
+                        overallBudget === tier && styles.budgetChipTextActive,
+                      ]}
+                    >
                       {tier}
                     </Text>
                   </Pressable>
@@ -397,9 +403,7 @@ export default function BuildItineraryScreen() {
                   <Plus size={32} color={colors.textTertiary} />
                 </View>
                 <Text style={styles.emptyTitle}>No activities yet</Text>
-                <Text style={styles.emptyDescription}>
-                  Tap to add your first activity
-                </Text>
+                <Text style={styles.emptyDescription}>Tap to add your first activity</Text>
               </Pressable>
             ) : (
               activities.map((activity, index) => (
@@ -416,35 +420,40 @@ export default function BuildItineraryScreen() {
                     <Pressable
                       onPress={() => handleMoveActivity(index, 'down')}
                       disabled={index === activities.length - 1}
-                      style={[styles.orderButton, index === activities.length - 1 && styles.orderButtonDisabled]}
+                      style={[
+                        styles.orderButton,
+                        index === activities.length - 1 && styles.orderButtonDisabled,
+                      ]}
                     >
                       <Text style={styles.orderButtonText}>▼</Text>
                     </Pressable>
                   </View>
 
-                  <Pressable 
+                  <Pressable
                     style={styles.activityContent}
                     onPress={() => handleEditActivity(activity)}
                   >
                     <View style={styles.activityHeader}>
                       <View style={styles.activityTypeChip}>
                         <Text style={styles.activityTypeEmoji}>
-                          {activityTypes.find(t => t.value === activity.type)?.emoji || '📍'}
+                          {activityTypes.find((t) => t.value === activity.type)?.emoji || '📍'}
                         </Text>
                         <Text style={styles.activityTypeText}>
-                          {activityTypes.find(t => t.value === activity.type)?.label || activity.type}
+                          {activityTypes.find((t) => t.value === activity.type)?.label ||
+                            activity.type}
                         </Text>
                       </View>
                       <Text style={styles.activityBudget}>{activity.estimatedCost}</Text>
                     </View>
 
                     <Text style={styles.activityName}>{activity.name}</Text>
-                    
+
                     <View style={styles.activityMeta}>
                       <View style={styles.metaItem}>
                         <Clock size={14} color={colors.textSecondary} />
                         <Text style={styles.metaText}>
-                          {activity.startTime}{activity.endTime ? ` - ${activity.endTime}` : ''}
+                          {activity.startTime}
+                          {activity.endTime ? ` - ${activity.endTime}` : ''}
                         </Text>
                       </View>
                       {activity.locationName && (
@@ -466,13 +475,13 @@ export default function BuildItineraryScreen() {
                   </Pressable>
 
                   <View style={styles.activityActions}>
-                    <Pressable 
+                    <Pressable
                       style={styles.actionButton}
                       onPress={() => handleEditActivity(activity)}
                     >
                       <Pencil size={18} color={colors.primary} />
                     </Pressable>
-                    <Pressable 
+                    <Pressable
                       style={styles.actionButton}
                       onPress={() => handleDeleteActivity(activity.id)}
                     >
@@ -526,7 +535,7 @@ export default function BuildItineraryScreen() {
                   <TextInput
                     style={styles.formInput}
                     value={activityForm.name}
-                    onChangeText={(text) => setActivityForm(prev => ({ ...prev, name: text }))}
+                    onChangeText={(text) => setActivityForm((prev) => ({ ...prev, name: text }))}
                     placeholder="e.g., Dinner at Chez Pierre"
                     placeholderTextColor={colors.textTertiary}
                   />
@@ -537,7 +546,9 @@ export default function BuildItineraryScreen() {
                   <TextInput
                     style={[styles.formInput, styles.formInputMultiline]}
                     value={activityForm.description}
-                    onChangeText={(text) => setActivityForm(prev => ({ ...prev, description: text }))}
+                    onChangeText={(text) =>
+                      setActivityForm((prev) => ({ ...prev, description: text }))
+                    }
                     placeholder="Add any details..."
                     placeholderTextColor={colors.textTertiary}
                     multiline
@@ -549,20 +560,24 @@ export default function BuildItineraryScreen() {
                   <Text style={styles.formLabel}>Type</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View style={styles.typeOptions}>
-                      {activityTypes.map(type => (
+                      {activityTypes.map((type) => (
                         <Pressable
                           key={type.value}
                           style={[
                             styles.typeOption,
                             activityForm.type === type.value && styles.typeOptionSelected,
                           ]}
-                          onPress={() => setActivityForm(prev => ({ ...prev, type: type.value }))}
+                          onPress={() => setActivityForm((prev) => ({ ...prev, type: type.value }))}
                         >
                           <Text style={styles.typeEmoji}>{type.emoji}</Text>
-                          <Text style={[
-                            styles.typeLabel,
-                            activityForm.type === type.value && styles.typeLabelSelected,
-                          ]}>{type.label}</Text>
+                          <Text
+                            style={[
+                              styles.typeLabel,
+                              activityForm.type === type.value && styles.typeLabelSelected,
+                            ]}
+                          >
+                            {type.label}
+                          </Text>
                         </Pressable>
                       ))}
                     </View>
@@ -575,7 +590,9 @@ export default function BuildItineraryScreen() {
                     <TextInput
                       style={styles.formInput}
                       value={activityForm.startTime}
-                      onChangeText={(text) => setActivityForm(prev => ({ ...prev, startTime: text }))}
+                      onChangeText={(text) =>
+                        setActivityForm((prev) => ({ ...prev, startTime: text }))
+                      }
                       placeholder="6:00 PM"
                       placeholderTextColor={colors.textTertiary}
                     />
@@ -585,7 +602,9 @@ export default function BuildItineraryScreen() {
                     <TextInput
                       style={styles.formInput}
                       value={activityForm.endTime}
-                      onChangeText={(text) => setActivityForm(prev => ({ ...prev, endTime: text }))}
+                      onChangeText={(text) =>
+                        setActivityForm((prev) => ({ ...prev, endTime: text }))
+                      }
                       placeholder="8:00 PM"
                       placeholderTextColor={colors.textTertiary}
                     />
@@ -597,7 +616,9 @@ export default function BuildItineraryScreen() {
                   <TextInput
                     style={styles.formInput}
                     value={activityForm.locationName}
-                    onChangeText={(text) => setActivityForm(prev => ({ ...prev, locationName: text }))}
+                    onChangeText={(text) =>
+                      setActivityForm((prev) => ({ ...prev, locationName: text }))
+                    }
                     placeholder="e.g., The Italian Place"
                     placeholderTextColor={colors.textTertiary}
                   />
@@ -608,7 +629,9 @@ export default function BuildItineraryScreen() {
                   <TextInput
                     style={styles.formInput}
                     value={activityForm.locationAddress}
-                    onChangeText={(text) => setActivityForm(prev => ({ ...prev, locationAddress: text }))}
+                    onChangeText={(text) =>
+                      setActivityForm((prev) => ({ ...prev, locationAddress: text }))
+                    }
                     placeholder="123 Main Street"
                     placeholderTextColor={colors.textTertiary}
                   />
@@ -617,19 +640,25 @@ export default function BuildItineraryScreen() {
                 <View style={styles.formGroup}>
                   <Text style={styles.formLabel}>Estimated Cost</Text>
                   <View style={styles.costOptions}>
-                    {budgetTiers.map(tier => (
+                    {budgetTiers.map((tier) => (
                       <Pressable
                         key={tier}
                         style={[
                           styles.costOption,
                           activityForm.estimatedCost === tier && styles.costOptionSelected,
                         ]}
-                        onPress={() => setActivityForm(prev => ({ ...prev, estimatedCost: tier }))}
+                        onPress={() =>
+                          setActivityForm((prev) => ({ ...prev, estimatedCost: tier }))
+                        }
                       >
-                        <Text style={[
-                          styles.costLabel,
-                          activityForm.estimatedCost === tier && styles.costLabelSelected,
-                        ]}>{tier}</Text>
+                        <Text
+                          style={[
+                            styles.costLabel,
+                            activityForm.estimatedCost === tier && styles.costLabelSelected,
+                          ]}
+                        >
+                          {tier}
+                        </Text>
                       </Pressable>
                     ))}
                   </View>
@@ -640,7 +669,7 @@ export default function BuildItineraryScreen() {
                   <TextInput
                     style={[styles.formInput, styles.formInputMultiline]}
                     value={activityForm.notes}
-                    onChangeText={(text) => setActivityForm(prev => ({ ...prev, notes: text }))}
+                    onChangeText={(text) => setActivityForm((prev) => ({ ...prev, notes: text }))}
                     placeholder="Any special notes..."
                     placeholderTextColor={colors.textTertiary}
                     multiline
@@ -650,16 +679,22 @@ export default function BuildItineraryScreen() {
 
                 <Pressable
                   style={styles.checkboxRow}
-                  onPress={() => setActivityForm(prev => ({ 
-                    ...prev, 
-                    reservationRequired: !prev.reservationRequired 
-                  }))}
+                  onPress={() =>
+                    setActivityForm((prev) => ({
+                      ...prev,
+                      reservationRequired: !prev.reservationRequired,
+                    }))
+                  }
                 >
-                  <View style={[
-                    styles.checkbox,
-                    activityForm.reservationRequired && styles.checkboxActive,
-                  ]}>
-                    {activityForm.reservationRequired && <Check size={14} color={colors.textLight} />}
+                  <View
+                    style={[
+                      styles.checkbox,
+                      activityForm.reservationRequired && styles.checkboxActive,
+                    ]}
+                  >
+                    {activityForm.reservationRequired && (
+                      <Check size={14} color={colors.textLight} />
+                    )}
                   </View>
                   <Text style={styles.checkboxLabel}>Reservation Required</Text>
                 </Pressable>
@@ -694,7 +729,7 @@ export default function BuildItineraryScreen() {
                 {partners.length === 0 ? (
                   <View style={styles.noPartners}>
                     <Text style={styles.noPartnersText}>No partners added yet</Text>
-                    <Pressable 
+                    <Pressable
                       style={styles.addPartnerButton}
                       onPress={() => {
                         setShowPartnerModal(false);
@@ -705,7 +740,7 @@ export default function BuildItineraryScreen() {
                     </Pressable>
                   </View>
                 ) : (
-                  partners.map(partner => (
+                  partners.map((partner) => (
                     <Pressable
                       key={partner.id}
                       style={[
@@ -750,8 +785,8 @@ export default function BuildItineraryScreen() {
                 </Pressable>
               </View>
 
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.dateOptions}
               >
@@ -759,7 +794,7 @@ export default function BuildItineraryScreen() {
                   const date = new Date();
                   date.setDate(date.getDate() + i);
                   const isSelected = date.toDateString() === selectedDate.toDateString();
-                  
+
                   return (
                     <Pressable
                       key={i}
@@ -770,8 +805,11 @@ export default function BuildItineraryScreen() {
                       }}
                     >
                       <Text style={[styles.dateDayName, isSelected && styles.dateTextSelected]}>
-                        {i === 0 ? 'Today' : i === 1 ? 'Tmrw' : 
-                          date.toLocaleDateString('en-US', { weekday: 'short' })}
+                        {i === 0
+                          ? 'Today'
+                          : i === 1
+                            ? 'Tmrw'
+                            : date.toLocaleDateString('en-US', { weekday: 'short' })}
                       </Text>
                       <Text style={[styles.dateDayNumber, isSelected && styles.dateTextSelected]}>
                         {date.getDate()}

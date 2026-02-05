@@ -128,13 +128,71 @@ const DATE_PATTERNS = [
 // ============================================================================
 
 const CATEGORY_KEYWORDS: { category: string; keywords: string[] }[] = [
-  { category: 'food_drink', keywords: ['restaurant', 'cafe', 'coffee', 'food', 'drink', 'bar', 'pub', 'bistro', 'diner', 'pizza', 'burger', 'sushi', 'bakery'] },
-  { category: 'transportation', keywords: ['uber', 'lyft', 'taxi', 'metro', 'bus', 'train', 'airline', 'flight', 'parking', 'gas', 'fuel', 'petrol'] },
-  { category: 'accommodation', keywords: ['hotel', 'motel', 'inn', 'hostel', 'airbnb', 'booking', 'lodging', 'resort'] },
-  { category: 'shopping', keywords: ['store', 'shop', 'mall', 'market', 'retail', 'amazon', 'walmart', 'target'] },
-  { category: 'activities', keywords: ['museum', 'tour', 'ticket', 'attraction', 'park', 'zoo', 'aquarium', 'theater', 'cinema'] },
-  { category: 'health', keywords: ['pharmacy', 'drug', 'medical', 'hospital', 'clinic', 'doctor', 'cvs', 'walgreens'] },
-  { category: 'entertainment', keywords: ['concert', 'show', 'event', 'game', 'sports', 'club', 'nightlife'] },
+  {
+    category: 'food_drink',
+    keywords: [
+      'restaurant',
+      'cafe',
+      'coffee',
+      'food',
+      'drink',
+      'bar',
+      'pub',
+      'bistro',
+      'diner',
+      'pizza',
+      'burger',
+      'sushi',
+      'bakery',
+    ],
+  },
+  {
+    category: 'transportation',
+    keywords: [
+      'uber',
+      'lyft',
+      'taxi',
+      'metro',
+      'bus',
+      'train',
+      'airline',
+      'flight',
+      'parking',
+      'gas',
+      'fuel',
+      'petrol',
+    ],
+  },
+  {
+    category: 'accommodation',
+    keywords: ['hotel', 'motel', 'inn', 'hostel', 'airbnb', 'booking', 'lodging', 'resort'],
+  },
+  {
+    category: 'shopping',
+    keywords: ['store', 'shop', 'mall', 'market', 'retail', 'amazon', 'walmart', 'target'],
+  },
+  {
+    category: 'activities',
+    keywords: [
+      'museum',
+      'tour',
+      'ticket',
+      'attraction',
+      'park',
+      'zoo',
+      'aquarium',
+      'theater',
+      'cinema',
+    ],
+  },
+  {
+    category: 'health',
+    keywords: ['pharmacy', 'drug', 'medical', 'hospital', 'clinic', 'doctor', 'cvs', 'walgreens'],
+  },
+  {
+    category: 'entertainment',
+    keywords: ['concert', 'show', 'event', 'game', 'sports', 'club', 'nightlife'],
+  },
 ];
 
 // ============================================================================
@@ -148,7 +206,11 @@ class OCRService {
     this.progressCallback = callback;
   }
 
-  private updateProgress(stage: ProcessingProgress['stage'], progress: number, message: string): void {
+  private updateProgress(
+    stage: ProcessingProgress['stage'],
+    progress: number,
+    message: string
+  ): void {
     this.progressCallback?.({ stage, progress, message });
   }
 
@@ -165,18 +227,18 @@ class OCRService {
       // Stage 2: Run OCR
       this.updateProgress('analyzing', 30, 'Analyzing receipt...');
       const ocrResult = await this.performOCR(imageUri);
-      
+
       // Stage 3: Extract data
       this.updateProgress('extracting', 60, 'Extracting information...');
       const extraction = await this.extractReceiptData(ocrResult);
-      
+
       // Stage 4: Categorize
       this.updateProgress('categorizing', 90, 'Categorizing expense...');
       const categorized = await this.categorizeReceipt(extraction);
-      
+
       // Complete
       this.updateProgress('complete', 100, 'Processing complete');
-      
+
       return categorized;
     } catch (error) {
       throw this.createError('OCR_FAILED', 'Failed to process receipt', error);
@@ -199,7 +261,7 @@ class OCRService {
 
     // For demo, return mock OCR based on random receipt type
     const receiptType = Math.random();
-    
+
     let mockText: string;
     if (receiptType < 0.33) {
       mockText = this.generateCafeReceipt();
@@ -221,7 +283,7 @@ class OCRService {
   }
 
   private textToBlocks(text: string): OCRTextBlock[] {
-    const lines = text.split('\n').filter(line => line.trim());
+    const lines = text.split('\n').filter((line) => line.trim());
     return lines.map((line, index) => ({
       text: line,
       confidence: 0.8 + Math.random() * 0.2,
@@ -243,28 +305,28 @@ class OCRService {
     await this.simulateDelay(300);
 
     const text = ocrResult.fullText;
-    
+
     // Extract merchant
     const merchant = this.extractMerchant(text, ocrResult.blocks);
-    
+
     // Extract date
     const date = this.extractDate(text);
-    
+
     // Detect currency
     const currency = this.detectCurrency(text);
-    
+
     // Extract amounts
     const total = this.extractAmount(text, TOTAL_PATTERNS, 'total');
     const subtotal = this.extractAmount(text, SUBTOTAL_PATTERNS, 'subtotal');
     const tax = this.extractAmount(text, TAX_PATTERNS, 'tax');
     const tip = this.extractAmount(text, TIP_PATTERNS, 'tip');
-    
+
     // Extract line items
     const lineItems = this.extractLineItems(text);
-    
+
     // Detect payment method
     const paymentMethod = this.detectPaymentMethod(text);
-    
+
     // Calculate overall confidence
     const confidences = [
       merchant?.confidence || 0,
@@ -324,7 +386,7 @@ class OCRService {
       .replace(/\s+/g, ' ')
       .trim()
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }
 
@@ -342,7 +404,7 @@ class OCRService {
         }
       }
     }
-    
+
     // Default to today if no date found
     return {
       date: new Date().toISOString().split('T')[0],
@@ -355,14 +417,26 @@ class OCRService {
     try {
       // Handle different date formats
       const monthNames: Record<string, number> = {
-        jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
-        jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+        jan: 0,
+        feb: 1,
+        mar: 2,
+        apr: 3,
+        may: 4,
+        jun: 5,
+        jul: 6,
+        aug: 7,
+        sep: 8,
+        oct: 9,
+        nov: 10,
+        dec: 11,
       };
 
       let year: number, month: number, day: number;
 
       // Check if contains month name
-      const monthMatch = match[0].toLowerCase().match(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/);
+      const monthMatch = match[0]
+        .toLowerCase()
+        .match(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/);
       if (monthMatch) {
         month = monthNames[monthMatch[0]];
         // Find numbers
@@ -394,7 +468,11 @@ class OCRService {
     }
   }
 
-  private detectCurrency(text: string): { code: string; confidence: number; detectedSymbol: string } {
+  private detectCurrency(text: string): {
+    code: string;
+    confidence: number;
+    detectedSymbol: string;
+  } {
     for (const { pattern, code, symbol } of CURRENCY_PATTERNS) {
       if (pattern.test(text)) {
         return { code, confidence: 0.9, detectedSymbol: symbol };
@@ -433,7 +511,7 @@ class OCRService {
 
     // Look for lines with prices
     const itemPattern = /^(.+?)\s+[$€£]?([\d,]+\.?\d*)$/;
-    
+
     for (const line of lines) {
       const match = line.match(itemPattern);
       if (match && match[1].length > 2 && match[1].length < 40) {
@@ -441,11 +519,13 @@ class OCRService {
         if (!isNaN(price) && price > 0 && price < 1000) {
           // Exclude totals, tax, etc.
           const lowerLine = line.toLowerCase();
-          if (!lowerLine.includes('total') && 
-              !lowerLine.includes('tax') && 
-              !lowerLine.includes('tip') &&
-              !lowerLine.includes('subtotal') &&
-              !lowerLine.includes('change')) {
+          if (
+            !lowerLine.includes('total') &&
+            !lowerLine.includes('tax') &&
+            !lowerLine.includes('tip') &&
+            !lowerLine.includes('subtotal') &&
+            !lowerLine.includes('change')
+          ) {
             items.push({
               description: match[1].trim(),
               totalPrice: price,
@@ -462,13 +542,19 @@ class OCRService {
 
   private detectPaymentMethod(text: string): ReceiptExtractionResult['paymentMethod'] {
     const lowerText = text.toLowerCase();
-    
+
     // Check for card
     const cardPatterns = [
-      /visa/i, /mastercard/i, /amex/i, /american express/i,
-      /debit/i, /credit/i, /card\s*ending/i, /\*{4}\d{4}/,
+      /visa/i,
+      /mastercard/i,
+      /amex/i,
+      /american express/i,
+      /debit/i,
+      /credit/i,
+      /card\s*ending/i,
+      /\*{4}\d{4}/,
     ];
-    
+
     for (const pattern of cardPatterns) {
       if (pattern.test(text)) {
         // Try to extract last 4 digits
@@ -476,9 +562,13 @@ class OCRService {
         return {
           type: 'card',
           lastFourDigits: lastFour?.[1] || lastFour?.[2] || lastFour?.[3],
-          cardType: /visa/i.test(text) ? 'Visa' : 
-                    /mastercard/i.test(text) ? 'Mastercard' :
-                    /amex/i.test(text) ? 'Amex' : undefined,
+          cardType: /visa/i.test(text)
+            ? 'Visa'
+            : /mastercard/i.test(text)
+              ? 'Mastercard'
+              : /amex/i.test(text)
+                ? 'Amex'
+                : undefined,
           confidence: 0.85,
         };
       }
@@ -508,10 +598,10 @@ class OCRService {
 
     const text = extraction.rawOCR.fullText.toLowerCase();
     const merchantName = extraction.merchant?.name?.toLowerCase() || '';
-    
+
     // Check merchant templates first
     for (const template of MERCHANT_TEMPLATES) {
-      if (template.patterns.namePatterns.some(p => p.test(merchantName))) {
+      if (template.patterns.namePatterns.some((p) => p.test(merchantName))) {
         return {
           ...extraction,
           suggestedCategory: {
@@ -525,8 +615,8 @@ class OCRService {
 
     // Check keywords
     for (const { category, keywords } of CATEGORY_KEYWORDS) {
-      const matchedKeywords = keywords.filter(kw => 
-        text.includes(kw) || merchantName.includes(kw)
+      const matchedKeywords = keywords.filter(
+        (kw) => text.includes(kw) || merchantName.includes(kw)
       );
       if (matchedKeywords.length > 0) {
         return {
@@ -556,13 +646,13 @@ class OCRService {
   // ============================================================================
 
   private generateCafeReceipt(): string {
-    const cafes = ['Starbucks Coffee', 'Blue Bottle Coffee', 'Peet\'s Coffee', 'Costa Coffee'];
+    const cafes = ['Starbucks Coffee', 'Blue Bottle Coffee', "Peet's Coffee", 'Costa Coffee'];
     const cafe = cafes[Math.floor(Math.random() * cafes.length)];
     const date = this.randomRecentDate();
     const items = [
       { name: 'Latte', price: 4.95 },
       { name: 'Cappuccino', price: 4.75 },
-      { name: 'Croissant', price: 3.50 },
+      { name: 'Croissant', price: 3.5 },
       { name: 'Muffin', price: 3.25 },
     ];
     const selectedItems = items.slice(0, 1 + Math.floor(Math.random() * 2));
@@ -577,7 +667,7 @@ San Francisco, CA 94102
 
 ${date}  10:${15 + Math.floor(Math.random() * 45)} AM
 
-${selectedItems.map(i => `${i.name.padEnd(20)} $${i.price.toFixed(2)}`).join('\n')}
+${selectedItems.map((i) => `${i.name.padEnd(20)} $${i.price.toFixed(2)}`).join('\n')}
 
 Subtotal              $${subtotal.toFixed(2)}
 Tax                   $${tax.toFixed(2)}
@@ -594,9 +684,9 @@ Thank you!
     const date = this.randomRecentDate();
     const items = [
       { name: 'Pasta Carbonara', price: 18.95 },
-      { name: 'Caesar Salad', price: 12.50 },
-      { name: 'Glass of Wine', price: 9.00 },
-      { name: 'Tiramisu', price: 8.50 },
+      { name: 'Caesar Salad', price: 12.5 },
+      { name: 'Glass of Wine', price: 9.0 },
+      { name: 'Tiramisu', price: 8.5 },
     ];
     const selectedItems = items.slice(0, 2 + Math.floor(Math.random() * 2));
     const subtotal = selectedItems.reduce((sum, i) => sum + i.price, 0);
@@ -614,7 +704,7 @@ Date: ${date}
 Table: 12
 Server: Mike
 
-${selectedItems.map(i => `${i.name.padEnd(20)} $${i.price.toFixed(2)}`).join('\n')}
+${selectedItems.map((i) => `${i.name.padEnd(20)} $${i.price.toFixed(2)}`).join('\n')}
 
 Subtotal              $${subtotal.toFixed(2)}
 Tax                   $${tax.toFixed(2)}
@@ -650,14 +740,14 @@ Chicago, IL 60601
 
 ${date}
 
-${selectedItems.map(i => `${i.name.padEnd(20)} $${i.price.toFixed(2)}`).join('\n')}
+${selectedItems.map((i) => `${i.name.padEnd(20)} $${i.price.toFixed(2)}`).join('\n')}
 
 SUBTOTAL              $${subtotal.toFixed(2)}
 TAX                   $${tax.toFixed(2)}
 TOTAL                 $${total.toFixed(2)}
 
 CASH TENDERED         $${(Math.ceil(total / 5) * 5).toFixed(2)}
-CHANGE                $${((Math.ceil(total / 5) * 5) - total).toFixed(2)}
+CHANGE                $${(Math.ceil(total / 5) * 5 - total).toFixed(2)}
 
 Thank you for shopping!
     `.trim();
@@ -675,7 +765,7 @@ Thank you for shopping!
   // ============================================================================
 
   private simulateDelay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private createError(

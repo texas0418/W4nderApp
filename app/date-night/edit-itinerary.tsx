@@ -26,22 +26,14 @@ import colors from '@/constants/colors';
 import ItineraryTimeline from '@/components/ItineraryTimeline';
 import NavigationModal from '@/components/NavigationModal';
 import RideshareModal from '@/components/RideshareModal';
-import {
-  TransportationMode,
-  ActivityWithTransport,
-  ItineraryLeg,
-} from '@/types/transportation';
+import { TransportationMode, ActivityWithTransport, ItineraryLeg } from '@/types/transportation';
 import {
   createTransportLeg,
   updateLegMode,
   openDirections,
   suggestTransportMode,
 } from '@/utils/transportationUtils';
-import {
-  detectTimeConflicts,
-  TimeConflict,
-  formatDuration,
-} from '@/types/timeConflicts';
+import { detectTimeConflicts, TimeConflict, formatDuration } from '@/types/timeConflicts';
 
 // Mock data with intentional conflicts for demonstration
 const MOCK_ITINERARY = {
@@ -58,7 +50,7 @@ const MOCK_ITINERARY = {
       location: {
         name: 'The Rooftop Bar',
         address: '123 Main St, Atlanta, GA',
-        coordinates: { lat: 33.7490, lng: -84.3880 },
+        coordinates: { lat: 33.749, lng: -84.388 },
       },
       startTime: '18:00',
       endTime: '19:15', // Overlaps with dinner!
@@ -84,11 +76,11 @@ const MOCK_ITINERARY = {
     },
     {
       id: 'a3',
-      name: 'Live Jazz at Venkman\'s',
+      name: "Live Jazz at Venkman's",
       description: 'End the night with live music and dancing',
       type: 'entertainment',
       location: {
-        name: 'Venkman\'s',
+        name: "Venkman's",
         address: '740 Ralph McGill Blvd, Atlanta, GA',
         coordinates: { lat: 33.7634, lng: -84.3626 },
       },
@@ -104,7 +96,7 @@ const MOCK_ITINERARY = {
 export default function EditItineraryScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  
+
   const [itinerary, setItinerary] = useState(MOCK_ITINERARY);
   const [activities, setActivities] = useState<ActivityWithTransport[]>([]);
   const [navigationModalVisible, setNavigationModalVisible] = useState(false);
@@ -123,12 +115,13 @@ export default function EditItineraryScreen() {
         let transportToNext: ItineraryLeg | undefined;
 
         if (nextActivity) {
-          const distance = activity.location.coordinates && nextActivity.location.coordinates
-            ? calculateDistanceSimple(
-                activity.location.coordinates,
-                nextActivity.location.coordinates
-              )
-            : 2;
+          const distance =
+            activity.location.coordinates && nextActivity.location.coordinates
+              ? calculateDistanceSimple(
+                  activity.location.coordinates,
+                  nextActivity.location.coordinates
+                )
+              : 2;
 
           const suggestedMode = suggestTransportMode(distance);
 
@@ -157,14 +150,17 @@ export default function EditItineraryScreen() {
   }, [activities]);
 
   // Simple distance calculation
-  const calculateDistanceSimple = (from: { lat: number; lng: number }, to: { lat: number; lng: number }) => {
+  const calculateDistanceSimple = (
+    from: { lat: number; lng: number },
+    to: { lat: number; lng: number }
+  ) => {
     const R = 3959;
-    const dLat = (to.lat - from.lat) * Math.PI / 180;
-    const dLng = (to.lng - from.lng) * Math.PI / 180;
+    const dLat = ((to.lat - from.lat) * Math.PI) / 180;
+    const dLng = ((to.lng - from.lng) * Math.PI) / 180;
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(from.lat * Math.PI / 180) *
-        Math.cos(to.lat * Math.PI / 180) *
+      Math.cos((from.lat * Math.PI) / 180) *
+        Math.cos((to.lat * Math.PI) / 180) *
         Math.sin(dLng / 2) *
         Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -172,8 +168,8 @@ export default function EditItineraryScreen() {
   };
 
   const handleTransportModeChange = useCallback((legId: string, newMode: TransportationMode) => {
-    setActivities(prev =>
-      prev.map(activity => {
+    setActivities((prev) =>
+      prev.map((activity) => {
         if (activity.transportToNext?.id === legId) {
           return {
             ...activity,
@@ -219,80 +215,86 @@ export default function EditItineraryScreen() {
     );
   }, []);
 
-  const handleResolveConflict = useCallback((conflict: TimeConflict) => {
-    // Show resolution options based on conflict type
-    const options: { text: string; onPress?: () => void; style?: 'cancel' | 'destructive' }[] = [];
+  const handleResolveConflict = useCallback(
+    (conflict: TimeConflict) => {
+      // Show resolution options based on conflict type
+      const options: { text: string; onPress?: () => void; style?: 'cancel' | 'destructive' }[] =
+        [];
 
-    if (conflict.type === 'overlap' || conflict.type === 'same_time') {
-      options.push({
-        text: 'Adjust Times',
-        onPress: () => {
-          const activity = activities.find(a => a.id === conflict.activityIds[0]);
-          if (activity) handleEditTimes(activity);
-        },
-      });
-      options.push({
-        text: 'Remove One Activity',
-        style: 'destructive',
-        onPress: () => {
-          Alert.alert('Remove Activity', 'Which activity would you like to remove?', [
-            ...conflict.activityIds.map(id => {
-              const activity = activities.find(a => a.id === id);
-              return {
-                text: activity?.name || id,
-                onPress: () => {
-                  setActivities(prev => prev.filter(a => a.id !== id));
-                },
-              };
-            }),
-            { text: 'Cancel', style: 'cancel' },
-          ]);
-        },
-      });
-    }
+      if (conflict.type === 'overlap' || conflict.type === 'same_time') {
+        options.push({
+          text: 'Adjust Times',
+          onPress: () => {
+            const activity = activities.find((a) => a.id === conflict.activityIds[0]);
+            if (activity) handleEditTimes(activity);
+          },
+        });
+        options.push({
+          text: 'Remove One Activity',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert('Remove Activity', 'Which activity would you like to remove?', [
+              ...conflict.activityIds.map((id) => {
+                const activity = activities.find((a) => a.id === id);
+                return {
+                  text: activity?.name || id,
+                  onPress: () => {
+                    setActivities((prev) => prev.filter((a) => a.id !== id));
+                  },
+                };
+              }),
+              { text: 'Cancel', style: 'cancel' },
+            ]);
+          },
+        });
+      }
 
-    if (conflict.type === 'insufficient_travel' || conflict.type === 'tight_transition') {
-      options.push({
-        text: 'Change Transportation',
-        onPress: () => {
-          // Expand the relevant leg
-          const fromActivity = activities.find(a => a.id === conflict.activityIds[0]);
-          if (fromActivity?.transportToNext) {
-            Alert.alert(
-              'Faster Transportation',
-              'Consider switching to rideshare for faster pickup, or driving if you have a car nearby.',
-              [
-                {
-                  text: 'Use Rideshare',
-                  onPress: () => handleTransportModeChange(fromActivity.transportToNext!.id, 'rideshare'),
-                },
-                {
-                  text: 'Drive',
-                  onPress: () => handleTransportModeChange(fromActivity.transportToNext!.id, 'car'),
-                },
-                { text: 'Cancel', style: 'cancel' },
-              ]
-            );
-          }
-        },
-      });
-      options.push({
-        text: 'Adjust Activity Times',
-        onPress: () => {
-          const activity = activities.find(a => a.id === conflict.activityIds[0]);
-          if (activity) handleEditTimes(activity);
-        },
-      });
-    }
+      if (conflict.type === 'insufficient_travel' || conflict.type === 'tight_transition') {
+        options.push({
+          text: 'Change Transportation',
+          onPress: () => {
+            // Expand the relevant leg
+            const fromActivity = activities.find((a) => a.id === conflict.activityIds[0]);
+            if (fromActivity?.transportToNext) {
+              Alert.alert(
+                'Faster Transportation',
+                'Consider switching to rideshare for faster pickup, or driving if you have a car nearby.',
+                [
+                  {
+                    text: 'Use Rideshare',
+                    onPress: () =>
+                      handleTransportModeChange(fromActivity.transportToNext!.id, 'rideshare'),
+                  },
+                  {
+                    text: 'Drive',
+                    onPress: () =>
+                      handleTransportModeChange(fromActivity.transportToNext!.id, 'car'),
+                  },
+                  { text: 'Cancel', style: 'cancel' },
+                ]
+              );
+            }
+          },
+        });
+        options.push({
+          text: 'Adjust Activity Times',
+          onPress: () => {
+            const activity = activities.find((a) => a.id === conflict.activityIds[0]);
+            if (activity) handleEditTimes(activity);
+          },
+        });
+      }
 
-    options.push({ text: 'Dismiss', style: 'cancel' });
+      options.push({ text: 'Dismiss', style: 'cancel' });
 
-    Alert.alert(
-      conflict.shortMessage,
-      `${conflict.message}\n\n${conflict.suggestedFix ? `💡 ${conflict.suggestedFix}` : ''}`,
-      options
-    );
-  }, [activities, handleEditTimes, handleTransportModeChange]);
+      Alert.alert(
+        conflict.shortMessage,
+        `${conflict.message}\n\n${conflict.suggestedFix ? `💡 ${conflict.suggestedFix}` : ''}`,
+        options
+      );
+    },
+    [activities, handleEditTimes, handleTransportModeChange]
+  );
 
   const handleAddActivity = useCallback(() => {
     Alert.alert('Add Activity', 'Add activity screen would open here');
@@ -381,7 +383,7 @@ export default function EditItineraryScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       <Stack.Screen
         options={{
           headerShown: false,
@@ -390,13 +392,10 @@ export default function EditItineraryScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        
+
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle} numberOfLines={1}>
             {itinerary.name}
@@ -428,9 +427,7 @@ export default function EditItineraryScreen() {
           <Text style={styles.summaryLabel}>Status</Text>
           <View style={styles.statusRow}>
             {getStatusIcon()}
-            <Text style={[styles.statusText, { color: getStatusColor() }]}>
-              {getStatusText()}
-            </Text>
+            <Text style={[styles.statusText, { color: getStatusColor() }]}>{getStatusText()}</Text>
           </View>
         </View>
       </View>
@@ -450,10 +447,7 @@ export default function EditItineraryScreen() {
       {/* Confirm Button */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[
-            styles.confirmButton,
-            conflictResult.hasErrors && styles.confirmButtonDisabled,
-          ]}
+          style={[styles.confirmButton, conflictResult.hasErrors && styles.confirmButtonDisabled]}
           onPress={handleConfirmItinerary}
           activeOpacity={0.7}
         >

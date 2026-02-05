@@ -91,7 +91,8 @@ export default function RSVPResponseScreen() {
   const handleSubmitResponse = () => {
     const response: RSVPResponse = {
       status: responseType,
-      excitementLevel: responseType === 'accepted' ? excitementLevel as 1|2|3|4|5 : undefined,
+      excitementLevel:
+        responseType === 'accepted' ? (excitementLevel as 1 | 2 | 3 | 4 | 5) : undefined,
       reactionEmoji: responseType === 'accepted' ? selectedEmoji : undefined,
       personalNote: personalNote || undefined,
       dietaryRestrictions: selectedDietary.length > 0 ? selectedDietary : undefined,
@@ -105,10 +106,8 @@ export default function RSVPResponseScreen() {
   };
 
   const toggleDietary = (id: string) => {
-    setSelectedDietary(prev => 
-      prev.includes(id) 
-        ? prev.filter(d => d !== id)
-        : [...prev, id]
+    setSelectedDietary((prev) =>
+      prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]
     );
   };
 
@@ -160,7 +159,7 @@ export default function RSVPResponseScreen() {
 
   if (hasResponded) {
     const statusColor = getRSVPStatusColor(invite.rsvpStatus);
-    
+
     return (
       <View style={styles.container}>
         <Stack.Screen options={{ headerShown: false }} />
@@ -172,7 +171,7 @@ export default function RSVPResponseScreen() {
             <Text style={styles.headerTitle}>RSVP</Text>
             <View style={{ width: 40 }} />
           </View>
-          
+
           <View style={styles.respondedContainer}>
             <View style={[styles.respondedIcon, { backgroundColor: statusColor + '20' }]}>
               {invite.rsvpStatus === 'accepted' ? (
@@ -183,19 +182,19 @@ export default function RSVPResponseScreen() {
                 <HelpCircle size={32} color={statusColor} />
               )}
             </View>
-            
+
             <Text style={styles.respondedTitle}>
               {invite.rsvpStatus === 'accepted' && "You're going! 🎉"}
               {invite.rsvpStatus === 'declined' && "You've declined"}
-              {invite.rsvpStatus === 'tentative' && "Marked as Maybe"}
+              {invite.rsvpStatus === 'tentative' && 'Marked as Maybe'}
             </Text>
-            
+
             <Text style={styles.respondedSubtitle}>
               {invite.creatorName} has been notified of your response.
             </Text>
 
             {invite.rsvpStatus === 'accepted' && (
-              <Pressable 
+              <Pressable
                 style={styles.viewItineraryBtn}
                 onPress={() => router.push(`/date-night/shared-view?code=${invite.shareCode}`)}
               >
@@ -216,28 +215,25 @@ export default function RSVPResponseScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Hero */}
-        <LinearGradient
-          colors={[colors.primary, '#FF6B9D']}
-          style={styles.hero}
-        >
+        <LinearGradient colors={[colors.primary, '#FF6B9D']} style={styles.hero}>
           <SafeAreaView>
             <View style={styles.heroHeader}>
               <Pressable style={styles.heroBackBtn} onPress={() => router.back()}>
                 <ArrowLeft size={22} color="#fff" />
               </Pressable>
             </View>
-            
+
             <View style={styles.heroContent}>
               <View style={styles.heroIconContainer}>
                 <Heart size={36} color="#fff" fill="#fff" />
               </View>
-              
+
               <Text style={styles.heroLabel}>You're Invited!</Text>
               <Text style={styles.heroTitle}>{invite.itineraryName}</Text>
-              
+
               {invite.personalMessage && (
                 <View style={styles.messageCard}>
                   <MessageSquare size={16} color="rgba(255,255,255,0.8)" />
@@ -292,7 +288,8 @@ export default function RSVPResponseScreen() {
               <Text style={styles.detailLabel}>What's Planned</Text>
               <Text style={styles.detailValue}>
                 {invite.activityCount} activities
-                {invite.surpriseCount > 0 && ` • ${invite.surpriseCount} surprise${invite.surpriseCount > 1 ? 's' : ''}`}
+                {invite.surpriseCount > 0 &&
+                  ` • ${invite.surpriseCount} surprise${invite.surpriseCount > 1 ? 's' : ''}`}
               </Text>
             </View>
           </View>
@@ -323,25 +320,25 @@ export default function RSVPResponseScreen() {
         {/* Response Buttons */}
         <View style={styles.responseSection}>
           <Text style={styles.responseSectionTitle}>Will you be there?</Text>
-          
+
           <View style={styles.responseButtons}>
-            <Pressable 
+            <Pressable
               style={[styles.responseBtn, styles.acceptBtn]}
               onPress={() => handleQuickResponse('accepted')}
             >
               <Check size={24} color="#fff" />
               <Text style={styles.responseBtnText}>Accept</Text>
             </Pressable>
-            
-            <Pressable 
+
+            <Pressable
               style={[styles.responseBtn, styles.maybeBtn]}
               onPress={() => handleQuickResponse('tentative')}
             >
               <HelpCircle size={24} color={colors.warning} />
               <Text style={[styles.responseBtnText, { color: colors.warning }]}>Maybe</Text>
             </Pressable>
-            
-            <Pressable 
+
+            <Pressable
               style={[styles.responseBtn, styles.declineBtn]}
               onPress={() => handleQuickResponse('declined')}
             >
@@ -404,16 +401,14 @@ export default function RSVPResponseScreen() {
                         ]}
                         onPress={() => setExcitementLevel(level)}
                       >
-                        <PartyPopper 
-                          size={level === 5 ? 20 : 16} 
-                          color={excitementLevel >= level ? '#fff' : colors.textTertiary} 
+                        <PartyPopper
+                          size={level === 5 ? 20 : 16}
+                          color={excitementLevel >= level ? '#fff' : colors.textTertiary}
                         />
                       </Pressable>
                     ))}
                   </View>
-                  <Text style={styles.excitementLabel}>
-                    {EXCITEMENT_LABELS[excitementLevel]}
-                  </Text>
+                  <Text style={styles.excitementLabel}>{EXCITEMENT_LABELS[excitementLevel]}</Text>
                 </View>
 
                 {/* Reaction Emoji */}
@@ -450,10 +445,12 @@ export default function RSVPResponseScreen() {
                           onPress={() => toggleDietary(option.id)}
                         >
                           <Text style={styles.dietaryEmoji}>{option.emoji}</Text>
-                          <Text style={[
-                            styles.dietaryLabel,
-                            selectedDietary.includes(option.id) && styles.dietaryLabelSelected,
-                          ]}>
+                          <Text
+                            style={[
+                              styles.dietaryLabel,
+                              selectedDietary.includes(option.id) && styles.dietaryLabelSelected,
+                            ]}
+                          >
                             {option.label}
                           </Text>
                         </Pressable>
@@ -540,7 +537,7 @@ export default function RSVPResponseScreen() {
 
           {/* Submit Button */}
           <View style={styles.modalFooter}>
-            <Pressable 
+            <Pressable
               style={[
                 styles.submitBtn,
                 responseType === 'accepted' && styles.submitBtnAccept,
@@ -551,8 +548,8 @@ export default function RSVPResponseScreen() {
             >
               <Text style={styles.submitBtnText}>
                 {responseType === 'accepted' && "I'll be there! 💕"}
-                {responseType === 'tentative' && "Mark as Maybe"}
-                {responseType === 'declined' && "Send Response"}
+                {responseType === 'tentative' && 'Mark as Maybe'}
+                {responseType === 'declined' && 'Send Response'}
               </Text>
             </Pressable>
           </View>

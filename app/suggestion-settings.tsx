@@ -1,15 +1,7 @@
 // W4nder Preference Sync - Suggestion Settings Screen
 
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { usePreferenceSync } from '../hooks/usePreferenceSync';
 import { SuggestionSettings } from '../types/preferences';
@@ -18,9 +10,7 @@ interface SuggestionSettingsScreenProps {
   navigation?: any;
 }
 
-const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
-  navigation,
-}) => {
+const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({ navigation }) => {
   const {
     suggestionSettings,
     updateSuggestionSettings,
@@ -32,17 +22,23 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
 
   const [settings, setSettings] = useState<SuggestionSettings>(suggestionSettings);
 
-  const handleToggle = useCallback((key: keyof SuggestionSettings, value: boolean) => {
-    const updated = { ...settings, [key]: value };
-    setSettings(updated);
-    updateSuggestionSettings(updated);
-  }, [settings, updateSuggestionSettings]);
+  const handleToggle = useCallback(
+    (key: keyof SuggestionSettings, value: boolean) => {
+      const updated = { ...settings, [key]: value };
+      setSettings(updated);
+      updateSuggestionSettings(updated);
+    },
+    [settings, updateSuggestionSettings]
+  );
 
-  const handleSliderChange = useCallback((key: keyof SuggestionSettings, value: number) => {
-    const updated = { ...settings, [key]: value };
-    setSettings(updated);
-    updateSuggestionSettings(updated);
-  }, [settings, updateSuggestionSettings]);
+  const handleSliderChange = useCallback(
+    (key: keyof SuggestionSettings, value: number) => {
+      const updated = { ...settings, [key]: value };
+      setSettings(updated);
+      updateSuggestionSettings(updated);
+    },
+    [settings, updateSuggestionSettings]
+  );
 
   const handleClearData = useCallback(() => {
     Alert.alert(
@@ -75,11 +71,9 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
 
   const handleSync = useCallback(async () => {
     const result = await syncNow();
-    Alert.alert(
-      'Sync Complete',
-      `Status: ${result.status}\nChanges: ${result.changesApplied}`,
-      [{ text: 'OK' }]
-    );
+    Alert.alert('Sync Complete', `Status: ${result.status}\nChanges: ${result.changesApplied}`, [
+      { text: 'OK' },
+    ]);
   }, [syncNow]);
 
   const renderToggleSetting = (
@@ -136,21 +130,13 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>
-            Customize how suggestions work
-          </Text>
+          <Text style={styles.headerSubtitle}>Customize how suggestions work</Text>
         </View>
       </LinearGradient>
 
@@ -158,28 +144,28 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
         {/* Personalization Settings */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Personalization</Text>
-          
+
           {renderToggleSetting(
             'Enable Personalization',
             'Use your preferences to rank suggestions',
             'enablePersonalization',
             settings.enablePersonalization
           )}
-          
+
           {renderToggleSetting(
             'Strict Filtering',
             'Only show items matching must-have preferences',
             'strictFiltering',
             settings.strictFiltering
           )}
-          
+
           {renderToggleSetting(
             'Show Match Scores',
             'Display how well items match your preferences',
             'showScores',
             settings.showScores
           )}
-          
+
           {renderSliderSetting(
             'Minimum Score',
             'Hide suggestions below this match score',
@@ -194,14 +180,14 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
         {/* Discovery Settings */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Discovery</Text>
-          
+
           {renderToggleSetting(
             'Prioritize New Experiences',
-            'Suggest things you haven\'t tried before',
+            "Suggest things you haven't tried before",
             'prioritizeNewExperiences',
             settings.prioritizeNewExperiences
           )}
-          
+
           {renderToggleSetting(
             'Balance Categories',
             'Mix different types of suggestions',
@@ -213,19 +199,20 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
         {/* Sync & Data */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Sync & Data</Text>
-          
+
           <TouchableOpacity style={styles.actionRow} onPress={handleSync}>
             <View style={styles.actionInfo}>
               <Text style={styles.actionTitle}>Sync Now</Text>
               <Text style={styles.actionDesc}>
-                Last synced: {syncHistory[0]?.timestamp 
+                Last synced:{' '}
+                {syncHistory[0]?.timestamp
                   ? new Date(syncHistory[0].timestamp).toLocaleString()
                   : 'Never'}
               </Text>
             </View>
             <Text style={styles.actionIcon}>🔄</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.actionRow} onPress={handleExport}>
             <View style={styles.actionInfo}>
               <Text style={styles.actionTitle}>Export Preferences</Text>
@@ -233,7 +220,7 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
             </View>
             <Text style={styles.actionIcon}>📤</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.actionRow}>
             <View style={styles.actionInfo}>
               <Text style={styles.actionTitle}>Import Preferences</Text>
@@ -246,16 +233,11 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
         {/* Danger Zone */}
         <View style={styles.section}>
           <Text style={styles.sectionTitleDanger}>Danger Zone</Text>
-          
-          <TouchableOpacity 
-            style={styles.dangerRow} 
-            onPress={handleClearData}
-          >
+
+          <TouchableOpacity style={styles.dangerRow} onPress={handleClearData}>
             <View style={styles.actionInfo}>
               <Text style={styles.dangerTitle}>Clear All Data</Text>
-              <Text style={styles.dangerDesc}>
-                Delete all preferences, companions, and history
-              </Text>
+              <Text style={styles.dangerDesc}>Delete all preferences, companions, and history</Text>
             </View>
             <Text style={styles.actionIcon}>🗑️</Text>
           </TouchableOpacity>
@@ -264,12 +246,12 @@ const SuggestionSettingsScreen: React.FC<SuggestionSettingsScreenProps> = ({
         {/* About */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
-          
+
           <View style={styles.aboutRow}>
             <Text style={styles.aboutLabel}>Preference Sync Version</Text>
             <Text style={styles.aboutValue}>1.0.0</Text>
           </View>
-          
+
           <View style={styles.aboutRow}>
             <Text style={styles.aboutLabel}>Learning Events</Text>
             <Text style={styles.aboutValue}>{syncHistory.length} synced</Text>

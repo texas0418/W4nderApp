@@ -103,9 +103,7 @@ const ParkingCard: React.FC<ParkingCardProps> = ({
         onPress={onPress}
       >
         <View style={styles.compactHeader}>
-          <Text style={styles.compactTypeIcon}>
-            {PARKING_TYPE_ICONS[parking.type]}
-          </Text>
+          <Text style={styles.compactTypeIcon}>{PARKING_TYPE_ICONS[parking.type]}</Text>
           <View style={styles.compactInfo}>
             <Text style={styles.compactName} numberOfLines={1}>
               {parking.name}
@@ -152,9 +150,7 @@ const ParkingCard: React.FC<ParkingCardProps> = ({
         </View>
         <View style={styles.infoItem}>
           <Clock size={14} color={colors.textSecondary} />
-          <Text style={styles.infoText}>
-            {parking.walkingTime} min walk
-          </Text>
+          <Text style={styles.infoText}>{parking.walkingTime} min walk</Text>
         </View>
         <View style={[styles.availabilityBadge, { backgroundColor: `${availabilityColor}15` }]}>
           <View style={[styles.availabilityDot, { backgroundColor: availabilityColor }]} />
@@ -167,7 +163,7 @@ const ParkingCard: React.FC<ParkingCardProps> = ({
       {/* Features */}
       {keyFeatures.length > 0 && (
         <View style={styles.featuresRow}>
-          {keyFeatures.map(feature => (
+          {keyFeatures.map((feature) => (
             <View key={feature} style={styles.featureBadge}>
               <Text style={styles.featureIcon}>{FEATURE_ICONS[feature]}</Text>
               <Text style={styles.featureText}>{FEATURE_LABELS[feature]}</Text>
@@ -182,7 +178,7 @@ const ParkingCard: React.FC<ParkingCardProps> = ({
           <Text style={styles.estimatedLabel}>Est. total:</Text>
           <Text style={styles.estimatedValue}>{estimatedCost}</Text>
         </View>
-        
+
         <View style={styles.cardActions}>
           {parking.rating && (
             <View style={styles.ratingBadge}>
@@ -246,7 +242,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
         <Pressable style={styles.filterBackdrop} onPress={onClose} />
         <View style={styles.filterSheet}>
           <View style={styles.filterHandle} />
-          
+
           <View style={styles.filterHeader}>
             <Text style={styles.filterTitle}>Filters</Text>
             <Pressable onPress={onReset}>
@@ -259,7 +255,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Sort By</Text>
               <View style={styles.sortOptions}>
-                {PARKING_FILTER_OPTIONS.sortOptions.map(option => (
+                {PARKING_FILTER_OPTIONS.sortOptions.map((option) => (
                   <Pressable
                     key={option.id}
                     style={[
@@ -276,9 +272,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                     >
                       {option.label}
                     </Text>
-                    {filters.sortBy === option.id && (
-                      <Check size={16} color={colors.primary} />
-                    )}
+                    {filters.sortBy === option.id && <Check size={16} color={colors.primary} />}
                   </Pressable>
                 ))}
               </View>
@@ -288,7 +282,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Parking Type</Text>
               <View style={styles.typeOptions}>
-                {PARKING_FILTER_OPTIONS.types.map(type => (
+                {PARKING_FILTER_OPTIONS.types.map((type) => (
                   <Pressable
                     key={type.id}
                     style={[
@@ -315,7 +309,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Max Price per Hour</Text>
               <View style={styles.priceOptions}>
-                {PARKING_FILTER_OPTIONS.priceRanges.map(range => (
+                {PARKING_FILTER_OPTIONS.priceRanges.map((range) => (
                   <Pressable
                     key={range.id}
                     style={[
@@ -341,7 +335,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Search Radius</Text>
               <View style={styles.radiusOptions}>
-                {[0.5, 1, 2, 5].map(radius => (
+                {[0.5, 1, 2, 5].map((radius) => (
                   <Pressable
                     key={radius}
                     style={[
@@ -367,7 +361,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Features</Text>
               <View style={styles.featureOptions}>
-                {PARKING_FILTER_OPTIONS.features.map(feature => (
+                {PARKING_FILTER_OPTIONS.features.map((feature) => (
                   <Pressable
                     key={feature.id}
                     style={[
@@ -397,18 +391,8 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                 onPress={() => onUpdateFilters({ mustBeOpen: !filters.mustBeOpen })}
               >
                 <Text style={styles.toggleLabel}>Open Now Only</Text>
-                <View
-                  style={[
-                    styles.toggleSwitch,
-                    filters.mustBeOpen && styles.toggleSwitchOn,
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.toggleThumb,
-                      filters.mustBeOpen && styles.toggleThumbOn,
-                    ]}
-                  />
+                <View style={[styles.toggleSwitch, filters.mustBeOpen && styles.toggleSwitchOn]}>
+                  <View style={[styles.toggleThumb, filters.mustBeOpen && styles.toggleThumbOn]} />
                 </View>
               </Pressable>
 
@@ -418,16 +402,10 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
               >
                 <Text style={styles.toggleLabel}>Reservable Only</Text>
                 <View
-                  style={[
-                    styles.toggleSwitch,
-                    filters.reservableOnly && styles.toggleSwitchOn,
-                  ]}
+                  style={[styles.toggleSwitch, filters.reservableOnly && styles.toggleSwitchOn]}
                 >
                   <View
-                    style={[
-                      styles.toggleThumb,
-                      filters.reservableOnly && styles.toggleThumbOn,
-                    ]}
+                    style={[styles.toggleThumb, filters.reservableOnly && styles.toggleThumbOn]}
                   />
                 </View>
               </Pressable>
@@ -456,7 +434,7 @@ export default function ParkingFinderScreen() {
     lat?: string;
     lng?: string;
   }>();
-  
+
   const mapRef = useRef<MapView>(null);
   const {
     isSearching,
@@ -493,11 +471,7 @@ export default function ParkingFinderScreen() {
 
   useEffect(() => {
     if (params.lat && params.lng) {
-      searchAtLocation(
-        parseFloat(params.lat),
-        parseFloat(params.lng),
-        params.destinationName
-      );
+      searchAtLocation(parseFloat(params.lat), parseFloat(params.lng), params.destinationName);
     } else {
       searchNearby();
     }
@@ -516,10 +490,13 @@ export default function ParkingFinderScreen() {
     });
   }, []);
 
-  const handleMarkerPress = useCallback((parking: ParkingLocation) => {
-    selectParking(parking);
-    focusOnParking(parking);
-  }, [selectParking, focusOnParking]);
+  const handleMarkerPress = useCallback(
+    (parking: ParkingLocation) => {
+      selectParking(parking);
+      focusOnParking(parking);
+    },
+    [selectParking, focusOnParking]
+  );
 
   // ─────────────────────────────────────────────────────────────────────────
   // Render
@@ -530,7 +507,7 @@ export default function ParkingFinderScreen() {
       <Pressable style={styles.backButton} onPress={() => router.back()}>
         <ArrowLeft size={22} color={colors.text} />
       </Pressable>
-      
+
       <View style={styles.headerTitleContainer}>
         <Text style={styles.headerTitle}>Find Parking</Text>
         {params.destinationName && (
@@ -560,10 +537,7 @@ export default function ParkingFinderScreen() {
   const renderToolbar = () => (
     <View style={styles.toolbar}>
       {/* Duration Picker */}
-      <Pressable
-        style={styles.durationPicker}
-        onPress={() => setShowDurationPicker(true)}
-      >
+      <Pressable style={styles.durationPicker} onPress={() => setShowDurationPicker(true)}>
         <Clock size={16} color={colors.textSecondary} />
         <Text style={styles.durationText}>{parkingDuration}h</Text>
         <ChevronDown size={14} color={colors.textSecondary} />
@@ -579,7 +553,7 @@ export default function ParkingFinderScreen() {
       >
         <Filter size={16} color={colors.textSecondary} />
         <Text style={styles.filterButtonText}>Filters</Text>
-        {(filters.types.length + filters.features.length) > 0 && (
+        {filters.types.length + filters.features.length > 0 && (
           <View style={styles.filterBadge}>
             <Text style={styles.filterBadgeText}>
               {filters.types.length + filters.features.length}
@@ -627,7 +601,7 @@ export default function ParkingFinderScreen() {
           </Marker>
 
           {/* Parking Markers */}
-          {filteredResults.map(parking => (
+          {filteredResults.map((parking) => (
             <Marker
               key={parking.id}
               coordinate={{
@@ -674,9 +648,7 @@ export default function ParkingFinderScreen() {
       style={styles.listContainer}
       contentContainerStyle={styles.listContent}
       showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={isSearching} onRefresh={refreshSearch} />
-      }
+      refreshControl={<RefreshControl refreshing={isSearching} onRefresh={refreshSearch} />}
     >
       {/* Results Count */}
       <View style={styles.resultsHeader}>
@@ -684,7 +656,8 @@ export default function ParkingFinderScreen() {
           {filteredResults.length} parking {filteredResults.length === 1 ? 'spot' : 'spots'} found
         </Text>
         <Text style={styles.resultsSortLabel}>
-          Sorted by: {PARKING_FILTER_OPTIONS.sortOptions.find(o => o.id === filters.sortBy)?.label}
+          Sorted by:{' '}
+          {PARKING_FILTER_OPTIONS.sortOptions.find((o) => o.id === filters.sortBy)?.label}
         </Text>
       </View>
 
@@ -707,7 +680,7 @@ export default function ParkingFinderScreen() {
       )}
 
       {/* Parking List */}
-      {filteredResults.map(parking => (
+      {filteredResults.map((parking) => (
         <ParkingCard
           key={parking.id}
           parking={parking}
@@ -741,14 +714,11 @@ export default function ParkingFinderScreen() {
       animationType="fade"
       onRequestClose={() => setShowDurationPicker(false)}
     >
-      <Pressable
-        style={styles.durationOverlay}
-        onPress={() => setShowDurationPicker(false)}
-      >
+      <Pressable style={styles.durationOverlay} onPress={() => setShowDurationPicker(false)}>
         <View style={styles.durationSheet}>
           <Text style={styles.durationSheetTitle}>Parking Duration</Text>
           <View style={styles.durationOptions}>
-            {[1, 2, 3, 4, 6, 8, 12, 24].map(hours => (
+            {[1, 2, 3, 4, 6, 8, 12, 24].map((hours) => (
               <Pressable
                 key={hours}
                 style={[
@@ -780,9 +750,9 @@ export default function ParkingFinderScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {renderHeader()}
       {renderToolbar()}
-      
+
       {viewMode === 'map' ? renderMap() : renderList()}
-      
+
       <FilterSheet
         visible={showFilters}
         onClose={() => setShowFilters(false)}
@@ -795,7 +765,7 @@ export default function ParkingFinderScreen() {
         onSetRadius={setRadius}
         onReset={resetFilters}
       />
-      
+
       {renderDurationPicker()}
     </SafeAreaView>
   );
@@ -810,7 +780,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  
+
   // Header
   header: {
     flexDirection: 'row',

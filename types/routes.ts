@@ -34,18 +34,18 @@ export type ActivityCategory =
   | 'other';
 
 export type TimeFlexibility =
-  | 'fixed'        // Cannot move (reservations, flights)
-  | 'preferred'    // Has preferred time but can shift
-  | 'flexible'     // Can move freely
-  | 'anytime';     // No time preference
+  | 'fixed' // Cannot move (reservations, flights)
+  | 'preferred' // Has preferred time but can shift
+  | 'flexible' // Can move freely
+  | 'anytime'; // No time preference
 
 export interface TimeWindow {
-  start: string;   // HH:mm
-  end: string;     // HH:mm
+  start: string; // HH:mm
+  end: string; // HH:mm
 }
 
 export interface OperatingHours {
-  dayOfWeek: number;  // 0-6 (Sun-Sat)
+  dayOfWeek: number; // 0-6 (Sun-Sat)
   open: string;
   close: string;
   isClosed?: boolean;
@@ -57,25 +57,25 @@ export interface Activity {
   description?: string;
   category: ActivityCategory;
   location: Location;
-  
+
   // Timing
   scheduledTime?: string;
-  duration: number;              // Minutes
+  duration: number; // Minutes
   flexibility: TimeFlexibility;
   preferredTimeWindow?: TimeWindow;
-  
+
   // Constraints
   operatingHours?: OperatingHours[];
   requiresReservation?: boolean;
   reservationTime?: string;
   lastEntryTime?: string;
-  
+
   // Priority
-  priority: number;              // 1-5
+  priority: number; // 1-5
   isLocked?: boolean;
   mustBeBefore?: string[];
   mustBeAfter?: string[];
-  
+
   // Metadata
   estimatedCost?: number;
   imageUrl?: string;
@@ -86,21 +86,15 @@ export interface Activity {
 // TRANSPORT
 // ============================================================================
 
-export type TransportMode =
-  | 'walking'
-  | 'driving'
-  | 'transit'
-  | 'cycling'
-  | 'rideshare'
-  | 'taxi';
+export type TransportMode = 'walking' | 'driving' | 'transit' | 'cycling' | 'rideshare' | 'taxi';
 
 export interface TravelSegment {
   id: string;
   fromActivityId: string;
   toActivityId: string;
   mode: TransportMode;
-  distance: number;          // Meters
-  duration: number;          // Minutes
+  distance: number; // Meters
+  duration: number; // Minutes
   departureTime: string;
   arrivalTime: string;
   cost?: number;
@@ -137,19 +131,19 @@ export interface Route {
   date: string;
   stops: RouteStop[];
   travelSegments: TravelSegment[];
-  
+
   // Summary
   totalDuration: number;
   totalTravelTime: number;
   totalDistance: number;
   totalWaitTime: number;
   activityTime: number;
-  
+
   startTime: string;
   endTime: string;
   startLocation?: Location;
   endLocation?: Location;
-  
+
   isOptimized: boolean;
   createdAt: string;
 }
@@ -190,19 +184,19 @@ export interface OptimizationResult {
   originalRoute: Route;
   optimizedRoute: Route;
   strategy: OptimizationStrategy;
-  
+
   // Savings
   timeSaved: number;
   distanceSaved: number;
-  
+
   // Changes
   changes: RouteChange[];
   changeCount: number;
-  
+
   // Score
   score: number;
   originalScore: number;
-  
+
   // Warnings
   warnings: Array<{
     type: string;
@@ -210,15 +204,11 @@ export interface OptimizationResult {
     severity: 'low' | 'medium' | 'high';
     activityId?: string;
   }>;
-  
+
   calculatedAt: string;
 }
 
-export type ApprovalStatus =
-  | 'pending'
-  | 'approved'
-  | 'partially_approved'
-  | 'rejected';
+export type ApprovalStatus = 'pending' | 'approved' | 'partially_approved' | 'rejected';
 
 // ============================================================================
 // UI STATE
@@ -229,15 +219,15 @@ export interface RouteOptimizerState {
   originalRoute: Route | null;
   optimizedRoute: Route | null;
   optimizationResult: OptimizationResult | null;
-  
+
   strategy: OptimizationStrategy;
   transportPreferences: TransportPreferences;
   constraints: OptimizationConstraints;
-  
+
   pendingChanges: RouteChange[];
   approvedChanges: string[];
   rejectedChanges: string[];
-  
+
   isOptimizing: boolean;
   error: string | null;
 }

@@ -86,7 +86,9 @@ class ConfirmationStorageService {
   // CRUD Operations
   // ============================================================================
 
-  async addConfirmation(data: Omit<Confirmation, 'id' | 'createdAt' | 'updatedAt'>): Promise<Confirmation> {
+  async addConfirmation(
+    data: Omit<Confirmation, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<Confirmation> {
     await this.initialize();
 
     const confirmation: Confirmation = {
@@ -119,27 +121,28 @@ class ConfirmationStorageService {
     // Apply filters
     if (filter) {
       if (filter.type) {
-        confirmations = confirmations.filter(c => c.type === filter.type);
+        confirmations = confirmations.filter((c) => c.type === filter.type);
       }
       if (filter.status) {
-        confirmations = confirmations.filter(c => c.status === filter.status);
+        confirmations = confirmations.filter((c) => c.status === filter.status);
       }
       if (filter.tripId) {
-        confirmations = confirmations.filter(c => c.tripId === filter.tripId);
+        confirmations = confirmations.filter((c) => c.tripId === filter.tripId);
       }
       if (filter.dateRange) {
         const { start, end } = filter.dateRange;
-        confirmations = confirmations.filter(c => {
+        confirmations = confirmations.filter((c) => {
           const date = new Date(c.date);
           return date >= new Date(start) && date <= new Date(end);
         });
       }
       if (filter.search) {
         const searchLower = filter.search.toLowerCase();
-        confirmations = confirmations.filter(c =>
-          c.title.toLowerCase().includes(searchLower) ||
-          c.provider?.toLowerCase().includes(searchLower) ||
-          c.confirmationNumber?.toLowerCase().includes(searchLower)
+        confirmations = confirmations.filter(
+          (c) =>
+            c.title.toLowerCase().includes(searchLower) ||
+            c.provider?.toLowerCase().includes(searchLower) ||
+            c.confirmationNumber?.toLowerCase().includes(searchLower)
         );
       }
     }
@@ -149,16 +152,16 @@ class ConfirmationStorageService {
   }
 
   async getUpcomingConfirmations(limit?: number): Promise<Confirmation[]> {
-    const all = await this.getAllConfirmations(
-      undefined,
-      { field: 'date', direction: 'asc' }
-    );
+    const all = await this.getAllConfirmations(undefined, { field: 'date', direction: 'asc' });
 
-    const upcoming = all.filter(c => !isConfirmationPast(c) && c.status !== 'cancelled');
+    const upcoming = all.filter((c) => !isConfirmationPast(c) && c.status !== 'cancelled');
     return limit ? upcoming.slice(0, limit) : upcoming;
   }
 
-  async updateConfirmation(id: string, updates: Partial<Confirmation>): Promise<Confirmation | null> {
+  async updateConfirmation(
+    id: string,
+    updates: Partial<Confirmation>
+  ): Promise<Confirmation | null> {
     await this.initialize();
 
     const existing = this.confirmations.get(id);
@@ -240,7 +243,7 @@ class ConfirmationStorageService {
     // Update ticket in confirmation
     for (const [confId, conf] of this.confirmations) {
       if (conf.tickets) {
-        const ticketIndex = conf.tickets.findIndex(t => t.id === ticketId);
+        const ticketIndex = conf.tickets.findIndex((t) => t.id === ticketId);
         if (ticketIndex >= 0) {
           conf.tickets[ticketIndex] = updated;
           await this.saveConfirmations();
@@ -264,7 +267,7 @@ class ConfirmationStorageService {
     // Remove from confirmation
     for (const [confId, conf] of this.confirmations) {
       if (conf.tickets) {
-        const ticketIndex = conf.tickets.findIndex(t => t.id === ticketId);
+        const ticketIndex = conf.tickets.findIndex((t) => t.id === ticketId);
         if (ticketIndex >= 0) {
           conf.tickets.splice(ticketIndex, 1);
           await this.saveConfirmations();
@@ -342,7 +345,7 @@ class ConfirmationStorageService {
   async importConfirmation(json: string): Promise<Confirmation | null> {
     try {
       const data = JSON.parse(json);
-      
+
       // Validate required fields
       if (!data.title || !data.date || !data.type) {
         throw new Error('Invalid confirmation data');
@@ -366,7 +369,7 @@ class ConfirmationStorageService {
 
     try {
       const shareText = this.formatConfirmationForShare(confirmation);
-      
+
       // Use React Native's built-in Share API
       await Share.share({
         message: shareText,

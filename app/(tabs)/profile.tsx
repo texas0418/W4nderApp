@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Switch,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Switch } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -37,14 +30,56 @@ import { useApp } from '@/contexts/AppContext';
 import { travelStyles, budgetRanges } from '@/mocks/preferences';
 
 const menuItems = [
-  { id: 'bucket-list', icon: Target, label: 'Bucket List', color: '#EC4899', route: '/bucket-list' },
-  { id: 'loyalty', icon: Award, label: 'Loyalty Programs', color: '#0EA5E9', route: '/loyalty-programs' },
-  { id: 'preferences', icon: Heart, label: 'Travel Preferences', color: colors.secondary, route: null },
-  { id: 'rewards', icon: Gift, label: 'Rewards & Points', color: colors.warning, route: '/rewards' },
-  { id: 'subscription', icon: Crown, label: 'Subscription', color: '#8B5CF6', route: '/subscription' },
+  {
+    id: 'bucket-list',
+    icon: Target,
+    label: 'Bucket List',
+    color: '#EC4899',
+    route: '/bucket-list',
+  },
+  {
+    id: 'loyalty',
+    icon: Award,
+    label: 'Loyalty Programs',
+    color: '#0EA5E9',
+    route: '/loyalty-programs',
+  },
+  {
+    id: 'preferences',
+    icon: Heart,
+    label: 'Travel Preferences',
+    color: colors.secondary,
+    route: null,
+  },
+  {
+    id: 'rewards',
+    icon: Gift,
+    label: 'Rewards & Points',
+    color: colors.warning,
+    route: '/rewards',
+  },
+  {
+    id: 'subscription',
+    icon: Crown,
+    label: 'Subscription',
+    color: '#8B5CF6',
+    route: '/subscription',
+  },
   { id: 'offline', icon: WifiOff, label: 'Offline Mode', color: '#06B6D4', route: '/offline-mode' },
-  { id: 'emergency', icon: AlertTriangle, label: 'Emergency Support', color: colors.error, route: '/emergency' },
-  { id: 'payment', icon: CreditCard, label: 'Payment Methods', color: colors.primaryLight, route: null },
+  {
+    id: 'emergency',
+    icon: AlertTriangle,
+    label: 'Emergency Support',
+    color: colors.error,
+    route: '/emergency',
+  },
+  {
+    id: 'payment',
+    icon: CreditCard,
+    label: 'Payment Methods',
+    color: colors.primaryLight,
+    route: null,
+  },
   { id: 'notifications', icon: Bell, label: 'Notifications', color: colors.warning, route: null },
   { id: 'privacy', icon: Shield, label: 'Privacy & Security', color: colors.success, route: null },
   { id: 'help', icon: HelpCircle, label: 'Help & Support', color: colors.accentDark, route: null },
@@ -54,8 +89,8 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { user, resetOnboarding, toggleCarbonOffset, bucketListCount } = useApp();
 
-  const travelStyle = travelStyles.find(s => s.id === user.travelStyle);
-  const budget = budgetRanges.find(b => b.id === user.budgetRange);
+  const travelStyle = travelStyles.find((s) => s.id === user.travelStyle);
+  const budget = budgetRanges.find((b) => b.id === user.budgetRange);
 
   const getTierBadge = () => {
     switch (user.subscriptionTier) {
@@ -84,11 +119,7 @@ export default function ProfileScreen() {
 
           <View style={styles.profileSection}>
             <View style={styles.avatarContainer}>
-              <Image
-                source={{ uri: user.avatar }}
-                style={styles.avatar}
-                contentFit="cover"
-              />
+              <Image source={{ uri: user.avatar }} style={styles.avatar} contentFit="cover" />
               <View style={styles.editBadge}>
                 <Text style={styles.editBadgeText}>Edit</Text>
               </View>
@@ -132,28 +163,19 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.quickActions}>
-            <Pressable 
-              style={styles.quickAction}
-              onPress={() => router.push('/group-trip')}
-            >
+            <Pressable style={styles.quickAction} onPress={() => router.push('/group-trip')}>
               <View style={[styles.quickActionIcon, { backgroundColor: `${colors.primary}15` }]}>
                 <Users size={20} color={colors.primary} />
               </View>
               <Text style={styles.quickActionText}>Group Trip</Text>
             </Pressable>
-            <Pressable 
-              style={styles.quickAction}
-              onPress={() => router.push('/date-plan')}
-            >
+            <Pressable style={styles.quickAction} onPress={() => router.push('/date-plan')}>
               <View style={[styles.quickActionIcon, { backgroundColor: `${colors.secondary}15` }]}>
                 <Heart size={20} color={colors.secondary} />
               </View>
               <Text style={styles.quickActionText}>Date Plan</Text>
             </Pressable>
-            <Pressable 
-              style={styles.quickAction}
-              onPress={() => router.push('/bucket-list')}
-            >
+            <Pressable style={styles.quickAction} onPress={() => router.push('/bucket-list')}>
               <View style={[styles.quickActionIcon, { backgroundColor: '#EC489915' }]}>
                 <Target size={20} color="#EC4899" />
               </View>
@@ -184,9 +206,7 @@ export default function ProfileScreen() {
               <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
                 <Text style={styles.infoLabel}>Interests</Text>
                 <Text style={styles.infoValue}>
-                  {user.preferences.length > 0
-                    ? `${user.preferences.length} selected`
-                    : 'None'}
+                  {user.preferences.length > 0 ? `${user.preferences.length} selected` : 'None'}
                 </Text>
               </View>
             </View>
@@ -218,8 +238,8 @@ export default function ProfileScreen() {
             <Text style={styles.sectionTitle}>Settings</Text>
             <View style={styles.menuCard}>
               {menuItems.map((item) => (
-                <Pressable 
-                  key={item.id} 
+                <Pressable
+                  key={item.id}
                   style={styles.menuItem}
                   onPress={() => item.route && router.push(item.route as any)}
                 >

@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Switch,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Switch } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -44,7 +37,7 @@ export default function DatePlanScreen() {
   const categories = ['romantic', 'adventure', 'cultural', 'foodie', 'relaxation'];
 
   const filteredIdeas = selectedCategory
-    ? datePlanIdeas.filter(idea => idea.category === selectedCategory)
+    ? datePlanIdeas.filter((idea) => idea.category === selectedCategory)
     : datePlanIdeas;
 
   const handleSelectIdea = (idea: DatePlanIdea) => {
@@ -74,16 +67,11 @@ export default function DatePlanScreen() {
           <View style={styles.headerContent}>
             <Heart size={28} color={colors.textLight} fill={colors.textLight} />
             <Text style={styles.headerTitle}>Date Planning</Text>
-            <Text style={styles.headerSubtitle}>
-              Create unforgettable moments together
-            </Text>
+            <Text style={styles.headerSubtitle}>Create unforgettable moments together</Text>
           </View>
         </View>
 
-        <ScrollView 
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.surpriseSection}>
             <View style={styles.surpriseContent}>
               <Gift size={24} color={colors.secondary} />
@@ -110,20 +98,14 @@ export default function DatePlanScreen() {
               contentContainerStyle={styles.categoriesContent}
             >
               <Pressable
-                style={[
-                  styles.categoryChip,
-                  !selectedCategory && styles.categoryChipActive,
-                ]}
+                style={[styles.categoryChip, !selectedCategory && styles.categoryChipActive]}
                 onPress={() => setSelectedCategory(null)}
               >
-                <Text style={[
-                  styles.categoryText,
-                  !selectedCategory && styles.categoryTextActive,
-                ]}>
+                <Text style={[styles.categoryText, !selectedCategory && styles.categoryTextActive]}>
                   All
                 </Text>
               </Pressable>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <Pressable
                   key={cat}
                   style={[
@@ -133,10 +115,12 @@ export default function DatePlanScreen() {
                   ]}
                   onPress={() => setSelectedCategory(cat)}
                 >
-                  <Text style={[
-                    styles.categoryText,
-                    selectedCategory === cat && styles.categoryTextActive,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.categoryText,
+                      selectedCategory === cat && styles.categoryTextActive,
+                    ]}
+                  >
                     {cat.charAt(0).toUpperCase() + cat.slice(1)}
                   </Text>
                 </Pressable>
@@ -146,29 +130,25 @@ export default function DatePlanScreen() {
 
           <View style={styles.ideasSection}>
             <Text style={styles.sectionTitle}>Date Ideas</Text>
-            {filteredIdeas.map(idea => (
+            {filteredIdeas.map((idea) => (
               <Pressable
                 key={idea.id}
-                style={[
-                  styles.ideaCard,
-                  selectedIdea?.id === idea.id && styles.ideaCardSelected,
-                ]}
+                style={[styles.ideaCard, selectedIdea?.id === idea.id && styles.ideaCardSelected]}
                 onPress={() => handleSelectIdea(idea)}
               >
-                <Image
-                  source={{ uri: idea.image }}
-                  style={styles.ideaImage}
-                  contentFit="cover"
-                />
+                <Image source={{ uri: idea.image }} style={styles.ideaImage} contentFit="cover" />
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.8)']}
                   style={styles.ideaGradient}
                 />
                 <View style={styles.ideaContent}>
-                  <View style={[styles.ideaCategoryBadge, { backgroundColor: categoryColors[idea.category] }]}>
-                    <Text style={styles.ideaCategoryText}>
-                      {idea.category}
-                    </Text>
+                  <View
+                    style={[
+                      styles.ideaCategoryBadge,
+                      { backgroundColor: categoryColors[idea.category] },
+                    ]}
+                  >
+                    <Text style={styles.ideaCategoryText}>{idea.category}</Text>
                   </View>
                   <Text style={styles.ideaName}>{idea.name}</Text>
                   <Text style={styles.ideaDescription} numberOfLines={2}>
@@ -215,17 +195,12 @@ export default function DatePlanScreen() {
 
         <View style={styles.footer}>
           <Pressable
-            style={[
-              styles.planButton,
-              !selectedIdea && styles.planButtonDisabled,
-            ]}
+            style={[styles.planButton, !selectedIdea && styles.planButtonDisabled]}
             onPress={handlePlanDate}
             disabled={!selectedIdea}
           >
             <Sparkles size={20} color={colors.textLight} />
-            <Text style={styles.planButtonText}>
-              Plan This Date
-            </Text>
+            <Text style={styles.planButtonText}>Plan This Date</Text>
           </Pressable>
         </View>
       </SafeAreaView>

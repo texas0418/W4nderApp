@@ -29,10 +29,7 @@ interface CategoryBudgetScreenProps {
   tripId?: string;
 }
 
-const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
-  navigation,
-  tripId,
-}) => {
+const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({ navigation, tripId }) => {
   const {
     budget,
     expenses,
@@ -66,7 +63,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
       other: 0,
     };
 
-    expenses.forEach(expense => {
+    expenses.forEach((expense) => {
       const amount = expense.convertedAmount || expense.amount;
       result[expense.category] = (result[expense.category] || 0) + amount;
     });
@@ -76,7 +73,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
 
   // Calculate category budgets with spending
   const categoryBudgets: CategoryBudget[] = useMemo(() => {
-    return EXPENSE_CATEGORIES.map(cat => {
+    return EXPENSE_CATEGORIES.map((cat) => {
       const budgetAmount = budget?.categoryBudgets?.[cat.id] || 0;
       const spent = spendingByCategory[cat.id as ExpenseCategory] || 0;
       const remaining = Math.max(0, budgetAmount - spent);
@@ -110,7 +107,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
   // Initialize edit state
   const startEditing = useCallback(() => {
     const initial: Record<string, string> = {};
-    EXPENSE_CATEGORIES.forEach(cat => {
+    EXPENSE_CATEGORIES.forEach((cat) => {
       initial[cat.id] = (budget?.categoryBudgets?.[cat.id] || 0).toString();
     });
     setEditedBudgets(initial);
@@ -124,7 +121,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
       const categoryBudgetsData: Record<string, number> = {};
       let totalFromCategories = 0;
 
-      EXPENSE_CATEGORIES.forEach(cat => {
+      EXPENSE_CATEGORIES.forEach((cat) => {
         const amount = parseFloat(editedBudgets[cat.id]) || 0;
         if (amount > 0) {
           categoryBudgetsData[cat.id] = amount;
@@ -148,9 +145,27 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
           currency: homeCurrency,
           categoryBudgets: categoryBudgetsData,
           alerts: [
-            { id: 'a1', type: 'threshold', threshold: 50, message: '50% of budget used', triggered: false },
-            { id: 'a2', type: 'threshold', threshold: 80, message: '80% of budget used', triggered: false },
-            { id: 'a3', type: 'threshold', threshold: 100, message: 'Budget exceeded!', triggered: false },
+            {
+              id: 'a1',
+              type: 'threshold',
+              threshold: 50,
+              message: '50% of budget used',
+              triggered: false,
+            },
+            {
+              id: 'a2',
+              type: 'threshold',
+              threshold: 80,
+              message: '80% of budget used',
+              triggered: false,
+            },
+            {
+              id: 'a3',
+              type: 'threshold',
+              threshold: 100,
+              message: 'Budget exceeded!',
+              triggered: false,
+            },
           ],
         });
       }
@@ -172,7 +187,10 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
   };
 
   const getCategoryInfo = (categoryId: string) => {
-    return EXPENSE_CATEGORIES.find(c => c.id === categoryId) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+    return (
+      EXPENSE_CATEGORIES.find((c) => c.id === categoryId) ||
+      EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1]
+    );
   };
 
   const currencySymbol = getCurrency(homeCurrency)?.symbol || '$';
@@ -196,16 +214,14 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
               style={styles.budgetInput}
               value={editedBudgets[catBudget.category]}
               onChangeText={(text) => {
-                setEditedBudgets(prev => ({ ...prev, [catBudget.category]: text }));
+                setEditedBudgets((prev) => ({ ...prev, [catBudget.category]: text }));
               }}
               keyboardType="decimal-pad"
               placeholder="0"
               placeholderTextColor="#999"
             />
           </View>
-          <Text style={styles.spentHint}>
-            Spent: {format(catBudget.spent, homeCurrency)}
-          </Text>
+          <Text style={styles.spentHint}>Spent: {format(catBudget.spent, homeCurrency)}</Text>
         </View>
       );
     }
@@ -219,7 +235,9 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
       <TouchableOpacity
         key={catBudget.category}
         style={styles.categoryCard}
-        onPress={() => navigation?.navigate('ExpenseTracker', { filterCategory: catBudget.category })}
+        onPress={() =>
+          navigation?.navigate('ExpenseTracker', { filterCategory: catBudget.category })
+        }
       >
         <View style={styles.categoryHeader}>
           <View style={[styles.categoryIcon, { backgroundColor: categoryInfo.color + '20' }]}>
@@ -227,17 +245,19 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
           </View>
           <View style={styles.categoryInfo}>
             <Text style={styles.categoryName}>{categoryInfo.name}</Text>
-            <Text style={styles.categorySpent}>
-              {format(catBudget.spent, homeCurrency)} spent
-            </Text>
+            <Text style={styles.categorySpent}>{format(catBudget.spent, homeCurrency)} spent</Text>
           </View>
           <View style={styles.categoryBudgetInfo}>
             <Text style={styles.categoryBudgetAmount}>
-              {catBudget.budgetAmount > 0 ? format(catBudget.budgetAmount, homeCurrency) : 'No budget'}
+              {catBudget.budgetAmount > 0
+                ? format(catBudget.budgetAmount, homeCurrency)
+                : 'No budget'}
             </Text>
             {catBudget.budgetAmount > 0 && (
               <Text style={[styles.categoryRemaining, { color: progressColor }]}>
-                {catBudget.remaining > 0 ? `${format(catBudget.remaining, homeCurrency)} left` : 'Over budget'}
+                {catBudget.remaining > 0
+                  ? `${format(catBudget.remaining, homeCurrency)} left`
+                  : 'Over budget'}
               </Text>
             )}
           </View>
@@ -275,20 +295,14 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Category Budgets</Text>
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => isEditing ? handleSave() : startEditing()}
+          onPress={() => (isEditing ? handleSave() : startEditing())}
           disabled={isSaving}
         >
           {isSaving ? (
@@ -317,9 +331,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
                 />
               </View>
             ) : (
-              <Text style={styles.summaryAmount}>
-                {format(totals.budget, homeCurrency)}
-              </Text>
+              <Text style={styles.summaryAmount}>{format(totals.budget, homeCurrency)}</Text>
             )}
           </View>
 
@@ -328,17 +340,17 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
               <View style={styles.summaryRow}>
                 <View style={styles.summaryItem}>
                   <Text style={styles.summaryLabel}>Spent</Text>
-                  <Text style={styles.summaryValue}>
-                    {format(totals.spent, homeCurrency)}
-                  </Text>
+                  <Text style={styles.summaryValue}>{format(totals.spent, homeCurrency)}</Text>
                 </View>
                 <View style={styles.summaryDivider} />
                 <View style={styles.summaryItem}>
                   <Text style={styles.summaryLabel}>Remaining</Text>
-                  <Text style={[
-                    styles.summaryValue,
-                    { color: totals.remaining > 0 ? '#34C759' : '#FF3B30' }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.summaryValue,
+                      { color: totals.remaining > 0 ? '#34C759' : '#FF3B30' },
+                    ]}
+                  >
                     {format(totals.remaining, homeCurrency)}
                   </Text>
                 </View>
@@ -367,28 +379,30 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
         {/* Category Budgets */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>By Category</Text>
-          
+
           {isEditing ? (
             // Show all categories when editing
-            EXPENSE_CATEGORIES.map(cat => renderCategoryBudgetCard({
-              category: cat.id as ExpenseCategory,
-              budgetAmount: budget?.categoryBudgets?.[cat.id] || 0,
-              spent: spendingByCategory[cat.id as ExpenseCategory] || 0,
-              remaining: 0,
-              percentUsed: 0,
-            }))
+            EXPENSE_CATEGORIES.map((cat) =>
+              renderCategoryBudgetCard({
+                category: cat.id as ExpenseCategory,
+                budgetAmount: budget?.categoryBudgets?.[cat.id] || 0,
+                spent: spendingByCategory[cat.id as ExpenseCategory] || 0,
+                remaining: 0,
+                percentUsed: 0,
+              })
+            )
           ) : (
             // Show only categories with budget or spending
             <>
-              {categoryBudgets.filter(cb => cb.budgetAmount > 0 || cb.spent > 0).map(renderCategoryBudgetCard)}
-              
-              {categoryBudgets.every(cb => cb.budgetAmount === 0 && cb.spent === 0) && (
+              {categoryBudgets
+                .filter((cb) => cb.budgetAmount > 0 || cb.spent > 0)
+                .map(renderCategoryBudgetCard)}
+
+              {categoryBudgets.every((cb) => cb.budgetAmount === 0 && cb.spent === 0) && (
                 <View style={styles.emptyState}>
                   <Text style={styles.emptyIcon}>📊</Text>
                   <Text style={styles.emptyTitle}>No budgets set</Text>
-                  <Text style={styles.emptyText}>
-                    Tap "Edit" to set budgets for each category
-                  </Text>
+                  <Text style={styles.emptyText}>Tap "Edit" to set budgets for each category</Text>
                 </View>
               )}
             </>
@@ -399,16 +413,16 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
         {!isEditing && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Budget Insights</Text>
-            
+
             <View style={styles.insightsContainer}>
               {/* Highest spending category */}
               {(() => {
                 const sorted = [...categoryBudgets]
-                  .filter(cb => cb.spent > 0)
+                  .filter((cb) => cb.spent > 0)
                   .sort((a, b) => b.spent - a.spent);
-                
+
                 if (sorted.length === 0) return null;
-                
+
                 const highest = sorted[0];
                 const highestInfo = getCategoryInfo(highest.category);
 
@@ -431,7 +445,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
               {/* Over budget categories */}
               {(() => {
                 const overBudget = categoryBudgets.filter(
-                  cb => cb.budgetAmount > 0 && cb.percentUsed >= 100
+                  (cb) => cb.budgetAmount > 0 && cb.percentUsed >= 100
                 );
 
                 if (overBudget.length === 0) return null;
@@ -452,7 +466,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
               {/* Categories under 50% */}
               {(() => {
                 const underHalf = categoryBudgets.filter(
-                  cb => cb.budgetAmount > 0 && cb.percentUsed < 50
+                  (cb) => cb.budgetAmount > 0 && cb.percentUsed < 50
                 );
 
                 if (underHalf.length === 0) return null;
@@ -463,7 +477,8 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
                     <View style={styles.insightInfo}>
                       <Text style={styles.insightLabel}>On Track</Text>
                       <Text style={styles.insightValue}>
-                        {underHalf.length} {underHalf.length === 1 ? 'category' : 'categories'} under 50%
+                        {underHalf.length} {underHalf.length === 1 ? 'category' : 'categories'}{' '}
+                        under 50%
                       </Text>
                     </View>
                   </View>
@@ -479,10 +494,7 @@ const CategoryBudgetScreen: React.FC<CategoryBudgetScreenProps> = ({
       {/* Cancel button when editing */}
       {isEditing && (
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => setIsEditing(false)}
-          >
+          <TouchableOpacity style={styles.cancelButton} onPress={() => setIsEditing(false)}>
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>

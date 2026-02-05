@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -34,22 +27,18 @@ export default function HistoryScreen() {
   const [filter, setFilter] = useState<FilterType>('all');
 
   const filteredItineraries = itineraries
-    .filter(i => filter === 'all' || i.status === filter)
+    .filter((i) => filter === 'all' || i.status === filter)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const handleDelete = (itinerary: DateItinerary) => {
-    Alert.alert(
-      'Delete Date',
-      `Are you sure you want to delete "${itinerary.name}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => deleteItinerary(itinerary.id),
-        },
-      ]
-    );
+    Alert.alert('Delete Date', `Are you sure you want to delete "${itinerary.name}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => deleteItinerary(itinerary.id),
+      },
+    ]);
   };
 
   const formatDate = (dateStr: string) => {
@@ -104,21 +93,18 @@ export default function HistoryScreen() {
         <View style={styles.content}>
           {/* Filter Tabs */}
           <View style={styles.filterContainer}>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.filterScroll}
             >
-              {(['all', 'planned', 'completed', 'cancelled'] as FilterType[]).map(f => (
+              {(['all', 'planned', 'completed', 'cancelled'] as FilterType[]).map((f) => (
                 <Pressable
                   key={f}
                   style={[styles.filterTab, filter === f && styles.filterTabActive]}
                   onPress={() => setFilter(f)}
                 >
-                  <Text style={[
-                    styles.filterText,
-                    filter === f && styles.filterTextActive,
-                  ]}>
+                  <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
                     {f.charAt(0).toUpperCase() + f.slice(1)}
                   </Text>
                 </Pressable>
@@ -126,7 +112,7 @@ export default function HistoryScreen() {
             </ScrollView>
           </View>
 
-          <ScrollView 
+          <ScrollView
             style={styles.listContainer}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
@@ -136,12 +122,12 @@ export default function HistoryScreen() {
                 <Heart size={48} color={colors.textTertiary} />
                 <Text style={styles.emptyTitle}>No dates yet</Text>
                 <Text style={styles.emptyDescription}>
-                  {filter === 'all' 
+                  {filter === 'all'
                     ? 'Start planning your first date!'
                     : `No ${filter} dates found.`}
                 </Text>
                 {filter === 'all' && (
-                  <Pressable 
+                  <Pressable
                     style={styles.emptyButton}
                     onPress={() => router.push('/(tabs)/date-night')}
                   >
@@ -150,22 +136,23 @@ export default function HistoryScreen() {
                 )}
               </View>
             ) : (
-              filteredItineraries.map(itinerary => (
+              filteredItineraries.map((itinerary) => (
                 <Pressable
                   key={itinerary.id}
                   style={styles.itineraryCard}
                   onPress={() => router.push(`/date-night/edit-itinerary?id=${itinerary.id}`)}
                 >
                   <View style={styles.cardHeader}>
-                    <View style={[
-                      styles.statusBadge,
-                      { backgroundColor: `${getStatusColor(itinerary.status)}15` }
-                    ]}>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: `${getStatusColor(itinerary.status)}15` },
+                      ]}
+                    >
                       {getStatusIcon(itinerary.status)}
-                      <Text style={[
-                        styles.statusText,
-                        { color: getStatusColor(itinerary.status) }
-                      ]}>
+                      <Text
+                        style={[styles.statusText, { color: getStatusColor(itinerary.status) }]}
+                      >
                         {itinerary.status.charAt(0).toUpperCase() + itinerary.status.slice(1)}
                       </Text>
                     </View>
@@ -192,9 +179,7 @@ export default function HistoryScreen() {
                   <View style={styles.cardMeta}>
                     <View style={styles.metaItem}>
                       <Clock size={14} color={colors.textSecondary} />
-                      <Text style={styles.metaText}>
-                        {itinerary.activities.length} activities
-                      </Text>
+                      <Text style={styles.metaText}>{itinerary.activities.length} activities</Text>
                     </View>
                     <View style={styles.metaItem}>
                       <Text style={styles.budgetText}>{itinerary.totalEstimatedCost}</Text>
@@ -202,7 +187,7 @@ export default function HistoryScreen() {
                   </View>
 
                   <View style={styles.cardActions}>
-                    <Pressable 
+                    <Pressable
                       style={styles.deleteButton}
                       onPress={(e) => {
                         e.stopPropagation();

@@ -62,30 +62,114 @@ interface ScheduledCall {
 }
 
 const TIMEZONE_DATA: Omit<TimeZone, 'id' | 'isFavorite'>[] = [
-  { city: 'New York', country: 'USA', timezone: 'America/New_York', offset: -5, abbreviation: 'EST' },
-  { city: 'Los Angeles', country: 'USA', timezone: 'America/Los_Angeles', offset: -8, abbreviation: 'PST' },
+  {
+    city: 'New York',
+    country: 'USA',
+    timezone: 'America/New_York',
+    offset: -5,
+    abbreviation: 'EST',
+  },
+  {
+    city: 'Los Angeles',
+    country: 'USA',
+    timezone: 'America/Los_Angeles',
+    offset: -8,
+    abbreviation: 'PST',
+  },
   { city: 'Chicago', country: 'USA', timezone: 'America/Chicago', offset: -6, abbreviation: 'CST' },
   { city: 'London', country: 'UK', timezone: 'Europe/London', offset: 0, abbreviation: 'GMT' },
   { city: 'Paris', country: 'France', timezone: 'Europe/Paris', offset: 1, abbreviation: 'CET' },
   { city: 'Berlin', country: 'Germany', timezone: 'Europe/Berlin', offset: 1, abbreviation: 'CET' },
   { city: 'Tokyo', country: 'Japan', timezone: 'Asia/Tokyo', offset: 9, abbreviation: 'JST' },
-  { city: 'Sydney', country: 'Australia', timezone: 'Australia/Sydney', offset: 11, abbreviation: 'AEDT' },
+  {
+    city: 'Sydney',
+    country: 'Australia',
+    timezone: 'Australia/Sydney',
+    offset: 11,
+    abbreviation: 'AEDT',
+  },
   { city: 'Dubai', country: 'UAE', timezone: 'Asia/Dubai', offset: 4, abbreviation: 'GST' },
-  { city: 'Singapore', country: 'Singapore', timezone: 'Asia/Singapore', offset: 8, abbreviation: 'SGT' },
-  { city: 'Hong Kong', country: 'China', timezone: 'Asia/Hong_Kong', offset: 8, abbreviation: 'HKT' },
+  {
+    city: 'Singapore',
+    country: 'Singapore',
+    timezone: 'Asia/Singapore',
+    offset: 8,
+    abbreviation: 'SGT',
+  },
+  {
+    city: 'Hong Kong',
+    country: 'China',
+    timezone: 'Asia/Hong_Kong',
+    offset: 8,
+    abbreviation: 'HKT',
+  },
   { city: 'Mumbai', country: 'India', timezone: 'Asia/Kolkata', offset: 5.5, abbreviation: 'IST' },
-  { city: 'São Paulo', country: 'Brazil', timezone: 'America/Sao_Paulo', offset: -3, abbreviation: 'BRT' },
-  { city: 'Toronto', country: 'Canada', timezone: 'America/Toronto', offset: -5, abbreviation: 'EST' },
-  { city: 'Vancouver', country: 'Canada', timezone: 'America/Vancouver', offset: -8, abbreviation: 'PST' },
-  { city: 'Amsterdam', country: 'Netherlands', timezone: 'Europe/Amsterdam', offset: 1, abbreviation: 'CET' },
+  {
+    city: 'São Paulo',
+    country: 'Brazil',
+    timezone: 'America/Sao_Paulo',
+    offset: -3,
+    abbreviation: 'BRT',
+  },
+  {
+    city: 'Toronto',
+    country: 'Canada',
+    timezone: 'America/Toronto',
+    offset: -5,
+    abbreviation: 'EST',
+  },
+  {
+    city: 'Vancouver',
+    country: 'Canada',
+    timezone: 'America/Vancouver',
+    offset: -8,
+    abbreviation: 'PST',
+  },
+  {
+    city: 'Amsterdam',
+    country: 'Netherlands',
+    timezone: 'Europe/Amsterdam',
+    offset: 1,
+    abbreviation: 'CET',
+  },
   { city: 'Moscow', country: 'Russia', timezone: 'Europe/Moscow', offset: 3, abbreviation: 'MSK' },
   { city: 'Seoul', country: 'South Korea', timezone: 'Asia/Seoul', offset: 9, abbreviation: 'KST' },
-  { city: 'Bangkok', country: 'Thailand', timezone: 'Asia/Bangkok', offset: 7, abbreviation: 'ICT' },
+  {
+    city: 'Bangkok',
+    country: 'Thailand',
+    timezone: 'Asia/Bangkok',
+    offset: 7,
+    abbreviation: 'ICT',
+  },
   { city: 'Cairo', country: 'Egypt', timezone: 'Africa/Cairo', offset: 2, abbreviation: 'EET' },
-  { city: 'Johannesburg', country: 'South Africa', timezone: 'Africa/Johannesburg', offset: 2, abbreviation: 'SAST' },
-  { city: 'Auckland', country: 'New Zealand', timezone: 'Pacific/Auckland', offset: 13, abbreviation: 'NZDT' },
-  { city: 'Mexico City', country: 'Mexico', timezone: 'America/Mexico_City', offset: -6, abbreviation: 'CST' },
-  { city: 'Buenos Aires', country: 'Argentina', timezone: 'America/Argentina/Buenos_Aires', offset: -3, abbreviation: 'ART' },
+  {
+    city: 'Johannesburg',
+    country: 'South Africa',
+    timezone: 'Africa/Johannesburg',
+    offset: 2,
+    abbreviation: 'SAST',
+  },
+  {
+    city: 'Auckland',
+    country: 'New Zealand',
+    timezone: 'Pacific/Auckland',
+    offset: 13,
+    abbreviation: 'NZDT',
+  },
+  {
+    city: 'Mexico City',
+    country: 'Mexico',
+    timezone: 'America/Mexico_City',
+    offset: -6,
+    abbreviation: 'CST',
+  },
+  {
+    city: 'Buenos Aires',
+    country: 'Argentina',
+    timezone: 'America/Argentina/Buenos_Aires',
+    offset: -3,
+    abbreviation: 'ART',
+  },
 ];
 
 const DEFAULT_TIMEZONES = ['America/New_York', 'Europe/London', 'Asia/Tokyo'];
@@ -99,7 +183,7 @@ export default function TimeZoneManagerScreen() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'zones' | 'schedule'>('zones');
-  
+
   const [newCall, setNewCall] = useState<Partial<ScheduledCall>>({
     title: '',
     date: '',
@@ -110,13 +194,13 @@ export default function TimeZoneManagerScreen() {
   const [selectedZonesForCall, setSelectedZonesForCall] = useState<string[]>([]);
 
   useEffect(() => {
-    const defaultZones = TIMEZONE_DATA
-      .filter(tz => DEFAULT_TIMEZONES.includes(tz.timezone))
-      .map((tz, idx) => ({
+    const defaultZones = TIMEZONE_DATA.filter((tz) => DEFAULT_TIMEZONES.includes(tz.timezone)).map(
+      (tz, idx) => ({
         ...tz,
         id: `tz-${idx}`,
         isFavorite: false,
-      }));
+      })
+    );
     setTrackedZones(defaultZones);
 
     setScheduledCalls([
@@ -154,11 +238,14 @@ export default function TimeZoneManagerScreen() {
     return () => clearInterval(timer);
   }, []);
 
-  const getTimeInZone = useCallback((offset: number) => {
-    const utc = currentTime.getTime() + (currentTime.getTimezoneOffset() * 60000);
-    const zoneTime = new Date(utc + (3600000 * offset));
-    return zoneTime;
-  }, [currentTime]);
+  const getTimeInZone = useCallback(
+    (offset: number) => {
+      const utc = currentTime.getTime() + currentTime.getTimezoneOffset() * 60000;
+      const zoneTime = new Date(utc + 3600000 * offset);
+      return zoneTime;
+    },
+    [currentTime]
+  );
 
   const formatTime = useCallback((date: Date, includeSeconds = false) => {
     const hours = date.getHours();
@@ -166,7 +253,7 @@ export default function TimeZoneManagerScreen() {
     const seconds = date.getSeconds().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const hour12 = hours % 12 || 12;
-    
+
     if (includeSeconds) {
       return `${hour12}:${minutes}:${seconds} ${ampm}`;
     }
@@ -174,17 +261,18 @@ export default function TimeZoneManagerScreen() {
   }, []);
 
   const formatDate = useCallback((date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
     });
   }, []);
 
   const getTimePeriod = useCallback((date: Date) => {
     const hour = date.getHours();
     if (hour >= 6 && hour < 12) return { icon: Sunrise, label: 'Morning', color: colors.warning };
-    if (hour >= 12 && hour < 17) return { icon: Sun, label: 'Afternoon', color: colors.secondaryDark };
+    if (hour >= 12 && hour < 17)
+      return { icon: Sun, label: 'Afternoon', color: colors.secondaryDark };
     if (hour >= 17 && hour < 21) return { icon: Sunset, label: 'Evening', color: colors.secondary };
     return { icon: Moon, label: 'Night', color: colors.primary };
   }, []);
@@ -203,49 +291,50 @@ export default function TimeZoneManagerScreen() {
     if (!searchQuery) return TIMEZONE_DATA;
     const query = searchQuery.toLowerCase();
     return TIMEZONE_DATA.filter(
-      tz =>
+      (tz) =>
         tz.city.toLowerCase().includes(query) ||
         tz.country.toLowerCase().includes(query) ||
         tz.abbreviation.toLowerCase().includes(query)
     );
   }, [searchQuery]);
 
-  const handleAddTimezone = useCallback((tz: Omit<TimeZone, 'id' | 'isFavorite'>) => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    
-    const exists = trackedZones.some(t => t.timezone === tz.timezone);
-    if (exists) {
-      Alert.alert('Already Added', `${tz.city} is already in your list.`);
-      return;
-    }
-    
-    const newZone: TimeZone = {
-      ...tz,
-      id: `tz-${Date.now()}`,
-      isFavorite: false,
-    };
-    setTrackedZones(prev => [...prev, newZone]);
-    setShowAddModal(false);
-    setSearchQuery('');
-  }, [trackedZones]);
+  const handleAddTimezone = useCallback(
+    (tz: Omit<TimeZone, 'id' | 'isFavorite'>) => {
+      if (Platform.OS !== 'web') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+
+      const exists = trackedZones.some((t) => t.timezone === tz.timezone);
+      if (exists) {
+        Alert.alert('Already Added', `${tz.city} is already in your list.`);
+        return;
+      }
+
+      const newZone: TimeZone = {
+        ...tz,
+        id: `tz-${Date.now()}`,
+        isFavorite: false,
+      };
+      setTrackedZones((prev) => [...prev, newZone]);
+      setShowAddModal(false);
+      setSearchQuery('');
+    },
+    [trackedZones]
+  );
 
   const handleRemoveTimezone = useCallback((id: string) => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    setTrackedZones(prev => prev.filter(tz => tz.id !== id));
+    setTrackedZones((prev) => prev.filter((tz) => tz.id !== id));
   }, []);
 
   const handleToggleFavorite = useCallback((id: string) => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setTrackedZones(prev =>
-      prev.map(tz =>
-        tz.id === id ? { ...tz, isFavorite: !tz.isFavorite } : tz
-      )
+    setTrackedZones((prev) =>
+      prev.map((tz) => (tz.id === id ? { ...tz, isFavorite: !tz.isFavorite } : tz))
     );
   }, []);
 
@@ -267,8 +356,8 @@ export default function TimeZoneManagerScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
 
-    const participants = selectedZonesForCall.map(tzId => {
-      const zone = trackedZones.find(z => z.id === tzId);
+    const participants = selectedZonesForCall.map((tzId) => {
+      const zone = trackedZones.find((z) => z.id === tzId);
       return {
         name: zone?.city || 'Unknown',
         timezone: zone?.timezone || '',
@@ -286,31 +375,31 @@ export default function TimeZoneManagerScreen() {
       notes: newCall.notes,
     };
 
-    setScheduledCalls(prev => [...prev, call]);
+    setScheduledCalls((prev) => [...prev, call]);
     setShowScheduleModal(false);
     setNewCall({ title: '', date: '', time: '', participants: [], type: 'video' });
     setSelectedZonesForCall([]);
   }, [newCall, selectedZonesForCall, trackedZones]);
 
   const getCallTimeInZone = useCallback((call: ScheduledCall, participantTimezone: string) => {
-    const participant = call.participants.find(p => p.timezone === participantTimezone);
+    const participant = call.participants.find((p) => p.timezone === participantTimezone);
     if (!participant) return call.time;
 
-    const baseZone = TIMEZONE_DATA.find(tz => tz.timezone === call.participants[0]?.timezone);
-    const targetZone = TIMEZONE_DATA.find(tz => tz.timezone === participantTimezone);
-    
+    const baseZone = TIMEZONE_DATA.find((tz) => tz.timezone === call.participants[0]?.timezone);
+    const targetZone = TIMEZONE_DATA.find((tz) => tz.timezone === participantTimezone);
+
     if (!baseZone || !targetZone) return call.time;
-    
+
     const [hours, minutes] = call.time.split(':').map(Number);
     const offsetDiff = targetZone.offset - baseZone.offset;
     let newHours = hours + offsetDiff;
-    
+
     if (newHours >= 24) newHours -= 24;
     if (newHours < 0) newHours += 24;
-    
+
     const ampm = newHours >= 12 ? 'PM' : 'AM';
     const hour12 = newHours % 12 || 12;
-    
+
     return `${hour12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
   }, []);
 
@@ -318,119 +407,122 @@ export default function TimeZoneManagerScreen() {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    Alert.alert(
-      'Delete Call',
-      'Are you sure you want to remove this scheduled call?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
-          style: 'destructive',
-          onPress: () => setScheduledCalls(prev => prev.filter(c => c.id !== id))
-        },
-      ]
-    );
+    Alert.alert('Delete Call', 'Are you sure you want to remove this scheduled call?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => setScheduledCalls((prev) => prev.filter((c) => c.id !== id)),
+      },
+    ]);
   }, []);
 
-  const renderTimeZoneCard = useCallback((zone: TimeZone) => {
-    const zoneTime = getTimeInZone(zone.offset);
-    const period = getTimePeriod(zoneTime);
-    const PeriodIcon = period.icon;
+  const renderTimeZoneCard = useCallback(
+    (zone: TimeZone) => {
+      const zoneTime = getTimeInZone(zone.offset);
+      const period = getTimePeriod(zoneTime);
+      const PeriodIcon = period.icon;
 
-    return (
-      <View key={zone.id} style={styles.zoneCard}>
-        <LinearGradient
-          colors={[colors.surface, colors.surfaceSecondary]}
-          style={styles.zoneCardGradient}
-        >
-          <View style={styles.zoneHeader}>
-            <View style={styles.zoneInfo}>
-              <View style={styles.zoneTitleRow}>
-                <Text style={styles.zoneCity}>{zone.city}</Text>
-                <View style={[styles.periodBadge, { backgroundColor: `${period.color}20` }]}>
-                  <PeriodIcon size={12} color={period.color} />
-                  <Text style={[styles.periodText, { color: period.color }]}>{period.label}</Text>
-                </View>
-              </View>
-              <Text style={styles.zoneCountry}>{zone.country}</Text>
-            </View>
-            <View style={styles.zoneActions}>
-              <Pressable
-                style={styles.actionButton}
-                onPress={() => handleToggleFavorite(zone.id)}
-              >
-                {zone.isFavorite ? (
-                  <Star size={18} color={colors.warning} fill={colors.warning} />
-                ) : (
-                  <StarOff size={18} color={colors.textTertiary} />
-                )}
-              </Pressable>
-              <Pressable
-                style={styles.actionButton}
-                onPress={() => handleRemoveTimezone(zone.id)}
-              >
-                <Trash2 size={18} color={colors.error} />
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={styles.timeDisplay}>
-            <Text style={styles.timeText}>{formatTime(zoneTime, true)}</Text>
-            <Text style={styles.dateText}>{formatDate(zoneTime)}</Text>
-          </View>
-
-          <View style={styles.zoneFooter}>
-            <View style={styles.offsetBadge}>
-              <Text style={styles.offsetText}>{getOffsetDisplay(zone.offset)}</Text>
-            </View>
-            <Text style={styles.abbreviation}>{zone.abbreviation}</Text>
-          </View>
-        </LinearGradient>
-      </View>
-    );
-  }, [getTimeInZone, getTimePeriod, formatTime, formatDate, getOffsetDisplay, handleToggleFavorite, handleRemoveTimezone]);
-
-  const renderScheduledCall = useCallback((call: ScheduledCall) => {
-    const CallIcon = call.type === 'video' ? Video : Phone;
-
-    return (
-      <View key={call.id} style={styles.callCard}>
-        <View style={styles.callHeader}>
-          <View style={styles.callTypeIcon}>
-            <CallIcon size={20} color={colors.primary} />
-          </View>
-          <View style={styles.callInfo}>
-            <Text style={styles.callTitle}>{call.title}</Text>
-            <Text style={styles.callDateTime}>
-              {call.date} at {call.time}
-            </Text>
-          </View>
-          <Pressable
-            style={styles.deleteCallButton}
-            onPress={() => handleDeleteCall(call.id)}
+      return (
+        <View key={zone.id} style={styles.zoneCard}>
+          <LinearGradient
+            colors={[colors.surface, colors.surfaceSecondary]}
+            style={styles.zoneCardGradient}
           >
-            <Trash2 size={16} color={colors.error} />
-          </Pressable>
-        </View>
+            <View style={styles.zoneHeader}>
+              <View style={styles.zoneInfo}>
+                <View style={styles.zoneTitleRow}>
+                  <Text style={styles.zoneCity}>{zone.city}</Text>
+                  <View style={[styles.periodBadge, { backgroundColor: `${period.color}20` }]}>
+                    <PeriodIcon size={12} color={period.color} />
+                    <Text style={[styles.periodText, { color: period.color }]}>{period.label}</Text>
+                  </View>
+                </View>
+                <Text style={styles.zoneCountry}>{zone.country}</Text>
+              </View>
+              <View style={styles.zoneActions}>
+                <Pressable
+                  style={styles.actionButton}
+                  onPress={() => handleToggleFavorite(zone.id)}
+                >
+                  {zone.isFavorite ? (
+                    <Star size={18} color={colors.warning} fill={colors.warning} />
+                  ) : (
+                    <StarOff size={18} color={colors.textTertiary} />
+                  )}
+                </Pressable>
+                <Pressable
+                  style={styles.actionButton}
+                  onPress={() => handleRemoveTimezone(zone.id)}
+                >
+                  <Trash2 size={18} color={colors.error} />
+                </Pressable>
+              </View>
+            </View>
 
-        <View style={styles.participantsList}>
-          {call.participants.map((p, idx) => (
-            <View key={idx} style={styles.participantItem}>
-              <View style={styles.participantDot} />
-              <Text style={styles.participantCity}>{p.city}</Text>
-              <Text style={styles.participantTime}>
-                {getCallTimeInZone(call, p.timezone)}
+            <View style={styles.timeDisplay}>
+              <Text style={styles.timeText}>{formatTime(zoneTime, true)}</Text>
+              <Text style={styles.dateText}>{formatDate(zoneTime)}</Text>
+            </View>
+
+            <View style={styles.zoneFooter}>
+              <View style={styles.offsetBadge}>
+                <Text style={styles.offsetText}>{getOffsetDisplay(zone.offset)}</Text>
+              </View>
+              <Text style={styles.abbreviation}>{zone.abbreviation}</Text>
+            </View>
+          </LinearGradient>
+        </View>
+      );
+    },
+    [
+      getTimeInZone,
+      getTimePeriod,
+      formatTime,
+      formatDate,
+      getOffsetDisplay,
+      handleToggleFavorite,
+      handleRemoveTimezone,
+    ]
+  );
+
+  const renderScheduledCall = useCallback(
+    (call: ScheduledCall) => {
+      const CallIcon = call.type === 'video' ? Video : Phone;
+
+      return (
+        <View key={call.id} style={styles.callCard}>
+          <View style={styles.callHeader}>
+            <View style={styles.callTypeIcon}>
+              <CallIcon size={20} color={colors.primary} />
+            </View>
+            <View style={styles.callInfo}>
+              <Text style={styles.callTitle}>{call.title}</Text>
+              <Text style={styles.callDateTime}>
+                {call.date} at {call.time}
               </Text>
             </View>
-          ))}
-        </View>
+            <Pressable style={styles.deleteCallButton} onPress={() => handleDeleteCall(call.id)}>
+              <Trash2 size={16} color={colors.error} />
+            </Pressable>
+          </View>
 
-        {call.notes && (
-          <Text style={styles.callNotes}>{call.notes}</Text>
-        )}
-      </View>
-    );
-  }, [handleDeleteCall, getCallTimeInZone]);
+          <View style={styles.participantsList}>
+            {call.participants.map((p, idx) => (
+              <View key={idx} style={styles.participantItem}>
+                <View style={styles.participantDot} />
+                <Text style={styles.participantCity}>{p.city}</Text>
+                <Text style={styles.participantTime}>{getCallTimeInZone(call, p.timezone)}</Text>
+              </View>
+            ))}
+          </View>
+
+          {call.notes && <Text style={styles.callNotes}>{call.notes}</Text>}
+        </View>
+      );
+    },
+    [handleDeleteCall, getCallTimeInZone]
+  );
 
   return (
     <View style={styles.container}>
@@ -442,10 +534,7 @@ export default function TimeZoneManagerScreen() {
         }}
       />
 
-      <LinearGradient
-        colors={[colors.primary, colors.primaryLight]}
-        style={styles.headerGradient}
-      >
+      <LinearGradient colors={[colors.primary, colors.primaryLight]} style={styles.headerGradient}>
         <SafeAreaView edges={['top']} style={styles.headerSafe}>
           <View style={styles.headerContent}>
             <View style={styles.globalTimeContainer}>
@@ -473,7 +562,10 @@ export default function TimeZoneManagerScreen() {
           style={[styles.tab, activeTab === 'schedule' && styles.tabActive]}
           onPress={() => setActiveTab('schedule')}
         >
-          <Calendar size={18} color={activeTab === 'schedule' ? colors.primary : colors.textSecondary} />
+          <Calendar
+            size={18}
+            color={activeTab === 'schedule' ? colors.primary : colors.textSecondary}
+          />
           <Text style={[styles.tabText, activeTab === 'schedule' && styles.tabTextActive]}>
             Schedule
           </Text>
@@ -489,10 +581,7 @@ export default function TimeZoneManagerScreen() {
           <>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Tracked Zones ({trackedZones.length})</Text>
-              <Pressable
-                style={styles.addButton}
-                onPress={() => setShowAddModal(true)}
-              >
+              <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
                 <Plus size={18} color={colors.textLight} />
                 <Text style={styles.addButtonText}>Add</Text>
               </Pressable>
@@ -514,10 +603,7 @@ export default function TimeZoneManagerScreen() {
           <>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Scheduled Calls ({scheduledCalls.length})</Text>
-              <Pressable
-                style={styles.addButton}
-                onPress={() => setShowScheduleModal(true)}
-              >
+              <Pressable style={styles.addButton} onPress={() => setShowScheduleModal(true)}>
                 <Plus size={18} color={colors.textLight} />
                 <Text style={styles.addButtonText}>New</Text>
               </Pressable>
@@ -547,7 +633,12 @@ export default function TimeZoneManagerScreen() {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Add Time Zone</Text>
-            <Pressable onPress={() => { setShowAddModal(false); setSearchQuery(''); }}>
+            <Pressable
+              onPress={() => {
+                setShowAddModal(false);
+                setSearchQuery('');
+              }}
+            >
               <X size={24} color={colors.text} />
             </Pressable>
           </View>
@@ -571,9 +662,9 @@ export default function TimeZoneManagerScreen() {
 
           <ScrollView style={styles.modalContent}>
             {filteredTimezones.map((tz, idx) => {
-              const isAdded = trackedZones.some(t => t.timezone === tz.timezone);
+              const isAdded = trackedZones.some((t) => t.timezone === tz.timezone);
               const zoneTime = getTimeInZone(tz.offset);
-              
+
               return (
                 <Pressable
                   key={idx}
@@ -626,7 +717,7 @@ export default function TimeZoneManagerScreen() {
                 placeholder="Meeting title..."
                 placeholderTextColor={colors.textTertiary}
                 value={newCall.title}
-                onChangeText={(text) => setNewCall(prev => ({ ...prev, title: text }))}
+                onChangeText={(text) => setNewCall((prev) => ({ ...prev, title: text }))}
               />
             </View>
 
@@ -638,7 +729,7 @@ export default function TimeZoneManagerScreen() {
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor={colors.textTertiary}
                   value={newCall.date}
-                  onChangeText={(text) => setNewCall(prev => ({ ...prev, date: text }))}
+                  onChangeText={(text) => setNewCall((prev) => ({ ...prev, date: text }))}
                 />
               </View>
               <View style={[styles.formGroup, { flex: 1 }]}>
@@ -648,7 +739,7 @@ export default function TimeZoneManagerScreen() {
                   placeholder="HH:MM"
                   placeholderTextColor={colors.textTertiary}
                   value={newCall.time}
-                  onChangeText={(text) => setNewCall(prev => ({ ...prev, time: text }))}
+                  onChangeText={(text) => setNewCall((prev) => ({ ...prev, time: text }))}
                 />
               </View>
             </View>
@@ -657,30 +748,38 @@ export default function TimeZoneManagerScreen() {
               <Text style={styles.formLabel}>Call Type</Text>
               <View style={styles.typeSelector}>
                 <Pressable
-                  style={[
-                    styles.typeOption,
-                    newCall.type === 'video' && styles.typeOptionActive,
-                  ]}
-                  onPress={() => setNewCall(prev => ({ ...prev, type: 'video' }))}
+                  style={[styles.typeOption, newCall.type === 'video' && styles.typeOptionActive]}
+                  onPress={() => setNewCall((prev) => ({ ...prev, type: 'video' }))}
                 >
-                  <Video size={18} color={newCall.type === 'video' ? colors.textLight : colors.textSecondary} />
-                  <Text style={[
-                    styles.typeOptionText,
-                    newCall.type === 'video' && styles.typeOptionTextActive,
-                  ]}>Video</Text>
+                  <Video
+                    size={18}
+                    color={newCall.type === 'video' ? colors.textLight : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.typeOptionText,
+                      newCall.type === 'video' && styles.typeOptionTextActive,
+                    ]}
+                  >
+                    Video
+                  </Text>
                 </Pressable>
                 <Pressable
-                  style={[
-                    styles.typeOption,
-                    newCall.type === 'phone' && styles.typeOptionActive,
-                  ]}
-                  onPress={() => setNewCall(prev => ({ ...prev, type: 'phone' }))}
+                  style={[styles.typeOption, newCall.type === 'phone' && styles.typeOptionActive]}
+                  onPress={() => setNewCall((prev) => ({ ...prev, type: 'phone' }))}
                 >
-                  <Phone size={18} color={newCall.type === 'phone' ? colors.textLight : colors.textSecondary} />
-                  <Text style={[
-                    styles.typeOptionText,
-                    newCall.type === 'phone' && styles.typeOptionTextActive,
-                  ]}>Phone</Text>
+                  <Phone
+                    size={18}
+                    color={newCall.type === 'phone' ? colors.textLight : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.typeOptionText,
+                      newCall.type === 'phone' && styles.typeOptionTextActive,
+                    ]}
+                  >
+                    Phone
+                  </Text>
                 </Pressable>
               </View>
             </View>
@@ -689,7 +788,7 @@ export default function TimeZoneManagerScreen() {
               <Text style={styles.formLabel}>Participants (select from your zones)</Text>
               {trackedZones.length > 0 ? (
                 <View style={styles.participantsSelect}>
-                  {trackedZones.map(zone => {
+                  {trackedZones.map((zone) => {
                     const isSelected = selectedZonesForCall.includes(zone.id);
                     return (
                       <Pressable
@@ -700,16 +799,18 @@ export default function TimeZoneManagerScreen() {
                         ]}
                         onPress={() => {
                           if (isSelected) {
-                            setSelectedZonesForCall(prev => prev.filter(id => id !== zone.id));
+                            setSelectedZonesForCall((prev) => prev.filter((id) => id !== zone.id));
                           } else {
-                            setSelectedZonesForCall(prev => [...prev, zone.id]);
+                            setSelectedZonesForCall((prev) => [...prev, zone.id]);
                           }
                         }}
                       >
-                        <Text style={[
-                          styles.participantOptionText,
-                          isSelected && styles.participantOptionTextSelected,
-                        ]}>
+                        <Text
+                          style={[
+                            styles.participantOptionText,
+                            isSelected && styles.participantOptionTextSelected,
+                          ]}
+                        >
                           {zone.city}
                         </Text>
                         {isSelected && <Check size={14} color={colors.textLight} />}
@@ -718,9 +819,7 @@ export default function TimeZoneManagerScreen() {
                   })}
                 </View>
               ) : (
-                <Text style={styles.noZonesText}>
-                  Add time zones first to select participants
-                </Text>
+                <Text style={styles.noZonesText}>Add time zones first to select participants</Text>
               )}
             </View>
 
@@ -731,7 +830,7 @@ export default function TimeZoneManagerScreen() {
                 placeholder="Add notes..."
                 placeholderTextColor={colors.textTertiary}
                 value={newCall.notes}
-                onChangeText={(text) => setNewCall(prev => ({ ...prev, notes: text }))}
+                onChangeText={(text) => setNewCall((prev) => ({ ...prev, notes: text }))}
                 multiline
                 numberOfLines={3}
               />

@@ -42,7 +42,14 @@ import {
   Wallet,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
-import { TransitCity, TransitLine, TransitPass, TransitRoute, TransitStation, TransitType } from '@/types';
+import {
+  TransitCity,
+  TransitLine,
+  TransitPass,
+  TransitRoute,
+  TransitStation,
+  TransitType,
+} from '@/types';
 import {
   transitCities,
   transitLines,
@@ -88,9 +95,7 @@ export default function PublicTransitScreen() {
 
   const filteredStations = useMemo(() => {
     if (!stationSearch) return cityStations;
-    return cityStations.filter(s => 
-      s.name.toLowerCase().includes(stationSearch.toLowerCase())
-    );
+    return cityStations.filter((s) => s.name.toLowerCase().includes(stationSearch.toLowerCase()));
   }, [cityStations, stationSearch]);
 
   const handleSearchRoutes = useCallback(() => {
@@ -120,7 +125,7 @@ export default function PublicTransitScreen() {
         {
           text: 'Purchase',
           onPress: () => {
-            setPurchasedPasses(prev => [...prev, pass.id]);
+            setPurchasedPasses((prev) => [...prev, pass.id]);
             setShowPassDetails(false);
             Alert.alert('Success', 'Transit pass purchased! Check your wallet for the QR code.');
           },
@@ -183,7 +188,7 @@ export default function PublicTransitScreen() {
         { key: 'lines' as TabType, label: 'Lines', icon: Train },
         { key: 'passes' as TabType, label: 'Passes', icon: Ticket },
         { key: 'schedule' as TabType, label: 'Schedule', icon: Clock },
-      ].map(tab => (
+      ].map((tab) => (
         <Pressable
           key={tab.key}
           style={[styles.tab, activeTab === tab.key && styles.tabActive]}
@@ -204,14 +209,13 @@ export default function PublicTransitScreen() {
   const renderTripPlanner = () => (
     <View style={styles.plannerContainer}>
       <View style={styles.stationInputs}>
-        <Pressable
-          style={styles.stationInput}
-          onPress={() => setShowStationPicker('origin')}
-        >
+        <Pressable style={styles.stationInput} onPress={() => setShowStationPicker('origin')}>
           <View style={[styles.stationDot, { backgroundColor: colors.success }]} />
           <View style={styles.stationInputContent}>
             <Text style={styles.stationInputLabel}>From</Text>
-            <Text style={[styles.stationInputValue, !originStation && styles.stationInputPlaceholder]}>
+            <Text
+              style={[styles.stationInputValue, !originStation && styles.stationInputPlaceholder]}
+            >
               {originStation?.name || 'Select origin station'}
             </Text>
           </View>
@@ -221,14 +225,16 @@ export default function PublicTransitScreen() {
           <ArrowLeftRight size={18} color={colors.primary} />
         </Pressable>
 
-        <Pressable
-          style={styles.stationInput}
-          onPress={() => setShowStationPicker('destination')}
-        >
+        <Pressable style={styles.stationInput} onPress={() => setShowStationPicker('destination')}>
           <View style={[styles.stationDot, { backgroundColor: colors.error }]} />
           <View style={styles.stationInputContent}>
             <Text style={styles.stationInputLabel}>To</Text>
-            <Text style={[styles.stationInputValue, !destinationStation && styles.stationInputPlaceholder]}>
+            <Text
+              style={[
+                styles.stationInputValue,
+                !destinationStation && styles.stationInputPlaceholder,
+              ]}
+            >
               {destinationStation?.name || 'Select destination station'}
             </Text>
           </View>
@@ -249,7 +255,7 @@ export default function PublicTransitScreen() {
       {routes.length > 0 && (
         <View style={styles.routesContainer}>
           <Text style={styles.routesTitle}>Available Routes</Text>
-          {routes.map(route => (
+          {routes.map((route) => (
             <Pressable key={route.id} style={styles.routeCard}>
               <View style={styles.routeHeader}>
                 <View style={styles.routeTimes}>
@@ -261,7 +267,9 @@ export default function PublicTransitScreen() {
                   {route.isFastest && (
                     <View style={[styles.routeBadge, { backgroundColor: colors.success + '20' }]}>
                       <Zap size={12} color={colors.success} />
-                      <Text style={[styles.routeBadgeText, { color: colors.success }]}>Fastest</Text>
+                      <Text style={[styles.routeBadgeText, { color: colors.success }]}>
+                        Fastest
+                      </Text>
                     </View>
                   )}
                   {route.isFewestTransfers && (
@@ -283,7 +291,9 @@ export default function PublicTransitScreen() {
                     ) : (
                       <View style={styles.transitLeg}>
                         <View style={[styles.lineBadge, { backgroundColor: leg.lineColor }]}>
-                          <Text style={styles.lineBadgeText}>{leg.lineName?.split(' ')[1] || leg.lineName}</Text>
+                          <Text style={styles.lineBadgeText}>
+                            {leg.lineName?.split(' ')[1] || leg.lineName}
+                          </Text>
                         </View>
                         <Text style={styles.legStops}>{leg.stops} stops</Text>
                       </View>
@@ -302,14 +312,16 @@ export default function PublicTransitScreen() {
                 </View>
                 <View style={styles.routeInfo}>
                   <RefreshCw size={14} color={colors.textSecondary} />
-                  <Text style={styles.routeInfoText}>{route.transfers} transfer{route.transfers !== 1 ? 's' : ''}</Text>
+                  <Text style={styles.routeInfoText}>
+                    {route.transfers} transfer{route.transfers !== 1 ? 's' : ''}
+                  </Text>
                 </View>
                 <View style={styles.routeInfo}>
-                  {route.isAccessible && (
-                    <Accessibility size={14} color={colors.success} />
-                  )}
+                  {route.isAccessible && <Accessibility size={14} color={colors.success} />}
                 </View>
-                <Text style={styles.routeFare}>{route.currency} {route.fare.toFixed(2)}</Text>
+                <Text style={styles.routeFare}>
+                  {route.currency} {route.fare.toFixed(2)}
+                </Text>
               </View>
             </Pressable>
           ))}
@@ -320,7 +332,7 @@ export default function PublicTransitScreen() {
 
   const renderLines = () => (
     <View style={styles.linesContainer}>
-      {cityLines.map(line => {
+      {cityLines.map((line) => {
         const Icon = getTransitIcon(line.type);
         return (
           <Pressable key={line.id} style={styles.lineCard}>
@@ -375,7 +387,7 @@ export default function PublicTransitScreen() {
         </Pressable>
       </View>
 
-      {cityPasses.map(pass => (
+      {cityPasses.map((pass) => (
         <Pressable
           key={pass.id}
           style={styles.passCard}
@@ -386,12 +398,19 @@ export default function PublicTransitScreen() {
         >
           <View style={styles.passHeader}>
             <View style={styles.passTypeContainer}>
-              <View style={[styles.passTypeIcon, { 
-                backgroundColor: pass.isTouristFriendly ? colors.secondary + '20' : colors.primary + '20' 
-              }]}>
-                <Ticket 
-                  size={20} 
-                  color={pass.isTouristFriendly ? colors.secondary : colors.primary} 
+              <View
+                style={[
+                  styles.passTypeIcon,
+                  {
+                    backgroundColor: pass.isTouristFriendly
+                      ? colors.secondary + '20'
+                      : colors.primary + '20',
+                  },
+                ]}
+              >
+                <Ticket
+                  size={20}
+                  color={pass.isTouristFriendly ? colors.secondary : colors.primary}
                 />
               </View>
               {pass.isPopular && (
@@ -420,7 +439,9 @@ export default function PublicTransitScreen() {
             {pass.validDays && (
               <View style={styles.passFeature}>
                 <Clock size={12} color={colors.textSecondary} />
-                <Text style={styles.passFeatureText}>{pass.validDays} day{pass.validDays > 1 ? 's' : ''}</Text>
+                <Text style={styles.passFeatureText}>
+                  {pass.validDays} day{pass.validDays > 1 ? 's' : ''}
+                </Text>
               </View>
             )}
             <View style={styles.passFeature}>
@@ -429,13 +450,15 @@ export default function PublicTransitScreen() {
             </View>
             {pass.isTouristFriendly && (
               <View style={[styles.passFeature, { backgroundColor: colors.secondary + '15' }]}>
-                <Text style={[styles.passFeatureText, { color: colors.secondary }]}>Tourist Friendly</Text>
+                <Text style={[styles.passFeatureText, { color: colors.secondary }]}>
+                  Tourist Friendly
+                </Text>
               </View>
             )}
           </View>
 
           <View style={styles.passIncludes}>
-            {pass.validTransitTypes.slice(0, 4).map(type => {
+            {pass.validTransitTypes.slice(0, 4).map((type) => {
               const Icon = getTransitIcon(type);
               return (
                 <View key={type} style={styles.includeIcon}>
@@ -476,10 +499,7 @@ export default function PublicTransitScreen() {
         {sampleSchedule.arrivals.map((arrival, index) => (
           <View key={index} style={styles.arrivalItem}>
             <View style={styles.arrivalTime}>
-              <Text style={[
-                styles.arrivalTimeText,
-                arrival.isDelayed && styles.arrivalDelayed
-              ]}>
+              <Text style={[styles.arrivalTimeText, arrival.isDelayed && styles.arrivalDelayed]}>
                 {arrival.time}
               </Text>
               {arrival.isDelayed && (
@@ -540,13 +560,10 @@ export default function PublicTransitScreen() {
               </Pressable>
             </View>
             <ScrollView style={styles.cityList}>
-              {transitCities.map(city => (
+              {transitCities.map((city) => (
                 <Pressable
                   key={city.id}
-                  style={[
-                    styles.cityItem,
-                    selectedCity.id === city.id && styles.cityItemSelected
-                  ]}
+                  style={[styles.cityItem, selectedCity.id === city.id && styles.cityItemSelected]}
                   onPress={() => {
                     setSelectedCity(city);
                     setOriginStation(null);
@@ -561,9 +578,7 @@ export default function PublicTransitScreen() {
                     <Text style={styles.cityItemCountry}>{city.country}</Text>
                     <Text style={styles.cityItemAuthority}>{city.transitAuthority}</Text>
                   </View>
-                  {selectedCity.id === city.id && (
-                    <Check size={20} color={colors.primary} />
-                  )}
+                  {selectedCity.id === city.id && <Check size={20} color={colors.primary} />}
                 </Pressable>
               ))}
             </ScrollView>
@@ -578,10 +593,12 @@ export default function PublicTransitScreen() {
               <Text style={styles.modalTitle}>
                 Select {showStationPicker === 'origin' ? 'Origin' : 'Destination'}
               </Text>
-              <Pressable onPress={() => {
-                setShowStationPicker(null);
-                setStationSearch('');
-              }}>
+              <Pressable
+                onPress={() => {
+                  setShowStationPicker(null);
+                  setStationSearch('');
+                }}
+              >
                 <X size={24} color={colors.text} />
               </Pressable>
             </View>
@@ -596,7 +613,7 @@ export default function PublicTransitScreen() {
               />
             </View>
             <ScrollView style={styles.stationList}>
-              {filteredStations.map(station => (
+              {filteredStations.map((station) => (
                 <Pressable
                   key={station.id}
                   style={styles.stationItem}
@@ -631,9 +648,7 @@ export default function PublicTransitScreen() {
                       <Text style={styles.hubText}>Hub</Text>
                     </View>
                   )}
-                  {station.isAccessible && (
-                    <Accessibility size={16} color={colors.success} />
-                  )}
+                  {station.isAccessible && <Accessibility size={16} color={colors.success} />}
                 </Pressable>
               ))}
             </ScrollView>
@@ -688,14 +703,12 @@ export default function PublicTransitScreen() {
                   <View style={styles.passDetailsSection}>
                     <Text style={styles.passDetailsSectionTitle}>Valid Transport</Text>
                     <View style={styles.validTransportList}>
-                      {selectedPass.validTransitTypes.map(type => {
+                      {selectedPass.validTransitTypes.map((type) => {
                         const Icon = getTransitIcon(type);
                         return (
                           <View key={type} style={styles.validTransportItem}>
                             <Icon size={18} color={colors.primary} />
-                            <Text style={styles.validTransportText}>
-                              {type.replace('_', ' ')}
-                            </Text>
+                            <Text style={styles.validTransportText}>{type.replace('_', ' ')}</Text>
                           </View>
                         );
                       })}
@@ -713,7 +726,7 @@ export default function PublicTransitScreen() {
                 <Pressable
                   style={[
                     styles.purchaseButton,
-                    purchasedPasses.includes(selectedPass.id) && styles.purchaseButtonDisabled
+                    purchasedPasses.includes(selectedPass.id) && styles.purchaseButtonDisabled,
                   ]}
                   onPress={() => handlePurchasePass(selectedPass)}
                   disabled={purchasedPasses.includes(selectedPass.id)}

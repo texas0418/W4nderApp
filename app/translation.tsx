@@ -88,16 +88,51 @@ const languages: Language[] = [
 ];
 
 const mockTranslations: Record<string, Record<string, string>> = {
-  'hello': { es: 'hola', fr: 'bonjour', de: 'hallo', it: 'ciao', ja: 'こんにちは', zh: '你好' },
-  'thank you': { es: 'gracias', fr: 'merci', de: 'danke', it: 'grazie', ja: 'ありがとう', zh: '谢谢' },
-  'where is': { es: 'dónde está', fr: 'où est', de: 'wo ist', it: 'dov\'è', ja: 'どこですか', zh: '在哪里' },
-  'how much': { es: 'cuánto cuesta', fr: 'combien', de: 'wie viel', it: 'quanto costa', ja: 'いくらですか', zh: '多少钱' },
-  'menu': { es: 'menú', fr: 'menu', de: 'speisekarte', it: 'menù', ja: 'メニュー', zh: '菜单' },
-  'restaurant': { es: 'restaurante', fr: 'restaurant', de: 'restaurant', it: 'ristorante', ja: 'レストラン', zh: '餐厅' },
-  'hotel': { es: 'hotel', fr: 'hôtel', de: 'hotel', it: 'albergo', ja: 'ホテル', zh: '酒店' },
-  'bathroom': { es: 'baño', fr: 'toilettes', de: 'toilette', it: 'bagno', ja: 'トイレ', zh: '洗手间' },
-  'help': { es: 'ayuda', fr: 'aide', de: 'hilfe', it: 'aiuto', ja: '助けて', zh: '帮助' },
-  'water': { es: 'agua', fr: 'eau', de: 'wasser', it: 'acqua', ja: '水', zh: '水' },
+  hello: { es: 'hola', fr: 'bonjour', de: 'hallo', it: 'ciao', ja: 'こんにちは', zh: '你好' },
+  'thank you': {
+    es: 'gracias',
+    fr: 'merci',
+    de: 'danke',
+    it: 'grazie',
+    ja: 'ありがとう',
+    zh: '谢谢',
+  },
+  'where is': {
+    es: 'dónde está',
+    fr: 'où est',
+    de: 'wo ist',
+    it: "dov'è",
+    ja: 'どこですか',
+    zh: '在哪里',
+  },
+  'how much': {
+    es: 'cuánto cuesta',
+    fr: 'combien',
+    de: 'wie viel',
+    it: 'quanto costa',
+    ja: 'いくらですか',
+    zh: '多少钱',
+  },
+  menu: { es: 'menú', fr: 'menu', de: 'speisekarte', it: 'menù', ja: 'メニュー', zh: '菜单' },
+  restaurant: {
+    es: 'restaurante',
+    fr: 'restaurant',
+    de: 'restaurant',
+    it: 'ristorante',
+    ja: 'レストラン',
+    zh: '餐厅',
+  },
+  hotel: { es: 'hotel', fr: 'hôtel', de: 'hotel', it: 'albergo', ja: 'ホテル', zh: '酒店' },
+  bathroom: {
+    es: 'baño',
+    fr: 'toilettes',
+    de: 'toilette',
+    it: 'bagno',
+    ja: 'トイレ',
+    zh: '洗手间',
+  },
+  help: { es: 'ayuda', fr: 'aide', de: 'hilfe', it: 'aiuto', ja: '助けて', zh: '帮助' },
+  water: { es: 'agua', fr: 'eau', de: 'wasser', it: 'acqua', ja: '水', zh: '水' },
 };
 
 type TranslationMode = 'text' | 'camera' | 'conversation';
@@ -120,7 +155,7 @@ export default function TranslationScreen() {
   const [copied, setCopied] = useState(false);
   const [cameraScanning, setCameraScanning] = useState(false);
   const [detectedText, setDetectedText] = useState('');
-  
+
   const scrollViewRef = useRef<ScrollView>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -144,13 +179,13 @@ export default function TranslationScreen() {
   const simulateTranslation = useCallback((text: string, target: Language): string => {
     const lowerText = text.toLowerCase().trim();
     const targetCode = target.code;
-    
+
     for (const [key, translations] of Object.entries(mockTranslations)) {
       if (lowerText.includes(key) && translations[targetCode]) {
         return text.replace(new RegExp(key, 'gi'), translations[targetCode]);
       }
     }
-    
+
     const prefixes: Record<string, string> = {
       es: '(ES) ',
       fr: '(FR) ',
@@ -170,24 +205,24 @@ export default function TranslationScreen() {
       pl: '(PL) ',
       pt: '(PT) ',
     };
-    
+
     return `${prefixes[targetCode] || ''}${text}`;
   }, []);
 
   const handleTranslate = useCallback(async () => {
     if (!inputText.trim()) return;
-    
+
     setIsTranslating(true);
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const result = simulateTranslation(inputText, targetLanguage);
     setTranslatedText(result);
     setIsTranslating(false);
-    
+
     const newItem: TranslationItem = {
       id: Date.now().toString(),
       sourceText: inputText,
@@ -197,7 +232,7 @@ export default function TranslationScreen() {
       timestamp: new Date().toISOString(),
       mode: 'text',
     };
-    setHistory(prev => [newItem, ...prev].slice(0, 50));
+    setHistory((prev) => [newItem, ...prev].slice(0, 50));
   }, [inputText, targetLanguage, sourceLanguage, simulateTranslation]);
 
   const handleSwapLanguages = useCallback(() => {
@@ -229,16 +264,16 @@ export default function TranslationScreen() {
 
   const handleConversationSend = useCallback(async () => {
     if (!conversationInput.trim()) return;
-    
+
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    
+
     const currentLang = isUserTurn ? sourceLanguage : targetLanguage;
     const translateTo = isUserTurn ? targetLanguage : sourceLanguage;
-    
+
     const translated = simulateTranslation(conversationInput, translateTo);
-    
+
     const newMessage: ConversationMessage = {
       id: Date.now().toString(),
       text: conversationInput,
@@ -247,11 +282,11 @@ export default function TranslationScreen() {
       language: currentLang,
       timestamp: new Date().toISOString(),
     };
-    
-    setConversationMessages(prev => [...prev, newMessage]);
+
+    setConversationMessages((prev) => [...prev, newMessage]);
     setConversationInput('');
     setIsUserTurn(!isUserTurn);
-    
+
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
@@ -260,13 +295,13 @@ export default function TranslationScreen() {
   const handleCameraCapture = useCallback(async () => {
     setCameraScanning(true);
     startPulseAnimation();
-    
+
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     }
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     const sampleTexts = [
       'Welcome to our restaurant',
       'Exit this way',
@@ -276,11 +311,11 @@ export default function TranslationScreen() {
     ];
     const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
     setDetectedText(randomText);
-    
+
     const translated = simulateTranslation(randomText, targetLanguage);
     setTranslatedText(translated);
     setCameraScanning(false);
-    
+
     const newItem: TranslationItem = {
       id: Date.now().toString(),
       sourceText: randomText,
@@ -290,44 +325,43 @@ export default function TranslationScreen() {
       timestamp: new Date().toISOString(),
       mode: 'camera',
     };
-    setHistory(prev => [newItem, ...prev].slice(0, 50));
+    setHistory((prev) => [newItem, ...prev].slice(0, 50));
   }, [targetLanguage, sourceLanguage, simulateTranslation, startPulseAnimation]);
 
-  const selectLanguage = useCallback((lang: Language) => {
-    if (showLanguagePicker === 'source') {
-      setSourceLanguage(lang);
-    } else {
-      setTargetLanguage(lang);
-    }
-    setShowLanguagePicker(null);
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
-  }, [showLanguagePicker]);
+  const selectLanguage = useCallback(
+    (lang: Language) => {
+      if (showLanguagePicker === 'source') {
+        setSourceLanguage(lang);
+      } else {
+        setTargetLanguage(lang);
+      }
+      setShowLanguagePicker(null);
+      if (Platform.OS !== 'web') {
+        Haptics.selectionAsync();
+      }
+    },
+    [showLanguagePicker]
+  );
 
   const clearHistory = useCallback(() => {
-    Alert.alert(
-      'Clear History',
-      'Are you sure you want to clear all translation history?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Clear', 
-          style: 'destructive',
-          onPress: () => {
-            setHistory([]);
-            if (Platform.OS !== 'web') {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            }
+    Alert.alert('Clear History', 'Are you sure you want to clear all translation history?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Clear',
+        style: 'destructive',
+        onPress: () => {
+          setHistory([]);
+          if (Platform.OS !== 'web') {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }
         },
-      ]
-    );
+      },
+    ]);
   }, []);
 
   const renderLanguagePicker = () => (
     <View style={styles.languagePickerOverlay}>
-      <Pressable 
+      <Pressable
         style={styles.languagePickerBackdrop}
         onPress={() => setShowLanguagePicker(null)}
       />
@@ -341,10 +375,11 @@ export default function TranslationScreen() {
           </Pressable>
         </View>
         <ScrollView style={styles.languageList} showsVerticalScrollIndicator={false}>
-          {languages.map(lang => {
-            const isSelected = showLanguagePicker === 'source' 
-              ? lang.code === sourceLanguage.code 
-              : lang.code === targetLanguage.code;
+          {languages.map((lang) => {
+            const isSelected =
+              showLanguagePicker === 'source'
+                ? lang.code === sourceLanguage.code
+                : lang.code === targetLanguage.code;
             return (
               <Pressable
                 key={lang.code}
@@ -368,17 +403,14 @@ export default function TranslationScreen() {
   );
 
   const renderTextMode = () => (
-    <ScrollView 
-      style={styles.modeContent} 
+    <ScrollView
+      style={styles.modeContent}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.textModeContent}
     >
       <View style={styles.inputCard}>
         <View style={styles.inputHeader}>
-          <Pressable 
-            style={styles.languageButton}
-            onPress={() => setShowLanguagePicker('source')}
-          >
+          <Pressable style={styles.languageButton} onPress={() => setShowLanguagePicker('source')}>
             <Text style={styles.languageButtonFlag}>{sourceLanguage.flag}</Text>
             <Text style={styles.languageButtonText}>{sourceLanguage.name}</Text>
             <ChevronDown size={16} color={colors.textSecondary} />
@@ -409,10 +441,7 @@ export default function TranslationScreen() {
 
       <View style={[styles.outputCard, !translatedText && styles.outputCardEmpty]}>
         <View style={styles.inputHeader}>
-          <Pressable 
-            style={styles.languageButton}
-            onPress={() => setShowLanguagePicker('target')}
-          >
+          <Pressable style={styles.languageButton} onPress={() => setShowLanguagePicker('target')}>
             <Text style={styles.languageButtonFlag}>{targetLanguage.flag}</Text>
             <Text style={styles.languageButtonText}>{targetLanguage.name}</Text>
             <ChevronDown size={16} color={colors.textSecondary} />
@@ -427,10 +456,7 @@ export default function TranslationScreen() {
           <>
             <Text style={styles.translatedText}>{translatedText}</Text>
             <View style={styles.outputActions}>
-              <Pressable 
-                style={styles.outputAction} 
-                onPress={() => handleCopy(translatedText)}
-              >
+              <Pressable style={styles.outputAction} onPress={() => handleCopy(translatedText)}>
                 {copied ? (
                   <Check size={18} color={colors.success} />
                 ) : (
@@ -440,10 +466,7 @@ export default function TranslationScreen() {
                   {copied ? 'Copied!' : 'Copy'}
                 </Text>
               </Pressable>
-              <Pressable 
-                style={styles.outputAction}
-                onPress={() => handleSpeak(translatedText)}
-              >
+              <Pressable style={styles.outputAction} onPress={() => handleSpeak(translatedText)}>
                 <Volume2 size={18} color={colors.primary} />
                 <Text style={styles.outputActionText}>Speak</Text>
               </Pressable>
@@ -454,13 +477,17 @@ export default function TranslationScreen() {
         )}
       </View>
 
-      <Pressable 
+      <Pressable
         style={[styles.translateButton, !inputText.trim() && styles.translateButtonDisabled]}
         onPress={handleTranslate}
         disabled={!inputText.trim() || isTranslating}
       >
         <LinearGradient
-          colors={inputText.trim() ? [colors.primary, colors.primaryLight] : [colors.border, colors.border]}
+          colors={
+            inputText.trim()
+              ? [colors.primary, colors.primaryLight]
+              : [colors.border, colors.border]
+          }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.translateButtonGradient}
@@ -499,11 +526,8 @@ export default function TranslationScreen() {
                 <View style={[styles.scanCorner, styles.scanCornerBL]} />
                 <View style={[styles.scanCorner, styles.scanCornerBR]} />
                 {cameraScanning && (
-                  <Animated.View 
-                    style={[
-                      styles.scanningIndicator,
-                      { transform: [{ scale: pulseAnim }] }
-                    ]}
+                  <Animated.View
+                    style={[styles.scanningIndicator, { transform: [{ scale: pulseAnim }] }]}
                   >
                     <Scan size={32} color={colors.secondary} />
                   </Animated.View>
@@ -517,13 +541,15 @@ export default function TranslationScreen() {
         ) : (
           <View style={styles.webCameraPlaceholder}>
             <Camera size={64} color={colors.textTertiary} />
-            <Text style={styles.webCameraText}>Camera translation is available on mobile devices</Text>
+            <Text style={styles.webCameraText}>
+              Camera translation is available on mobile devices
+            </Text>
           </View>
         )}
-        
+
         <View style={styles.cameraControls}>
           <View style={styles.cameraLanguageRow}>
-            <Pressable 
+            <Pressable
               style={styles.cameraLanguageButton}
               onPress={() => setShowLanguagePicker('source')}
             >
@@ -531,7 +557,7 @@ export default function TranslationScreen() {
               <Text style={styles.cameraLanguageText}>{sourceLanguage.name}</Text>
             </Pressable>
             <ArrowLeftRight size={20} color={colors.textSecondary} />
-            <Pressable 
+            <Pressable
               style={styles.cameraLanguageButton}
               onPress={() => setShowLanguagePicker('target')}
             >
@@ -539,7 +565,7 @@ export default function TranslationScreen() {
               <Text style={styles.cameraLanguageText}>{targetLanguage.name}</Text>
             </Pressable>
           </View>
-          
+
           {detectedText && (
             <View style={styles.detectedTextCard}>
               <Text style={styles.detectedLabel}>Detected Text</Text>
@@ -548,14 +574,11 @@ export default function TranslationScreen() {
               <Text style={styles.translatedLabel}>Translation</Text>
               <Text style={styles.translatedTextContent}>{translatedText}</Text>
               <View style={styles.detectedActions}>
-                <Pressable 
-                  style={styles.detectedAction}
-                  onPress={() => handleCopy(translatedText)}
-                >
+                <Pressable style={styles.detectedAction} onPress={() => handleCopy(translatedText)}>
                   <Copy size={16} color={colors.primary} />
                   <Text style={styles.detectedActionText}>Copy</Text>
                 </Pressable>
-                <Pressable 
+                <Pressable
                   style={styles.detectedAction}
                   onPress={() => handleSpeak(translatedText)}
                 >
@@ -565,8 +588,8 @@ export default function TranslationScreen() {
               </View>
             </View>
           )}
-          
-          <Pressable 
+
+          <Pressable
             style={[styles.captureButton, cameraScanning && styles.captureButtonScanning]}
             onPress={handleCameraCapture}
             disabled={cameraScanning}
@@ -583,30 +606,34 @@ export default function TranslationScreen() {
   const renderConversationMode = () => (
     <View style={styles.conversationContainer}>
       <View style={styles.conversationHeader}>
-        <Pressable 
+        <Pressable
           style={[styles.conversationSide, isUserTurn && styles.conversationSideActive]}
           onPress={() => setIsUserTurn(true)}
         >
           <Text style={styles.conversationSideFlag}>{sourceLanguage.flag}</Text>
-          <Text style={[styles.conversationSideText, isUserTurn && styles.conversationSideTextActive]}>
+          <Text
+            style={[styles.conversationSideText, isUserTurn && styles.conversationSideTextActive]}
+          >
             {sourceLanguage.name}
           </Text>
         </Pressable>
         <View style={styles.conversationDivider}>
           <MessageSquare size={20} color={colors.textTertiary} />
         </View>
-        <Pressable 
+        <Pressable
           style={[styles.conversationSide, !isUserTurn && styles.conversationSideActive]}
           onPress={() => setIsUserTurn(false)}
         >
           <Text style={styles.conversationSideFlag}>{targetLanguage.flag}</Text>
-          <Text style={[styles.conversationSideText, !isUserTurn && styles.conversationSideTextActive]}>
+          <Text
+            style={[styles.conversationSideText, !isUserTurn && styles.conversationSideTextActive]}
+          >
             {targetLanguage.name}
           </Text>
         </Pressable>
       </View>
 
-      <ScrollView 
+      <ScrollView
         ref={scrollViewRef}
         style={styles.conversationMessages}
         showsVerticalScrollIndicator={false}
@@ -617,14 +644,18 @@ export default function TranslationScreen() {
             <MessageSquare size={48} color={colors.textTertiary} />
             <Text style={styles.conversationEmptyTitle}>Start a Conversation</Text>
             <Text style={styles.conversationEmptyText}>
-              Tap the speaker icon to switch between languages and have a real-time translated conversation
+              Tap the speaker icon to switch between languages and have a real-time translated
+              conversation
             </Text>
           </View>
         ) : (
-          conversationMessages.map(msg => (
-            <View 
+          conversationMessages.map((msg) => (
+            <View
               key={msg.id}
-              style={[styles.messageBubble, msg.isUser ? styles.messageBubbleUser : styles.messageBubbleOther]}
+              style={[
+                styles.messageBubble,
+                msg.isUser ? styles.messageBubbleUser : styles.messageBubbleOther,
+              ]}
             >
               <View style={styles.messageHeader}>
                 <Text style={styles.messageFlag}>{msg.language.flag}</Text>
@@ -636,11 +667,14 @@ export default function TranslationScreen() {
               <View style={styles.messageTranslation}>
                 <Text style={styles.messageTranslationText}>{msg.translatedText}</Text>
               </View>
-              <Pressable 
+              <Pressable
                 style={styles.messageSpeakButton}
                 onPress={() => handleSpeak(msg.translatedText)}
               >
-                <Volume2 size={14} color={msg.isUser ? colors.primaryLight : colors.textSecondary} />
+                <Volume2
+                  size={14}
+                  color={msg.isUser ? colors.primaryLight : colors.textSecondary}
+                />
               </Pressable>
             </View>
           ))
@@ -648,10 +682,12 @@ export default function TranslationScreen() {
       </ScrollView>
 
       <View style={styles.conversationInputContainer}>
-        <View style={[
-          styles.conversationInputWrapper,
-          isUserTurn ? styles.conversationInputUser : styles.conversationInputOther
-        ]}>
+        <View
+          style={[
+            styles.conversationInputWrapper,
+            isUserTurn ? styles.conversationInputUser : styles.conversationInputOther,
+          ]}
+        >
           <Text style={styles.conversationInputFlag}>
             {isUserTurn ? sourceLanguage.flag : targetLanguage.flag}
           </Text>
@@ -665,12 +701,15 @@ export default function TranslationScreen() {
           <Pressable style={styles.micButton}>
             <Mic size={20} color={colors.textSecondary} />
           </Pressable>
-          <Pressable 
+          <Pressable
             style={[styles.sendButton, !conversationInput.trim() && styles.sendButtonDisabled]}
             onPress={handleConversationSend}
             disabled={!conversationInput.trim()}
           >
-            <Send size={18} color={conversationInput.trim() ? colors.textLight : colors.textTertiary} />
+            <Send
+              size={18}
+              color={conversationInput.trim() ? colors.textLight : colors.textTertiary}
+            />
           </Pressable>
         </View>
       </View>
@@ -700,9 +739,9 @@ export default function TranslationScreen() {
               <Text style={styles.historyEmptyText}>No translation history yet</Text>
             </View>
           ) : (
-            history.map(item => (
-              <Pressable 
-                key={item.id} 
+            history.map((item) => (
+              <Pressable
+                key={item.id}
                 style={styles.historyItem}
                 onPress={() => {
                   setInputText(item.sourceText);
@@ -719,10 +758,12 @@ export default function TranslationScreen() {
                     <ArrowLeftRight size={12} color={colors.textTertiary} />
                     <Text style={styles.historyFlag}>{item.targetLanguage.flag}</Text>
                   </View>
-                  <View style={[
-                    styles.historyModeBadge,
-                    item.mode === 'camera' && styles.historyModeBadgeCamera
-                  ]}>
+                  <View
+                    style={[
+                      styles.historyModeBadge,
+                      item.mode === 'camera' && styles.historyModeBadgeCamera,
+                    ]}
+                  >
                     {item.mode === 'camera' ? (
                       <Camera size={10} color={colors.secondary} />
                     ) : (
@@ -730,8 +771,12 @@ export default function TranslationScreen() {
                     )}
                   </View>
                 </View>
-                <Text style={styles.historySource} numberOfLines={1}>{item.sourceText}</Text>
-                <Text style={styles.historyTranslated} numberOfLines={1}>{item.translatedText}</Text>
+                <Text style={styles.historySource} numberOfLines={1}>
+                  {item.sourceText}
+                </Text>
+                <Text style={styles.historyTranslated} numberOfLines={1}>
+                  {item.translatedText}
+                </Text>
               </Pressable>
             ))
           )}
@@ -761,7 +806,7 @@ export default function TranslationScreen() {
         </View>
 
         <View style={styles.modeSelector}>
-          <Pressable 
+          <Pressable
             style={[styles.modeTab, mode === 'text' && styles.modeTabActive]}
             onPress={() => setMode('text')}
           >
@@ -770,7 +815,7 @@ export default function TranslationScreen() {
               Text
             </Text>
           </Pressable>
-          <Pressable 
+          <Pressable
             style={[styles.modeTab, mode === 'camera' && styles.modeTabActive]}
             onPress={() => setMode('camera')}
           >
@@ -779,11 +824,14 @@ export default function TranslationScreen() {
               Camera
             </Text>
           </Pressable>
-          <Pressable 
+          <Pressable
             style={[styles.modeTab, mode === 'conversation' && styles.modeTabActive]}
             onPress={() => setMode('conversation')}
           >
-            <MessageSquare size={18} color={mode === 'conversation' ? colors.primary : colors.textLight} />
+            <MessageSquare
+              size={18}
+              color={mode === 'conversation' ? colors.primary : colors.textLight}
+            />
             <Text style={[styles.modeTabText, mode === 'conversation' && styles.modeTabTextActive]}>
               Conversation
             </Text>

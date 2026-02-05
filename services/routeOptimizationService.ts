@@ -43,8 +43,8 @@ class RouteOptimizationService {
     const deltaLat = this.toRadians(to.latitude - from.latitude);
     const deltaLon = this.toRadians(to.longitude - from.longitude);
 
-    const a = Math.sin(deltaLat / 2) ** 2 +
-              Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLon / 2) ** 2;
+    const a =
+      Math.sin(deltaLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLon / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c;
@@ -62,7 +62,7 @@ class RouteOptimizationService {
   ): number {
     const distance = this.calculateDistance(from, to);
     const speed = AVERAGE_SPEEDS[mode];
-    let baseTime = (distance / 1000) / speed * 60;
+    let baseTime = (distance / 1000 / speed) * 60;
 
     // Rush hour adjustment
     if ((mode === 'driving' || mode === 'rideshare' || mode === 'taxi') && departureTime) {
@@ -246,8 +246,8 @@ class RouteOptimizationService {
     );
 
     // Separate fixed and flexible activities
-    const fixed = activities.filter(a => a.flexibility === 'fixed' || a.isLocked);
-    const flexible = activities.filter(a => a.flexibility !== 'fixed' && !a.isLocked);
+    const fixed = activities.filter((a) => a.flexibility === 'fixed' || a.isLocked);
+    const flexible = activities.filter((a) => a.flexibility !== 'fixed' && !a.isLocked);
 
     // Optimize based on strategy
     let optimizedOrder: Activity[];
@@ -256,9 +256,7 @@ class RouteOptimizationService {
         optimizedOrder = this.nearestNeighbor(flexible, fixed, startLocation);
         break;
       case 'minimize_distance':
-        optimizedOrder = this.twoOptOptimize(
-          this.nearestNeighbor(flexible, fixed, startLocation)
-        );
+        optimizedOrder = this.twoOptOptimize(this.nearestNeighbor(flexible, fixed, startLocation));
         break;
       case 'priority_first':
         optimizedOrder = this.priorityOptimize(flexible, fixed);
@@ -283,14 +281,15 @@ class RouteOptimizationService {
 
     // Mark reordered stops
     optimizedRoute.stops.forEach((stop, newIdx) => {
-      const origIdx = activities.findIndex(a => a.id === stop.activity.id);
+      const origIdx = activities.findIndex((a) => a.id === stop.activity.id);
       stop.originalOrder = origIdx;
       stop.wasReordered = origIdx !== newIdx;
       if (stop.wasReordered) {
-        const origStop = originalRoute.stops.find(s => s.activity.id === stop.activity.id);
+        const origStop = originalRoute.stops.find((s) => s.activity.id === stop.activity.id);
         if (origStop) {
           stop.timeDelta = Math.round(
-            (new Date(stop.arrivalTime).getTime() - new Date(origStop.arrivalTime).getTime()) / 60000
+            (new Date(stop.arrivalTime).getTime() - new Date(origStop.arrivalTime).getTime()) /
+              60000
           );
         }
       }
@@ -455,7 +454,7 @@ class RouteOptimizationService {
     category: string,
     window: { start: string; end: string }
   ): Activity[] {
-    const diningIdx = route.findIndex(a => a.category === category);
+    const diningIdx = route.findIndex((a) => a.category === category);
     if (diningIdx === -1) return route;
 
     const windowMid = (this.parseTime(window.start) + this.parseTime(window.end)) / 2;
@@ -496,11 +495,15 @@ class RouteOptimizationService {
     return Math.max(0, Math.min(100, Math.round(score)));
   }
 
-  private generateChanges(original: Route, optimized: Route, activities: Activity[]): RouteChange[] {
+  private generateChanges(
+    original: Route,
+    optimized: Route,
+    activities: Activity[]
+  ): RouteChange[] {
     const changes: RouteChange[] = [];
 
     for (const optStop of optimized.stops) {
-      const origStop = original.stops.find(s => s.activity.id === optStop.activity.id);
+      const origStop = original.stops.find((s) => s.activity.id === optStop.activity.id);
       if (!origStop) continue;
 
       if (optStop.order !== origStop.order) {
@@ -535,7 +538,12 @@ class RouteOptimizationService {
   }
 
   private generateWarnings(route: Route, constraints: OptimizationConstraints) {
-    const warnings: Array<{ type: string; message: string; severity: 'low' | 'medium' | 'high'; activityId?: string }> = [];
+    const warnings: Array<{
+      type: string;
+      message: string;
+      severity: 'low' | 'medium' | 'high';
+      activityId?: string;
+    }> = [];
 
     for (const segment of route.travelSegments) {
       if (segment.duration > 45) {
@@ -591,7 +599,7 @@ class RouteOptimizationService {
 
   private getOpeningTime(hours: OperatingHours[], date: Date): Date | null {
     const dayOfWeek = date.getDay();
-    const todayHours = hours.find(h => h.dayOfWeek === dayOfWeek);
+    const todayHours = hours.find((h) => h.dayOfWeek === dayOfWeek);
     if (!todayHours || todayHours.isClosed) return null;
 
     const [h, m] = todayHours.open.split(':').map(Number);
@@ -607,7 +615,7 @@ class RouteOptimizationService {
   async saveRoute(route: Route): Promise<void> {
     const data = await AsyncStorage.getItem(STORAGE_KEYS.ROUTES);
     const routes: Route[] = data ? JSON.parse(data) : [];
-    const idx = routes.findIndex(r => r.id === route.id);
+    const idx = routes.findIndex((r) => r.id === route.id);
     if (idx >= 0) routes[idx] = route;
     else routes.push(route);
     await AsyncStorage.setItem(STORAGE_KEYS.ROUTES, JSON.stringify(routes));

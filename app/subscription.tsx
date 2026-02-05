@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -69,7 +62,7 @@ export default function SubscriptionScreen() {
     );
   };
 
-  const getPrice = (plan: typeof subscriptionPlans[0]) => {
+  const getPrice = (plan: (typeof subscriptionPlans)[0]) => {
     if (billingCycle === 'yearly') {
       return (plan.price * 10).toFixed(2);
     }
@@ -78,10 +71,7 @@ export default function SubscriptionScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#8B5CF6', '#A78BFA']}
-        style={styles.headerGradient}
-      />
+      <LinearGradient colors={['#8B5CF6', '#A78BFA']} style={styles.headerGradient} />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
@@ -92,15 +82,10 @@ export default function SubscriptionScreen() {
         <View style={styles.heroSection}>
           <Crown size={48} color={colors.textLight} />
           <Text style={styles.heroTitle}>Upgrade Your Journey</Text>
-          <Text style={styles.heroSubtitle}>
-            Unlock premium features and exclusive benefits
-          </Text>
+          <Text style={styles.heroSubtitle}>Unlock premium features and exclusive benefits</Text>
         </View>
 
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.billingToggle}>
             <Pressable
               style={[
@@ -109,10 +94,9 @@ export default function SubscriptionScreen() {
               ]}
               onPress={() => setBillingCycle('monthly')}
             >
-              <Text style={[
-                styles.billingText,
-                billingCycle === 'monthly' && styles.billingTextActive,
-              ]}>
+              <Text
+                style={[styles.billingText, billingCycle === 'monthly' && styles.billingTextActive]}
+              >
                 Monthly
               </Text>
             </Pressable>
@@ -123,10 +107,9 @@ export default function SubscriptionScreen() {
               ]}
               onPress={() => setBillingCycle('yearly')}
             >
-              <Text style={[
-                styles.billingText,
-                billingCycle === 'yearly' && styles.billingTextActive,
-              ]}>
+              <Text
+                style={[styles.billingText, billingCycle === 'yearly' && styles.billingTextActive]}
+              >
                 Yearly
               </Text>
               <View style={styles.saveBadge}>
@@ -136,7 +119,7 @@ export default function SubscriptionScreen() {
           </View>
 
           <View style={styles.plansSection}>
-            {subscriptionPlans.map(plan => {
+            {subscriptionPlans.map((plan) => {
               const Icon = planIcons[plan.name];
               const isCurrentPlan = user.subscriptionTier === plan.name;
               const isSelected = selectedPlan === plan.name;
@@ -158,10 +141,7 @@ export default function SubscriptionScreen() {
                   )}
 
                   <View style={styles.planHeader}>
-                    <LinearGradient
-                      colors={planColors[plan.name]}
-                      style={styles.planIcon}
-                    >
+                    <LinearGradient colors={planColors[plan.name]} style={styles.planIcon}>
                       <Icon size={24} color={colors.textLight} />
                     </LinearGradient>
                     <View style={styles.planTitleContainer}>
@@ -177,9 +157,7 @@ export default function SubscriptionScreen() {
                   </View>
 
                   <View style={styles.priceContainer}>
-                    <Text style={styles.priceValue}>
-                      ${getPrice(plan)}
-                    </Text>
+                    <Text style={styles.priceValue}>${getPrice(plan)}</Text>
                     <Text style={styles.pricePeriod}>
                       /{billingCycle === 'monthly' ? 'month' : 'year'}
                     </Text>
@@ -253,13 +231,11 @@ export default function SubscriptionScreen() {
               {selectedPlan === user.subscriptionTier
                 ? 'Current Plan'
                 : selectedPlan === 'free'
-                ? 'Downgrade to Free'
-                : `Upgrade to ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}`}
+                  ? 'Downgrade to Free'
+                  : `Upgrade to ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}`}
             </Text>
           </Pressable>
-          <Text style={styles.footerNote}>
-            Cancel anytime. Terms and conditions apply.
-          </Text>
+          <Text style={styles.footerNote}>Cancel anytime. Terms and conditions apply.</Text>
         </View>
       </SafeAreaView>
     </View>

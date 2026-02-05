@@ -47,7 +47,8 @@ const MOCK_ALERTS: SafetyAlert[] = [
     type: 'advisory',
     severity: 'moderate',
     title: 'Travel Advisory: Political Unrest',
-    description: 'Ongoing political demonstrations in the capital city. Avoid government buildings and central plaza areas. Public transportation may be disrupted.',
+    description:
+      'Ongoing political demonstrations in the capital city. Avoid government buildings and central plaza areas. Public transportation may be disrupted.',
     location: {
       city: 'Bangkok',
       country: 'Thailand',
@@ -71,7 +72,8 @@ const MOCK_ALERTS: SafetyAlert[] = [
     type: 'protest',
     severity: 'high',
     title: 'Large-Scale Protests Expected',
-    description: 'Major protests planned for the weekend in downtown area. Road closures and transport disruptions expected. Businesses may close early.',
+    description:
+      'Major protests planned for the weekend in downtown area. Road closures and transport disruptions expected. Businesses may close early.',
     location: {
       city: 'Paris',
       country: 'France',
@@ -96,7 +98,8 @@ const MOCK_ALERTS: SafetyAlert[] = [
     type: 'natural_disaster',
     severity: 'critical',
     title: 'Tropical Storm Warning',
-    description: 'Tropical Storm approaching coastal areas. Heavy rainfall and strong winds expected for the next 48 hours. Flash flooding possible in low-lying areas.',
+    description:
+      'Tropical Storm approaching coastal areas. Heavy rainfall and strong winds expected for the next 48 hours. Flash flooding possible in low-lying areas.',
     location: {
       city: 'Cancun',
       country: 'Mexico',
@@ -121,7 +124,8 @@ const MOCK_ALERTS: SafetyAlert[] = [
     type: 'health',
     severity: 'moderate',
     title: 'Dengue Fever Outbreak',
-    description: 'Increased cases of dengue fever reported in urban areas. Mosquito-borne illness risk elevated during rainy season.',
+    description:
+      'Increased cases of dengue fever reported in urban areas. Mosquito-borne illness risk elevated during rainy season.',
     location: {
       country: 'Vietnam',
       region: 'Southern Region',
@@ -144,7 +148,8 @@ const MOCK_ALERTS: SafetyAlert[] = [
     type: 'crime',
     severity: 'low',
     title: 'Increased Pickpocket Activity',
-    description: 'Reports of increased pickpocket activity in tourist areas and public transport. Be vigilant with personal belongings.',
+    description:
+      'Reports of increased pickpocket activity in tourist areas and public transport. Be vigilant with personal belongings.',
     location: {
       city: 'Barcelona',
       country: 'Spain',
@@ -168,7 +173,8 @@ const MOCK_ALERTS: SafetyAlert[] = [
     type: 'emergency',
     severity: 'high',
     title: 'Airport Closure',
-    description: 'Main international airport temporarily closed due to security incident. Flights diverted to nearby airports. Significant delays expected.',
+    description:
+      'Main international airport temporarily closed due to security incident. Flights diverted to nearby airports. Significant delays expected.',
     location: {
       city: 'London',
       country: 'United Kingdom',
@@ -196,10 +202,38 @@ const MOCK_SUBSCRIPTIONS: SafetySubscription[] = [
 ];
 
 const EMERGENCY_SERVICES: EmergencyService[] = [
-  { id: '1', country: 'United States', police: '911', ambulance: '911', fire: '911', tourist: '1-888-407-4747' },
-  { id: '2', country: 'United Kingdom', police: '999', ambulance: '999', fire: '999', tourist: '+44 20 7008 1500' },
-  { id: '3', country: 'Japan', police: '110', ambulance: '119', fire: '119', tourist: '03-3501-8431' },
-  { id: '4', country: 'France', police: '17', ambulance: '15', fire: '18', tourist: '+33 1 43 17 53 53' },
+  {
+    id: '1',
+    country: 'United States',
+    police: '911',
+    ambulance: '911',
+    fire: '911',
+    tourist: '1-888-407-4747',
+  },
+  {
+    id: '2',
+    country: 'United Kingdom',
+    police: '999',
+    ambulance: '999',
+    fire: '999',
+    tourist: '+44 20 7008 1500',
+  },
+  {
+    id: '3',
+    country: 'Japan',
+    police: '110',
+    ambulance: '119',
+    fire: '119',
+    tourist: '03-3501-8431',
+  },
+  {
+    id: '4',
+    country: 'France',
+    police: '17',
+    ambulance: '15',
+    fire: '18',
+    tourist: '+33 1 43 17 53 53',
+  },
   { id: '5', country: 'Thailand', police: '191', ambulance: '1669', fire: '199', tourist: '1155' },
   { id: '6', country: 'Mexico', police: '911', ambulance: '911', fire: '911', tourist: '078' },
 ];
@@ -221,7 +255,14 @@ const TYPE_CONFIG = {
   terrorism: { icon: AlertTriangle, label: 'Security', color: colors.error },
 };
 
-type FilterType = 'all' | 'advisory' | 'emergency' | 'protest' | 'natural_disaster' | 'health' | 'crime';
+type FilterType =
+  | 'all'
+  | 'advisory'
+  | 'emergency'
+  | 'protest'
+  | 'natural_disaster'
+  | 'health'
+  | 'crime';
 type SeverityFilter = 'all' | 'low' | 'moderate' | 'high' | 'critical';
 
 export default function SafetyAlertsScreen() {
@@ -234,11 +275,10 @@ export default function SafetyAlertsScreen() {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<SafetyAlert | null>(null);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
-  
+
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'alerts' | 'subscriptions'>('alerts');
-  
-  
+
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -267,8 +307,9 @@ export default function SafetyAlertsScreen() {
     }, 1500);
   }, []);
 
-  const filteredAlerts = alerts.filter(alert => {
-    const matchesSearch = alert.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredAlerts = alerts.filter((alert) => {
+    const matchesSearch =
+      alert.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       alert.location.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (alert.location.city?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
     const matchesType = typeFilter === 'all' || alert.type === typeFilter;
@@ -276,23 +317,27 @@ export default function SafetyAlertsScreen() {
     return matchesSearch && matchesType && matchesSeverity && alert.isActive;
   });
 
-  const criticalAlerts = filteredAlerts.filter(a => a.severity === 'critical' || a.severity === 'high');
-  const otherAlerts = filteredAlerts.filter(a => a.severity !== 'critical' && a.severity !== 'high');
+  const criticalAlerts = filteredAlerts.filter(
+    (a) => a.severity === 'critical' || a.severity === 'high'
+  );
+  const otherAlerts = filteredAlerts.filter(
+    (a) => a.severity !== 'critical' && a.severity !== 'high'
+  );
 
   const markAsRead = (alertId: string) => {
-    setAlerts(prev => prev.map(a => 
-      a.id === alertId ? { ...a, isRead: true } : a
-    ));
+    setAlerts((prev) => prev.map((a) => (a.id === alertId ? { ...a, isRead: true } : a)));
   };
 
   const toggleSubscriptionNotification = (subId: string) => {
-    setSubscriptions(prev => prev.map(s =>
-      s.id === subId ? { ...s, notificationsEnabled: !s.notificationsEnabled } : s
-    ));
+    setSubscriptions((prev) =>
+      prev.map((s) =>
+        s.id === subId ? { ...s, notificationsEnabled: !s.notificationsEnabled } : s
+      )
+    );
   };
 
   const removeSubscription = (subId: string) => {
-    setSubscriptions(prev => prev.filter(s => s.id !== subId));
+    setSubscriptions((prev) => prev.filter((s) => s.id !== subId));
   };
 
   const formatDate = (dateStr: string) => {
@@ -300,7 +345,7 @@ export default function SafetyAlertsScreen() {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
+
     if (diffHours < 1) return 'Just now';
     if (diffHours < 24) return `${diffHours}h ago`;
     const diffDays = Math.floor(diffHours / 24);
@@ -337,13 +382,16 @@ export default function SafetyAlertsScreen() {
           </View>
           <View style={styles.alertHeaderText}>
             <View style={styles.alertTitleRow}>
-              <Text style={styles.alertTitle} numberOfLines={2}>{alert.title}</Text>
+              <Text style={styles.alertTitle} numberOfLines={2}>
+                {alert.title}
+              </Text>
               {!alert.isRead && <View style={styles.unreadDot} />}
             </View>
             <View style={styles.alertMeta}>
               <MapPin size={12} color={colors.textSecondary} />
               <Text style={styles.alertLocation}>
-                {alert.location.city ? `${alert.location.city}, ` : ''}{alert.location.country}
+                {alert.location.city ? `${alert.location.city}, ` : ''}
+                {alert.location.country}
               </Text>
             </View>
           </View>
@@ -372,7 +420,7 @@ export default function SafetyAlertsScreen() {
 
   const renderAlertDetail = () => {
     if (!selectedAlert) return null;
-    
+
     const severityConfig = SEVERITY_CONFIG[selectedAlert.severity];
     const typeConfig = TYPE_CONFIG[selectedAlert.type];
     const TypeIcon = typeConfig.icon;
@@ -452,7 +500,11 @@ export default function SafetyAlertsScreen() {
                 <Text style={styles.detailMetaLabel}>Issued:</Text>
                 <Text style={styles.detailMetaValue}>
                   {new Date(selectedAlert.issuedAt).toLocaleDateString('en-US', {
-                    month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })}
                 </Text>
               </View>
@@ -460,7 +512,11 @@ export default function SafetyAlertsScreen() {
                 <Text style={styles.detailMetaLabel}>Last Updated:</Text>
                 <Text style={styles.detailMetaValue}>
                   {new Date(selectedAlert.updatedAt).toLocaleDateString('en-US', {
-                    month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })}
                 </Text>
               </View>
@@ -469,17 +525,24 @@ export default function SafetyAlertsScreen() {
                   <Text style={styles.detailMetaLabel}>Expires:</Text>
                   <Text style={styles.detailMetaValue}>
                     {new Date(selectedAlert.expiresAt).toLocaleDateString('en-US', {
-                      month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </Text>
                 </View>
               )}
             </View>
 
-            <TouchableOpacity style={styles.emergencyButton} onPress={() => {
-              setSelectedAlert(null);
-              setShowEmergencyModal(true);
-            }}>
+            <TouchableOpacity
+              style={styles.emergencyButton}
+              onPress={() => {
+                setSelectedAlert(null);
+                setShowEmergencyModal(true);
+              }}
+            >
               <Phone size={20} color={colors.textLight} />
               <Text style={styles.emergencyButtonText}>Emergency Contacts</Text>
             </TouchableOpacity>
@@ -513,15 +576,15 @@ export default function SafetyAlertsScreen() {
             </Text>
           </View>
 
-          {EMERGENCY_SERVICES.map(service => (
+          {EMERGENCY_SERVICES.map((service) => (
             <View key={service.id} style={styles.emergencyCountry}>
               <View style={styles.emergencyCountryHeader}>
                 <Globe size={20} color={colors.primary} />
                 <Text style={styles.emergencyCountryName}>{service.country}</Text>
               </View>
-              
+
               <View style={styles.emergencyNumbers}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.emergencyNumberItem}
                   onPress={() => callEmergency(service.police)}
                 >
@@ -535,7 +598,7 @@ export default function SafetyAlertsScreen() {
                   <Phone size={18} color={colors.primary} />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.emergencyNumberItem}
                   onPress={() => callEmergency(service.ambulance)}
                 >
@@ -549,7 +612,7 @@ export default function SafetyAlertsScreen() {
                   <Phone size={18} color={colors.primary} />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.emergencyNumberItem}
                   onPress={() => callEmergency(service.fire)}
                 >
@@ -563,7 +626,7 @@ export default function SafetyAlertsScreen() {
                   <Phone size={18} color={colors.primary} />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.emergencyNumberItem}
                   onPress={() => callEmergency(service.tourist)}
                 >
@@ -597,10 +660,12 @@ export default function SafetyAlertsScreen() {
             <X size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.modalTitle}>Filter Alerts</Text>
-          <TouchableOpacity onPress={() => {
-            setTypeFilter('all');
-            setSeverityFilter('all');
-          }}>
+          <TouchableOpacity
+            onPress={() => {
+              setTypeFilter('all');
+              setSeverityFilter('all');
+            }}
+          >
             <Text style={styles.clearFilters}>Clear</Text>
           </TouchableOpacity>
         </View>
@@ -608,14 +673,31 @@ export default function SafetyAlertsScreen() {
         <ScrollView style={styles.modalContent}>
           <Text style={styles.filterSectionTitle}>Alert Type</Text>
           <View style={styles.filterOptions}>
-            {(['all', 'advisory', 'emergency', 'protest', 'natural_disaster', 'health', 'crime'] as FilterType[]).map(type => (
+            {(
+              [
+                'all',
+                'advisory',
+                'emergency',
+                'protest',
+                'natural_disaster',
+                'health',
+                'crime',
+              ] as FilterType[]
+            ).map((type) => (
               <TouchableOpacity
                 key={type}
                 style={[styles.filterOption, typeFilter === type && styles.filterOptionActive]}
                 onPress={() => setTypeFilter(type)}
               >
-                <Text style={[styles.filterOptionText, typeFilter === type && styles.filterOptionTextActive]}>
-                  {type === 'all' ? 'All Types' : TYPE_CONFIG[type as keyof typeof TYPE_CONFIG]?.label || type}
+                <Text
+                  style={[
+                    styles.filterOptionText,
+                    typeFilter === type && styles.filterOptionTextActive,
+                  ]}
+                >
+                  {type === 'all'
+                    ? 'All Types'
+                    : TYPE_CONFIG[type as keyof typeof TYPE_CONFIG]?.label || type}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -623,29 +705,37 @@ export default function SafetyAlertsScreen() {
 
           <Text style={styles.filterSectionTitle}>Severity Level</Text>
           <View style={styles.filterOptions}>
-            {(['all', 'low', 'moderate', 'high', 'critical'] as SeverityFilter[]).map(severity => (
-              <TouchableOpacity
-                key={severity}
-                style={[
-                  styles.filterOption,
-                  severityFilter === severity && styles.filterOptionActive,
-                  severity !== 'all' && { borderColor: SEVERITY_CONFIG[severity as keyof typeof SEVERITY_CONFIG].color },
-                ]}
-                onPress={() => setSeverityFilter(severity)}
-              >
-                <Text style={[
-                  styles.filterOptionText,
-                  severityFilter === severity && styles.filterOptionTextActive,
-                ]}>
-                  {severity === 'all' ? 'All Levels' : SEVERITY_CONFIG[severity as keyof typeof SEVERITY_CONFIG].label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {(['all', 'low', 'moderate', 'high', 'critical'] as SeverityFilter[]).map(
+              (severity) => (
+                <TouchableOpacity
+                  key={severity}
+                  style={[
+                    styles.filterOption,
+                    severityFilter === severity && styles.filterOptionActive,
+                    severity !== 'all' && {
+                      borderColor: SEVERITY_CONFIG[severity as keyof typeof SEVERITY_CONFIG].color,
+                    },
+                  ]}
+                  onPress={() => setSeverityFilter(severity)}
+                >
+                  <Text
+                    style={[
+                      styles.filterOptionText,
+                      severityFilter === severity && styles.filterOptionTextActive,
+                    ]}
+                  >
+                    {severity === 'all'
+                      ? 'All Levels'
+                      : SEVERITY_CONFIG[severity as keyof typeof SEVERITY_CONFIG].label}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
           </View>
         </ScrollView>
 
         <View style={styles.filterFooter}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.applyFilterButton}
             onPress={() => setShowFilterModal(false)}
           >
@@ -660,9 +750,7 @@ export default function SafetyAlertsScreen() {
     <View style={styles.subscriptionsContainer}>
       <View style={styles.subscriptionsHeader}>
         <Text style={styles.subscriptionsTitle}>Monitored Locations</Text>
-        <Text style={styles.subscriptionsSubtitle}>
-          Get alerts for these destinations
-        </Text>
+        <Text style={styles.subscriptionsSubtitle}>Get alerts for these destinations</Text>
       </View>
 
       {subscriptions.length === 0 ? (
@@ -674,7 +762,7 @@ export default function SafetyAlertsScreen() {
           </Text>
         </View>
       ) : (
-        subscriptions.map(sub => (
+        subscriptions.map((sub) => (
           <View key={sub.id} style={styles.subscriptionCard}>
             <View style={styles.subscriptionInfo}>
               <View style={styles.subscriptionIcon}>
@@ -682,7 +770,8 @@ export default function SafetyAlertsScreen() {
               </View>
               <View>
                 <Text style={styles.subscriptionLocation}>
-                  {sub.city ? `${sub.city}, ` : ''}{sub.country}
+                  {sub.city ? `${sub.city}, ` : ''}
+                  {sub.country}
                 </Text>
                 <Text style={styles.subscriptionStatus}>
                   {sub.notificationsEnabled ? 'Notifications on' : 'Notifications off'}
@@ -718,7 +807,7 @@ export default function SafetyAlertsScreen() {
     </View>
   );
 
-  const unreadCount = alerts.filter(a => !a.isRead && a.isActive).length;
+  const unreadCount = alerts.filter((a) => !a.isRead && a.isActive).length;
 
   return (
     <View style={styles.container}>
@@ -736,7 +825,10 @@ export default function SafetyAlertsScreen() {
               </Animated.View>
             )}
           </View>
-          <TouchableOpacity onPress={() => setShowEmergencyModal(true)} style={styles.emergencyIcon}>
+          <TouchableOpacity
+            onPress={() => setShowEmergencyModal(true)}
+            style={styles.emergencyIcon}
+          >
             <Phone size={22} color={colors.error} />
           </TouchableOpacity>
         </View>
@@ -746,15 +838,25 @@ export default function SafetyAlertsScreen() {
             style={[styles.tab, activeTab === 'alerts' && styles.tabActive]}
             onPress={() => setActiveTab('alerts')}
           >
-            <AlertTriangle size={18} color={activeTab === 'alerts' ? colors.primary : colors.textSecondary} />
-            <Text style={[styles.tabText, activeTab === 'alerts' && styles.tabTextActive]}>Alerts</Text>
+            <AlertTriangle
+              size={18}
+              color={activeTab === 'alerts' ? colors.primary : colors.textSecondary}
+            />
+            <Text style={[styles.tabText, activeTab === 'alerts' && styles.tabTextActive]}>
+              Alerts
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'subscriptions' && styles.tabActive]}
             onPress={() => setActiveTab('subscriptions')}
           >
-            <Bell size={18} color={activeTab === 'subscriptions' ? colors.primary : colors.textSecondary} />
-            <Text style={[styles.tabText, activeTab === 'subscriptions' && styles.tabTextActive]}>Subscriptions</Text>
+            <Bell
+              size={18}
+              color={activeTab === 'subscriptions' ? colors.primary : colors.textSecondary}
+            />
+            <Text style={[styles.tabText, activeTab === 'subscriptions' && styles.tabTextActive]}>
+              Subscriptions
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -772,11 +874,19 @@ export default function SafetyAlertsScreen() {
                 onChangeText={setSearchQuery}
               />
             </View>
-            <TouchableOpacity 
-              style={[styles.filterButton, (typeFilter !== 'all' || severityFilter !== 'all') && styles.filterButtonActive]}
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                (typeFilter !== 'all' || severityFilter !== 'all') && styles.filterButtonActive,
+              ]}
               onPress={() => setShowFilterModal(true)}
             >
-              <Filter size={20} color={(typeFilter !== 'all' || severityFilter !== 'all') ? colors.textLight : colors.text} />
+              <Filter
+                size={20}
+                color={
+                  typeFilter !== 'all' || severityFilter !== 'all' ? colors.textLight : colors.text
+                }
+              />
             </TouchableOpacity>
           </View>
 
@@ -784,7 +894,11 @@ export default function SafetyAlertsScreen() {
             style={styles.content}
             showsVerticalScrollIndicator={false}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={colors.primary}
+              />
             }
           >
             {criticalAlerts.length > 0 && (
@@ -830,7 +944,11 @@ export default function SafetyAlertsScreen() {
           style={styles.content}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.primary}
+            />
           }
         >
           {renderSubscriptions()}

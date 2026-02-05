@@ -95,18 +95,14 @@ export default function EmergencyScreen() {
   };
 
   const handleRemoveContact = (contactId: string) => {
-    Alert.alert(
-      'Remove Contact',
-      'Are you sure you want to remove this emergency contact?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
-          style: 'destructive',
-          onPress: () => removeEmergencyContact(contactId),
-        },
-      ]
-    );
+    Alert.alert('Remove Contact', 'Are you sure you want to remove this emergency contact?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => removeEmergencyContact(contactId),
+      },
+    ]);
   };
 
   return (
@@ -120,10 +116,7 @@ export default function EmergencyScreen() {
           <View style={styles.placeholder} />
         </View>
 
-        <ScrollView 
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.alertBanner}>
             <AlertTriangle size={24} color={colors.error} />
             <Text style={styles.alertText}>
@@ -134,7 +127,7 @@ export default function EmergencyScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Emergency Services</Text>
             <View style={styles.servicesGrid}>
-              {emergencyServices.map(service => (
+              {emergencyServices.map((service) => (
                 <Pressable
                   key={service.id}
                   style={styles.serviceCard}
@@ -157,10 +150,7 @@ export default function EmergencyScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Emergency Contacts</Text>
-              <Pressable 
-                style={styles.addButton}
-                onPress={() => setShowAddModal(true)}
-              >
+              <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
                 <Plus size={18} color={colors.primary} />
                 <Text style={styles.addButtonText}>Add</Text>
               </Pressable>
@@ -168,7 +158,7 @@ export default function EmergencyScreen() {
 
             {(user.emergencyContacts || []).length > 0 ? (
               <View style={styles.contactsList}>
-                {(user.emergencyContacts || []).map(contact => (
+                {(user.emergencyContacts || []).map((contact) => (
                   <View key={contact.id} style={styles.contactCard}>
                     <View style={styles.contactAvatar}>
                       <User size={20} color={colors.textSecondary} />
@@ -179,13 +169,13 @@ export default function EmergencyScreen() {
                       <Text style={styles.contactPhone}>{contact.phone}</Text>
                     </View>
                     <View style={styles.contactActions}>
-                      <Pressable 
+                      <Pressable
                         style={styles.contactCallBtn}
                         onPress={() => handleCall(contact.phone)}
                       >
                         <Phone size={18} color={colors.textLight} />
                       </Pressable>
-                      <Pressable 
+                      <Pressable
                         style={styles.contactDeleteBtn}
                         onPress={() => handleRemoveContact(contact.id)}
                       >
@@ -217,7 +207,8 @@ export default function EmergencyScreen() {
                 </View>
               </View>
               <Text style={styles.supportDescription}>
-                Our support team can help with booking issues, rebooking, lost items, and travel emergencies.
+                Our support team can help with booking issues, rebooking, lost items, and travel
+                emergencies.
               </Text>
               <View style={styles.supportActions}>
                 <Pressable style={styles.supportButton}>
@@ -274,9 +265,7 @@ export default function EmergencyScreen() {
               </View>
               <View style={styles.tipItem}>
                 <View style={styles.tipBullet} />
-                <Text style={styles.tipText}>
-                  Share your itinerary with family or friends
-                </Text>
+                <Text style={styles.tipText}>Share your itinerary with family or friends</Text>
               </View>
               <View style={styles.tipItem}>
                 <View style={styles.tipBullet} />

@@ -55,7 +55,7 @@ export default function BudgetTrackerScreen() {
   const router = useRouter();
   const { trips, addExpense } = useApp();
 
-  const trip = trips.find(t => t.id === tripId);
+  const trip = trips.find((t) => t.id === tripId);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [newExpense, setNewExpense] = useState({
@@ -88,10 +88,13 @@ export default function BudgetTrackerScreen() {
   const remaining = trip.totalBudget - trip.spentBudget;
   const isOverBudget = remaining < 0;
 
-  const expensesByCategory = expenses.reduce((acc, exp) => {
-    acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
-    return acc;
-  }, {} as Record<string, number>);
+  const expensesByCategory = expenses.reduce(
+    (acc, exp) => {
+      acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const handleAddExpense = () => {
     if (!newExpense.amount || parseFloat(newExpense.amount) <= 0) {
@@ -129,18 +132,12 @@ export default function BudgetTrackerScreen() {
             <ArrowLeft size={22} color={colors.text} />
           </Pressable>
           <Text style={styles.headerTitle}>Budget Tracker</Text>
-          <Pressable 
-            style={styles.addButton}
-            onPress={() => setShowAddModal(true)}
-          >
+          <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
             <Plus size={22} color={colors.primary} />
           </Pressable>
         </View>
 
-        <ScrollView 
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.summaryCard}>
             <Text style={styles.tripName}>{trip.destination.name}</Text>
             <View style={styles.budgetOverview}>
@@ -159,11 +156,9 @@ export default function BudgetTrackerScreen() {
                 ) : (
                   <TrendingDown size={24} color={colors.success} />
                 )}
-                <Text style={[
-                  styles.remainingAmount,
-                  isOverBudget && styles.overBudget,
-                ]}>
-                  {isOverBudget ? 'Over by' : 'Remaining'}{'\n'}
+                <Text style={[styles.remainingAmount, isOverBudget && styles.overBudget]}>
+                  {isOverBudget ? 'Over by' : 'Remaining'}
+                  {'\n'}
                   {trip.currency} {Math.abs(remaining).toLocaleString()}
                 </Text>
               </View>
@@ -171,15 +166,19 @@ export default function BudgetTrackerScreen() {
 
             <View style={styles.progressContainer}>
               <View style={styles.progressBar}>
-                <View 
+                <View
                   style={[
                     styles.progressFill,
-                    { 
+                    {
                       width: `${Math.min(budgetProgress, 100)}%`,
-                      backgroundColor: budgetProgress > 90 ? colors.error : 
-                        budgetProgress > 70 ? colors.warning : colors.success,
+                      backgroundColor:
+                        budgetProgress > 90
+                          ? colors.error
+                          : budgetProgress > 70
+                            ? colors.warning
+                            : colors.success,
                     },
-                  ]} 
+                  ]}
                 />
               </View>
               <Text style={styles.progressText}>{budgetProgress.toFixed(0)}% used</Text>
@@ -191,13 +190,14 @@ export default function BudgetTrackerScreen() {
             <View style={styles.categoriesGrid}>
               {Object.entries(categoryIcons).map(([cat, Icon]) => {
                 const amount = expensesByCategory[cat] || 0;
-                const percentage = trip.spentBudget > 0 
-                  ? ((amount / trip.spentBudget) * 100).toFixed(0) 
-                  : '0';
-                
+                const percentage =
+                  trip.spentBudget > 0 ? ((amount / trip.spentBudget) * 100).toFixed(0) : '0';
+
                 return (
                   <View key={cat} style={styles.categoryCard}>
-                    <View style={[styles.categoryIcon, { backgroundColor: `${categoryColors[cat]}15` }]}>
+                    <View
+                      style={[styles.categoryIcon, { backgroundColor: `${categoryColors[cat]}15` }]}
+                    >
                       <Icon size={20} color={categoryColors[cat]} />
                     </View>
                     <Text style={styles.categoryName}>
@@ -217,11 +217,16 @@ export default function BudgetTrackerScreen() {
             <Text style={styles.sectionTitle}>Recent Expenses</Text>
             {expenses.length > 0 ? (
               <View style={styles.expensesList}>
-                {expenses.slice(0, 10).map(expense => {
+                {expenses.slice(0, 10).map((expense) => {
                   const Icon = categoryIcons[expense.category] || MoreHorizontal;
                   return (
                     <View key={expense.id} style={styles.expenseItem}>
-                      <View style={[styles.expenseIcon, { backgroundColor: `${categoryColors[expense.category]}15` }]}>
+                      <View
+                        style={[
+                          styles.expenseIcon,
+                          { backgroundColor: `${categoryColors[expense.category]}15` },
+                        ]}
+                      >
                         <Icon size={18} color={categoryColors[expense.category]} />
                       </View>
                       <View style={styles.expenseInfo}>
@@ -239,10 +244,7 @@ export default function BudgetTrackerScreen() {
               <View style={styles.emptyExpenses}>
                 <PieChart size={40} color={colors.textTertiary} />
                 <Text style={styles.emptyText}>No expenses recorded yet</Text>
-                <Pressable 
-                  style={styles.addExpenseButton}
-                  onPress={() => setShowAddModal(true)}
-                >
+                <Pressable style={styles.addExpenseButton} onPress={() => setShowAddModal(true)}>
                   <Plus size={18} color={colors.textLight} />
                   <Text style={styles.addExpenseText}>Add Expense</Text>
                 </Pressable>
@@ -254,9 +256,11 @@ export default function BudgetTrackerScreen() {
             <Text style={styles.sectionTitle}>Budget Tips</Text>
             <View style={styles.tipCard}>
               <Text style={styles.tipText}>
-                💡 You're spending most on <Text style={styles.tipHighlight}>
+                💡 You're spending most on{' '}
+                <Text style={styles.tipHighlight}>
                   {Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1])[0]?.[0] || 'food'}
-                </Text>. Consider setting daily limits for this category.
+                </Text>
+                . Consider setting daily limits for this category.
               </Text>
             </View>
           </View>
@@ -280,8 +284,8 @@ export default function BudgetTrackerScreen() {
               </View>
 
               <Text style={styles.inputLabel}>Category</Text>
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 style={styles.categoryScroll}
               >
@@ -292,16 +296,20 @@ export default function BudgetTrackerScreen() {
                       styles.categoryOption,
                       newExpense.category === cat && styles.categoryOptionActive,
                     ]}
-                    onPress={() => setNewExpense({ ...newExpense, category: cat as Expense['category'] })}
+                    onPress={() =>
+                      setNewExpense({ ...newExpense, category: cat as Expense['category'] })
+                    }
                   >
-                    <Icon 
-                      size={20} 
-                      color={newExpense.category === cat ? colors.textLight : categoryColors[cat]} 
+                    <Icon
+                      size={20}
+                      color={newExpense.category === cat ? colors.textLight : categoryColors[cat]}
                     />
-                    <Text style={[
-                      styles.categoryOptionText,
-                      newExpense.category === cat && styles.categoryOptionTextActive,
-                    ]}>
+                    <Text
+                      style={[
+                        styles.categoryOptionText,
+                        newExpense.category === cat && styles.categoryOptionTextActive,
+                      ]}
+                    >
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
                     </Text>
                   </Pressable>
@@ -332,10 +340,7 @@ export default function BudgetTrackerScreen() {
               />
 
               <Pressable
-                style={[
-                  styles.saveButton,
-                  !newExpense.amount && styles.saveButtonDisabled,
-                ]}
+                style={[styles.saveButton, !newExpense.amount && styles.saveButtonDisabled]}
                 onPress={handleAddExpense}
                 disabled={!newExpense.amount}
               >

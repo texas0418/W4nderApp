@@ -4,7 +4,7 @@ export type BudgetTier = '$' | '$$' | '$$$' | '$$$$';
 
 export type TripScope = 'local' | 'domestic' | 'international';
 
-export type ActivityType = 
+export type ActivityType =
   | 'adventurous'
   | 'relaxed'
   | 'romantic'

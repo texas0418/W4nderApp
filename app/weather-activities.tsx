@@ -95,9 +95,7 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
     autoLoad: true,
   });
 
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [selectedActivity, setSelectedActivity] = useState<WeatherAwareActivity | null>(null);
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [showFilter, setShowFilter] = useState<'all' | 'suitable' | 'indoor'>('suitable');
@@ -115,7 +113,7 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
       case 'suitable':
         return getSuitableActivities(selectedDate);
       case 'indoor':
-        return MOCK_ACTIVITIES.filter(a => !a.weatherRequirements.isOutdoor);
+        return MOCK_ACTIVITIES.filter((a) => !a.weatherRequirements.isOutdoor);
       default:
         return MOCK_ACTIVITIES;
     }
@@ -141,14 +139,11 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
         const isSelected = selectedDate === day.date;
         const isGood = isGoodWeatherDay(day.date);
         const date = new Date(day.date);
-        
+
         return (
           <TouchableOpacity
             key={day.date}
-            style={[
-              styles.dateCard,
-              isSelected && styles.dateCardSelected,
-            ]}
+            style={[styles.dateCard, isSelected && styles.dateCardSelected]}
             onPress={() => setSelectedDate(day.date)}
           >
             <Text style={[styles.dateDayName, isSelected && styles.dateTextSelected]}>
@@ -157,9 +152,7 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
             <Text style={[styles.dateDay, isSelected && styles.dateTextSelected]}>
               {date.getDate()}
             </Text>
-            <Text style={styles.dateWeatherIcon}>
-              {getWeatherIcon(day.condition.type)}
-            </Text>
+            <Text style={styles.dateWeatherIcon}>{getWeatherIcon(day.condition.type)}</Text>
             <Text style={[styles.dateTemp, isSelected && styles.dateTextSelected]}>
               {formatTemperature(day.high)}
             </Text>
@@ -182,18 +175,15 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
     return (
       <LinearGradient colors={gradient} style={styles.weatherHeader}>
         <View style={styles.weatherMain}>
-          <Text style={styles.weatherIcon}>
-            {getWeatherIcon(selectedForecast.condition.type)}
-          </Text>
+          <Text style={styles.weatherIcon}>{getWeatherIcon(selectedForecast.condition.type)}</Text>
           <View style={styles.weatherInfo}>
             <Text style={styles.weatherTemp}>
               {formatTemperature(selectedForecast.condition.temperature)}
             </Text>
-            <Text style={styles.weatherDesc}>
-              {selectedForecast.condition.description}
-            </Text>
+            <Text style={styles.weatherDesc}>{selectedForecast.condition.description}</Text>
             <Text style={styles.weatherHighLow}>
-              H: {formatTemperature(selectedForecast.high)} • L: {formatTemperature(selectedForecast.low)}
+              H: {formatTemperature(selectedForecast.high)} • L:{' '}
+              {formatTemperature(selectedForecast.low)}
             </Text>
           </View>
         </View>
@@ -206,7 +196,9 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
           </View>
           <View style={styles.weatherDetailItem}>
             <Text style={styles.weatherDetailIcon}>💨</Text>
-            <Text style={styles.weatherDetailValue}>{selectedForecast.condition.windSpeed} km/h</Text>
+            <Text style={styles.weatherDetailValue}>
+              {selectedForecast.condition.windSpeed} km/h
+            </Text>
             <Text style={styles.weatherDetailLabel}>Wind</Text>
           </View>
           <View style={styles.weatherDetailItem}>
@@ -216,7 +208,9 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
           </View>
           <View style={styles.weatherDetailItem}>
             <Text style={styles.weatherDetailIcon}>🌧️</Text>
-            <Text style={styles.weatherDetailValue}>{selectedForecast.condition.precipitation}%</Text>
+            <Text style={styles.weatherDetailValue}>
+              {selectedForecast.condition.precipitation}%
+            </Text>
             <Text style={styles.weatherDetailLabel}>Rain</Text>
           </View>
         </View>
@@ -240,32 +234,37 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
   const renderFilterTabs = () => (
     <View style={styles.filterTabs}>
       {[
-        { key: 'suitable', label: '✨ Recommended', count: getSuitableActivities(selectedDate).length },
-        { key: 'indoor', label: '🏠 Indoor', count: MOCK_ACTIVITIES.filter(a => !a.weatherRequirements.isOutdoor).length },
+        {
+          key: 'suitable',
+          label: '✨ Recommended',
+          count: getSuitableActivities(selectedDate).length,
+        },
+        {
+          key: 'indoor',
+          label: '🏠 Indoor',
+          count: MOCK_ACTIVITIES.filter((a) => !a.weatherRequirements.isOutdoor).length,
+        },
         { key: 'all', label: '📋 All', count: MOCK_ACTIVITIES.length },
       ].map((tab) => (
         <TouchableOpacity
           key={tab.key}
-          style={[
-            styles.filterTab,
-            showFilter === tab.key && styles.filterTabActive,
-          ]}
+          style={[styles.filterTab, showFilter === tab.key && styles.filterTabActive]}
           onPress={() => setShowFilter(tab.key as any)}
         >
-          <Text style={[
-            styles.filterTabText,
-            showFilter === tab.key && styles.filterTabTextActive,
-          ]}>
+          <Text
+            style={[styles.filterTabText, showFilter === tab.key && styles.filterTabTextActive]}
+          >
             {tab.label}
           </Text>
-          <View style={[
-            styles.filterTabBadge,
-            showFilter === tab.key && styles.filterTabBadgeActive,
-          ]}>
-            <Text style={[
-              styles.filterTabBadgeText,
-              showFilter === tab.key && styles.filterTabBadgeTextActive,
-            ]}>
+          <View
+            style={[styles.filterTabBadge, showFilter === tab.key && styles.filterTabBadgeActive]}
+          >
+            <Text
+              style={[
+                styles.filterTabBadgeText,
+                showFilter === tab.key && styles.filterTabBadgeTextActive,
+              ]}
+            >
               {tab.count}
             </Text>
           </View>
@@ -285,17 +284,29 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
         activeOpacity={0.9}
       >
         <View style={styles.activityImageContainer}>
-          <View style={[styles.activityImagePlaceholder, { backgroundColor: severityColor + '20' }]}>
+          <View
+            style={[styles.activityImagePlaceholder, { backgroundColor: severityColor + '20' }]}
+          >
             <Text style={styles.activityCategoryIcon}>
-              {activity.category === 'beach' ? '🏖️' :
-               activity.category === 'hiking' ? '🥾' :
-               activity.category === 'cultural' ? '🎨' :
-               activity.category === 'water_sports' ? '🚤' :
-               activity.category === 'food_drink' ? '🍷' :
-               activity.category === 'cycling' ? '🚴' :
-               activity.category === 'wellness' ? '🧘' :
-               activity.category === 'sightseeing' ? '📸' :
-               activity.category === 'nightlife' ? '🎭' : '✨'}
+              {activity.category === 'beach'
+                ? '🏖️'
+                : activity.category === 'hiking'
+                  ? '🥾'
+                  : activity.category === 'cultural'
+                    ? '🎨'
+                    : activity.category === 'water_sports'
+                      ? '🚤'
+                      : activity.category === 'food_drink'
+                        ? '🍷'
+                        : activity.category === 'cycling'
+                          ? '🚴'
+                          : activity.category === 'wellness'
+                            ? '🧘'
+                            : activity.category === 'sightseeing'
+                              ? '📸'
+                              : activity.category === 'nightlife'
+                                ? '🎭'
+                                : '✨'}
             </Text>
           </View>
           {suitability && (
@@ -310,9 +321,7 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
             <Text style={styles.activityName} numberOfLines={1}>
               {activity.name}
             </Text>
-            <Text style={styles.activityPrice}>
-              €{activity.price}
-            </Text>
+            <Text style={styles.activityPrice}>€{activity.price}</Text>
           </View>
 
           <Text style={styles.activityDescription} numberOfLines={2}>
@@ -352,9 +361,7 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
                 </View>
               ))}
               {suitability.adjustments.length > 3 && (
-                <Text style={styles.moreAdjustments}>
-                  +{suitability.adjustments.length - 3}
-                </Text>
+                <Text style={styles.moreAdjustments}>+{suitability.adjustments.length - 3}</Text>
               )}
             </View>
           )}
@@ -400,7 +407,8 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
                   </View>
                   <View style={styles.suitabilityInfo}>
                     <Text style={[styles.suitabilitySeverity, { color: severityColor }]}>
-                      {suitability.severity.charAt(0).toUpperCase() + suitability.severity.slice(1)} Conditions
+                      {suitability.severity.charAt(0).toUpperCase() + suitability.severity.slice(1)}{' '}
+                      Conditions
                     </Text>
                     <Text style={styles.suitabilityRecommended}>
                       {suitability.isRecommended ? '✅ Recommended' : '⚠️ Consider alternatives'}
@@ -412,7 +420,9 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
                   <View style={styles.warningsSection}>
                     <Text style={styles.warningSectionTitle}>⚠️ Weather Concerns</Text>
                     {suitability.warnings.map((warning, index) => (
-                      <Text key={index} style={styles.warningItem}>{warning}</Text>
+                      <Text key={index} style={styles.warningItem}>
+                        {warning}
+                      </Text>
                     ))}
                   </View>
                 )}
@@ -425,14 +435,23 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
                         <Text style={styles.adjustmentItemIcon}>{adj.icon}</Text>
                         <View style={styles.adjustmentItemContent}>
                           <Text style={styles.adjustmentItemTitle}>
-                            {adj.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            {adj.type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                           </Text>
                           <Text style={styles.adjustmentItemDesc}>{adj.description}</Text>
                         </View>
-                        <View style={[
-                          styles.adjustmentPriority,
-                          { backgroundColor: adj.priority === 'required' ? '#EF4444' : adj.priority === 'recommended' ? '#F59E0B' : '#10B981' }
-                        ]}>
+                        <View
+                          style={[
+                            styles.adjustmentPriority,
+                            {
+                              backgroundColor:
+                                adj.priority === 'required'
+                                  ? '#EF4444'
+                                  : adj.priority === 'recommended'
+                                    ? '#F59E0B'
+                                    : '#10B981',
+                            },
+                          ]}
+                        >
                           <Text style={styles.adjustmentPriorityText}>{adj.priority}</Text>
                         </View>
                       </View>
@@ -447,7 +466,12 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
                       <View key={index} style={styles.timeSlotItem}>
                         <Text style={styles.timeSlotTime}>{slot.startTime}</Text>
                         <View style={styles.timeSlotInfo}>
-                          <View style={[styles.timeSlotScore, { backgroundColor: `rgba(16, 185, 129, ${slot.score / 100})` }]}>
+                          <View
+                            style={[
+                              styles.timeSlotScore,
+                              { backgroundColor: `rgba(16, 185, 129, ${slot.score / 100})` },
+                            ]}
+                          >
                             <Text style={styles.timeSlotScoreText}>{slot.score}</Text>
                           </View>
                           <Text style={styles.timeSlotReason}>{slot.reason}</Text>
@@ -468,7 +492,7 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
                     key={index}
                     style={styles.alternativeItem}
                     onPress={() => {
-                      const altActivity = MOCK_ACTIVITIES.find(a => a.id === alt.alternativeId);
+                      const altActivity = MOCK_ACTIVITIES.find((a) => a.id === alt.alternativeId);
                       if (altActivity) {
                         setSelectedActivity(altActivity);
                       }
@@ -495,14 +519,11 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
 
             {/* Book Button */}
             <TouchableOpacity
-              style={[
-                styles.bookButton,
-                !suitability?.isRecommended && styles.bookButtonWarning,
-              ]}
+              style={[styles.bookButton, !suitability?.isRecommended && styles.bookButtonWarning]}
               onPress={() => {
                 Alert.alert(
                   suitability?.isRecommended ? 'Book Activity' : 'Weather Warning',
-                  suitability?.isRecommended 
+                  suitability?.isRecommended
                     ? 'Proceeding to booking...'
                     : 'Weather conditions may not be ideal. Do you want to proceed anyway?',
                   [
@@ -542,15 +563,15 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} />}
         stickyHeaderIndices={[2]}
       >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Weather-Aware Activities</Text>
-          <Text style={styles.headerSubtitle}>{location.city}, {location.country}</Text>
+          <Text style={styles.headerSubtitle}>
+            {location.city}, {location.country}
+          </Text>
         </View>
 
         {/* Date Selector */}
@@ -569,21 +590,16 @@ export const WeatherAwareActivitiesScreen: React.FC<WeatherAwareActivitiesScreen
               <Text style={styles.emptyIcon}>🌧️</Text>
               <Text style={styles.emptyTitle}>No suitable activities</Text>
               <Text style={styles.emptySubtitle}>
-                Weather conditions may not be ideal for outdoor activities today.
-                Try viewing indoor options!
+                Weather conditions may not be ideal for outdoor activities today. Try viewing indoor
+                options!
               </Text>
-              <TouchableOpacity
-                style={styles.emptyButton}
-                onPress={() => setShowFilter('indoor')}
-              >
+              <TouchableOpacity style={styles.emptyButton} onPress={() => setShowFilter('indoor')}>
                 <Text style={styles.emptyButtonText}>Show Indoor Activities</Text>
               </TouchableOpacity>
             </View>
           ) : (
-            displayActivities.map(activity => (
-              <View key={activity.id}>
-                {renderActivityCard(activity)}
-              </View>
+            displayActivities.map((activity) => (
+              <View key={activity.id}>{renderActivityCard(activity)}</View>
             ))
           )}
         </View>

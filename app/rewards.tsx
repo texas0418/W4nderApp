@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -42,10 +35,10 @@ export default function RewardsScreen() {
   const categories = ['discount', 'upgrade', 'freebie', 'experience'];
 
   const filteredRewards = selectedCategory
-    ? rewards.filter(r => r.category === selectedCategory && !r.isRedeemed)
-    : rewards.filter(r => !r.isRedeemed);
+    ? rewards.filter((r) => r.category === selectedCategory && !r.isRedeemed)
+    : rewards.filter((r) => !r.isRedeemed);
 
-  const redeemedRewards = rewards.filter(r => r.isRedeemed);
+  const redeemedRewards = rewards.filter((r) => r.isRedeemed);
 
   const handleRedeem = (reward: Reward) => {
     if (user.rewardPoints < reward.pointsCost) {
@@ -61,14 +54,17 @@ export default function RewardsScreen() {
       `Are you sure you want to redeem "${reward.name}" for ${reward.pointsCost} points?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Redeem', 
+        {
+          text: 'Redeem',
           onPress: () => {
             const success = redeemReward(reward.id);
             if (success) {
-              Alert.alert('Success!', 'Your reward has been redeemed. Check your email for details.');
+              Alert.alert(
+                'Success!',
+                'Your reward has been redeemed. Check your email for details.'
+              );
             }
-          }
+          },
         },
       ]
     );
@@ -86,16 +82,9 @@ export default function RewardsScreen() {
         disabled={!canRedeem}
       >
         {reward.image && (
-          <Image
-            source={{ uri: reward.image }}
-            style={styles.rewardImage}
-            contentFit="cover"
-          />
+          <Image source={{ uri: reward.image }} style={styles.rewardImage} contentFit="cover" />
         )}
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.8)']}
-          style={styles.rewardGradient}
-        />
+        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.rewardGradient} />
         <View style={styles.rewardContent}>
           <View style={styles.rewardBadge}>
             <Icon size={14} color={colors.textLight} />
@@ -128,10 +117,7 @@ export default function RewardsScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={[colors.warning, '#F59E0B']}
-        style={styles.headerGradient}
-      />
+      <LinearGradient colors={[colors.warning, '#F59E0B']} style={styles.headerGradient} />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <Pressable style={styles.backButton} onPress={() => router.back()}>
@@ -143,19 +129,18 @@ export default function RewardsScreen() {
           <Sparkles size={32} color={colors.textLight} />
           <Text style={styles.pointsLabel}>Your Points</Text>
           <Text style={styles.pointsValue}>{user.rewardPoints.toLocaleString()}</Text>
-          <Pressable 
+          <Pressable
             style={styles.earnMoreButton}
-            onPress={() => Alert.alert('Earn Points', 'Complete trips and bookings to earn more points!')}
+            onPress={() =>
+              Alert.alert('Earn Points', 'Complete trips and bookings to earn more points!')
+            }
           >
             <Text style={styles.earnMoreText}>How to earn more</Text>
             <ChevronRight size={16} color={colors.warning} />
           </Pressable>
         </View>
 
-        <ScrollView 
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.categoriesSection}>
             <ScrollView
               horizontal
@@ -163,20 +148,14 @@ export default function RewardsScreen() {
               contentContainerStyle={styles.categoriesContent}
             >
               <Pressable
-                style={[
-                  styles.categoryChip,
-                  !selectedCategory && styles.categoryChipActive,
-                ]}
+                style={[styles.categoryChip, !selectedCategory && styles.categoryChipActive]}
                 onPress={() => setSelectedCategory(null)}
               >
-                <Text style={[
-                  styles.categoryText,
-                  !selectedCategory && styles.categoryTextActive,
-                ]}>
+                <Text style={[styles.categoryText, !selectedCategory && styles.categoryTextActive]}>
                   All
                 </Text>
               </Pressable>
-              {categories.map(cat => {
+              {categories.map((cat) => {
                 const Icon = categoryIcons[cat];
                 return (
                   <Pressable
@@ -187,14 +166,16 @@ export default function RewardsScreen() {
                     ]}
                     onPress={() => setSelectedCategory(cat)}
                   >
-                    <Icon 
-                      size={16} 
-                      color={selectedCategory === cat ? colors.textLight : colors.textSecondary} 
+                    <Icon
+                      size={16}
+                      color={selectedCategory === cat ? colors.textLight : colors.textSecondary}
                     />
-                    <Text style={[
-                      styles.categoryText,
-                      selectedCategory === cat && styles.categoryTextActive,
-                    ]}>
+                    <Text
+                      style={[
+                        styles.categoryText,
+                        selectedCategory === cat && styles.categoryTextActive,
+                      ]}
+                    >
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
                     </Text>
                   </Pressable>
@@ -206,9 +187,7 @@ export default function RewardsScreen() {
           <View style={styles.rewardsSection}>
             <Text style={styles.sectionTitle}>Available Rewards</Text>
             {filteredRewards.length > 0 ? (
-              <View style={styles.rewardsGrid}>
-                {filteredRewards.map(renderRewardCard)}
-              </View>
+              <View style={styles.rewardsGrid}>{filteredRewards.map(renderRewardCard)}</View>
             ) : (
               <View style={styles.emptyState}>
                 <Gift size={40} color={colors.textTertiary} />
@@ -220,7 +199,7 @@ export default function RewardsScreen() {
           {redeemedRewards.length > 0 && (
             <View style={styles.redeemedSection}>
               <Text style={styles.sectionTitle}>Redeemed</Text>
-              {redeemedRewards.map(reward => (
+              {redeemedRewards.map((reward) => (
                 <View key={reward.id} style={styles.redeemedCard}>
                   <View style={styles.redeemedIcon}>
                     <Check size={18} color={colors.success} />

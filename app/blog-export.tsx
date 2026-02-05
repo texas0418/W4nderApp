@@ -41,7 +41,7 @@ import {
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
 import { PhotoJournalEntry } from '@/types';
-import React from "react";
+import React from 'react';
 
 const { width } = Dimensions.get('window');
 
@@ -193,7 +193,7 @@ export default function BlogExportScreen() {
 
   const uniqueTrips = useMemo(() => {
     const tripMap: Record<string, { id: string; name: string; entries: PhotoJournalEntry[] }> = {};
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       if (entry.tripId && entry.tripName) {
         if (!tripMap[entry.tripId]) {
           tripMap[entry.tripId] = { id: entry.tripId, name: entry.tripName, entries: [] };
@@ -205,40 +205,43 @@ export default function BlogExportScreen() {
   }, [entries]);
 
   const selectedEntriesData = useMemo(() => {
-    return entries.filter(e => selectedEntries.includes(e.id));
+    return entries.filter((e) => selectedEntries.includes(e.id));
   }, [entries, selectedEntries]);
 
   const toggleEntry = (entryId: string) => {
-    setSelectedEntries(prev => 
-      prev.includes(entryId) 
-        ? prev.filter(id => id !== entryId)
-        : [...prev, entryId]
+    setSelectedEntries((prev) =>
+      prev.includes(entryId) ? prev.filter((id) => id !== entryId) : [...prev, entryId]
     );
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const selectAllFromTrip = (tripId: string) => {
-    const tripEntries = entries.filter(e => e.tripId === tripId).map(e => e.id);
-    const allSelected = tripEntries.every(id => selectedEntries.includes(id));
-    
+    const tripEntries = entries.filter((e) => e.tripId === tripId).map((e) => e.id);
+    const allSelected = tripEntries.every((id) => selectedEntries.includes(id));
+
     if (allSelected) {
-      setSelectedEntries(prev => prev.filter(id => !tripEntries.includes(id)));
+      setSelectedEntries((prev) => prev.filter((id) => !tripEntries.includes(id)));
     } else {
-      setSelectedEntries(prev => [...new Set([...prev, ...tripEntries])]);
+      setSelectedEntries((prev) => [...new Set([...prev, ...tripEntries])]);
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   const generateBlogContent = () => {
     const tripName = selectedEntriesData[0]?.tripName || 'My Travel Story';
-    const locations = [...new Set(selectedEntriesData.map(e => e.location?.name).filter(Boolean))];
-    const dateRange = selectedEntriesData.length > 0 
-      ? `${formatDate(selectedEntriesData[selectedEntriesData.length - 1].date)} - ${formatDate(selectedEntriesData[0].date)}`
-      : '';
+    const locations = [
+      ...new Set(selectedEntriesData.map((e) => e.location?.name).filter(Boolean)),
+    ];
+    const dateRange =
+      selectedEntriesData.length > 0
+        ? `${formatDate(selectedEntriesData[selectedEntriesData.length - 1].date)} - ${formatDate(selectedEntriesData[0].date)}`
+        : '';
 
     return {
       title: blogTitle || `${tripName}: A Journey to Remember`,
-      intro: blogIntro || `Discover the highlights of my unforgettable adventure through ${locations.slice(0, 3).join(', ')}${locations.length > 3 ? ' and more' : ''}.`,
+      intro:
+        blogIntro ||
+        `Discover the highlights of my unforgettable adventure through ${locations.slice(0, 3).join(', ')}${locations.length > 3 ? ' and more' : ''}.`,
       author: authorName || 'Travel Enthusiast',
       dateRange,
       entries: selectedEntriesData,
@@ -290,7 +293,7 @@ export default function BlogExportScreen() {
       text += `📍 ${entry.location?.name || 'Unknown location'} | 📅 ${formatDate(entry.date)}\n\n`;
       text += `${entry.note}\n\n`;
       if (entry.tags.length > 0) {
-        text += `Tags: ${entry.tags.map(t => `#${t}`).join(' ')}\n\n`;
+        text += `Tags: ${entry.tags.map((t) => `#${t}`).join(' ')}\n\n`;
       }
       if (index < blog.entries.length - 1) {
         text += `---\n\n`;
@@ -330,32 +333,34 @@ export default function BlogExportScreen() {
     <View style={styles.stepIndicator}>
       {['select', 'customize', 'preview'].map((step, index) => (
         <View key={step} style={styles.stepItem}>
-          <View style={[
-            styles.stepDot,
-            currentStep === step && styles.stepDotActive,
-            (['select', 'customize', 'preview'].indexOf(currentStep) > index) && styles.stepDotCompleted,
-          ]}>
-            {(['select', 'customize', 'preview'].indexOf(currentStep) > index) ? (
+          <View
+            style={[
+              styles.stepDot,
+              currentStep === step && styles.stepDotActive,
+              ['select', 'customize', 'preview'].indexOf(currentStep) > index &&
+                styles.stepDotCompleted,
+            ]}
+          >
+            {['select', 'customize', 'preview'].indexOf(currentStep) > index ? (
               <Check size={12} color={colors.textLight} />
             ) : (
-              <Text style={[
-                styles.stepNumber,
-                currentStep === step && styles.stepNumberActive,
-              ]}>
+              <Text style={[styles.stepNumber, currentStep === step && styles.stepNumberActive]}>
                 {index + 1}
               </Text>
             )}
           </View>
-          <Text style={[
-            styles.stepLabel,
-            currentStep === step && styles.stepLabelActive,
-          ]}>
+          <Text style={[styles.stepLabel, currentStep === step && styles.stepLabelActive]}>
             {step.charAt(0).toUpperCase() + step.slice(1)}
           </Text>
-          {index < 2 && <View style={[
-            styles.stepLine,
-            (['select', 'customize', 'preview'].indexOf(currentStep) > index) && styles.stepLineCompleted,
-          ]} />}
+          {index < 2 && (
+            <View
+              style={[
+                styles.stepLine,
+                ['select', 'customize', 'preview'].indexOf(currentStep) > index &&
+                  styles.stepLineCompleted,
+              ]}
+            />
+          )}
         </View>
       ))}
     </View>
@@ -364,21 +369,16 @@ export default function BlogExportScreen() {
   const renderSelectStep = () => (
     <ScrollView style={styles.stepContent} showsVerticalScrollIndicator={false}>
       <Text style={styles.sectionTitle}>Select Photos for Your Story</Text>
-      <Text style={styles.sectionSubtitle}>
-        Choose the moments you want to share
-      </Text>
+      <Text style={styles.sectionSubtitle}>Choose the moments you want to share</Text>
 
-      {uniqueTrips.map(trip => {
-        const tripEntryIds = trip.entries.map(e => e.id);
-        const selectedCount = tripEntryIds.filter(id => selectedEntries.includes(id)).length;
+      {uniqueTrips.map((trip) => {
+        const tripEntryIds = trip.entries.map((e) => e.id);
+        const selectedCount = tripEntryIds.filter((id) => selectedEntries.includes(id)).length;
         const allSelected = selectedCount === trip.entries.length;
 
         return (
           <View key={trip.id} style={styles.tripSection}>
-            <Pressable 
-              style={styles.tripHeader}
-              onPress={() => selectAllFromTrip(trip.id)}
-            >
+            <Pressable style={styles.tripHeader} onPress={() => selectAllFromTrip(trip.id)}>
               <View style={styles.tripHeaderLeft}>
                 <Globe size={18} color={colors.primary} />
                 <Text style={styles.tripName}>{trip.name}</Text>
@@ -392,7 +392,7 @@ export default function BlogExportScreen() {
             </Pressable>
 
             <View style={styles.entriesGrid}>
-              {trip.entries.map(entry => {
+              {trip.entries.map((entry) => {
                 const isSelected = selectedEntries.includes(entry.id);
                 return (
                   <Pressable
@@ -422,7 +422,9 @@ export default function BlogExportScreen() {
                         </View>
                       )}
                     </View>
-                    <View style={[styles.entryCheckbox, isSelected && styles.entryCheckboxSelected]}>
+                    <View
+                      style={[styles.entryCheckbox, isSelected && styles.entryCheckboxSelected]}
+                    >
                       {isSelected && <Check size={14} color={colors.textLight} />}
                     </View>
                     {entry.isFavorite && (
@@ -445,9 +447,7 @@ export default function BlogExportScreen() {
   const renderCustomizeStep = () => (
     <ScrollView style={styles.stepContent} showsVerticalScrollIndicator={false}>
       <Text style={styles.sectionTitle}>Customize Your Blog</Text>
-      <Text style={styles.sectionSubtitle}>
-        Add your personal touch
-      </Text>
+      <Text style={styles.sectionSubtitle}>Add your personal touch</Text>
 
       <View style={styles.formSection}>
         <Text style={styles.formLabel}>Blog Title</Text>
@@ -487,7 +487,7 @@ export default function BlogExportScreen() {
       <View style={styles.formSection}>
         <Text style={styles.formLabel}>Choose a Style</Text>
         <View style={styles.templateGrid}>
-          {BLOG_TEMPLATES.map(template => (
+          {BLOG_TEMPLATES.map((template) => (
             <Pressable
               key={template.id}
               style={[
@@ -509,10 +509,9 @@ export default function BlogExportScreen() {
                 style={styles.templateGradient}
               />
               <View style={styles.templateInfo}>
-                <View style={[
-                  styles.templateIcon,
-                  { backgroundColor: template.primaryColor + '20' },
-                ]}>
+                <View
+                  style={[styles.templateIcon, { backgroundColor: template.primaryColor + '20' }]}
+                >
                   {template.icon}
                 </View>
                 <Text style={styles.templateName}>{template.name}</Text>
@@ -536,15 +535,12 @@ export default function BlogExportScreen() {
 
   const renderPreviewStep = () => {
     const blog = generateBlogContent();
-    
+
     return (
       <ScrollView style={styles.stepContent} showsVerticalScrollIndicator={false}>
         <View style={styles.previewHeader}>
           <Text style={styles.sectionTitle}>Preview Your Blog</Text>
-          <Pressable 
-            style={styles.fullPreviewButton}
-            onPress={() => setShowPreviewModal(true)}
-          >
+          <Pressable style={styles.fullPreviewButton} onPress={() => setShowPreviewModal(true)}>
             <Eye size={16} color={colors.primary} />
             <Text style={styles.fullPreviewText}>Full Preview</Text>
           </Pressable>
@@ -616,9 +612,7 @@ export default function BlogExportScreen() {
                 {entry.location && (
                   <View style={styles.entryPreviewLocation}>
                     <MapPin size={12} color={colors.textTertiary} />
-                    <Text style={styles.entryPreviewLocationText}>
-                      {entry.location.name}
-                    </Text>
+                    <Text style={styles.entryPreviewLocationText}>{entry.location.name}</Text>
                   </View>
                 )}
               </View>
@@ -626,17 +620,15 @@ export default function BlogExportScreen() {
           ))}
           {blog.entries.length > 3 && (
             <View style={styles.moreEntriesIndicator}>
-              <Text style={styles.moreEntriesText}>
-                +{blog.entries.length - 3} more entries
-              </Text>
+              <Text style={styles.moreEntriesText}>+{blog.entries.length - 3} more entries</Text>
             </View>
           )}
         </View>
 
         <View style={styles.exportActions}>
           <Text style={styles.exportTitle}>Export Your Story</Text>
-          
-          <Pressable 
+
+          <Pressable
             style={styles.exportOption}
             onPress={() => handleExport('share')}
             disabled={isExporting}
@@ -653,7 +645,7 @@ export default function BlogExportScreen() {
             <ChevronRight size={20} color={colors.textTertiary} />
           </Pressable>
 
-          <Pressable 
+          <Pressable
             style={styles.exportOption}
             onPress={() => handleExport('copy')}
             disabled={isExporting}
@@ -678,9 +670,7 @@ export default function BlogExportScreen() {
               <Text style={[styles.exportOptionTitle, { color: colors.textTertiary }]}>
                 Publish Online
               </Text>
-              <Text style={styles.exportOptionDescription}>
-                Coming soon - Get a shareable link
-              </Text>
+              <Text style={styles.exportOptionDescription}>Coming soon - Get a shareable link</Text>
             </View>
             <View style={styles.comingSoonBadge}>
               <Text style={styles.comingSoonText}>Soon</Text>
@@ -697,11 +687,7 @@ export default function BlogExportScreen() {
     const blog = generateBlogContent();
 
     return (
-      <Modal
-        visible={showPreviewModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
+      <Modal visible={showPreviewModal} animationType="slide" presentationStyle="pageSheet">
         <SafeAreaView style={styles.previewModalContainer}>
           <View style={styles.previewModalHeader}>
             <Pressable onPress={() => setShowPreviewModal(false)}>
@@ -746,22 +732,18 @@ export default function BlogExportScreen() {
                     {entry.location && (
                       <View style={styles.fullBlogEntryMetaItem}>
                         <MapPin size={14} color={colors.textSecondary} />
-                        <Text style={styles.fullBlogEntryMetaText}>
-                          {entry.location.name}
-                        </Text>
+                        <Text style={styles.fullBlogEntryMetaText}>{entry.location.name}</Text>
                       </View>
                     )}
                     <View style={styles.fullBlogEntryMetaItem}>
                       <Calendar size={14} color={colors.textSecondary} />
-                      <Text style={styles.fullBlogEntryMetaText}>
-                        {formatDate(entry.date)}
-                      </Text>
+                      <Text style={styles.fullBlogEntryMetaText}>{formatDate(entry.date)}</Text>
                     </View>
                   </View>
                   <Text style={styles.fullBlogEntryNote}>{entry.note}</Text>
                   {entry.tags.length > 0 && (
                     <View style={styles.fullBlogEntryTags}>
-                      {entry.tags.map(tag => (
+                      {entry.tags.map((tag) => (
                         <View key={tag} style={styles.fullBlogTag}>
                           <Text style={styles.fullBlogTagText}>#{tag}</Text>
                         </View>
@@ -779,15 +761,12 @@ export default function BlogExportScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#1a1a2e', '#16213e']}
-        style={styles.headerGradient}
-      />
+      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.headerGradient} />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
-          <Pressable 
-            style={styles.backButton} 
-            onPress={() => currentStep === 'select' ? router.back() : prevStep()}
+          <Pressable
+            style={styles.backButton}
+            onPress={() => (currentStep === 'select' ? router.back() : prevStep())}
           >
             <ArrowLeft size={24} color={colors.textLight} />
           </Pressable>
@@ -819,9 +798,7 @@ export default function BlogExportScreen() {
               {currentStep === 'customize' && (
                 <>
                   <Type size={16} color={colors.textSecondary} />
-                  <Text style={styles.selectionText}>
-                    {selectedTemplate.name} template
-                  </Text>
+                  <Text style={styles.selectionText}>{selectedTemplate.name} template</Text>
                 </>
               )}
             </View>

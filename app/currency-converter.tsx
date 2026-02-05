@@ -97,7 +97,7 @@ const MOCK_RATES: ExchangeRate = {
   USD: 1,
   EUR: 0.92,
   GBP: 0.79,
-  JPY: 149.50,
+  JPY: 149.5,
   AUD: 1.53,
   CAD: 1.36,
   CHF: 0.88,
@@ -105,7 +105,7 @@ const MOCK_RATES: ExchangeRate = {
   INR: 83.12,
   MXN: 17.15,
   BRL: 4.97,
-  KRW: 1328.50,
+  KRW: 1328.5,
   SGD: 1.34,
   HKD: 7.82,
   NOK: 10.62,
@@ -116,9 +116,9 @@ const MOCK_RATES: ExchangeRate = {
   THB: 35.23,
   AED: 3.67,
   PHP: 55.89,
-  IDR: 15678.50,
+  IDR: 15678.5,
   MYR: 4.72,
-  VND: 24365.00,
+  VND: 24365.0,
   TRY: 32.15,
   PLN: 3.98,
   CZK: 22.75,
@@ -158,13 +158,14 @@ export default function CurrencyConverterScreen() {
 
   const loadStoredData = async () => {
     try {
-      const [storedRates, storedLastUpdated, storedHistory, storedFavorites, storedSpending] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEYS.RATES),
-        AsyncStorage.getItem(STORAGE_KEYS.LAST_UPDATED),
-        AsyncStorage.getItem(STORAGE_KEYS.HISTORY),
-        AsyncStorage.getItem(STORAGE_KEYS.FAVORITES),
-        AsyncStorage.getItem(STORAGE_KEYS.SPENDING),
-      ]);
+      const [storedRates, storedLastUpdated, storedHistory, storedFavorites, storedSpending] =
+        await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEYS.RATES),
+          AsyncStorage.getItem(STORAGE_KEYS.LAST_UPDATED),
+          AsyncStorage.getItem(STORAGE_KEYS.HISTORY),
+          AsyncStorage.getItem(STORAGE_KEYS.FAVORITES),
+          AsyncStorage.getItem(STORAGE_KEYS.SPENDING),
+        ]);
 
       if (storedRates) {
         setRates(JSON.parse(storedRates));
@@ -189,10 +190,10 @@ export default function CurrencyConverterScreen() {
   const fetchRates = async () => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
       const fluctuatedRates = { ...MOCK_RATES };
-      Object.keys(fluctuatedRates).forEach(key => {
+      Object.keys(fluctuatedRates).forEach((key) => {
         if (key !== 'USD') {
           const fluctuation = 1 + (Math.random() - 0.5) * 0.02;
           fluctuatedRates[key] = MOCK_RATES[key] * fluctuation;
@@ -213,12 +214,15 @@ export default function CurrencyConverterScreen() {
     }
   };
 
-  const convertAmount = useCallback((value: number, from: string, to: string): number => {
-    if (from === to) return value;
-    const fromRate = rates[from] || 1;
-    const toRate = rates[to] || 1;
-    return (value / fromRate) * toRate;
-  }, [rates]);
+  const convertAmount = useCallback(
+    (value: number, from: string, to: string): number => {
+      if (from === to) return value;
+      const fromRate = rates[from] || 1;
+      const toRate = rates[to] || 1;
+      return (value / fromRate) * toRate;
+    },
+    [rates]
+  );
 
   const convertedAmount = useMemo(() => {
     const numAmount = parseFloat(amount) || 0;
@@ -256,7 +260,7 @@ export default function CurrencyConverterScreen() {
 
   const toggleFavorite = async (code: string) => {
     const updated = favorites.includes(code)
-      ? favorites.filter(f => f !== code)
+      ? favorites.filter((f) => f !== code)
       : [...favorites, code];
     setFavorites(updated);
     await AsyncStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(updated));
@@ -265,7 +269,7 @@ export default function CurrencyConverterScreen() {
   const filteredCurrencies = useMemo(() => {
     const query = searchQuery.toLowerCase();
     return CURRENCIES.filter(
-      c => c.code.toLowerCase().includes(query) || c.name.toLowerCase().includes(query)
+      (c) => c.code.toLowerCase().includes(query) || c.name.toLowerCase().includes(query)
     ).sort((a, b) => {
       const aFav = favorites.includes(a.code);
       const bFav = favorites.includes(b.code);
@@ -307,7 +311,7 @@ export default function CurrencyConverterScreen() {
   };
 
   const removeSpendingItem = async (id: string) => {
-    const updated = spendingItems.filter(item => item.id !== id);
+    const updated = spendingItems.filter((item) => item.id !== id);
     setSpendingItems(updated);
     await AsyncStorage.setItem(STORAGE_KEYS.SPENDING, JSON.stringify(updated));
   };
@@ -333,7 +337,7 @@ export default function CurrencyConverterScreen() {
   };
 
   const getCurrencyByCode = (code: string): Currency => {
-    return CURRENCIES.find(c => c.code === code) || CURRENCIES[0];
+    return CURRENCIES.find((c) => c.code === code) || CURRENCIES[0];
   };
 
   const renderCurrencyPicker = () => (
@@ -370,7 +374,7 @@ export default function CurrencyConverterScreen() {
 
         <FlatList
           data={filteredCurrencies}
-          keyExtractor={item => item.code}
+          keyExtractor={(item) => item.code}
           renderItem={({ item }) => (
             <Pressable
               style={[
@@ -385,10 +389,7 @@ export default function CurrencyConverterScreen() {
                 <Text style={styles.currencyCode}>{item.code}</Text>
                 <Text style={styles.currencyName}>{item.name}</Text>
               </View>
-              <Pressable
-                style={styles.favoriteButton}
-                onPress={() => toggleFavorite(item.code)}
-              >
+              <Pressable style={styles.favoriteButton} onPress={() => toggleFavorite(item.code)}>
                 <Star
                   size={20}
                   color={favorites.includes(item.code) ? colors.warning : colors.textTertiary}
@@ -421,16 +422,16 @@ export default function CurrencyConverterScreen() {
             ) : (
               <WifiOff size={16} color={colors.warning} />
             )}
-            <Text style={[styles.statusText, { color: isOnline ? colors.success : colors.warning }]}>
+            <Text
+              style={[styles.statusText, { color: isOnline ? colors.success : colors.warning }]}
+            >
               {isOnline ? 'Live Rates' : 'Offline Mode'}
             </Text>
           </View>
           {lastUpdated && (
             <View style={styles.statusItem}>
               <Clock size={14} color={colors.textTertiary} />
-              <Text style={styles.statusTextSmall}>
-                Updated {formatTime(lastUpdated)}
-              </Text>
+              <Text style={styles.statusTextSmall}>Updated {formatTime(lastUpdated)}</Text>
             </View>
           )}
           <Pressable style={styles.refreshButton} onPress={fetchRates} disabled={isLoading}>
@@ -447,7 +448,10 @@ export default function CurrencyConverterScreen() {
             style={[styles.tab, activeTab === 'converter' && styles.tabActive]}
             onPress={() => setActiveTab('converter')}
           >
-            <ArrowLeftRight size={18} color={activeTab === 'converter' ? colors.primary : colors.textTertiary} />
+            <ArrowLeftRight
+              size={18}
+              color={activeTab === 'converter' ? colors.primary : colors.textTertiary}
+            />
             <Text style={[styles.tabText, activeTab === 'converter' && styles.tabTextActive]}>
               Converter
             </Text>
@@ -456,7 +460,10 @@ export default function CurrencyConverterScreen() {
             style={[styles.tab, activeTab === 'calculator' && styles.tabActive]}
             onPress={() => setActiveTab('calculator')}
           >
-            <Calculator size={18} color={activeTab === 'calculator' ? colors.primary : colors.textTertiary} />
+            <Calculator
+              size={18}
+              color={activeTab === 'calculator' ? colors.primary : colors.textTertiary}
+            />
             <Text style={[styles.tabText, activeTab === 'calculator' && styles.tabTextActive]}>
               Spending
             </Text>
@@ -523,7 +530,7 @@ export default function CurrencyConverterScreen() {
             {history.length > 0 && (
               <View style={styles.historySection}>
                 <Text style={styles.sectionTitle}>Recent Conversions</Text>
-                {history.slice(0, 5).map(item => {
+                {history.slice(0, 5).map((item) => {
                   const from = getCurrencyByCode(item.from);
                   const to = getCurrencyByCode(item.to);
                   return (
@@ -543,7 +550,9 @@ export default function CurrencyConverterScreen() {
                       </View>
                       <View style={styles.historyDetails}>
                         <Text style={styles.historyAmount}>
-                          {from.symbol}{formatNumber(item.amount)} → {to.symbol}{formatNumber(item.result)}
+                          {from.symbol}
+                          {formatNumber(item.amount)} → {to.symbol}
+                          {formatNumber(item.result)}
                         </Text>
                         <Text style={styles.historyTime}>
                           {new Date(item.timestamp).toLocaleDateString()}
@@ -558,17 +567,19 @@ export default function CurrencyConverterScreen() {
             <View style={styles.quickConvert}>
               <Text style={styles.sectionTitle}>Quick Convert from {fromCurrency.code}</Text>
               <View style={styles.quickConvertGrid}>
-                {[10, 50, 100, 500].map(val => (
+                {[10, 50, 100, 500].map((val) => (
                   <Pressable
                     key={val}
                     style={styles.quickConvertItem}
                     onPress={() => setAmount(val.toString())}
                   >
                     <Text style={styles.quickConvertFrom}>
-                      {fromCurrency.symbol}{val}
+                      {fromCurrency.symbol}
+                      {val}
                     </Text>
                     <Text style={styles.quickConvertTo}>
-                      {toCurrency.symbol}{formatNumber(convertAmount(val, fromCurrency.code, toCurrency.code))}
+                      {toCurrency.symbol}
+                      {formatNumber(convertAmount(val, fromCurrency.code, toCurrency.code))}
                     </Text>
                   </Pressable>
                 ))}
@@ -645,19 +656,21 @@ export default function CurrencyConverterScreen() {
                 </View>
               ) : (
                 <View>
-                  {spendingItems.map(item => {
+                  {spendingItems.map((item) => {
                     const currency = getCurrencyByCode(item.currency);
                     return (
                       <View key={item.id} style={styles.spendingItem}>
                         <View style={styles.spendingItemInfo}>
                           <Text style={styles.spendingItemDesc}>{item.description}</Text>
                           <Text style={styles.spendingItemAmount}>
-                            {currency.flag} {currency.symbol}{formatNumber(item.amount)}
+                            {currency.flag} {currency.symbol}
+                            {formatNumber(item.amount)}
                           </Text>
                         </View>
                         <View style={styles.spendingItemConverted}>
                           <Text style={styles.spendingItemConvertedAmount}>
-                            {homeCurrency.symbol}{formatNumber(item.convertedAmount)}
+                            {homeCurrency.symbol}
+                            {formatNumber(item.convertedAmount)}
                           </Text>
                           <Pressable
                             style={styles.removeButton}
@@ -677,11 +690,10 @@ export default function CurrencyConverterScreen() {
               <View style={styles.totalCard}>
                 <Text style={styles.totalLabel}>Total Spending</Text>
                 <Text style={styles.totalAmount}>
-                  {homeCurrency.symbol}{formatNumber(totalSpending)}
+                  {homeCurrency.symbol}
+                  {formatNumber(totalSpending)}
                 </Text>
-                <Text style={styles.totalSubtext}>
-                  in {homeCurrency.name}
-                </Text>
+                <Text style={styles.totalSubtext}>in {homeCurrency.name}</Text>
               </View>
             )}
           </View>

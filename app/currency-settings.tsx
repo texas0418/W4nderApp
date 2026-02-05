@@ -1,15 +1,7 @@
 // W4nder Multi-Currency - Currency Settings Screen
 
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMultiCurrency } from '../hooks/useMultiCurrency';
 import { CurrencyCode, Currency } from '../types/currency';
@@ -18,9 +10,7 @@ interface CurrencySettingsScreenProps {
   navigation?: any;
 }
 
-const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
-  navigation,
-}) => {
+const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({ navigation }) => {
   const {
     preferences,
     updatePreferences,
@@ -38,14 +28,20 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [pickerMode, setPickerMode] = useState<'home' | 'favorite'>('home');
 
-  const handleSelectHomeCurrency = useCallback(async (code: CurrencyCode) => {
-    await setHomeCurrency(code);
-    setShowCurrencyPicker(false);
-  }, [setHomeCurrency]);
+  const handleSelectHomeCurrency = useCallback(
+    async (code: CurrencyCode) => {
+      await setHomeCurrency(code);
+      setShowCurrencyPicker(false);
+    },
+    [setHomeCurrency]
+  );
 
-  const handleToggleFavorite = useCallback(async (code: CurrencyCode) => {
-    await toggleFavorite(code);
-  }, [toggleFavorite]);
+  const handleToggleFavorite = useCallback(
+    async (code: CurrencyCode) => {
+      await toggleFavorite(code);
+    },
+    [toggleFavorite]
+  );
 
   const handleClearData = useCallback(() => {
     Alert.alert(
@@ -74,9 +70,9 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
   const renderCurrencyPicker = () => {
     const currencies = getAllCurrencies();
     const grouped: Record<string, Currency[]> = {};
-    
+
     // Group by region
-    currencies.forEach(currency => {
+    currencies.forEach((currency) => {
       const region = getRegion(currency.code);
       if (!grouped[region]) grouped[region] = [];
       grouped[region].push(currency);
@@ -98,7 +94,7 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
             {Object.entries(grouped).map(([region, regionCurrencies]) => (
               <View key={region} style={styles.pickerSection}>
                 <Text style={styles.pickerSectionTitle}>{region}</Text>
-                {regionCurrencies.map(currency => (
+                {regionCurrencies.map((currency) => (
                   <TouchableOpacity
                     key={currency.code}
                     style={styles.currencyOption}
@@ -137,14 +133,8 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Currency Settings</Text>
@@ -189,7 +179,7 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
             </TouchableOpacity>
           </View>
           <View style={styles.favoritesGrid}>
-            {favoriteCurrencies.map(code => {
+            {favoriteCurrencies.map((code) => {
               const currency = getCurrency(code);
               return (
                 <View key={code} style={styles.favoriteChip}>
@@ -204,13 +194,11 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
         {/* Display Options */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Display Options</Text>
-          
+
           <View style={styles.settingRow}>
             <View style={styles.settingTextContainer}>
               <Text style={styles.settingTitle}>Show Original Amount</Text>
-              <Text style={styles.settingSubtitle}>
-                Display amount in original currency
-              </Text>
+              <Text style={styles.settingSubtitle}>Display amount in original currency</Text>
             </View>
             <Switch
               value={preferences.showOriginalAmount}
@@ -222,9 +210,7 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
           <View style={styles.settingRow}>
             <View style={styles.settingTextContainer}>
               <Text style={styles.settingTitle}>Show Converted Amount</Text>
-              <Text style={styles.settingSubtitle}>
-                Display equivalent in home currency
-              </Text>
+              <Text style={styles.settingSubtitle}>Display equivalent in home currency</Text>
             </View>
             <Switch
               value={preferences.showConvertedAmount}
@@ -236,9 +222,7 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
           <View style={styles.settingRow}>
             <View style={styles.settingTextContainer}>
               <Text style={styles.settingTitle}>Auto-Convert New Expenses</Text>
-              <Text style={styles.settingSubtitle}>
-                Automatically convert when adding expenses
-              </Text>
+              <Text style={styles.settingSubtitle}>Automatically convert when adding expenses</Text>
             </View>
             <Switch
               value={preferences.autoConvert}
@@ -251,28 +235,32 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
         {/* Rounding */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Rounding</Text>
-          
+
           <View style={styles.roundingOptions}>
             {[
               { value: 'none', label: 'None' },
               { value: 'nearest', label: 'Nearest' },
               { value: 'up', label: 'Round Up' },
               { value: 'down', label: 'Round Down' },
-            ].map(option => (
+            ].map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[
                   styles.roundingOption,
                   preferences.roundingMode === option.value && styles.roundingOptionActive,
                 ]}
-                onPress={() => updatePreferences({ 
-                  roundingMode: option.value as 'none' | 'nearest' | 'up' | 'down'
-                })}
+                onPress={() =>
+                  updatePreferences({
+                    roundingMode: option.value as 'none' | 'nearest' | 'up' | 'down',
+                  })
+                }
               >
-                <Text style={[
-                  styles.roundingOptionText,
-                  preferences.roundingMode === option.value && styles.roundingOptionTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.roundingOptionText,
+                    preferences.roundingMode === option.value && styles.roundingOptionTextActive,
+                  ]}
+                >
                   {option.label}
                 </Text>
               </TouchableOpacity>
@@ -281,7 +269,7 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
 
           <Text style={styles.sectionSubtitle}>Decimal Places</Text>
           <View style={styles.decimalOptions}>
-            {[0, 1, 2, 3].map(places => (
+            {[0, 1, 2, 3].map((places) => (
               <TouchableOpacity
                 key={places}
                 style={[
@@ -290,10 +278,12 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
                 ]}
                 onPress={() => updatePreferences({ roundingPrecision: places })}
               >
-                <Text style={[
-                  styles.decimalOptionText,
-                  preferences.roundingPrecision === places && styles.decimalOptionTextActive,
-                ]}>
+                <Text
+                  style={[
+                    styles.decimalOptionText,
+                    preferences.roundingPrecision === places && styles.decimalOptionTextActive,
+                  ]}
+                >
                   {places}
                 </Text>
               </TouchableOpacity>
@@ -304,7 +294,7 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
         {/* Exchange Rates */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Exchange Rates</Text>
-          
+
           <View style={styles.ratesCard}>
             <View style={styles.ratesInfo}>
               <Text style={styles.ratesLabel}>Last Updated</Text>
@@ -328,7 +318,7 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
         {/* Data Management */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Data Management</Text>
-          
+
           <TouchableOpacity style={styles.dangerButton} onPress={handleClearData}>
             <Text style={styles.dangerButtonText}>Clear All Currency Data</Text>
           </TouchableOpacity>
@@ -348,9 +338,24 @@ const CurrencySettingsScreen: React.FC<CurrencySettingsScreenProps> = ({
 // Helper function to group currencies by region
 function getRegion(code: CurrencyCode): string {
   const regions: Record<string, CurrencyCode[]> = {
-    'Americas': ['USD', 'CAD', 'MXN', 'BRL', 'ARS', 'CLP', 'COP', 'PEN'],
-    'Europe': ['EUR', 'GBP', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'TRY', 'RUB'],
-    'Asia Pacific': ['JPY', 'CNY', 'AUD', 'NZD', 'HKD', 'SGD', 'KRW', 'THB', 'MYR', 'IDR', 'PHP', 'VND', 'TWD', 'INR'],
+    Americas: ['USD', 'CAD', 'MXN', 'BRL', 'ARS', 'CLP', 'COP', 'PEN'],
+    Europe: ['EUR', 'GBP', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'TRY', 'RUB'],
+    'Asia Pacific': [
+      'JPY',
+      'CNY',
+      'AUD',
+      'NZD',
+      'HKD',
+      'SGD',
+      'KRW',
+      'THB',
+      'MYR',
+      'IDR',
+      'PHP',
+      'VND',
+      'TWD',
+      'INR',
+    ],
     'Middle East & Africa': ['ZAR', 'ILS', 'AED', 'SAR', 'EGP', 'MAD', 'NGN'],
   };
 

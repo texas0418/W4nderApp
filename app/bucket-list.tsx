@@ -63,7 +63,7 @@ export default function BucketListScreen() {
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const filteredItems = bucketList.filter(item => {
+  const filteredItems = bucketList.filter((item) => {
     const matchesFilter =
       activeFilter === 'all' ||
       (activeFilter === 'wishlist' && !item.isVisited) ||
@@ -76,20 +76,11 @@ export default function BucketListScreen() {
     return matchesFilter && matchesSearch;
   });
 
-  const availableDestinations = destinations.filter(
-    dest => !isInBucketList(dest.id)
-  );
+  const availableDestinations = destinations.filter((dest) => !isInBucketList(dest.id));
 
-  const totalSavingsGoal = bucketList.reduce(
-    (sum, item) => sum + (item.savingsGoal || 0),
-    0
-  );
-  const totalCurrentSavings = bucketList.reduce(
-    (sum, item) => sum + (item.currentSavings || 0),
-    0
-  );
-  const savingsProgress =
-    totalSavingsGoal > 0 ? (totalCurrentSavings / totalSavingsGoal) * 100 : 0;
+  const totalSavingsGoal = bucketList.reduce((sum, item) => sum + (item.savingsGoal || 0), 0);
+  const totalCurrentSavings = bucketList.reduce((sum, item) => sum + (item.currentSavings || 0), 0);
+  const savingsProgress = totalSavingsGoal > 0 ? (totalCurrentSavings / totalSavingsGoal) * 100 : 0;
 
   const handleAddDestination = useCallback(
     (destination: Destination) => {
@@ -105,21 +96,17 @@ export default function BucketListScreen() {
 
   const handleRemoveItem = useCallback(
     (itemId: string) => {
-      Alert.alert(
-        'Remove from Bucket List',
-        'Are you sure you want to remove this destination?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Remove',
-            style: 'destructive',
-            onPress: () => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              removeFromBucketList(itemId);
-            },
+      Alert.alert('Remove from Bucket List', 'Are you sure you want to remove this destination?', [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            removeFromBucketList(itemId);
           },
-        ]
-      );
+        },
+      ]);
     },
     [removeFromBucketList]
   );
@@ -187,10 +174,7 @@ export default function BucketListScreen() {
             </View>
           )}
           <View
-            style={[
-              styles.priorityBadge,
-              { backgroundColor: getPriorityColor(item.priority) },
-            ]}
+            style={[styles.priorityBadge, { backgroundColor: getPriorityColor(item.priority) }]}
           >
             <Flag size={12} color={colors.textLight} />
           </View>
@@ -202,9 +186,7 @@ export default function BucketListScreen() {
               <Text style={styles.cardTitle}>{item.destination.name}</Text>
               <View style={styles.locationRow}>
                 <MapPin size={12} color={colors.textSecondary} />
-                <Text style={styles.cardLocation}>
-                  {item.destination.country}
-                </Text>
+                <Text style={styles.cardLocation}>{item.destination.country}</Text>
               </View>
             </View>
             <View style={styles.ratingBadge}>
@@ -223,9 +205,7 @@ export default function BucketListScreen() {
                 </Text>
               </View>
               <View style={styles.progressBar}>
-                <View
-                  style={[styles.progressFill, { width: `${progress}%` }]}
-                />
+                <View style={[styles.progressFill, { width: `${progress}%` }]} />
               </View>
               <Text style={styles.progressText}>{progress.toFixed(0)}% saved</Text>
             </View>
@@ -257,16 +237,11 @@ export default function BucketListScreen() {
                   onPress={() => handleMarkVisited(item.id)}
                 >
                   <Check size={16} color={colors.success} />
-                  <Text style={[styles.actionText, { color: colors.success }]}>
-                    Mark Visited
-                  </Text>
+                  <Text style={[styles.actionText, { color: colors.success }]}>Mark Visited</Text>
                 </Pressable>
               </>
             )}
-            <Pressable
-              style={styles.deleteButton}
-              onPress={() => handleRemoveItem(item.id)}
-            >
+            <Pressable style={styles.deleteButton} onPress={() => handleRemoveItem(item.id)}>
               <Trash2 size={16} color={colors.error} />
             </Pressable>
           </View>
@@ -283,10 +258,7 @@ export default function BucketListScreen() {
           headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.text,
           headerRight: () => (
-            <Pressable
-              style={styles.addButton}
-              onPress={() => setShowAddModal(true)}
-            >
+            <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
               <Plus size={22} color={colors.primary} />
             </Pressable>
           ),
@@ -309,9 +281,7 @@ export default function BucketListScreen() {
                 <View style={[styles.statIcon, { backgroundColor: `${colors.success}15` }]}>
                   <Award size={20} color={colors.success} />
                 </View>
-                <Text style={styles.statValue}>
-                  {bucketList.filter(i => i.isVisited).length}
-                </Text>
+                <Text style={styles.statValue}>{bucketList.filter((i) => i.isVisited).length}</Text>
                 <Text style={styles.statLabel}>Completed</Text>
               </View>
               <View style={styles.statDivider} />
@@ -328,16 +298,10 @@ export default function BucketListScreen() {
               <View style={styles.totalSavings}>
                 <Text style={styles.totalSavingsLabel}>Total Savings Progress</Text>
                 <View style={styles.totalProgressBar}>
-                  <View
-                    style={[
-                      styles.totalProgressFill,
-                      { width: `${savingsProgress}%` },
-                    ]}
-                  />
+                  <View style={[styles.totalProgressFill, { width: `${savingsProgress}%` }]} />
                 </View>
                 <Text style={styles.totalSavingsAmount}>
-                  ${totalCurrentSavings.toLocaleString()} of $
-                  {totalSavingsGoal.toLocaleString()}
+                  ${totalCurrentSavings.toLocaleString()} of ${totalSavingsGoal.toLocaleString()}
                 </Text>
               </View>
             )}
@@ -358,29 +322,17 @@ export default function BucketListScreen() {
         </View>
 
         <View style={styles.filterSection}>
-          {(['all', 'wishlist', 'visited'] as FilterType[]).map(filter => (
+          {(['all', 'wishlist', 'visited'] as FilterType[]).map((filter) => (
             <Pressable
               key={filter}
-              style={[
-                styles.filterChip,
-                activeFilter === filter && styles.filterChipActive,
-              ]}
+              style={[styles.filterChip, activeFilter === filter && styles.filterChipActive]}
               onPress={() => {
                 setActiveFilter(filter);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
             >
-              <Text
-                style={[
-                  styles.filterText,
-                  activeFilter === filter && styles.filterTextActive,
-                ]}
-              >
-                {filter === 'all'
-                  ? 'All'
-                  : filter === 'wishlist'
-                  ? 'Wishlist'
-                  : 'Visited'}
+              <Text style={[styles.filterText, activeFilter === filter && styles.filterTextActive]}>
+                {filter === 'all' ? 'All' : filter === 'wishlist' ? 'Wishlist' : 'Visited'}
               </Text>
             </Pressable>
           ))}
@@ -395,9 +347,7 @@ export default function BucketListScreen() {
                 <Sparkles size={48} color={colors.primary} />
               </View>
               <Text style={styles.emptyTitle}>
-                {bucketList.length === 0
-                  ? 'Start Your Bucket List'
-                  : 'No destinations found'}
+                {bucketList.length === 0 ? 'Start Your Bucket List' : 'No destinations found'}
               </Text>
               <Text style={styles.emptySubtitle}>
                 {bucketList.length === 0
@@ -405,10 +355,7 @@ export default function BucketListScreen() {
                   : 'Try adjusting your filters or search'}
               </Text>
               {bucketList.length === 0 && (
-                <Pressable
-                  style={styles.emptyButton}
-                  onPress={() => setShowAddModal(true)}
-                >
+                <Pressable style={styles.emptyButton} onPress={() => setShowAddModal(true)}>
                   <Plus size={18} color={colors.textLight} />
                   <Text style={styles.emptyButtonText}>Add Destination</Text>
                 </Pressable>
@@ -427,10 +374,7 @@ export default function BucketListScreen() {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Add to Bucket List</Text>
-            <Pressable
-              style={styles.closeButton}
-              onPress={() => setShowAddModal(false)}
-            >
+            <Pressable style={styles.closeButton} onPress={() => setShowAddModal(false)}>
               <X size={24} color={colors.text} />
             </Pressable>
           </View>
@@ -438,7 +382,7 @@ export default function BucketListScreen() {
           <ScrollView showsVerticalScrollIndicator={false}>
             {availableDestinations.length > 0 ? (
               <View style={styles.destinationGrid}>
-                {availableDestinations.map(dest => (
+                {availableDestinations.map((dest) => (
                   <Pressable
                     key={dest.id}
                     style={styles.destinationCard}
@@ -453,15 +397,9 @@ export default function BucketListScreen() {
                       <Text style={styles.destinationName}>{dest.name}</Text>
                       <Text style={styles.destinationCountry}>{dest.country}</Text>
                       <View style={styles.destinationMeta}>
-                        <Star
-                          size={12}
-                          color={colors.warning}
-                          fill={colors.warning}
-                        />
+                        <Star size={12} color={colors.warning} fill={colors.warning} />
                         <Text style={styles.destinationRating}>{dest.rating}</Text>
-                        <Text style={styles.destinationPrice}>
-                          ~${dest.avgPrice}/day
-                        </Text>
+                        <Text style={styles.destinationPrice}>~${dest.avgPrice}/day</Text>
                       </View>
                     </View>
                     <View style={styles.addOverlay}>
@@ -493,9 +431,7 @@ export default function BucketListScreen() {
           <View style={styles.editModalContent}>
             <Text style={styles.editModalTitle}>Add Savings</Text>
             {selectedItem && (
-              <Text style={styles.editModalSubtitle}>
-                {selectedItem.destination.name}
-              </Text>
+              <Text style={styles.editModalSubtitle}>{selectedItem.destination.name}</Text>
             )}
 
             <View style={styles.savingsInputContainer}>
@@ -515,13 +451,12 @@ export default function BucketListScreen() {
               <View style={styles.prioritySection}>
                 <Text style={styles.priorityLabel}>Priority</Text>
                 <View style={styles.priorityButtons}>
-                  {(['high', 'medium', 'low'] as PriorityType[]).map(priority => (
+                  {(['high', 'medium', 'low'] as PriorityType[]).map((priority) => (
                     <Pressable
                       key={priority}
                       style={[
                         styles.priorityButton,
-                        selectedItem.priority === priority &&
-                          styles.priorityButtonActive,
+                        selectedItem.priority === priority && styles.priorityButtonActive,
                         {
                           borderColor: getPriorityColor(priority),
                           backgroundColor:
@@ -561,10 +496,7 @@ export default function BucketListScreen() {
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </Pressable>
-              <Pressable
-                style={styles.saveButton}
-                onPress={handleUpdateSavings}
-              >
+              <Pressable style={styles.saveButton} onPress={handleUpdateSavings}>
                 <Text style={styles.saveButtonText}>Add Savings</Text>
               </Pressable>
             </View>

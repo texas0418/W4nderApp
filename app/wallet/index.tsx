@@ -32,11 +32,7 @@ import ConfirmationCard, {
   ConfirmationGroupHeader,
 } from '@/components/ConfirmationCard';
 import TicketViewer from '@/components/TicketViewer';
-import {
-  Confirmation,
-  ConfirmationType,
-  CONFIRMATION_TYPE_CONFIG,
-} from '@/types/confirmation';
+import { Confirmation, ConfirmationType, CONFIRMATION_TYPE_CONFIG } from '@/types/confirmation';
 import { useConfirmationWallet } from '@/hooks/useConfirmationStorage';
 
 const TYPE_ICONS: Record<ConfirmationType, React.ComponentType<any>> = {
@@ -98,7 +94,7 @@ export default function WalletScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.todayScroll}
         >
-          {todayConfirmations.map(conf => (
+          {todayConfirmations.map((conf) => (
             <MiniConfirmationCard
               key={conf.id}
               confirmation={conf}
@@ -118,22 +114,18 @@ export default function WalletScreen() {
       contentContainerStyle={styles.filterContent}
     >
       <TouchableOpacity
-        style={[
-          styles.filterChip,
-          selectedType === null && styles.filterChipSelected,
-        ]}
+        style={[styles.filterChip, selectedType === null && styles.filterChipSelected]}
         onPress={() => handleTypeFilter(null)}
       >
         <Wallet size={16} color={selectedType === null ? '#fff' : colors.text} />
-        <Text style={[
-          styles.filterChipText,
-          selectedType === null && styles.filterChipTextSelected,
-        ]}>
+        <Text
+          style={[styles.filterChipText, selectedType === null && styles.filterChipTextSelected]}
+        >
           All
         </Text>
       </TouchableOpacity>
 
-      {(Object.keys(CONFIRMATION_TYPE_CONFIG) as ConfirmationType[]).map(type => {
+      {(Object.keys(CONFIRMATION_TYPE_CONFIG) as ConfirmationType[]).map((type) => {
         const config = CONFIRMATION_TYPE_CONFIG[type];
         const Icon = TYPE_ICONS[type];
         const isSelected = selectedType === type;
@@ -141,17 +133,11 @@ export default function WalletScreen() {
         return (
           <TouchableOpacity
             key={type}
-            style={[
-              styles.filterChip,
-              isSelected && { backgroundColor: config.color },
-            ]}
+            style={[styles.filterChip, isSelected && { backgroundColor: config.color }]}
             onPress={() => handleTypeFilter(type)}
           >
             <Icon size={16} color={isSelected ? '#fff' : config.color} />
-            <Text style={[
-              styles.filterChipText,
-              isSelected && styles.filterChipTextSelected,
-            ]}>
+            <Text style={[styles.filterChipText, isSelected && styles.filterChipTextSelected]}>
               {config.label}
             </Text>
           </TouchableOpacity>
@@ -167,10 +153,7 @@ export default function WalletScreen() {
       <Text style={styles.emptyText}>
         Your booking confirmations, tickets, and QR codes will appear here
       </Text>
-      <TouchableOpacity
-        style={styles.emptyButton}
-        onPress={() => router.push('/wallet/add')}
-      >
+      <TouchableOpacity style={styles.emptyButton} onPress={() => router.push('/wallet/add')}>
         <Plus size={18} color="#fff" />
         <Text style={styles.emptyButtonText}>Add Confirmation</Text>
       </TouchableOpacity>
@@ -204,11 +187,8 @@ export default function WalletScreen() {
       keyExtractor={(item) => item.label}
       renderItem={({ item: group }) => (
         <View>
-          <ConfirmationGroupHeader
-            label={group.label}
-            count={group.confirmations.length}
-          />
-          {group.confirmations.map(conf => (
+          <ConfirmationGroupHeader label={group.label} count={group.confirmations.length} />
+          {group.confirmations.map((conf) => (
             <ConfirmationCard
               key={conf.id}
               confirmation={conf}
@@ -222,11 +202,7 @@ export default function WalletScreen() {
       ListHeaderComponent={!searchQuery ? renderTodaySection : null}
       ListEmptyComponent={renderEmpty}
       refreshControl={
-        <RefreshControl
-          refreshing={isLoading}
-          onRefresh={refresh}
-          tintColor={colors.primary}
-        />
+        <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={colors.primary} />
       }
     />
   );
@@ -243,10 +219,7 @@ export default function WalletScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Wallet</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push('/wallet/add')}
-        >
+        <TouchableOpacity style={styles.addButton} onPress={() => router.push('/wallet/add')}>
           <Plus size={22} color={colors.primary} />
         </TouchableOpacity>
       </View>

@@ -1,14 +1,7 @@
 // W4nder Time-Optimized Routes - Route Settings Screen
 
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TransportPreferences, OptimizationConstraints, TransportMode } from '../types/routes';
 import { TRANSPORT_MODE_INFO } from '../mocks/mockRouteData';
@@ -43,38 +36,40 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
   const [cons, setCons] = useState<OptimizationConstraints>(constraints);
 
   const toggleMode = useCallback((mode: TransportMode) => {
-    setPrefs(prev => {
+    setPrefs((prev) => {
       const modes = prev.preferredModes.includes(mode)
-        ? prev.preferredModes.filter(m => m !== mode)
+        ? prev.preferredModes.filter((m) => m !== mode)
         : [...prev.preferredModes, mode];
       return { ...prev, preferredModes: modes };
     });
   }, []);
 
   const updateTime = useCallback((field: 'startTime' | 'endTime', delta: number) => {
-    setCons(prev => {
+    setCons((prev) => {
       const [h, m] = prev[field].split(':').map(Number);
       const newH = Math.max(6, Math.min(23, h + delta));
       return { ...prev, [field]: `${String(newH).padStart(2, '0')}:${String(m).padStart(2, '0')}` };
     });
   }, []);
 
-  const updateMealTime = useCallback((
-    meal: 'lunchWindow' | 'dinnerWindow',
-    type: 'start' | 'end',
-    delta: number
-  ) => {
-    setCons(prev => {
-      const window = prev[meal];
-      if (!window) return prev;
-      const [h, m] = window[type].split(':').map(Number);
-      const newH = Math.max(6, Math.min(23, h + delta));
-      return {
-        ...prev,
-        [meal]: { ...window, [type]: `${String(newH).padStart(2, '0')}:${String(m).padStart(2, '0')}` },
-      };
-    });
-  }, []);
+  const updateMealTime = useCallback(
+    (meal: 'lunchWindow' | 'dinnerWindow', type: 'start' | 'end', delta: number) => {
+      setCons((prev) => {
+        const window = prev[meal];
+        if (!window) return prev;
+        const [h, m] = window[type].split(':').map(Number);
+        const newH = Math.max(6, Math.min(23, h + delta));
+        return {
+          ...prev,
+          [meal]: {
+            ...window,
+            [type]: `${String(newH).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+          },
+        };
+      });
+    },
+    []
+  );
 
   const handleSave = useCallback(() => {
     onSave?.(prefs, cons);
@@ -96,7 +91,7 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preferred Transport</Text>
           <View style={styles.modesGrid}>
-            {(Object.keys(TRANSPORT_MODE_INFO) as TransportMode[]).map(mode => {
+            {(Object.keys(TRANSPORT_MODE_INFO) as TransportMode[]).map((mode) => {
               const info = TRANSPORT_MODE_INFO[mode];
               const selected = prefs.preferredModes.includes(mode);
               return (
@@ -123,9 +118,12 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
             <View style={styles.stepper}>
               <TouchableOpacity
                 style={styles.stepperBtn}
-                onPress={() => setPrefs(p => ({
-                  ...p, maxWalkingDistance: Math.max(500, p.maxWalkingDistance - 250)
-                }))}
+                onPress={() =>
+                  setPrefs((p) => ({
+                    ...p,
+                    maxWalkingDistance: Math.max(500, p.maxWalkingDistance - 250),
+                  }))
+                }
               >
                 <Text style={styles.stepperBtnText}>−</Text>
               </TouchableOpacity>
@@ -136,9 +134,12 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
               </Text>
               <TouchableOpacity
                 style={styles.stepperBtn}
-                onPress={() => setPrefs(p => ({
-                  ...p, maxWalkingDistance: Math.min(5000, p.maxWalkingDistance + 250)
-                }))}
+                onPress={() =>
+                  setPrefs((p) => ({
+                    ...p,
+                    maxWalkingDistance: Math.min(5000, p.maxWalkingDistance + 250),
+                  }))
+                }
               >
                 <Text style={styles.stepperBtnText}>+</Text>
               </TouchableOpacity>
@@ -150,18 +151,24 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
             <View style={styles.stepper}>
               <TouchableOpacity
                 style={styles.stepperBtn}
-                onPress={() => setPrefs(p => ({
-                  ...p, maxWalkingDuration: Math.max(5, p.maxWalkingDuration - 5)
-                }))}
+                onPress={() =>
+                  setPrefs((p) => ({
+                    ...p,
+                    maxWalkingDuration: Math.max(5, p.maxWalkingDuration - 5),
+                  }))
+                }
               >
                 <Text style={styles.stepperBtnText}>−</Text>
               </TouchableOpacity>
               <Text style={styles.stepperValue}>{prefs.maxWalkingDuration} min</Text>
               <TouchableOpacity
                 style={styles.stepperBtn}
-                onPress={() => setPrefs(p => ({
-                  ...p, maxWalkingDuration: Math.min(45, p.maxWalkingDuration + 5)
-                }))}
+                onPress={() =>
+                  setPrefs((p) => ({
+                    ...p,
+                    maxWalkingDuration: Math.min(45, p.maxWalkingDuration + 5),
+                  }))
+                }
               >
                 <Text style={styles.stepperBtnText}>+</Text>
               </TouchableOpacity>
@@ -179,7 +186,7 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
             </View>
             <Switch
               value={prefs.avoidHighways || false}
-              onValueChange={v => setPrefs(p => ({ ...p, avoidHighways: v }))}
+              onValueChange={(v) => setPrefs((p) => ({ ...p, avoidHighways: v }))}
               trackColor={{ false: '#ddd', true: '#00b894' }}
               thumbColor="#fff"
             />
@@ -192,7 +199,7 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
             </View>
             <Switch
               value={prefs.avoidTolls || false}
-              onValueChange={v => setPrefs(p => ({ ...p, avoidTolls: v }))}
+              onValueChange={(v) => setPrefs((p) => ({ ...p, avoidTolls: v }))}
               trackColor={{ false: '#ddd', true: '#00b894' }}
               thumbColor="#fff"
             />
@@ -205,7 +212,7 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
             </View>
             <Switch
               value={prefs.wheelchairAccessible || false}
-              onValueChange={v => setPrefs(p => ({ ...p, wheelchairAccessible: v }))}
+              onValueChange={(v) => setPrefs((p) => ({ ...p, wheelchairAccessible: v }))}
               trackColor={{ false: '#ddd', true: '#00b894' }}
               thumbColor="#fff"
             />
@@ -219,7 +226,10 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
             <View style={styles.timeBlock}>
               <Text style={styles.timeLabel}>Day Start</Text>
               <View style={styles.timeStepper}>
-                <TouchableOpacity style={styles.timeBtn} onPress={() => updateTime('startTime', -1)}>
+                <TouchableOpacity
+                  style={styles.timeBtn}
+                  onPress={() => updateTime('startTime', -1)}
+                >
                   <Text style={styles.timeBtnText}>−</Text>
                 </TouchableOpacity>
                 <Text style={styles.timeValue}>{cons.startTime}</Text>
@@ -249,11 +259,17 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
               <View style={styles.timeBlock}>
                 <Text style={styles.timeLabel}>From</Text>
                 <View style={styles.timeStepper}>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('lunchWindow', 'start', -1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('lunchWindow', 'start', -1)}
+                  >
                     <Text style={styles.timeBtnText}>−</Text>
                   </TouchableOpacity>
                   <Text style={styles.timeValue}>{cons.lunchWindow?.start}</Text>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('lunchWindow', 'start', 1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('lunchWindow', 'start', 1)}
+                  >
                     <Text style={styles.timeBtnText}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -261,11 +277,17 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
               <View style={styles.timeBlock}>
                 <Text style={styles.timeLabel}>To</Text>
                 <View style={styles.timeStepper}>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('lunchWindow', 'end', -1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('lunchWindow', 'end', -1)}
+                  >
                     <Text style={styles.timeBtnText}>−</Text>
                   </TouchableOpacity>
                   <Text style={styles.timeValue}>{cons.lunchWindow?.end}</Text>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('lunchWindow', 'end', 1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('lunchWindow', 'end', 1)}
+                  >
                     <Text style={styles.timeBtnText}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -280,11 +302,17 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
               <View style={styles.timeBlock}>
                 <Text style={styles.timeLabel}>From</Text>
                 <View style={styles.timeStepper}>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('dinnerWindow', 'start', -1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('dinnerWindow', 'start', -1)}
+                  >
                     <Text style={styles.timeBtnText}>−</Text>
                   </TouchableOpacity>
                   <Text style={styles.timeValue}>{cons.dinnerWindow?.start}</Text>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('dinnerWindow', 'start', 1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('dinnerWindow', 'start', 1)}
+                  >
                     <Text style={styles.timeBtnText}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -292,11 +320,17 @@ const RouteSettingsScreen: React.FC<RouteSettingsScreenProps> = ({
               <View style={styles.timeBlock}>
                 <Text style={styles.timeLabel}>To</Text>
                 <View style={styles.timeStepper}>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('dinnerWindow', 'end', -1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('dinnerWindow', 'end', -1)}
+                  >
                     <Text style={styles.timeBtnText}>−</Text>
                   </TouchableOpacity>
                   <Text style={styles.timeValue}>{cons.dinnerWindow?.end}</Text>
-                  <TouchableOpacity style={styles.timeBtn} onPress={() => updateMealTime('dinnerWindow', 'end', 1)}>
+                  <TouchableOpacity
+                    style={styles.timeBtn}
+                    onPress={() => updateMealTime('dinnerWindow', 'end', 1)}
+                  >
                     <Text style={styles.timeBtnText}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -327,50 +361,86 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: '600', color: '#1a1a1a', marginBottom: 12 },
   modesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   modeCard: {
-    width: '30%', backgroundColor: '#fff', borderRadius: 16, padding: 16, alignItems: 'center',
-    borderWidth: 2, borderColor: 'transparent',
+    width: '30%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   modeCardSelected: { borderColor: '#00b894', backgroundColor: '#E8FFF8' },
   modeIcon: { fontSize: 28, marginBottom: 8 },
   modeName: { fontSize: 13, fontWeight: '600', color: '#666' },
   modeNameSelected: { color: '#00b894' },
   settingRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
   },
   settingLabel: { fontSize: 15, fontWeight: '600', color: '#1a1a1a' },
   stepper: { flexDirection: 'row', alignItems: 'center' },
   stepperBtn: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: '#f5f5f5',
-    justifyContent: 'center', alignItems: 'center',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   stepperBtnText: { fontSize: 20, color: '#00b894', fontWeight: '600' },
   stepperValue: {
-    fontSize: 16, fontWeight: '700', color: '#00b894', marginHorizontal: 12, minWidth: 60, textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#00b894',
+    marginHorizontal: 12,
+    minWidth: 60,
+    textAlign: 'center',
   },
   toggleRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
   },
   toggleInfo: { flex: 1, marginRight: 16 },
   toggleLabel: { fontSize: 15, fontWeight: '600', color: '#1a1a1a', marginBottom: 2 },
   toggleDesc: { fontSize: 13, color: '#888' },
   timeRow: { flexDirection: 'row', gap: 12 },
   timeBlock: {
-    flex: 1, backgroundColor: '#fff', borderRadius: 16, padding: 16, alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
   },
   timeLabel: { fontSize: 12, color: '#888', marginBottom: 8 },
   timeStepper: { flexDirection: 'row', alignItems: 'center' },
   timeBtn: {
-    width: 32, height: 32, borderRadius: 16, backgroundColor: '#f5f5f5',
-    justifyContent: 'center', alignItems: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   timeBtnText: { fontSize: 18, color: '#00b894', fontWeight: '600' },
   timeValue: { fontSize: 18, fontWeight: '700', color: '#1a1a1a', marginHorizontal: 12 },
   mealSection: { marginTop: 16 },
   mealTitle: { fontSize: 15, fontWeight: '600', color: '#1a1a1a', marginBottom: 12 },
   saveButton: {
-    backgroundColor: '#00b894', borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginTop: 8,
+    backgroundColor: '#00b894',
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    marginTop: 8,
   },
   saveButtonText: { fontSize: 17, fontWeight: '600', color: '#fff' },
   bottomPadding: { height: 40 },

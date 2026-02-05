@@ -1,13 +1,5 @@
 import React, { useState, useRef, ComponentType } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Dimensions,
-  Animated,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable, Dimensions, Animated, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -37,7 +29,12 @@ import {
 } from 'lucide-react-native';
 import type { LucideProps } from 'lucide-react-native';
 import colors from '@/constants/colors';
-import { travelStyles, budgetRanges, travelPreferences, foodPreferences } from '@/mocks/preferences';
+import {
+  travelStyles,
+  budgetRanges,
+  travelPreferences,
+  foodPreferences,
+} from '@/mocks/preferences';
 import { useApp } from '@/contexts/AppContext';
 import { OnboardingData } from '@/types';
 
@@ -118,26 +115,32 @@ export default function OnboardingScreen() {
 
   const togglePreference = (id: string) => {
     const prefs = data.preferences.includes(id)
-      ? data.preferences.filter(p => p !== id)
+      ? data.preferences.filter((p) => p !== id)
       : [...data.preferences, id];
     setData({ ...data, preferences: prefs });
   };
 
   const toggleFoodPreference = (id: string) => {
     const prefs = data.foodPreferences.includes(id)
-      ? data.foodPreferences.filter(p => p !== id)
+      ? data.foodPreferences.filter((p) => p !== id)
       : [...data.foodPreferences, id];
     setData({ ...data, foodPreferences: prefs });
   };
 
   const canProceed = () => {
     switch (step) {
-      case 0: return true;
-      case 1: return data.travelStyle !== null;
-      case 2: return data.budgetRange !== null;
-      case 3: return data.preferences.length >= 3;
-      case 4: return data.foodPreferences.length >= 2;
-      default: return false;
+      case 0:
+        return true;
+      case 1:
+        return data.travelStyle !== null;
+      case 2:
+        return data.budgetRange !== null;
+      case 3:
+        return data.preferences.length >= 3;
+      case 4:
+        return data.foodPreferences.length >= 2;
+      default:
+        return false;
     }
   };
 
@@ -182,7 +185,7 @@ export default function OnboardingScreen() {
         This helps us tailor recommendations to your travel style
       </Text>
       <View style={styles.optionsGrid}>
-        {travelStyles.map(style => {
+        {travelStyles.map((style) => {
           const IconComponent = iconMap[style.icon];
           const isSelected = data.travelStyle === style.id;
           return (
@@ -193,10 +196,7 @@ export default function OnboardingScreen() {
             >
               <View style={[styles.styleIconContainer, isSelected && styles.styleIconSelected]}>
                 {IconComponent && (
-                  <IconComponent
-                    size={28}
-                    color={isSelected ? colors.textLight : colors.primary}
-                  />
+                  <IconComponent size={28} color={isSelected ? colors.textLight : colors.primary} />
                 )}
               </View>
               <Text style={[styles.styleName, isSelected && styles.styleNameSelected]}>
@@ -222,7 +222,7 @@ export default function OnboardingScreen() {
         Average daily spending per person (accommodations, food, activities)
       </Text>
       <View style={styles.budgetList}>
-        {budgetRanges.map(budget => {
+        {budgetRanges.map((budget) => {
           const IconComponent = iconMap[budget.icon];
           const isSelected = data.budgetRange === budget.id;
           return (
@@ -233,10 +233,7 @@ export default function OnboardingScreen() {
             >
               <View style={[styles.budgetIcon, isSelected && styles.budgetIconSelected]}>
                 {IconComponent && (
-                  <IconComponent
-                    size={24}
-                    color={isSelected ? colors.textLight : colors.primary}
-                  />
+                  <IconComponent size={24} color={isSelected ? colors.textLight : colors.primary} />
                 )}
               </View>
               <View style={styles.budgetInfo}>
@@ -265,13 +262,13 @@ export default function OnboardingScreen() {
       <Text style={styles.stepSubtitle}>
         Select at least 3 interests to personalize your experience
       </Text>
-      <ScrollView 
+      <ScrollView
         style={styles.preferencesScroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.preferencesContent}
       >
         <View style={styles.preferencesGrid}>
-          {travelPreferences.map(pref => {
+          {travelPreferences.map((pref) => {
             const IconComponent = iconMap[pref.icon];
             const isSelected = data.preferences.includes(pref.id);
             return (
@@ -281,10 +278,7 @@ export default function OnboardingScreen() {
                 onPress={() => togglePreference(pref.id)}
               >
                 {IconComponent && (
-                  <IconComponent
-                    size={18}
-                    color={isSelected ? colors.textLight : colors.primary}
-                  />
+                  <IconComponent size={18} color={isSelected ? colors.textLight : colors.primary} />
                 )}
                 <Text style={[styles.prefText, isSelected && styles.prefTextSelected]}>
                   {pref.name}
@@ -306,13 +300,13 @@ export default function OnboardingScreen() {
       <Text style={styles.stepSubtitle}>
         Select at least 2 food preferences to get personalized dining recommendations
       </Text>
-      <ScrollView 
+      <ScrollView
         style={styles.preferencesScroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.preferencesContent}
       >
         <View style={styles.foodGrid}>
-          {foodPreferences.map(food => {
+          {foodPreferences.map((food) => {
             const isSelected = data.foodPreferences.includes(food.id);
             return (
               <Pressable
@@ -340,7 +334,13 @@ export default function OnboardingScreen() {
     </View>
   );
 
-  const steps = [renderWelcome, renderTravelStyle, renderBudget, renderPreferences, renderFoodPreferences];
+  const steps = [
+    renderWelcome,
+    renderTravelStyle,
+    renderBudget,
+    renderPreferences,
+    renderFoodPreferences,
+  ];
 
   return (
     <View style={styles.container}>
@@ -357,14 +357,8 @@ export default function OnboardingScreen() {
           )}
           {step > 0 && (
             <View style={styles.progressContainer}>
-              {[1, 2, 3, 4].map(i => (
-                <View
-                  key={i}
-                  style={[
-                    styles.progressDot,
-                    i <= step && styles.progressDotActive,
-                  ]}
-                />
+              {[1, 2, 3, 4].map((i) => (
+                <View key={i} style={[styles.progressDot, i <= step && styles.progressDotActive]} />
               ))}
             </View>
           )}
@@ -382,7 +376,7 @@ export default function OnboardingScreen() {
             disabled={!canProceed()}
           >
             <Text style={styles.nextButtonText}>
-              {step === 0 ? 'Let\'s Begin' : step === 4 ? 'Start Exploring' : 'Continue'}
+              {step === 0 ? "Let's Begin" : step === 4 ? 'Start Exploring' : 'Continue'}
             </Text>
             <ChevronRight size={20} color={colors.textLight} />
           </Pressable>

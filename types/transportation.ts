@@ -117,7 +117,7 @@ export const TRANSPORTATION_OPTIONS: TransportationOption[] = [
 
 // Helper to get option by mode
 export function getTransportOption(mode: TransportationMode): TransportationOption {
-  return TRANSPORTATION_OPTIONS.find(opt => opt.mode === mode) || TRANSPORTATION_OPTIONS[0];
+  return TRANSPORTATION_OPTIONS.find((opt) => opt.mode === mode) || TRANSPORTATION_OPTIONS[0];
 }
 
 // Duration estimates by mode (rough multipliers based on driving time)

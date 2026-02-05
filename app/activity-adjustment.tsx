@@ -108,7 +108,7 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
 
   // Get activity data
   const activity = useMemo(() => {
-    return MOCK_ACTIVITIES.find(a => a.id === activityId) || MOCK_ACTIVITIES[0];
+    return MOCK_ACTIVITIES.find((a) => a.id === activityId) || MOCK_ACTIVITIES[0];
   }, [activityId]);
 
   // Get weather assessment
@@ -131,14 +131,15 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
   const handleShare = async () => {
     if (!activity || !suitability) return;
 
-    const shareText = `🏃 Activity Weather Check\n\n` +
+    const shareText =
+      `🏃 Activity Weather Check\n\n` +
       `📍 ${activity.name}\n` +
       `📅 ${selectedDate}\n` +
       `🌡️ Weather: ${dayForecast?.condition.description || 'Unknown'}\n\n` +
       `📊 Suitability Score: ${suitability.score}/100\n` +
       `${suitability.isRecommended ? '✅ Recommended' : '⚠️ Not Ideal'}\n\n` +
-      (suitability.adjustments.length > 0 
-        ? `🎯 Tips:\n${suitability.adjustments.map(a => `• ${a.description}`).join('\n')}\n\n`
+      (suitability.adjustments.length > 0
+        ? `🎯 Tips:\n${suitability.adjustments.map((a) => `• ${a.description}`).join('\n')}\n\n`
         : '') +
       `Plan your activities with W4nder! 🧳`;
 
@@ -156,10 +157,16 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
         'The weather conditions are not ideal for this activity. Would you like to proceed anyway or see alternatives?',
         [
           { text: 'See Alternatives', onPress: () => setShowAlternativesModal(true) },
-          { text: 'Proceed Anyway', onPress: () => {
-            // Navigate to booking
-            navigation?.navigate('ActivityBooking', { activityId: activity?.id, date: selectedDate });
-          }},
+          {
+            text: 'Proceed Anyway',
+            onPress: () => {
+              // Navigate to booking
+              navigation?.navigate('ActivityBooking', {
+                activityId: activity?.id,
+                date: selectedDate,
+              });
+            },
+          },
           { text: 'Cancel', style: 'cancel' },
         ]
       );
@@ -192,29 +199,21 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
     return (
       <LinearGradient colors={gradient} style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.shareButton}
-            onPress={handleShare}
-          >
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <Text style={styles.shareButtonText}>📤</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.headerContent}>
           <View style={styles.activityIcon}>
-            <Text style={styles.activityIconText}>
-              {categoryIcons[activity.category] || '✨'}
-            </Text>
+            <Text style={styles.activityIconText}>{categoryIcons[activity.category] || '✨'}</Text>
           </View>
           <Text style={styles.activityName}>{activity.name}</Text>
           <Text style={styles.activityCategory}>
-            {activity.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            {activity.category.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
           </Text>
 
           {/* Suitability Score Circle */}
@@ -223,10 +222,12 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
             <Text style={styles.scoreLabel}>/ 100</Text>
           </View>
 
-          <View style={[
-            styles.recommendationBadge,
-            suitability.isRecommended ? styles.badgeGood : styles.badgeWarning
-          ]}>
+          <View
+            style={[
+              styles.recommendationBadge,
+              suitability.isRecommended ? styles.badgeGood : styles.badgeWarning,
+            ]}
+          >
             <Text style={styles.recommendationText}>
               {suitability.isRecommended ? '✓ Recommended Today' : '⚠️ Not Ideal Today'}
             </Text>
@@ -237,9 +238,7 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
         {dayForecast && (
           <View style={styles.weatherSnapshot}>
             <View style={styles.weatherItem}>
-              <Text style={styles.weatherIcon}>
-                {getWeatherIcon(dayForecast.condition.type)}
-              </Text>
+              <Text style={styles.weatherIcon}>{getWeatherIcon(dayForecast.condition.type)}</Text>
               <Text style={styles.weatherValue}>
                 {formatTemperature(dayForecast.condition.temperature)}
               </Text>
@@ -287,15 +286,11 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
     if (!suitability || suitability.adjustments.length === 0) return null;
 
     // Group by priority
-    const required = suitability.adjustments.filter(a => a.priority === 'required');
-    const recommended = suitability.adjustments.filter(a => a.priority === 'recommended');
-    const optional = suitability.adjustments.filter(a => a.priority === 'optional');
+    const required = suitability.adjustments.filter((a) => a.priority === 'required');
+    const recommended = suitability.adjustments.filter((a) => a.priority === 'recommended');
+    const optional = suitability.adjustments.filter((a) => a.priority === 'optional');
 
-    const renderAdjustmentGroup = (
-      items: ActivityAdjustment[], 
-      title: string, 
-      color: string
-    ) => {
+    const renderAdjustmentGroup = (items: ActivityAdjustment[], title: string, color: string) => {
       if (items.length === 0) return null;
 
       return (
@@ -312,9 +307,7 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
                 <Text style={styles.adjustmentDescription}>{adjustment.description}</Text>
               </View>
               <View style={[styles.priorityBadge, { backgroundColor: color }]}>
-                <Text style={styles.priorityBadgeText}>
-                  {adjustment.priority.toUpperCase()}
-                </Text>
+                <Text style={styles.priorityBadgeText}>{adjustment.priority.toUpperCase()}</Text>
               </View>
             </View>
           ))}
@@ -344,15 +337,15 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
           </TouchableOpacity>
         </View>
 
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.timeSlotsScroll}
         >
           {suitability.bestTimeSlots.slice(0, 4).map((slot, index) => {
-            const scoreColor = slot.score >= 80 ? '#10B981' : 
-                              slot.score >= 60 ? '#F59E0B' : '#EF4444';
-            
+            const scoreColor =
+              slot.score >= 80 ? '#10B981' : slot.score >= 60 ? '#F59E0B' : '#EF4444';
+
             return (
               <View key={index} style={styles.timeSlotCard}>
                 <View style={[styles.timeSlotScore, { backgroundColor: scoreColor }]}>
@@ -362,7 +355,8 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
                   {slot.startTime} - {slot.endTime}
                 </Text>
                 <Text style={styles.timeSlotWeather}>
-                  {getWeatherIcon(slot.condition.type)} {formatTemperature(slot.condition.temperature)}
+                  {getWeatherIcon(slot.condition.type)}{' '}
+                  {formatTemperature(slot.condition.temperature)}
                 </Text>
                 <Text style={styles.timeSlotReason} numberOfLines={2}>
                   {slot.reason}
@@ -392,14 +386,16 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
         </Text>
 
         {alternatives.slice(0, 2).map((alt, index) => (
-          <TouchableOpacity 
-            key={index} 
+          <TouchableOpacity
+            key={index}
             style={styles.alternativeCard}
-            onPress={() => navigation?.navigate('ActivityAdjustment', {
-              activityId: alt.alternativeId,
-              date: selectedDate,
-              location,
-            })}
+            onPress={() =>
+              navigation?.navigate('ActivityAdjustment', {
+                activityId: alt.alternativeId,
+                date: selectedDate,
+                location,
+              })
+            }
           >
             <View style={styles.alternativeHeader}>
               <Text style={styles.alternativeName}>{alt.alternativeName}</Text>
@@ -417,8 +413,11 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
             </View>
             <View style={styles.alternativeFooter}>
               <Text style={styles.priceComparison}>
-                {alt.priceComparison === 'cheaper' ? '💚 Cheaper' :
-                 alt.priceComparison === 'similar' ? '🔵 Similar price' : '🔴 More expensive'}
+                {alt.priceComparison === 'cheaper'
+                  ? '💚 Cheaper'
+                  : alt.priceComparison === 'similar'
+                    ? '🔵 Similar price'
+                    : '🔴 More expensive'}
               </Text>
               <Text style={styles.viewArrow}>View →</Text>
             </View>
@@ -469,8 +468,8 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
           </Text>
 
           {suitability?.bestTimeSlots.map((slot, index) => {
-            const scoreColor = slot.score >= 80 ? '#10B981' : 
-                              slot.score >= 60 ? '#F59E0B' : '#EF4444';
+            const scoreColor =
+              slot.score >= 80 ? '#10B981' : slot.score >= 60 ? '#F59E0B' : '#EF4444';
 
             return (
               <View key={index} style={styles.fullTimeSlotCard}>
@@ -487,7 +486,8 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
                         {getWeatherIcon(slot.condition.type)}
                       </Text>
                       <Text style={styles.timeSlotWeatherText}>
-                        {formatTemperature(slot.condition.temperature)} • {slot.condition.description}
+                        {formatTemperature(slot.condition.temperature)} •{' '}
+                        {slot.condition.description}
                       </Text>
                     </View>
                     <Text style={styles.timeSlotReasonFull}>{slot.reason}</Text>
@@ -537,13 +537,11 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
         </View>
 
         <ScrollView style={styles.modalContent}>
-          <Text style={styles.modalSubtitle}>
-            Weather-proof alternatives to {activity?.name}
-          </Text>
+          <Text style={styles.modalSubtitle}>Weather-proof alternatives to {activity?.name}</Text>
 
           {alternatives.map((alt, index) => (
-            <TouchableOpacity 
-              key={index} 
+            <TouchableOpacity
+              key={index}
               style={styles.fullAlternativeCard}
               onPress={() => {
                 setShowAlternativesModal(false);
@@ -558,7 +556,7 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
                 <View>
                   <Text style={styles.fullAltName}>{alt.alternativeName}</Text>
                   <Text style={styles.fullAltCategory}>
-                    {alt.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    {alt.category.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                   </Text>
                 </View>
                 <View style={styles.fullMatchBadge}>
@@ -578,14 +576,19 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
               </View>
 
               <View style={styles.fullAltFooter}>
-                <View style={[
-                  styles.priceBadge,
-                  alt.priceComparison === 'cheaper' && styles.priceCheaper,
-                  alt.priceComparison === 'more_expensive' && styles.priceMore,
-                ]}>
+                <View
+                  style={[
+                    styles.priceBadge,
+                    alt.priceComparison === 'cheaper' && styles.priceCheaper,
+                    alt.priceComparison === 'more_expensive' && styles.priceMore,
+                  ]}
+                >
                   <Text style={styles.priceText}>
-                    {alt.priceComparison === 'cheaper' ? '↓ Cheaper' :
-                     alt.priceComparison === 'similar' ? '≈ Similar' : '↑ More'}
+                    {alt.priceComparison === 'cheaper'
+                      ? '↓ Cheaper'
+                      : alt.priceComparison === 'similar'
+                        ? '≈ Similar'
+                        : '↑ More'}
                   </Text>
                 </View>
                 <Text style={styles.selectText}>Select →</Text>
@@ -634,10 +637,7 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {renderHeader()}
 
         <View style={styles.content}>
@@ -652,10 +652,7 @@ export const ActivityAdjustmentScreen: React.FC<ActivityAdjustmentScreenProps> =
       {/* Action Button */}
       <View style={styles.actionBar}>
         <TouchableOpacity
-          style={[
-            styles.actionButton,
-            !suitability?.isRecommended && styles.actionButtonWarning
-          ]}
+          style={[styles.actionButton, !suitability?.isRecommended && styles.actionButtonWarning]}
           onPress={handleBookActivity}
         >
           <Text style={styles.actionButtonText}>

@@ -28,7 +28,7 @@ class BookingService {
 
   private notifyListeners() {
     if (this.currentSession) {
-      this.listeners.forEach(callback => callback(this.currentSession!));
+      this.listeners.forEach((callback) => callback(this.currentSession!));
     }
   }
 
@@ -87,7 +87,7 @@ class BookingService {
     // Process each request in priority order
     for (const request of this.currentSession.requests) {
       await this.processBooking(request);
-      
+
       // Small delay between bookings to avoid rate limiting
       await this.delay(500);
     }
@@ -127,13 +127,12 @@ class BookingService {
     try {
       // Simulate API call to provider
       const bookingResult = await this.callProviderAPI(request);
-      
+
       // Update result with response
       Object.assign(result, bookingResult);
-      
+
       // Update progress
       this.updateProgress(result);
-      
     } catch (error: any) {
       result.status = 'failed';
       result.error = {
@@ -142,7 +141,7 @@ class BookingService {
         recoverable: true,
         suggestedAction: 'Try again or book manually',
       };
-      
+
       // Try fallback providers
       if (request.fallbackProviders && request.fallbackProviders.length > 0) {
         const fallbackResult = await this.tryFallbackProviders(request, result);
@@ -150,13 +149,13 @@ class BookingService {
           Object.assign(result, fallbackResult);
         }
       }
-      
+
       this.updateProgress(result);
     }
 
     this.currentSession.results.set(request.id, result);
     this.notifyListeners();
-    
+
     return result;
   }
 
@@ -166,7 +165,7 @@ class BookingService {
     await this.delay(1500 + Math.random() * 1500);
 
     const provider = PROVIDER_CONFIGS[request.provider];
-    
+
     // Simulate different success rates by category
     const successRate = this.getSuccessRate(request.category);
     const isSuccess = Math.random() < successRate;
@@ -177,7 +176,7 @@ class BookingService {
 
     // Generate confirmation
     const confirmationNumber = this.generateConfirmationNumber(request.provider);
-    
+
     // Calculate final cost (may vary from estimate)
     const costVariation = 0.9 + Math.random() * 0.2; // -10% to +10%
     const finalCost = Math.round(request.estimatedCost * costVariation * 100) / 100;
@@ -221,7 +220,9 @@ class BookingService {
         const fallbackRequest = { ...request, provider: fallbackProvider };
         const result = await this.callProviderAPI(fallbackRequest);
         result.provider = fallbackProvider;
-        result.warnings = [`Booked via ${PROVIDER_CONFIGS[fallbackProvider].displayName} (fallback)`];
+        result.warnings = [
+          `Booked via ${PROVIDER_CONFIGS[fallbackProvider].displayName} (fallback)`,
+        ];
         return result;
       } catch {
         continue;
@@ -244,7 +245,9 @@ class BookingService {
         if (result.finalCost) {
           this.currentSession.paymentSummary.actualTotal += result.finalCost;
           this.currentSession.paymentSummary.itemizedCosts.push({
-            name: this.currentSession.requests.find(r => r.id === result.requestId)?.activityName || 'Unknown',
+            name:
+              this.currentSession.requests.find((r) => r.id === result.requestId)?.activityName ||
+              'Unknown',
             cost: result.finalCost,
           });
         }
@@ -264,7 +267,7 @@ class BookingService {
     if (!this.currentSession) return;
 
     const { progress } = this.currentSession;
-    
+
     if (progress.failed === 0 && progress.requiresAction === 0) {
       this.currentSession.status = 'completed';
     } else if (progress.completed === 0) {
@@ -283,7 +286,7 @@ class BookingService {
       throw new Error('No active booking session');
     }
 
-    const request = this.currentSession.requests.find(r => r.id === requestId);
+    const request = this.currentSession.requests.find((r) => r.id === requestId);
     if (!request) {
       throw new Error('Booking request not found');
     }
@@ -295,7 +298,7 @@ class BookingService {
 
     const result = await this.processBooking(request);
     this.finalizeSession();
-    
+
     return result;
   }
 
@@ -327,10 +330,10 @@ class BookingService {
 
     result.status = 'cancelled';
     result.paymentStatus = 'refunded';
-    
+
     // Update progress
     this.currentSession.progress.completed--;
-    this.currentSession.paymentSummary.actualTotal -= (result.finalCost || 0);
+    this.currentSession.paymentSummary.actualTotal -= result.finalCost || 0;
 
     this.notifyListeners();
     return result;
@@ -338,7 +341,7 @@ class BookingService {
 
   // Helper methods
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private getSuccessRate(category: BookingCategory): number {
@@ -392,7 +395,7 @@ export function createBookingRequestsFromItinerary(
   preferences: any
 ): BookingRequest[] {
   return activities
-    .filter(activity => activity.reservationRequired || activity.ticketRequired)
+    .filter((activity) => activity.reservationRequired || activity.ticketRequired)
     .map((activity, index) => {
       const category = detectBookingCategory(activity);
       const provider = detectBestProvider(category, activity);
@@ -435,7 +438,12 @@ function detectBookingCategory(activity: any): BookingCategory {
   const type = (activity.type || '').toLowerCase();
   const name = (activity.name || '').toLowerCase();
 
-  if (type.includes('dining') || type.includes('restaurant') || name.includes('dinner') || name.includes('lunch')) {
+  if (
+    type.includes('dining') ||
+    type.includes('restaurant') ||
+    name.includes('dinner') ||
+    name.includes('lunch')
+  ) {
     return 'restaurant';
   }
   if (type.includes('concert') || name.includes('concert') || name.includes('show')) {
@@ -486,7 +494,10 @@ function detectBestProvider(category: BookingCategory, activity: any): BookingPr
   return providerMap[category] || 'direct';
 }
 
-function getFallbackProviders(primary: BookingProvider, category: BookingCategory): BookingProvider[] {
+function getFallbackProviders(
+  primary: BookingProvider,
+  category: BookingCategory
+): BookingProvider[] {
   const fallbacks: Record<BookingCategory, BookingProvider[]> = {
     restaurant: ['resy', 'yelp', 'direct'],
     concert: ['stubhub', 'axs', 'eventbrite'],
@@ -503,7 +514,7 @@ function getFallbackProviders(primary: BookingProvider, category: BookingCategor
     other: ['phone', 'email'],
   };
 
-  return (fallbacks[category] || []).filter(p => p !== primary);
+  return (fallbacks[category] || []).filter((p) => p !== primary);
 }
 
 function calculateDuration(startTime: string, endTime: string): number {
@@ -512,7 +523,7 @@ function calculateDuration(startTime: string, endTime: string): number {
   const [startHour, startMin] = startTime.split(':').map(Number);
   const [endHour, endMin] = endTime.split(':').map(Number);
 
-  let duration = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+  let duration = endHour * 60 + endMin - (startHour * 60 + startMin);
   if (duration < 0) duration += 24 * 60; // handle overnight
 
   return duration;
@@ -522,10 +533,10 @@ function estimateCost(activity: any, category: BookingCategory): number {
   // Use activity's estimated cost if available
   if (activity.estimatedCost) {
     const costMap: Record<string, number> = {
-      '$': 25,
-      '$$': 50,
-      '$$$': 100,
-      '$$$$': 200,
+      $: 25,
+      $$: 50,
+      $$$: 100,
+      $$$$: 200,
     };
     return costMap[activity.estimatedCost] || 50;
   }

@@ -4,12 +4,47 @@
 // CURRENCY CORE TYPES
 // ============================================================================
 
-export type CurrencyCode = 
-  | 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CNY' | 'AUD' | 'CAD' | 'CHF'
-  | 'HKD' | 'SGD' | 'SEK' | 'NOK' | 'DKK' | 'NZD' | 'MXN' | 'BRL'
-  | 'INR' | 'KRW' | 'THB' | 'MYR' | 'IDR' | 'PHP' | 'VND' | 'TWD'
-  | 'ZAR' | 'TRY' | 'PLN' | 'CZK' | 'HUF' | 'ILS' | 'AED' | 'SAR'
-  | 'RUB' | 'CLP' | 'COP' | 'PEN' | 'ARS' | 'EGP' | 'MAD' | 'NGN';
+export type CurrencyCode =
+  | 'USD'
+  | 'EUR'
+  | 'GBP'
+  | 'JPY'
+  | 'CNY'
+  | 'AUD'
+  | 'CAD'
+  | 'CHF'
+  | 'HKD'
+  | 'SGD'
+  | 'SEK'
+  | 'NOK'
+  | 'DKK'
+  | 'NZD'
+  | 'MXN'
+  | 'BRL'
+  | 'INR'
+  | 'KRW'
+  | 'THB'
+  | 'MYR'
+  | 'IDR'
+  | 'PHP'
+  | 'VND'
+  | 'TWD'
+  | 'ZAR'
+  | 'TRY'
+  | 'PLN'
+  | 'CZK'
+  | 'HUF'
+  | 'ILS'
+  | 'AED'
+  | 'SAR'
+  | 'RUB'
+  | 'CLP'
+  | 'COP'
+  | 'PEN'
+  | 'ARS'
+  | 'EGP'
+  | 'MAD'
+  | 'NGN';
 
 export interface Currency {
   code: CurrencyCode;
@@ -106,21 +141,21 @@ export type ExpenseCategory =
 export interface Expense {
   id: string;
   tripId?: string;
-  
+
   // Amount
   amount: number;
   currency: CurrencyCode;
   convertedAmount?: number;
   convertedCurrency?: CurrencyCode;
   exchangeRateUsed?: number;
-  
+
   // Details
   description: string;
   category: ExpenseCategory;
   subcategory?: string;
   vendor?: string;
   location?: string;
-  
+
   // Metadata
   date: string;
   time?: string;
@@ -128,12 +163,12 @@ export interface Expense {
   receiptImageUri?: string;
   notes?: string;
   tags?: string[];
-  
+
   // Splitting
   isSplit?: boolean;
   splitWith?: string[];
   myShare?: number;
-  
+
   createdAt: string;
   updatedAt: string;
 }
@@ -156,22 +191,22 @@ export interface Budget {
   id: string;
   tripId?: string;
   name: string;
-  
+
   totalAmount: number;
   currency: CurrencyCode;
-  
+
   // Allocation
   categoryBudgets?: Partial<Record<ExpenseCategory, number>>;
   dailyBudget?: number;
-  
+
   // Tracking
   spent: number;
   remaining: number;
   percentUsed: number;
-  
+
   startDate: string;
   endDate: string;
-  
+
   alerts: BudgetAlert[];
 }
 
@@ -227,23 +262,23 @@ export interface CashBalance {
 export interface CashTransaction {
   id: string;
   type: 'withdraw' | 'exchange' | 'spend' | 'receive' | 'adjustment';
-  
+
   // For exchange
   fromCurrency?: CurrencyCode;
   fromAmount?: number;
   toCurrency?: CurrencyCode;
   toAmount?: number;
   exchangeRate?: number;
-  
+
   // For spend/receive/withdraw
   currency: CurrencyCode;
   amount: number;
-  
+
   description: string;
   location?: string;
   fees?: number;
   feesCurrency?: CurrencyCode;
-  
+
   date: string;
   createdAt: string;
 }
@@ -268,11 +303,11 @@ export interface FormatOptions {
   minimumFractionDigits?: number;
 }
 
-export type FormatStyle = 
-  | 'standard'      // $1,234.56
-  | 'compact'       // $1.2K
-  | 'accounting'    // ($1,234.56) for negative
-  | 'code'          // 1,234.56 USD
+export type FormatStyle =
+  | 'standard' // $1,234.56
+  | 'compact' // $1.2K
+  | 'accounting' // ($1,234.56) for negative
+  | 'code' // 1,234.56 USD
   | 'symbol_after'; // 1,234.56 $
 
 // ============================================================================
@@ -283,26 +318,26 @@ export interface MultiCurrencyState {
   // Settings
   preferences: CurrencyPreferences;
   tripSettings: TripCurrencySettings | null;
-  
+
   // Rates
   rates: Record<string, ExchangeRate>; // Key: "USD_EUR"
   ratesLastUpdated: string | null;
   isLoadingRates: boolean;
   ratesError: string | null;
-  
+
   // Expenses
   expenses: Expense[];
   expenseSummary: ExpenseSummary | null;
-  
+
   // Budget
   budget: Budget | null;
-  
+
   // Cash
   cashWallet: CashWallet | null;
-  
+
   // Quick conversions
   quickConversions: QuickConversion[];
-  
+
   // UI
   isLoading: boolean;
   error: string | null;

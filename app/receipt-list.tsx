@@ -21,16 +21,8 @@ interface ReceiptListScreenProps {
   tripId?: string;
 }
 
-const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
-  navigation,
-  tripId,
-}) => {
-  const {
-    receipts,
-    deleteReceipt,
-    refreshReceipts,
-    isLoading,
-  } = useReceiptScanner({ tripId });
+const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({ navigation, tripId }) => {
+  const { receipts, deleteReceipt, refreshReceipts, isLoading } = useReceiptScanner({ tripId });
 
   const [filter, setFilter] = useState<'all' | 'pending' | 'imported'>('all');
   const [refreshing, setRefreshing] = useState(false);
@@ -38,11 +30,11 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
   const filteredReceipts = useMemo(() => {
     switch (filter) {
       case 'pending':
-        return receipts.filter(r => r.status === 'reviewing' || r.status === 'confirmed');
+        return receipts.filter((r) => r.status === 'reviewing' || r.status === 'confirmed');
       case 'imported':
-        return receipts.filter(r => r.status === 'imported');
+        return receipts.filter((r) => r.status === 'imported');
       default:
-        return receipts.filter(r => r.status !== 'discarded');
+        return receipts.filter((r) => r.status !== 'discarded');
     }
   }, [receipts, filter]);
 
@@ -52,23 +44,25 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
     setRefreshing(false);
   }, [refreshReceipts]);
 
-  const handleDeleteReceipt = useCallback((receipt: Receipt) => {
-    Alert.alert(
-      'Delete Receipt',
-      'Are you sure you want to delete this receipt?',
-      [
+  const handleDeleteReceipt = useCallback(
+    (receipt: Receipt) => {
+      Alert.alert('Delete Receipt', 'Are you sure you want to delete this receipt?', [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
           style: 'destructive',
           onPress: () => deleteReceipt(receipt.id),
         },
-      ]
-    );
-  }, [deleteReceipt]);
+      ]);
+    },
+    [deleteReceipt]
+  );
 
   const getCategoryInfo = (categoryId: string) => {
-    return EXPENSE_CATEGORIES.find(c => c.id === categoryId) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+    return (
+      EXPENSE_CATEGORIES.find((c) => c.id === categoryId) ||
+      EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1]
+    );
   };
 
   const getStatusColor = (status: ReceiptStatus): string => {
@@ -107,7 +101,7 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
 
   const renderReceiptCard = (receipt: Receipt) => {
     const categoryInfo = getCategoryInfo(receipt.finalData?.category || 'other');
-    
+
     return (
       <TouchableOpacity
         key={receipt.id}
@@ -116,16 +110,13 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
         onLongPress={() => handleDeleteReceipt(receipt)}
         activeOpacity={0.7}
       >
-        <Image
-          source={{ uri: receipt.image.uri }}
-          style={styles.receiptThumbnail}
-        />
-        
+        <Image source={{ uri: receipt.image.uri }} style={styles.receiptThumbnail} />
+
         <View style={styles.receiptInfo}>
           <Text style={styles.receiptMerchant} numberOfLines={1}>
             {receipt.finalData?.merchant || 'Unknown Merchant'}
           </Text>
-          
+
           <View style={styles.receiptMeta}>
             <Text style={styles.receiptCategory}>
               {categoryInfo.icon} {categoryInfo.name}
@@ -136,7 +127,9 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
             </Text>
           </View>
 
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(receipt.status) + '20' }]}>
+          <View
+            style={[styles.statusBadge, { backgroundColor: getStatusColor(receipt.status) + '20' }]}
+          >
             <View style={[styles.statusDot, { backgroundColor: getStatusColor(receipt.status) }]} />
             <Text style={[styles.statusText, { color: getStatusColor(receipt.status) }]}>
               {getStatusLabel(receipt.status)}
@@ -153,19 +146,15 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
     );
   };
 
-  const pendingCount = receipts.filter(r => r.status === 'reviewing' || r.status === 'confirmed').length;
-  const importedCount = receipts.filter(r => r.status === 'imported').length;
+  const pendingCount = receipts.filter(
+    (r) => r.status === 'reviewing' || r.status === 'confirmed'
+  ).length;
+  const importedCount = receipts.filter((r) => r.status === 'imported').length;
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Receipts</Text>
@@ -184,7 +173,7 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
           onPress={() => setFilter('all')}
         >
           <Text style={[styles.filterTabText, filter === 'all' && styles.filterTabTextActive]}>
-            All ({receipts.filter(r => r.status !== 'discarded').length})
+            All ({receipts.filter((r) => r.status !== 'discarded').length})
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -207,9 +196,7 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
 
       <ScrollView
         style={styles.content}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
       >
         {filteredReceipts.length === 0 ? (
           <View style={styles.emptyState}>
@@ -219,8 +206,8 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
               {filter === 'all'
                 ? 'Scan your first receipt to get started'
                 : filter === 'pending'
-                ? 'No pending receipts to review'
-                : 'No imported receipts yet'}
+                  ? 'No pending receipts to review'
+                  : 'No imported receipts yet'}
             </Text>
             {filter === 'all' && (
               <TouchableOpacity
@@ -232,9 +219,7 @@ const ReceiptListScreen: React.FC<ReceiptListScreenProps> = ({
             )}
           </View>
         ) : (
-          <View style={styles.receiptsList}>
-            {filteredReceipts.map(renderReceiptCard)}
-          </View>
+          <View style={styles.receiptsList}>{filteredReceipts.map(renderReceiptCard)}</View>
         )}
 
         <View style={styles.bottomPadding} />

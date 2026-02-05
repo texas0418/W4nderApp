@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,23 +24,17 @@ import { PartnerProfile, DateItinerary } from '@/types/date-night';
 
 export default function DateNightScreen() {
   const router = useRouter();
-  const { 
-    partners, 
-    itineraries, 
-    selectedPartner, 
-    setSelectedPartner,
-    removePartner,
-    userProfile,
-  } = useDateNight();
+  const { partners, itineraries, selectedPartner, setSelectedPartner, removePartner, userProfile } =
+    useDateNight();
 
-  const upcomingItineraries = itineraries.filter(i => 
-    i.status === 'planned' && new Date(i.date) >= new Date()
-  ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const upcomingItineraries = itineraries
+    .filter((i) => i.status === 'planned' && new Date(i.date) >= new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const completedItineraries = itineraries.filter(i => i.status === 'completed');
+  const completedItineraries = itineraries.filter((i) => i.status === 'completed');
 
   // Count dates this month
-  const datesThisMonth = itineraries.filter(i => {
+  const datesThisMonth = itineraries.filter((i) => {
     const date = new Date(i.date);
     const now = new Date();
     return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
@@ -58,18 +45,14 @@ export default function DateNightScreen() {
   };
 
   const handleDeletePartner = (partner: PartnerProfile) => {
-    Alert.alert(
-      'Remove Partner',
-      `Are you sure you want to remove ${partner.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
-          style: 'destructive',
-          onPress: () => removePartner(partner.id)
-        },
-      ]
-    );
+    Alert.alert('Remove Partner', `Are you sure you want to remove ${partner.name}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => removePartner(partner.id),
+      },
+    ]);
   };
 
   const handlePlanDate = () => {
@@ -99,28 +82,23 @@ export default function DateNightScreen() {
               <Heart size={28} color={colors.textLight} fill={colors.textLight} />
               <Text style={styles.headerTitle}>Date Night</Text>
             </View>
-            <Pressable 
+            <Pressable
               style={styles.headerButton}
               onPress={() => router.push('/date-night/my-preferences')}
             >
               <Settings size={22} color={colors.textLight} />
             </Pressable>
           </View>
-          <Text style={styles.headerSubtitle}>
-            Plan unforgettable moments together
-          </Text>
+          <Text style={styles.headerSubtitle}>Plan unforgettable moments together</Text>
         </View>
 
-        <ScrollView 
+        <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.contentContainer}
         >
           {/* Stats Banner */}
-          <Pressable 
-            style={styles.statsBanner}
-            onPress={() => router.push('/(tabs)/calendar')}
-          >
+          <Pressable style={styles.statsBanner} onPress={() => router.push('/(tabs)/calendar')}>
             <View style={styles.statItem}>
               <Text style={styles.statNumber}>{upcomingItineraries.length}</Text>
               <Text style={styles.statLabel}>Upcoming</Text>
@@ -140,7 +118,7 @@ export default function DateNightScreen() {
 
           {/* Setup Banner */}
           {!hasSetupPreferences && (
-            <Pressable 
+            <Pressable
               style={styles.setupBanner}
               onPress={() => router.push('/date-night/my-preferences')}
             >
@@ -161,7 +139,7 @@ export default function DateNightScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Your Partners</Text>
-              <Pressable 
+              <Pressable
                 style={styles.addButton}
                 onPress={() => router.push('/date-night/add-partner')}
               >
@@ -171,7 +149,7 @@ export default function DateNightScreen() {
             </View>
 
             {partners.length === 0 ? (
-              <Pressable 
+              <Pressable
                 style={styles.emptyPartnerCard}
                 onPress={() => router.push('/date-night/add-partner')}
               >
@@ -184,12 +162,12 @@ export default function DateNightScreen() {
                 </Text>
               </Pressable>
             ) : (
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.partnersScroll}
               >
-                {partners.map(partner => (
+                {partners.map((partner) => (
                   <Pressable
                     key={partner.id}
                     style={[
@@ -268,7 +246,7 @@ export default function DateNightScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitleNoMargin}>Quick Actions</Text>
             <View style={styles.actionsRow}>
-              <Pressable 
+              <Pressable
                 style={styles.actionCard}
                 onPress={() => router.push('/date-night/my-preferences')}
               >
@@ -278,7 +256,7 @@ export default function DateNightScreen() {
                 <Text style={styles.actionTitle}>Preferences</Text>
               </Pressable>
 
-              <Pressable 
+              <Pressable
                 style={styles.actionCard}
                 onPress={() => router.push('/date-night/history')}
               >
@@ -288,7 +266,7 @@ export default function DateNightScreen() {
                 <Text style={styles.actionTitle}>History</Text>
               </Pressable>
 
-              <Pressable 
+              <Pressable
                 style={styles.actionCard}
                 onPress={() => router.push('/date-night/add-partner')}
               >
@@ -309,9 +287,9 @@ export default function DateNightScreen() {
                   <Text style={styles.seeAllText}>See All</Text>
                 </Pressable>
               </View>
-              {upcomingItineraries.slice(0, 3).map(itinerary => (
-                <ItineraryCard 
-                  key={itinerary.id} 
+              {upcomingItineraries.slice(0, 3).map((itinerary) => (
+                <ItineraryCard
+                  key={itinerary.id}
                   itinerary={itinerary}
                   onPress={() => router.push(`/date-night/edit-itinerary?id=${itinerary.id}`)}
                 />
@@ -322,13 +300,13 @@ export default function DateNightScreen() {
           {/* Date Inspiration */}
           <View style={styles.section}>
             <Text style={styles.sectionTitleNoMargin}>Date Inspiration</Text>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.inspirationScroll}
             >
               {dateInspiration.map((idea, index) => (
-                <Pressable 
+                <Pressable
                   key={index}
                   style={styles.inspirationCard}
                   onPress={() => {
@@ -381,17 +359,20 @@ function ItineraryCard({ itinerary, onPress }: ItineraryCardProps) {
     if (date.toDateString() === tomorrow.toDateString()) {
       return 'Tomorrow';
     }
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
   const isToday = new Date(itinerary.date).toDateString() === new Date().toDateString();
 
   return (
-    <Pressable style={[styles.itineraryCard, isToday && styles.itineraryCardToday]} onPress={onPress}>
+    <Pressable
+      style={[styles.itineraryCard, isToday && styles.itineraryCardToday]}
+      onPress={onPress}
+    >
       {isToday && (
         <View style={styles.todayBadge}>
           <Text style={styles.todayBadgeText}>TODAY</Text>
@@ -409,9 +390,7 @@ function ItineraryCard({ itinerary, onPress }: ItineraryCardProps) {
         </View>
         <View style={styles.itineraryMetaItem}>
           <Clock size={14} color={colors.textTertiary} />
-          <Text style={styles.itineraryMetaText}>
-            {itinerary.activities.length} activities
-          </Text>
+          <Text style={styles.itineraryMetaText}>{itinerary.activities.length} activities</Text>
         </View>
         {itinerary.destination && (
           <View style={styles.itineraryMetaItem}>

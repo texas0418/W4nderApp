@@ -87,10 +87,25 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'JP',
       destinationName: 'Japan',
       destinationFlag: '🇯🇵',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'SG' ? 'visa_free' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'SG'
+          ? 'visa_free'
+          : 'visa_required',
       maxStay: '90 days',
-      documents: ['Valid passport (6+ months)', 'Return ticket', 'Proof of accommodation', 'Sufficient funds'],
-      notes: ['Passport must be valid for duration of stay', 'May need to show itinerary at immigration'],
+      documents: [
+        'Valid passport (6+ months)',
+        'Return ticket',
+        'Proof of accommodation',
+        'Sufficient funds',
+      ],
+      notes: [
+        'Passport must be valid for duration of stay',
+        'May need to show itinerary at immigration',
+      ],
       healthRequirements: ['No mandatory vaccinations'],
       lastUpdated: '2024-01-15',
     },
@@ -98,7 +113,17 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'TH',
       destinationName: 'Thailand',
       destinationFlag: '🇹🇭',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'DE' || passportCode === 'FR' ? 'visa_free' : passportCode === 'CN' || passportCode === 'IN' ? 'visa_on_arrival' : 'e_visa',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'DE' ||
+        passportCode === 'FR'
+          ? 'visa_free'
+          : passportCode === 'CN' || passportCode === 'IN'
+            ? 'visa_on_arrival'
+            : 'e_visa',
       maxStay: passportCode === 'US' || passportCode === 'GB' ? '30 days' : '15 days',
       fee: passportCode === 'CN' || passportCode === 'IN' ? '$35 USD' : undefined,
       documents: ['Valid passport (6+ months)', 'Passport photo', 'Return ticket', 'Hotel booking'],
@@ -110,11 +135,27 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'US',
       destinationName: 'United States',
       destinationFlag: '🇺🇸',
-      visaType: passportCode === 'GB' || passportCode === 'AU' || passportCode === 'JP' || passportCode === 'DE' || passportCode === 'FR' || passportCode === 'SG' || passportCode === 'KR' ? 'e_visa' : 'visa_required',
+      visaType:
+        passportCode === 'GB' ||
+        passportCode === 'AU' ||
+        passportCode === 'JP' ||
+        passportCode === 'DE' ||
+        passportCode === 'FR' ||
+        passportCode === 'SG' ||
+        passportCode === 'KR'
+          ? 'e_visa'
+          : 'visa_required',
       maxStay: '90 days',
-      processingTime: passportCode === 'GB' || passportCode === 'AU' ? '72 hours (ESTA)' : '3-6 weeks',
+      processingTime:
+        passportCode === 'GB' || passportCode === 'AU' ? '72 hours (ESTA)' : '3-6 weeks',
       fee: passportCode === 'GB' || passportCode === 'AU' ? '$21 USD (ESTA)' : '$185 USD',
-      documents: ['Valid passport', 'ESTA approval or visa', 'Return ticket', 'Proof of funds', 'Travel itinerary'],
+      documents: [
+        'Valid passport',
+        'ESTA approval or visa',
+        'Return ticket',
+        'Proof of funds',
+        'Travel itinerary',
+      ],
       notes: ['ESTA valid for 2 years', 'Interview required for visa', 'Biometrics required'],
       lastUpdated: '2024-01-12',
     },
@@ -122,11 +163,30 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'GB',
       destinationName: 'United Kingdom',
       destinationFlag: '🇬🇧',
-      visaType: passportCode === 'US' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'JP' || passportCode === 'SG' || passportCode === 'KR' ? 'e_visa' : passportCode === 'DE' || passportCode === 'FR' || passportCode === 'IT' || passportCode === 'ES' ? 'visa_free' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'JP' ||
+        passportCode === 'SG' ||
+        passportCode === 'KR'
+          ? 'e_visa'
+          : passportCode === 'DE' ||
+              passportCode === 'FR' ||
+              passportCode === 'IT' ||
+              passportCode === 'ES'
+            ? 'visa_free'
+            : 'visa_required',
       maxStay: '6 months',
       processingTime: passportCode === 'US' ? 'Instant (ETA)' : '3 weeks',
       fee: passportCode === 'US' || passportCode === 'CA' ? '£10 (ETA)' : '£100',
-      documents: ['Valid passport', 'ETA or visa', 'Proof of accommodation', 'Return ticket', 'Financial evidence'],
+      documents: [
+        'Valid passport',
+        'ETA or visa',
+        'Proof of accommodation',
+        'Return ticket',
+        'Financial evidence',
+      ],
       notes: ['ETA required from 2024 for visa-exempt nationals', 'Cannot work on tourist visa'],
       lastUpdated: '2024-01-14',
     },
@@ -134,12 +194,30 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'AU',
       destinationName: 'Australia',
       destinationFlag: '🇦🇺',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'JP' || passportCode === 'SG' || passportCode === 'KR' ? 'e_visa' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'JP' ||
+        passportCode === 'SG' ||
+        passportCode === 'KR'
+          ? 'e_visa'
+          : 'visa_required',
       maxStay: '90 days',
       processingTime: '24-48 hours (ETA)',
       fee: '$20 AUD (ETA)',
-      documents: ['Valid passport (6+ months)', 'ETA or visa', 'Return ticket', 'Proof of funds', 'Health insurance recommended'],
-      notes: ['Strict biosecurity laws', 'Declare all food and organic items', 'Working Holiday visa available for some'],
+      documents: [
+        'Valid passport (6+ months)',
+        'ETA or visa',
+        'Return ticket',
+        'Proof of funds',
+        'Health insurance recommended',
+      ],
+      notes: [
+        'Strict biosecurity laws',
+        'Declare all food and organic items',
+        'Working Holiday visa available for some',
+      ],
       healthRequirements: ['No mandatory vaccinations', 'Health insurance strongly recommended'],
       lastUpdated: '2024-01-11',
     },
@@ -147,36 +225,97 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'FR',
       destinationName: 'France',
       destinationFlag: '🇫🇷',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'JP' || passportCode === 'SG' || passportCode === 'KR' ? 'visa_free' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'JP' ||
+        passportCode === 'SG' ||
+        passportCode === 'KR'
+          ? 'visa_free'
+          : 'visa_required',
       maxStay: '90 days in 180-day period',
       processingTime: passportCode === 'IN' || passportCode === 'CN' ? '15 days' : undefined,
       fee: passportCode === 'IN' || passportCode === 'CN' ? '€80' : undefined,
-      documents: ['Valid passport (3+ months beyond stay)', 'Schengen visa if required', 'Travel insurance (€30,000 coverage)', 'Accommodation proof', 'Return ticket'],
-      notes: ['Part of Schengen Area', '90/180 day rule applies to all Schengen countries combined', 'ETIAS required from 2025 for visa-exempt travelers'],
+      documents: [
+        'Valid passport (3+ months beyond stay)',
+        'Schengen visa if required',
+        'Travel insurance (€30,000 coverage)',
+        'Accommodation proof',
+        'Return ticket',
+      ],
+      notes: [
+        'Part of Schengen Area',
+        '90/180 day rule applies to all Schengen countries combined',
+        'ETIAS required from 2025 for visa-exempt travelers',
+      ],
       lastUpdated: '2024-01-13',
     },
     {
       destinationCode: 'AE',
       destinationName: 'United Arab Emirates',
       destinationFlag: '🇦🇪',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'DE' || passportCode === 'FR' ? 'visa_free' : passportCode === 'IN' || passportCode === 'CN' ? 'e_visa' : 'visa_on_arrival',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'DE' ||
+        passportCode === 'FR'
+          ? 'visa_free'
+          : passportCode === 'IN' || passportCode === 'CN'
+            ? 'e_visa'
+            : 'visa_on_arrival',
       maxStay: passportCode === 'US' || passportCode === 'GB' ? '30 days' : '14 days',
       processingTime: passportCode === 'IN' ? '3-5 days' : undefined,
       fee: passportCode === 'IN' ? '$90 USD' : undefined,
-      documents: ['Valid passport (6+ months)', 'Passport photo', 'Return ticket', 'Hotel booking', 'Proof of funds'],
-      notes: ['Can extend visa for 30 days', 'Respect local customs and dress codes', 'Alcohol only in licensed venues'],
+      documents: [
+        'Valid passport (6+ months)',
+        'Passport photo',
+        'Return ticket',
+        'Hotel booking',
+        'Proof of funds',
+      ],
+      notes: [
+        'Can extend visa for 30 days',
+        'Respect local customs and dress codes',
+        'Alcohol only in licensed venues',
+      ],
       lastUpdated: '2024-01-08',
     },
     {
       destinationCode: 'SG',
       destinationName: 'Singapore',
       destinationFlag: '🇸🇬',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'DE' || passportCode === 'FR' || passportCode === 'JP' || passportCode === 'KR' ? 'visa_free' : passportCode === 'IN' || passportCode === 'CN' ? 'e_visa' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'DE' ||
+        passportCode === 'FR' ||
+        passportCode === 'JP' ||
+        passportCode === 'KR'
+          ? 'visa_free'
+          : passportCode === 'IN' || passportCode === 'CN'
+            ? 'e_visa'
+            : 'visa_required',
       maxStay: '30-90 days',
       processingTime: passportCode === 'IN' ? '3 days' : undefined,
       fee: passportCode === 'IN' ? '$30 USD' : undefined,
-      documents: ['Valid passport (6+ months)', 'Return ticket', 'Proof of accommodation', 'Sufficient funds', 'SG Arrival Card'],
-      notes: ['SG Arrival Card must be filled within 3 days of arrival', 'Strict laws - chewing gum prohibited', 'Heavy fines for littering'],
+      documents: [
+        'Valid passport (6+ months)',
+        'Return ticket',
+        'Proof of accommodation',
+        'Sufficient funds',
+        'SG Arrival Card',
+      ],
+      notes: [
+        'SG Arrival Card must be filled within 3 days of arrival',
+        'Strict laws - chewing gum prohibited',
+        'Heavy fines for littering',
+      ],
       healthRequirements: ['Yellow fever certificate if arriving from affected area'],
       lastUpdated: '2024-01-09',
     },
@@ -184,26 +323,62 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'BR',
       destinationName: 'Brazil',
       destinationFlag: '🇧🇷',
-      visaType: passportCode === 'US' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'JP' ? 'e_visa' : passportCode === 'GB' || passportCode === 'DE' || passportCode === 'FR' || passportCode === 'IT' ? 'visa_free' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'JP'
+          ? 'e_visa'
+          : passportCode === 'GB' ||
+              passportCode === 'DE' ||
+              passportCode === 'FR' ||
+              passportCode === 'IT'
+            ? 'visa_free'
+            : 'visa_required',
       maxStay: '90 days',
       processingTime: '5-10 days',
       fee: '$80 USD',
-      documents: ['Valid passport (6+ months)', 'e-Visa or visa', 'Return ticket', 'Proof of accommodation', 'Yellow fever vaccination'],
-      notes: ['Yellow fever vaccine recommended for Amazon region', 'Register with Federal Police if staying 90+ days'],
-      healthRequirements: ['Yellow fever vaccination strongly recommended', 'Malaria prophylaxis for Amazon'],
+      documents: [
+        'Valid passport (6+ months)',
+        'e-Visa or visa',
+        'Return ticket',
+        'Proof of accommodation',
+        'Yellow fever vaccination',
+      ],
+      notes: [
+        'Yellow fever vaccine recommended for Amazon region',
+        'Register with Federal Police if staying 90+ days',
+      ],
+      healthRequirements: [
+        'Yellow fever vaccination strongly recommended',
+        'Malaria prophylaxis for Amazon',
+      ],
       lastUpdated: '2024-01-07',
     },
     {
       destinationCode: 'IN',
       destinationName: 'India',
       destinationFlag: '🇮🇳',
-      visaType: passportCode === 'JP' || passportCode === 'SG' || passportCode === 'KR' ? 'visa_free' : 'e_visa',
+      visaType:
+        passportCode === 'JP' || passportCode === 'SG' || passportCode === 'KR'
+          ? 'visa_free'
+          : 'e_visa',
       maxStay: passportCode === 'JP' ? '30 days' : '60 days',
       processingTime: '3-5 days',
       fee: '$25-100 USD',
       validity: '1 year (multiple entry)',
-      documents: ['Valid passport (6+ months)', 'e-Visa', 'Passport photo', 'Return ticket', 'Proof of accommodation'],
-      notes: ['e-Visa available for 150+ countries', 'Medical and Business e-Visas also available', 'Register with FRRO for stays over 180 days'],
+      documents: [
+        'Valid passport (6+ months)',
+        'e-Visa',
+        'Passport photo',
+        'Return ticket',
+        'Proof of accommodation',
+      ],
+      notes: [
+        'e-Visa available for 150+ countries',
+        'Medical and Business e-Visas also available',
+        'Register with FRRO for stays over 180 days',
+      ],
       healthRequirements: ['No mandatory vaccinations', 'Typhoid & Hepatitis A recommended'],
       lastUpdated: '2024-01-06',
     },
@@ -211,10 +386,28 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'MX',
       destinationName: 'Mexico',
       destinationFlag: '🇲🇽',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'AU' || passportCode === 'JP' || passportCode === 'DE' || passportCode === 'FR' ? 'visa_free' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'AU' ||
+        passportCode === 'JP' ||
+        passportCode === 'DE' ||
+        passportCode === 'FR'
+          ? 'visa_free'
+          : 'visa_required',
       maxStay: '180 days',
-      documents: ['Valid passport', 'FMM tourist card (free)', 'Return ticket', 'Proof of accommodation'],
-      notes: ['FMM card issued on arrival', 'Keep FMM card safe - needed on departure', 'Can be fined for overstaying'],
+      documents: [
+        'Valid passport',
+        'FMM tourist card (free)',
+        'Return ticket',
+        'Proof of accommodation',
+      ],
+      notes: [
+        'FMM card issued on arrival',
+        'Keep FMM card safe - needed on departure',
+        'Can be fined for overstaying',
+      ],
       healthRequirements: ['No mandatory vaccinations'],
       lastUpdated: '2024-01-05',
     },
@@ -222,48 +415,66 @@ const getVisaRequirements = (passportCode: string): VisaRequirement[] => {
       destinationCode: 'NZ',
       destinationName: 'New Zealand',
       destinationFlag: '🇳🇿',
-      visaType: passportCode === 'US' || passportCode === 'GB' || passportCode === 'CA' || passportCode === 'DE' || passportCode === 'FR' || passportCode === 'JP' ? 'e_visa' : 'visa_required',
+      visaType:
+        passportCode === 'US' ||
+        passportCode === 'GB' ||
+        passportCode === 'CA' ||
+        passportCode === 'DE' ||
+        passportCode === 'FR' ||
+        passportCode === 'JP'
+          ? 'e_visa'
+          : 'visa_required',
       maxStay: '90 days',
       processingTime: '72 hours (NZeTA)',
       fee: '$17-23 NZD (NZeTA)',
-      documents: ['Valid passport', 'NZeTA', 'Return ticket', 'Proof of funds ($1000/month)', 'Travel insurance recommended'],
-      notes: ['NZeTA required for visa-waiver travelers', 'Strict biosecurity - declare all food/organic items', 'IVL levy included in NZeTA'],
+      documents: [
+        'Valid passport',
+        'NZeTA',
+        'Return ticket',
+        'Proof of funds ($1000/month)',
+        'Travel insurance recommended',
+      ],
+      notes: [
+        'NZeTA required for visa-waiver travelers',
+        'Strict biosecurity - declare all food/organic items',
+        'IVL levy included in NZeTA',
+      ],
       healthRequirements: ['No mandatory vaccinations'],
       lastUpdated: '2024-01-04',
     },
   ];
 
-  return baseRequirements.filter(req => req.destinationCode !== passportCode);
+  return baseRequirements.filter((req) => req.destinationCode !== passportCode);
 };
 
 const visaTypeConfig = {
-  visa_free: { 
-    label: 'Visa Free', 
-    color: colors.success, 
+  visa_free: {
+    label: 'Visa Free',
+    color: colors.success,
     bgColor: '#E8F5E9',
     icon: CheckCircle,
-    description: 'No visa required'
+    description: 'No visa required',
   },
-  visa_on_arrival: { 
-    label: 'Visa on Arrival', 
-    color: colors.warning, 
+  visa_on_arrival: {
+    label: 'Visa on Arrival',
+    color: colors.warning,
     bgColor: '#FFF3E0',
     icon: Stamp,
-    description: 'Get visa at airport'
+    description: 'Get visa at airport',
   },
-  e_visa: { 
-    label: 'e-Visa / ETA', 
-    color: colors.primaryLight, 
+  e_visa: {
+    label: 'e-Visa / ETA',
+    color: colors.primaryLight,
     bgColor: '#E3F2FD',
     icon: Globe,
-    description: 'Apply online before travel'
+    description: 'Apply online before travel',
   },
-  visa_required: { 
-    label: 'Visa Required', 
-    color: colors.error, 
+  visa_required: {
+    label: 'Visa Required',
+    color: colors.error,
     bgColor: '#FFEBEE',
     icon: FileText,
-    description: 'Embassy/consulate application'
+    description: 'Embassy/consulate application',
   },
 };
 
@@ -283,18 +494,16 @@ export default function VisaRequirementsScreen() {
 
   const filteredRequirements = useMemo(() => {
     let filtered = requirements;
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        r => r.destinationName.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter((r) => r.destinationName.toLowerCase().includes(query));
     }
-    
+
     if (filterType) {
-      filtered = filtered.filter(r => r.visaType === filterType);
+      filtered = filtered.filter((r) => r.visaType === filterType);
     }
-    
+
     return filtered.sort((a, b) => {
       const order = ['visa_free', 'visa_on_arrival', 'e_visa', 'visa_required'];
       return order.indexOf(a.visaType) - order.indexOf(b.visaType);
@@ -304,39 +513,40 @@ export default function VisaRequirementsScreen() {
   const filteredCountries = useMemo(() => {
     if (!passportSearch) return countries;
     const query = passportSearch.toLowerCase();
-    return countries.filter(c => c.name.toLowerCase().includes(query));
+    return countries.filter((c) => c.name.toLowerCase().includes(query));
   }, [passportSearch]);
 
   const stats = useMemo(() => {
     return {
-      visaFree: requirements.filter(r => r.visaType === 'visa_free').length,
-      visaOnArrival: requirements.filter(r => r.visaType === 'visa_on_arrival').length,
-      eVisa: requirements.filter(r => r.visaType === 'e_visa').length,
-      visaRequired: requirements.filter(r => r.visaType === 'visa_required').length,
+      visaFree: requirements.filter((r) => r.visaType === 'visa_free').length,
+      visaOnArrival: requirements.filter((r) => r.visaType === 'visa_on_arrival').length,
+      eVisa: requirements.filter((r) => r.visaType === 'e_visa').length,
+      visaRequired: requirements.filter((r) => r.visaType === 'visa_required').length,
     };
   }, [requirements]);
 
-  const renderCountryItem = useCallback(({ item }: { item: Country }) => (
-    <Pressable
-      style={styles.countryItem}
-      onPress={() => {
-        setSelectedPassport(item);
-        setPassportModalVisible(false);
-        setPassportSearch('');
-      }}
-    >
-      <Text style={styles.countryFlag}>{item.flag}</Text>
-      <Text style={styles.countryName}>{item.name}</Text>
-      {selectedPassport?.code === item.code && (
-        <CheckCircle size={20} color={colors.success} />
-      )}
-    </Pressable>
-  ), [selectedPassport]);
+  const renderCountryItem = useCallback(
+    ({ item }: { item: Country }) => (
+      <Pressable
+        style={styles.countryItem}
+        onPress={() => {
+          setSelectedPassport(item);
+          setPassportModalVisible(false);
+          setPassportSearch('');
+        }}
+      >
+        <Text style={styles.countryFlag}>{item.flag}</Text>
+        <Text style={styles.countryName}>{item.name}</Text>
+        {selectedPassport?.code === item.code && <CheckCircle size={20} color={colors.success} />}
+      </Pressable>
+    ),
+    [selectedPassport]
+  );
 
   const renderRequirementCard = useCallback((req: VisaRequirement) => {
     const config = visaTypeConfig[req.visaType];
     const IconComponent = config.icon;
-    
+
     return (
       <Pressable
         key={req.destinationCode}
@@ -353,12 +563,10 @@ export default function VisaRequirementsScreen() {
           </View>
           <View style={[styles.visaBadge, { backgroundColor: config.bgColor }]}>
             <IconComponent size={14} color={config.color} />
-            <Text style={[styles.visaBadgeText, { color: config.color }]}>
-              {config.label}
-            </Text>
+            <Text style={[styles.visaBadgeText, { color: config.color }]}>{config.label}</Text>
           </View>
         </View>
-        
+
         <View style={styles.reqDetails}>
           {req.processingTime && (
             <View style={styles.detailRow}>
@@ -373,7 +581,7 @@ export default function VisaRequirementsScreen() {
             </View>
           )}
         </View>
-        
+
         <View style={styles.reqFooter}>
           <Text style={styles.lastUpdated}>Updated {req.lastUpdated}</Text>
           <ChevronRight size={18} color={colors.textTertiary} />
@@ -389,14 +597,11 @@ export default function VisaRequirementsScreen() {
           headerShown: false,
         }}
       />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <Pressable
-              style={styles.backButton}
-              onPress={() => router.back()}
-            >
+            <Pressable style={styles.backButton} onPress={() => router.back()}>
               <ArrowLeft size={24} color={colors.text} />
             </Pressable>
             <View style={styles.headerTitleContainer}>
@@ -405,10 +610,7 @@ export default function VisaRequirementsScreen() {
             </View>
           </View>
 
-          <Pressable
-            style={styles.passportSelector}
-            onPress={() => setPassportModalVisible(true)}
-          >
+          <Pressable style={styles.passportSelector} onPress={() => setPassportModalVisible(true)}>
             <Shield size={20} color={colors.primary} />
             {selectedPassport ? (
               <View style={styles.selectedPassport}>
@@ -433,24 +635,33 @@ export default function VisaRequirementsScreen() {
                 style={[styles.statCard, filterType === 'visa_free' && styles.statCardActive]}
                 onPress={() => setFilterType(filterType === 'visa_free' ? null : 'visa_free')}
               >
-                <View style={[styles.statIcon, { backgroundColor: visaTypeConfig.visa_free.bgColor }]}>
+                <View
+                  style={[styles.statIcon, { backgroundColor: visaTypeConfig.visa_free.bgColor }]}
+                >
                   <CheckCircle size={18} color={visaTypeConfig.visa_free.color} />
                 </View>
                 <Text style={styles.statNumber}>{stats.visaFree}</Text>
                 <Text style={styles.statLabel}>Visa Free</Text>
               </Pressable>
-              
+
               <Pressable
                 style={[styles.statCard, filterType === 'visa_on_arrival' && styles.statCardActive]}
-                onPress={() => setFilterType(filterType === 'visa_on_arrival' ? null : 'visa_on_arrival')}
+                onPress={() =>
+                  setFilterType(filterType === 'visa_on_arrival' ? null : 'visa_on_arrival')
+                }
               >
-                <View style={[styles.statIcon, { backgroundColor: visaTypeConfig.visa_on_arrival.bgColor }]}>
+                <View
+                  style={[
+                    styles.statIcon,
+                    { backgroundColor: visaTypeConfig.visa_on_arrival.bgColor },
+                  ]}
+                >
                   <Stamp size={18} color={visaTypeConfig.visa_on_arrival.color} />
                 </View>
                 <Text style={styles.statNumber}>{stats.visaOnArrival}</Text>
                 <Text style={styles.statLabel}>On Arrival</Text>
               </Pressable>
-              
+
               <Pressable
                 style={[styles.statCard, filterType === 'e_visa' && styles.statCardActive]}
                 onPress={() => setFilterType(filterType === 'e_visa' ? null : 'e_visa')}
@@ -461,12 +672,19 @@ export default function VisaRequirementsScreen() {
                 <Text style={styles.statNumber}>{stats.eVisa}</Text>
                 <Text style={styles.statLabel}>e-Visa</Text>
               </Pressable>
-              
+
               <Pressable
                 style={[styles.statCard, filterType === 'visa_required' && styles.statCardActive]}
-                onPress={() => setFilterType(filterType === 'visa_required' ? null : 'visa_required')}
+                onPress={() =>
+                  setFilterType(filterType === 'visa_required' ? null : 'visa_required')
+                }
               >
-                <View style={[styles.statIcon, { backgroundColor: visaTypeConfig.visa_required.bgColor }]}>
+                <View
+                  style={[
+                    styles.statIcon,
+                    { backgroundColor: visaTypeConfig.visa_required.bgColor },
+                  ]}
+                >
                   <FileText size={18} color={visaTypeConfig.visa_required.color} />
                 </View>
                 <Text style={styles.statNumber}>{stats.visaRequired}</Text>
@@ -502,7 +720,8 @@ export default function VisaRequirementsScreen() {
             )}
 
             <Text style={styles.resultsCount}>
-              {filteredRequirements.length} destination{filteredRequirements.length !== 1 ? 's' : ''}
+              {filteredRequirements.length} destination
+              {filteredRequirements.length !== 1 ? 's' : ''}
             </Text>
 
             <View style={styles.requirementsList}>
@@ -512,7 +731,8 @@ export default function VisaRequirementsScreen() {
             <View style={styles.disclaimer}>
               <AlertTriangle size={16} color={colors.warning} />
               <Text style={styles.disclaimerText}>
-                Visa requirements can change. Always verify with the embassy or official government sources before traveling.
+                Visa requirements can change. Always verify with the embassy or official government
+                sources before traveling.
               </Text>
             </View>
           </ScrollView>
@@ -525,10 +745,7 @@ export default function VisaRequirementsScreen() {
             <Text style={styles.emptyText}>
               Choose your passport nationality to see visa requirements for destinations worldwide.
             </Text>
-            <Pressable
-              style={styles.selectButton}
-              onPress={() => setPassportModalVisible(true)}
-            >
+            <Pressable style={styles.selectButton} onPress={() => setPassportModalVisible(true)}>
               <Text style={styles.selectButtonText}>Select Passport</Text>
             </Pressable>
           </View>
@@ -554,7 +771,7 @@ export default function VisaRequirementsScreen() {
               <X size={24} color={colors.text} />
             </Pressable>
           </View>
-          
+
           <View style={styles.modalSearch}>
             <Search size={20} color={colors.textTertiary} />
             <TextInput
@@ -566,7 +783,7 @@ export default function VisaRequirementsScreen() {
               autoFocus
             />
           </View>
-          
+
           <FlatList
             data={filteredCountries}
             renderItem={renderCountryItem}
@@ -591,26 +808,33 @@ export default function VisaRequirementsScreen() {
                   <Text style={styles.detailFlag}>{selectedRequirement.destinationFlag}</Text>
                   <Text style={styles.detailTitle}>{selectedRequirement.destinationName}</Text>
                 </View>
-                <Pressable
-                  style={styles.modalClose}
-                  onPress={() => setSelectedRequirement(null)}
-                >
+                <Pressable style={styles.modalClose} onPress={() => setSelectedRequirement(null)}>
                   <X size={24} color={colors.text} />
                 </Pressable>
               </View>
-              
+
               <ScrollView
                 style={styles.detailContent}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.detailScrollContent}
               >
-                <View style={[styles.visaTypeBanner, { backgroundColor: visaTypeConfig[selectedRequirement.visaType].bgColor }]}>
+                <View
+                  style={[
+                    styles.visaTypeBanner,
+                    { backgroundColor: visaTypeConfig[selectedRequirement.visaType].bgColor },
+                  ]}
+                >
                   {React.createElement(visaTypeConfig[selectedRequirement.visaType].icon, {
                     size: 24,
-                    color: visaTypeConfig[selectedRequirement.visaType].color
+                    color: visaTypeConfig[selectedRequirement.visaType].color,
                   })}
                   <View style={styles.visaTypeInfo}>
-                    <Text style={[styles.visaTypeLabel, { color: visaTypeConfig[selectedRequirement.visaType].color }]}>
+                    <Text
+                      style={[
+                        styles.visaTypeLabel,
+                        { color: visaTypeConfig[selectedRequirement.visaType].color },
+                      ]}
+                    >
                       {visaTypeConfig[selectedRequirement.visaType].label}
                     </Text>
                     <Text style={styles.visaTypeDesc}>
@@ -658,17 +882,18 @@ export default function VisaRequirementsScreen() {
                   ))}
                 </View>
 
-                {selectedRequirement.healthRequirements && selectedRequirement.healthRequirements.length > 0 && (
-                  <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Health Requirements</Text>
-                    {selectedRequirement.healthRequirements.map((req, index) => (
-                      <View key={index} style={styles.listItem}>
-                        <Info size={16} color={colors.primaryLight} />
-                        <Text style={styles.listItemText}>{req}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
+                {selectedRequirement.healthRequirements &&
+                  selectedRequirement.healthRequirements.length > 0 && (
+                    <View style={styles.section}>
+                      <Text style={styles.sectionTitle}>Health Requirements</Text>
+                      {selectedRequirement.healthRequirements.map((req, index) => (
+                        <View key={index} style={styles.listItem}>
+                          <Info size={16} color={colors.primaryLight} />
+                          <Text style={styles.listItemText}>{req}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
 
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>Important Notes</Text>

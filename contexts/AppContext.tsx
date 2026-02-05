@@ -2,18 +2,18 @@ import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  OnboardingData, 
-  UserProfile, 
-  Trip, 
-  Booking, 
-  Notification, 
+import {
+  OnboardingData,
+  UserProfile,
+  Trip,
+  Booking,
+  Notification,
   Expense,
   LoyaltyProgram,
   Reward,
   EmergencyContact,
   BucketListItem,
-  Destination
+  Destination,
 } from '@/types';
 import { trips as mockTrips } from '@/mocks/trips';
 import { mockBookings, mockNotifications, mockRewards } from '@/mocks/appData';
@@ -171,13 +171,19 @@ export const [AppProvider, useApp] = createContextHook(() => {
   const { mutate: saveTripsData } = saveTripsMutation;
   const { mutate: saveBucketListData } = saveBucketListMutation;
 
-  const completeOnboarding = useCallback((data: OnboardingData) => {
-    saveOnboarding(data);
-  }, [saveOnboarding]);
+  const completeOnboarding = useCallback(
+    (data: OnboardingData) => {
+      saveOnboarding(data);
+    },
+    [saveOnboarding]
+  );
 
-  const updateUser = useCallback((updates: Partial<UserProfile>) => {
-    updateUserData(updates);
-  }, [updateUserData]);
+  const updateUser = useCallback(
+    (updates: Partial<UserProfile>) => {
+      updateUserData(updates);
+    },
+    [updateUserData]
+  );
 
   const resetOnboarding = useCallback(async () => {
     await AsyncStorage.removeItem(ONBOARDING_KEY);
@@ -185,180 +191,228 @@ export const [AppProvider, useApp] = createContextHook(() => {
     queryClient.invalidateQueries({ queryKey: ['onboarding'] });
   }, [queryClient]);
 
-  const addTrip = useCallback((trip: Trip) => {
-    const updatedTrips = [trip, ...trips];
-    setTrips(updatedTrips);
-    saveTripsData(updatedTrips);
-  }, [trips, saveTripsData]);
+  const addTrip = useCallback(
+    (trip: Trip) => {
+      const updatedTrips = [trip, ...trips];
+      setTrips(updatedTrips);
+      saveTripsData(updatedTrips);
+    },
+    [trips, saveTripsData]
+  );
 
-  const updateTrip = useCallback((tripId: string, updates: Partial<Trip>) => {
-    const updatedTrips = trips.map(t => 
-      t.id === tripId ? { ...t, ...updates } : t
-    );
-    setTrips(updatedTrips);
-    saveTripsData(updatedTrips);
-  }, [trips, saveTripsData]);
+  const updateTrip = useCallback(
+    (tripId: string, updates: Partial<Trip>) => {
+      const updatedTrips = trips.map((t) => (t.id === tripId ? { ...t, ...updates } : t));
+      setTrips(updatedTrips);
+      saveTripsData(updatedTrips);
+    },
+    [trips, saveTripsData]
+  );
 
-  const deleteTrip = useCallback((tripId: string) => {
-    const updatedTrips = trips.filter(t => t.id !== tripId);
-    setTrips(updatedTrips);
-    saveTripsData(updatedTrips);
-  }, [trips, saveTripsData]);
+  const deleteTrip = useCallback(
+    (tripId: string) => {
+      const updatedTrips = trips.filter((t) => t.id !== tripId);
+      setTrips(updatedTrips);
+      saveTripsData(updatedTrips);
+    },
+    [trips, saveTripsData]
+  );
 
   const addBooking = useCallback((booking: Booking) => {
-    setBookings(prev => [booking, ...prev]);
+    setBookings((prev) => [booking, ...prev]);
   }, []);
 
   const updateBooking = useCallback((bookingId: string, updates: Partial<Booking>) => {
-    setBookings(prev => prev.map(b => 
-      b.id === bookingId ? { ...b, ...updates } : b
-    ));
+    setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, ...updates } : b)));
   }, []);
 
   const cancelBooking = useCallback((bookingId: string) => {
-    setBookings(prev => prev.map(b => 
-      b.id === bookingId ? { ...b, status: 'cancelled' as const } : b
-    ));
+    setBookings((prev) =>
+      prev.map((b) => (b.id === bookingId ? { ...b, status: 'cancelled' as const } : b))
+    );
   }, []);
 
-  const addExpense = useCallback((tripId: string, expense: Expense) => {
-    const trip = trips.find(t => t.id === tripId);
-    if (trip) {
-      const updatedExpenses = [...(trip.expenses || []), expense];
-      const totalSpent = updatedExpenses.reduce((sum, e) => sum + e.amount, 0);
-      updateTrip(tripId, { expenses: updatedExpenses, spentBudget: totalSpent });
-    }
-  }, [trips, updateTrip]);
+  const addExpense = useCallback(
+    (tripId: string, expense: Expense) => {
+      const trip = trips.find((t) => t.id === tripId);
+      if (trip) {
+        const updatedExpenses = [...(trip.expenses || []), expense];
+        const totalSpent = updatedExpenses.reduce((sum, e) => sum + e.amount, 0);
+        updateTrip(tripId, { expenses: updatedExpenses, spentBudget: totalSpent });
+      }
+    },
+    [trips, updateTrip]
+  );
 
   const addNotification = useCallback((notification: Notification) => {
-    setNotifications(prev => [notification, ...prev]);
+    setNotifications((prev) => [notification, ...prev]);
   }, []);
 
   const markNotificationRead = useCallback((notificationId: string) => {
-    setNotifications(prev => prev.map(n => 
-      n.id === notificationId ? { ...n, read: true } : n
-    ));
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
+    );
   }, []);
 
   const markAllNotificationsRead = useCallback(() => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }, []);
 
   const clearNotifications = useCallback(() => {
     setNotifications([]);
   }, []);
 
-  const addRewardPoints = useCallback((points: number) => {
-    const newTotal = user.rewardPoints + points;
-    updateUser({ rewardPoints: newTotal });
-  }, [user.rewardPoints, updateUser]);
+  const addRewardPoints = useCallback(
+    (points: number) => {
+      const newTotal = user.rewardPoints + points;
+      updateUser({ rewardPoints: newTotal });
+    },
+    [user.rewardPoints, updateUser]
+  );
 
-  const redeemReward = useCallback((rewardId: string) => {
-    const reward = rewards.find(r => r.id === rewardId);
-    if (reward && user.rewardPoints >= reward.pointsCost) {
-      updateUser({ rewardPoints: user.rewardPoints - reward.pointsCost });
-      setRewards(prev => prev.map(r => 
-        r.id === rewardId ? { ...r, isRedeemed: true } : r
-      ));
-      return true;
-    }
-    return false;
-  }, [rewards, user.rewardPoints, updateUser]);
+  const redeemReward = useCallback(
+    (rewardId: string) => {
+      const reward = rewards.find((r) => r.id === rewardId);
+      if (reward && user.rewardPoints >= reward.pointsCost) {
+        updateUser({ rewardPoints: user.rewardPoints - reward.pointsCost });
+        setRewards((prev) => prev.map((r) => (r.id === rewardId ? { ...r, isRedeemed: true } : r)));
+        return true;
+      }
+      return false;
+    },
+    [rewards, user.rewardPoints, updateUser]
+  );
 
-  const addLoyaltyProgram = useCallback((program: LoyaltyProgram) => {
-    const updatedPrograms = [...(user.loyaltyPrograms || []), program];
-    updateUser({ loyaltyPrograms: updatedPrograms });
-  }, [user.loyaltyPrograms, updateUser]);
+  const addLoyaltyProgram = useCallback(
+    (program: LoyaltyProgram) => {
+      const updatedPrograms = [...(user.loyaltyPrograms || []), program];
+      updateUser({ loyaltyPrograms: updatedPrograms });
+    },
+    [user.loyaltyPrograms, updateUser]
+  );
 
-  const updateLoyaltyProgram = useCallback((programId: string, updates: Partial<LoyaltyProgram>) => {
-    const updatedPrograms = (user.loyaltyPrograms || []).map(p =>
-      p.id === programId ? { ...p, ...updates } : p
-    );
-    updateUser({ loyaltyPrograms: updatedPrograms });
-  }, [user.loyaltyPrograms, updateUser]);
+  const updateLoyaltyProgram = useCallback(
+    (programId: string, updates: Partial<LoyaltyProgram>) => {
+      const updatedPrograms = (user.loyaltyPrograms || []).map((p) =>
+        p.id === programId ? { ...p, ...updates } : p
+      );
+      updateUser({ loyaltyPrograms: updatedPrograms });
+    },
+    [user.loyaltyPrograms, updateUser]
+  );
 
-  const removeLoyaltyProgram = useCallback((programId: string) => {
-    const updatedPrograms = (user.loyaltyPrograms || []).filter(p => p.id !== programId);
-    updateUser({ loyaltyPrograms: updatedPrograms });
-  }, [user.loyaltyPrograms, updateUser]);
+  const removeLoyaltyProgram = useCallback(
+    (programId: string) => {
+      const updatedPrograms = (user.loyaltyPrograms || []).filter((p) => p.id !== programId);
+      updateUser({ loyaltyPrograms: updatedPrograms });
+    },
+    [user.loyaltyPrograms, updateUser]
+  );
 
-  const addEmergencyContact = useCallback((contact: EmergencyContact) => {
-    const updatedContacts = [...(user.emergencyContacts || []), contact];
-    updateUser({ emergencyContacts: updatedContacts });
-  }, [user.emergencyContacts, updateUser]);
+  const addEmergencyContact = useCallback(
+    (contact: EmergencyContact) => {
+      const updatedContacts = [...(user.emergencyContacts || []), contact];
+      updateUser({ emergencyContacts: updatedContacts });
+    },
+    [user.emergencyContacts, updateUser]
+  );
 
-  const removeEmergencyContact = useCallback((contactId: string) => {
-    const updatedContacts = (user.emergencyContacts || []).filter(c => c.id !== contactId);
-    updateUser({ emergencyContacts: updatedContacts });
-  }, [user.emergencyContacts, updateUser]);
+  const removeEmergencyContact = useCallback(
+    (contactId: string) => {
+      const updatedContacts = (user.emergencyContacts || []).filter((c) => c.id !== contactId);
+      updateUser({ emergencyContacts: updatedContacts });
+    },
+    [user.emergencyContacts, updateUser]
+  );
 
-  const upgradeSubscription = useCallback((tier: UserProfile['subscriptionTier']) => {
-    updateUser({ subscriptionTier: tier });
-  }, [updateUser]);
+  const upgradeSubscription = useCallback(
+    (tier: UserProfile['subscriptionTier']) => {
+      updateUser({ subscriptionTier: tier });
+    },
+    [updateUser]
+  );
 
   const toggleCarbonOffset = useCallback(() => {
     updateUser({ carbonOffsetEnabled: !user.carbonOffsetEnabled });
   }, [user.carbonOffsetEnabled, updateUser]);
 
-  const addToBucketList = useCallback((destination: Destination, options?: Partial<BucketListItem>) => {
-    const existingItem = bucketList.find(item => item.destinationId === destination.id);
-    if (existingItem) {
-      console.log('Destination already in bucket list');
-      return false;
-    }
-    const newItem: BucketListItem = {
-      id: Date.now().toString(),
-      destinationId: destination.id,
-      destination,
-      addedAt: new Date().toISOString(),
-      priority: 'medium',
-      isVisited: false,
-      ...options,
-    };
-    const updatedList = [newItem, ...bucketList];
-    setBucketList(updatedList);
-    saveBucketListData(updatedList);
-    return true;
-  }, [bucketList, saveBucketListData]);
+  const addToBucketList = useCallback(
+    (destination: Destination, options?: Partial<BucketListItem>) => {
+      const existingItem = bucketList.find((item) => item.destinationId === destination.id);
+      if (existingItem) {
+        console.log('Destination already in bucket list');
+        return false;
+      }
+      const newItem: BucketListItem = {
+        id: Date.now().toString(),
+        destinationId: destination.id,
+        destination,
+        addedAt: new Date().toISOString(),
+        priority: 'medium',
+        isVisited: false,
+        ...options,
+      };
+      const updatedList = [newItem, ...bucketList];
+      setBucketList(updatedList);
+      saveBucketListData(updatedList);
+      return true;
+    },
+    [bucketList, saveBucketListData]
+  );
 
-  const removeFromBucketList = useCallback((itemId: string) => {
-    const updatedList = bucketList.filter(item => item.id !== itemId);
-    setBucketList(updatedList);
-    saveBucketListData(updatedList);
-  }, [bucketList, saveBucketListData]);
+  const removeFromBucketList = useCallback(
+    (itemId: string) => {
+      const updatedList = bucketList.filter((item) => item.id !== itemId);
+      setBucketList(updatedList);
+      saveBucketListData(updatedList);
+    },
+    [bucketList, saveBucketListData]
+  );
 
-  const updateBucketListItem = useCallback((itemId: string, updates: Partial<BucketListItem>) => {
-    const updatedList = bucketList.map(item =>
-      item.id === itemId ? { ...item, ...updates } : item
-    );
-    setBucketList(updatedList);
-    saveBucketListData(updatedList);
-  }, [bucketList, saveBucketListData]);
+  const updateBucketListItem = useCallback(
+    (itemId: string, updates: Partial<BucketListItem>) => {
+      const updatedList = bucketList.map((item) =>
+        item.id === itemId ? { ...item, ...updates } : item
+      );
+      setBucketList(updatedList);
+      saveBucketListData(updatedList);
+    },
+    [bucketList, saveBucketListData]
+  );
 
-  const markAsVisited = useCallback((itemId: string) => {
-    updateBucketListItem(itemId, {
-      isVisited: true,
-      visitedDate: new Date().toISOString(),
-    });
-  }, [updateBucketListItem]);
+  const markAsVisited = useCallback(
+    (itemId: string) => {
+      updateBucketListItem(itemId, {
+        isVisited: true,
+        visitedDate: new Date().toISOString(),
+      });
+    },
+    [updateBucketListItem]
+  );
 
-  const updateSavings = useCallback((itemId: string, amount: number) => {
-    const item = bucketList.find(i => i.id === itemId);
-    if (item) {
-      const newSavings = (item.currentSavings || 0) + amount;
-      updateBucketListItem(itemId, { currentSavings: Math.max(0, newSavings) });
-    }
-  }, [bucketList, updateBucketListItem]);
+  const updateSavings = useCallback(
+    (itemId: string, amount: number) => {
+      const item = bucketList.find((i) => i.id === itemId);
+      if (item) {
+        const newSavings = (item.currentSavings || 0) + amount;
+        updateBucketListItem(itemId, { currentSavings: Math.max(0, newSavings) });
+      }
+    },
+    [bucketList, updateBucketListItem]
+  );
 
-  const isInBucketList = useCallback((destinationId: string) => {
-    return bucketList.some(item => item.destinationId === destinationId);
-  }, [bucketList]);
+  const isInBucketList = useCallback(
+    (destinationId: string) => {
+      return bucketList.some((item) => item.destinationId === destinationId);
+    },
+    [bucketList]
+  );
 
-  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
-  const upcomingBookings = bookings.filter(b => b.status === 'confirmed');
-  const activeTrips = trips.filter(t => t.status === 'upcoming' || t.status === 'ongoing');
+  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
+  const upcomingBookings = bookings.filter((b) => b.status === 'confirmed');
+  const activeTrips = trips.filter((t) => t.status === 'upcoming' || t.status === 'ongoing');
   const bucketListCount = bucketList.length;
-  const visitedCount = bucketList.filter(item => item.isVisited).length;
+  const visitedCount = bucketList.filter((item) => item.isVisited).length;
 
   return {
     isOnboarded,

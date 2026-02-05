@@ -18,9 +18,7 @@ interface CurrencyConverterScreenProps {
   navigation?: any;
 }
 
-const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
-  navigation,
-}) => {
+const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({ navigation }) => {
   const {
     convert,
     format,
@@ -60,22 +58,19 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
     setAmount(value.toString());
   }, []);
 
-  const handleSelectCurrency = useCallback((
-    code: CurrencyCode,
-    isFrom: boolean
-  ) => {
-    if (isFrom) {
-      setFromCurrency(code);
-      setShowFromPicker(false);
-    } else {
-      setToCurrency(code);
-      setShowToPicker(false);
-    }
-    addQuickConversion(
-      isFrom ? code : fromCurrency,
-      isFrom ? toCurrency : code
-    );
-  }, [fromCurrency, toCurrency, addQuickConversion]);
+  const handleSelectCurrency = useCallback(
+    (code: CurrencyCode, isFrom: boolean) => {
+      if (isFrom) {
+        setFromCurrency(code);
+        setShowFromPicker(false);
+      } else {
+        setToCurrency(code);
+        setShowToPicker(false);
+      }
+      addQuickConversion(isFrom ? code : fromCurrency, isFrom ? toCurrency : code);
+    },
+    [fromCurrency, toCurrency, addQuickConversion]
+  );
 
   const quickAmounts = [10, 20, 50, 100, 200, 500, 1000];
 
@@ -84,7 +79,7 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
     const date = new Date(ratesLastUpdated);
     const now = new Date();
     const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
-    
+
     if (diffMinutes < 1) return 'Just now';
     if (diffMinutes < 60) return `${diffMinutes}m ago`;
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}h ago`;
@@ -93,18 +88,18 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
 
   const renderCurrencyPicker = (isFrom: boolean) => {
     const popular = getPopularCurrencies();
-    const favorites = favoriteCurrencies.map(code => getCurrency(code)).filter(Boolean) as Currency[];
-    const recent = recentCurrencies.map(code => getCurrency(code)).filter(Boolean) as Currency[];
+    const favorites = favoriteCurrencies
+      .map((code) => getCurrency(code))
+      .filter(Boolean) as Currency[];
+    const recent = recentCurrencies.map((code) => getCurrency(code)).filter(Boolean) as Currency[];
 
     return (
       <View style={styles.pickerOverlay}>
         <View style={styles.pickerContainer}>
           <View style={styles.pickerHeader}>
-            <Text style={styles.pickerTitle}>
-              Select {isFrom ? 'From' : 'To'} Currency
-            </Text>
+            <Text style={styles.pickerTitle}>Select {isFrom ? 'From' : 'To'} Currency</Text>
             <TouchableOpacity
-              onPress={() => isFrom ? setShowFromPicker(false) : setShowToPicker(false)}
+              onPress={() => (isFrom ? setShowFromPicker(false) : setShowToPicker(false))}
             >
               <Text style={styles.pickerClose}>✕</Text>
             </TouchableOpacity>
@@ -114,7 +109,7 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
             {favorites.length > 0 && (
               <View style={styles.pickerSection}>
                 <Text style={styles.pickerSectionTitle}>⭐ Favorites</Text>
-                {favorites.map(currency => (
+                {favorites.map((currency) => (
                   <TouchableOpacity
                     key={currency.code}
                     style={styles.currencyOption}
@@ -133,7 +128,7 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
             {recent.length > 0 && (
               <View style={styles.pickerSection}>
                 <Text style={styles.pickerSectionTitle}>🕐 Recent</Text>
-                {recent.slice(0, 5).map(currency => (
+                {recent.slice(0, 5).map((currency) => (
                   <TouchableOpacity
                     key={currency.code}
                     style={styles.currencyOption}
@@ -151,7 +146,7 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
 
             <View style={styles.pickerSection}>
               <Text style={styles.pickerSectionTitle}>🌍 Popular</Text>
-              {popular.map(currency => (
+              {popular.map((currency) => (
                 <TouchableOpacity
                   key={currency.code}
                   style={styles.currencyOption}
@@ -173,22 +168,14 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-        >
+      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation?.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Currency Converter</Text>
           <View style={styles.ratesInfo}>
-            <Text style={styles.ratesText}>
-              Rates updated: {formatLastUpdated()}
-            </Text>
+            <Text style={styles.ratesText}>Rates updated: {formatLastUpdated()}</Text>
             <TouchableOpacity
               style={styles.refreshBtn}
               onPress={refreshRates}
@@ -208,10 +195,7 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
         {/* Converter Card */}
         <View style={styles.converterCard}>
           {/* From Currency */}
-          <TouchableOpacity
-            style={styles.currencyRow}
-            onPress={() => setShowFromPicker(true)}
-          >
+          <TouchableOpacity style={styles.currencyRow} onPress={() => setShowFromPicker(true)}>
             <View style={styles.currencySelector}>
               <Text style={styles.currencySelectorFlag}>{fromCurrencyData?.flag}</Text>
               <Text style={styles.currencySelectorCode}>{fromCurrency}</Text>
@@ -228,18 +212,12 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
           </TouchableOpacity>
 
           {/* Swap Button */}
-          <TouchableOpacity
-            style={styles.swapButton}
-            onPress={handleSwapCurrencies}
-          >
+          <TouchableOpacity style={styles.swapButton} onPress={handleSwapCurrencies}>
             <Text style={styles.swapButtonText}>⇅</Text>
           </TouchableOpacity>
 
           {/* To Currency */}
-          <TouchableOpacity
-            style={styles.currencyRow}
-            onPress={() => setShowToPicker(true)}
-          >
+          <TouchableOpacity style={styles.currencyRow} onPress={() => setShowToPicker(true)}>
             <View style={styles.currencySelector}>
               <Text style={styles.currencySelectorFlag}>{toCurrencyData?.flag}</Text>
               <Text style={styles.currencySelectorCode}>{toCurrency}</Text>
@@ -269,7 +247,7 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Amounts</Text>
           <View style={styles.quickAmountsGrid}>
-            {quickAmounts.map(value => (
+            {quickAmounts.map((value) => (
               <TouchableOpacity
                 key={value}
                 style={[
@@ -278,11 +256,14 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
                 ]}
                 onPress={() => handleQuickAmount(value)}
               >
-                <Text style={[
-                  styles.quickAmountText,
-                  parseFloat(amount) === value && styles.quickAmountTextActive,
-                ]}>
-                  {fromCurrencyData?.symbol}{value}
+                <Text
+                  style={[
+                    styles.quickAmountText,
+                    parseFloat(amount) === value && styles.quickAmountTextActive,
+                  ]}
+                >
+                  {fromCurrencyData?.symbol}
+                  {value}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -294,7 +275,7 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Pairs</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {quickConversions.slice(0, 5).map(qc => {
+              {quickConversions.slice(0, 5).map((qc) => {
                 const fromData = getCurrency(qc.from);
                 const toData = getCurrency(qc.to);
                 return (
@@ -325,13 +306,11 @@ const CurrencyConverterScreen: React.FC<CurrencyConverterScreenProps> = ({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Conversion Table</Text>
           <View style={styles.tableCard}>
-            {[1, 5, 10, 20, 50, 100, 500, 1000].map(value => {
+            {[1, 5, 10, 20, 50, 100, 500, 1000].map((value) => {
               const result = convert(value, fromCurrency, toCurrency);
               return (
                 <View key={value} style={styles.tableRow}>
-                  <Text style={styles.tableFrom}>
-                    {format(value, fromCurrency)}
-                  </Text>
+                  <Text style={styles.tableFrom}>{format(value, fromCurrency)}</Text>
                   <Text style={styles.tableEquals}>=</Text>
                   <Text style={styles.tableTo}>
                     {result ? format(result.convertedAmount, toCurrency) : '-'}

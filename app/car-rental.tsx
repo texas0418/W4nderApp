@@ -40,7 +40,12 @@ import {
   Navigation,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
-import { mockRentalCars, carRentalProviders, insuranceOptions, carExtras } from '@/mocks/carRentals';
+import {
+  mockRentalCars,
+  carRentalProviders,
+  insuranceOptions,
+  carExtras,
+} from '@/mocks/carRentals';
 import { RentalCar, CarCategory, CarInsuranceOption, CarExtra } from '@/types';
 
 const CAR_CATEGORIES: { id: CarCategory; label: string; icon: typeof Car }[] = [
@@ -56,7 +61,7 @@ const CAR_CATEGORIES: { id: CarCategory; label: string; icon: typeof Car }[] = [
   { id: 'electric', label: 'Electric', icon: Zap },
 ];
 
-const PROVIDERS = ['All', ...carRentalProviders.map(p => p.name)];
+const PROVIDERS = ['All', ...carRentalProviders.map((p) => p.name)];
 
 export default function CarRentalScreen() {
   const router = useRouter();
@@ -70,7 +75,9 @@ export default function CarRentalScreen() {
   const [rentalDays, setRentalDays] = useState(3);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [sortBy, setSortBy] = useState<'price' | 'rating' | 'popularity'>('popularity');
-  const [transmissionFilter, setTransmissionFilter] = useState<'all' | 'automatic' | 'manual'>('all');
+  const [transmissionFilter, setTransmissionFilter] = useState<'all' | 'automatic' | 'manual'>(
+    'all'
+  );
   const [electricOnly, setElectricOnly] = useState(false);
   const [freeCancellationOnly, setFreeCancellationOnly] = useState(false);
   const [selectedInsurance, setSelectedInsurance] = useState<CarInsuranceOption | null>(null);
@@ -81,34 +88,37 @@ export default function CarRentalScreen() {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      results = results.filter(c =>
-        c.name.toLowerCase().includes(query) ||
-        c.brand.toLowerCase().includes(query) ||
-        c.model.toLowerCase().includes(query) ||
-        c.pickupLocation.city.toLowerCase().includes(query)
+      results = results.filter(
+        (c) =>
+          c.name.toLowerCase().includes(query) ||
+          c.brand.toLowerCase().includes(query) ||
+          c.model.toLowerCase().includes(query) ||
+          c.pickupLocation.city.toLowerCase().includes(query)
       );
     }
 
     if (selectedCategories.length > 0) {
-      results = results.filter(c => selectedCategories.includes(c.category));
+      results = results.filter((c) => selectedCategories.includes(c.category));
     }
 
     if (selectedProvider !== 'All') {
-      results = results.filter(c => c.provider.name === selectedProvider);
+      results = results.filter((c) => c.provider.name === selectedProvider);
     }
 
-    results = results.filter(c => c.pricePerDay >= priceRange[0] && c.pricePerDay <= priceRange[1]);
+    results = results.filter(
+      (c) => c.pricePerDay >= priceRange[0] && c.pricePerDay <= priceRange[1]
+    );
 
     if (transmissionFilter !== 'all') {
-      results = results.filter(c => c.transmission === transmissionFilter);
+      results = results.filter((c) => c.transmission === transmissionFilter);
     }
 
     if (electricOnly) {
-      results = results.filter(c => c.isElectric);
+      results = results.filter((c) => c.isElectric);
     }
 
     if (freeCancellationOnly) {
-      results = results.filter(c => c.freeCancellation);
+      results = results.filter((c) => c.freeCancellation);
     }
 
     switch (sortBy) {
@@ -124,45 +134,54 @@ export default function CarRentalScreen() {
     }
 
     return results;
-  }, [searchQuery, selectedCategories, selectedProvider, priceRange, sortBy, transmissionFilter, electricOnly, freeCancellationOnly]);
+  }, [
+    searchQuery,
+    selectedCategories,
+    selectedProvider,
+    priceRange,
+    sortBy,
+    transmissionFilter,
+    electricOnly,
+    freeCancellationOnly,
+  ]);
 
   const toggleFavorite = useCallback((id: string) => {
-    setFavorites(prev =>
-      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-    );
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
   }, []);
 
   const toggleCategory = useCallback((category: CarCategory) => {
-    setSelectedCategories(prev =>
-      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+    setSelectedCategories((prev) =>
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
   }, []);
 
   const openBooking = useCallback((car: RentalCar) => {
     setSelectedCar(car);
-    setSelectedInsurance(insuranceOptions.find(i => i.recommended) || null);
+    setSelectedInsurance(insuranceOptions.find((i) => i.recommended) || null);
     setSelectedExtras([]);
     setShowBookingModal(true);
   }, []);
 
   const toggleExtra = useCallback((extra: CarExtra) => {
-    setSelectedExtras(prev => {
-      const existing = prev.find(e => e.extra.id === extra.id);
+    setSelectedExtras((prev) => {
+      const existing = prev.find((e) => e.extra.id === extra.id);
       if (existing) {
-        return prev.filter(e => e.extra.id !== extra.id);
+        return prev.filter((e) => e.extra.id !== extra.id);
       }
       return [...prev, { extra, quantity: 1 }];
     });
   }, []);
 
   const updateExtraQuantity = useCallback((extraId: string, change: number) => {
-    setSelectedExtras(prev => prev.map(e => {
-      if (e.extra.id === extraId) {
-        const newQty = Math.max(1, Math.min(e.extra.maxQuantity, e.quantity + change));
-        return { ...e, quantity: newQty };
-      }
-      return e;
-    }));
+    setSelectedExtras((prev) =>
+      prev.map((e) => {
+        if (e.extra.id === extraId) {
+          const newQty = Math.max(1, Math.min(e.extra.maxQuantity, e.quantity + change));
+          return { ...e, quantity: newQty };
+        }
+        return e;
+      })
+    );
   }, []);
 
   const calculateTotal = useCallback(() => {
@@ -170,7 +189,10 @@ export default function CarRentalScreen() {
 
     const base = selectedCar.pricePerDay * rentalDays;
     const insurance = selectedInsurance ? selectedInsurance.pricePerDay * rentalDays : 0;
-    const extras = selectedExtras.reduce((sum, e) => sum + (e.extra.pricePerDay * e.quantity * rentalDays), 0);
+    const extras = selectedExtras.reduce(
+      (sum, e) => sum + e.extra.pricePerDay * e.quantity * rentalDays,
+      0
+    );
     const subtotal = base + insurance + extras;
     const taxes = subtotal * 0.1;
     const total = subtotal + taxes;
@@ -203,124 +225,121 @@ export default function CarRentalScreen() {
     );
   }, [selectedCar, rentalDays, calculateTotal]);
 
-  const renderCarCard = useCallback(({ item }: { item: RentalCar }) => {
-    const isFavorite = favorites.includes(item.id);
+  const renderCarCard = useCallback(
+    ({ item }: { item: RentalCar }) => {
+      const isFavorite = favorites.includes(item.id);
 
-    return (
-      <Pressable
-        style={styles.carCard}
-        onPress={() => openBooking(item)}
-      >
-        <View style={styles.cardImageContainer}>
-          <Image
-            source={{ uri: item.image }}
-            style={styles.cardImage}
-            contentFit="cover"
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.5)']}
-            style={styles.cardGradient}
-          />
-          <Pressable
-            style={styles.favoriteButton}
-            onPress={() => toggleFavorite(item.id)}
-          >
-            <Heart
-              size={20}
-              color={isFavorite ? colors.secondary : colors.textLight}
-              fill={isFavorite ? colors.secondary : 'transparent'}
+      return (
+        <Pressable style={styles.carCard} onPress={() => openBooking(item)}>
+          <View style={styles.cardImageContainer}>
+            <Image source={{ uri: item.image }} style={styles.cardImage} contentFit="cover" />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.5)']}
+              style={styles.cardGradient}
             />
-          </Pressable>
-          {item.isFeatured && (
-            <View style={styles.featuredBadge}>
-              <Star size={12} color={colors.textLight} />
-              <Text style={styles.featuredText}>Featured</Text>
-            </View>
-          )}
-          {item.isElectric && (
-            <View style={styles.electricBadge}>
-              <Leaf size={14} color={colors.success} />
-            </View>
-          )}
-          <View style={styles.categoryTag}>
-            <Text style={styles.categoryText}>{item.category}</Text>
-          </View>
-        </View>
-
-        <View style={styles.cardContent}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardTitleRow}>
-              <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
-              <Text style={styles.cardYear}>{item.year}</Text>
-            </View>
-            <View style={styles.ratingContainer}>
-              <Star size={14} color={colors.warning} fill={colors.warning} />
-              <Text style={styles.rating}>{item.rating}</Text>
-              <Text style={styles.reviewCount}>({item.reviewCount})</Text>
-            </View>
-          </View>
-
-          <View style={styles.providerRow}>
-            <Text style={styles.providerName}>{item.provider.name}</Text>
-            <View style={styles.locationRow}>
-              <MapPin size={12} color={colors.textSecondary} />
-              <Text style={styles.locationText}>{item.pickupLocation.city}</Text>
-            </View>
-          </View>
-
-          <View style={styles.specsRow}>
-            <View style={styles.specItem}>
-              <Users size={14} color={colors.textSecondary} />
-              <Text style={styles.specText}>{item.seats}</Text>
-            </View>
-            <View style={styles.specItem}>
-              <Briefcase size={14} color={colors.textSecondary} />
-              <Text style={styles.specText}>{item.luggage.large + item.luggage.small}</Text>
-            </View>
-            <View style={styles.specItem}>
-              <Settings2 size={14} color={colors.textSecondary} />
-              <Text style={styles.specText}>{item.transmission === 'automatic' ? 'Auto' : 'Manual'}</Text>
-            </View>
-            <View style={styles.specItem}>
-              <Fuel size={14} color={colors.textSecondary} />
-              <Text style={styles.specText}>{item.fuelType}</Text>
-            </View>
-          </View>
-
-          <View style={styles.featuresRow}>
-            {item.features.slice(0, 3).map((feature, index) => (
-              <View key={index} style={styles.featureChip}>
-                <Text style={styles.featureText}>{feature}</Text>
+            <Pressable style={styles.favoriteButton} onPress={() => toggleFavorite(item.id)}>
+              <Heart
+                size={20}
+                color={isFavorite ? colors.secondary : colors.textLight}
+                fill={isFavorite ? colors.secondary : 'transparent'}
+              />
+            </Pressable>
+            {item.isFeatured && (
+              <View style={styles.featuredBadge}>
+                <Star size={12} color={colors.textLight} />
+                <Text style={styles.featuredText}>Featured</Text>
               </View>
-            ))}
+            )}
+            {item.isElectric && (
+              <View style={styles.electricBadge}>
+                <Leaf size={14} color={colors.success} />
+              </View>
+            )}
+            <View style={styles.categoryTag}>
+              <Text style={styles.categoryText}>{item.category}</Text>
+            </View>
           </View>
 
-          <View style={styles.cardFooter}>
-            <View style={styles.priceContainer}>
-              {item.originalPrice && (
-                <Text style={styles.originalPrice}>${item.originalPrice}</Text>
-              )}
-              <Text style={styles.price}>
-                ${item.pricePerDay}
-                <Text style={styles.perDay}>/day</Text>
-              </Text>
+          <View style={styles.cardContent}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardTitleRow}>
+                <Text style={styles.cardName} numberOfLines={1}>
+                  {item.name}
+                </Text>
+                <Text style={styles.cardYear}>{item.year}</Text>
+              </View>
+              <View style={styles.ratingContainer}>
+                <Star size={14} color={colors.warning} fill={colors.warning} />
+                <Text style={styles.rating}>{item.rating}</Text>
+                <Text style={styles.reviewCount}>({item.reviewCount})</Text>
+              </View>
             </View>
-            <View style={styles.cardActions}>
-              {item.freeCancellation && (
-                <View style={styles.freeCancelBadge}>
-                  <Check size={12} color={colors.success} />
-                  <Text style={styles.freeCancelText}>Free Cancel</Text>
+
+            <View style={styles.providerRow}>
+              <Text style={styles.providerName}>{item.provider.name}</Text>
+              <View style={styles.locationRow}>
+                <MapPin size={12} color={colors.textSecondary} />
+                <Text style={styles.locationText}>{item.pickupLocation.city}</Text>
+              </View>
+            </View>
+
+            <View style={styles.specsRow}>
+              <View style={styles.specItem}>
+                <Users size={14} color={colors.textSecondary} />
+                <Text style={styles.specText}>{item.seats}</Text>
+              </View>
+              <View style={styles.specItem}>
+                <Briefcase size={14} color={colors.textSecondary} />
+                <Text style={styles.specText}>{item.luggage.large + item.luggage.small}</Text>
+              </View>
+              <View style={styles.specItem}>
+                <Settings2 size={14} color={colors.textSecondary} />
+                <Text style={styles.specText}>
+                  {item.transmission === 'automatic' ? 'Auto' : 'Manual'}
+                </Text>
+              </View>
+              <View style={styles.specItem}>
+                <Fuel size={14} color={colors.textSecondary} />
+                <Text style={styles.specText}>{item.fuelType}</Text>
+              </View>
+            </View>
+
+            <View style={styles.featuresRow}>
+              {item.features.slice(0, 3).map((feature, index) => (
+                <View key={index} style={styles.featureChip}>
+                  <Text style={styles.featureText}>{feature}</Text>
                 </View>
-              )}
-              <Pressable style={styles.bookButton} onPress={() => openBooking(item)}>
-                <Text style={styles.bookButtonText}>Select</Text>
-              </Pressable>
+              ))}
+            </View>
+
+            <View style={styles.cardFooter}>
+              <View style={styles.priceContainer}>
+                {item.originalPrice && (
+                  <Text style={styles.originalPrice}>${item.originalPrice}</Text>
+                )}
+                <Text style={styles.price}>
+                  ${item.pricePerDay}
+                  <Text style={styles.perDay}>/day</Text>
+                </Text>
+              </View>
+              <View style={styles.cardActions}>
+                {item.freeCancellation && (
+                  <View style={styles.freeCancelBadge}>
+                    <Check size={12} color={colors.success} />
+                    <Text style={styles.freeCancelText}>Free Cancel</Text>
+                  </View>
+                )}
+                <Pressable style={styles.bookButton} onPress={() => openBooking(item)}>
+                  <Text style={styles.bookButtonText}>Select</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
-      </Pressable>
-    );
-  }, [favorites, toggleFavorite, openBooking]);
+        </Pressable>
+      );
+    },
+    [favorites, toggleFavorite, openBooking]
+  );
 
   const renderFilterModal = () => (
     <Modal
@@ -340,7 +359,7 @@ export default function CarRentalScreen() {
         <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
           <Text style={styles.filterSectionTitle}>Car Category</Text>
           <View style={styles.categoryGrid}>
-            {CAR_CATEGORIES.map(cat => {
+            {CAR_CATEGORIES.map((cat) => {
               const isSelected = selectedCategories.includes(cat.id);
               const CatIcon = cat.icon;
               return (
@@ -350,7 +369,12 @@ export default function CarRentalScreen() {
                   onPress={() => toggleCategory(cat.id)}
                 >
                   <CatIcon size={18} color={isSelected ? colors.textLight : colors.text} />
-                  <Text style={[styles.categoryButtonText, isSelected && styles.categoryButtonTextSelected]}>
+                  <Text
+                    style={[
+                      styles.categoryButtonText,
+                      isSelected && styles.categoryButtonTextSelected,
+                    ]}
+                  >
                     {cat.label}
                   </Text>
                 </Pressable>
@@ -359,8 +383,12 @@ export default function CarRentalScreen() {
           </View>
 
           <Text style={styles.filterSectionTitle}>Provider</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.providerScroll}>
-            {PROVIDERS.map(provider => (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.providerScroll}
+          >
+            {PROVIDERS.map((provider) => (
               <Pressable
                 key={provider}
                 style={[
@@ -369,10 +397,12 @@ export default function CarRentalScreen() {
                 ]}
                 onPress={() => setSelectedProvider(provider)}
               >
-                <Text style={[
-                  styles.providerChipText,
-                  selectedProvider === provider && styles.providerChipTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.providerChipText,
+                    selectedProvider === provider && styles.providerChipTextSelected,
+                  ]}
+                >
                   {provider}
                 </Text>
               </Pressable>
@@ -381,16 +411,21 @@ export default function CarRentalScreen() {
 
           <Text style={styles.filterSectionTitle}>Transmission</Text>
           <View style={styles.transmissionOptions}>
-            {(['all', 'automatic', 'manual'] as const).map(option => (
+            {(['all', 'automatic', 'manual'] as const).map((option) => (
               <Pressable
                 key={option}
-                style={[styles.transmissionOption, transmissionFilter === option && styles.transmissionOptionSelected]}
+                style={[
+                  styles.transmissionOption,
+                  transmissionFilter === option && styles.transmissionOptionSelected,
+                ]}
                 onPress={() => setTransmissionFilter(option)}
               >
-                <Text style={[
-                  styles.transmissionOptionText,
-                  transmissionFilter === option && styles.transmissionOptionTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.transmissionOptionText,
+                    transmissionFilter === option && styles.transmissionOptionTextSelected,
+                  ]}
+                >
                   {option === 'all' ? 'All' : option.charAt(0).toUpperCase() + option.slice(1)}
                 </Text>
               </Pressable>
@@ -399,16 +434,18 @@ export default function CarRentalScreen() {
 
           <Text style={styles.filterSectionTitle}>Sort By</Text>
           <View style={styles.sortOptions}>
-            {(['popularity', 'rating', 'price'] as const).map(option => (
+            {(['popularity', 'rating', 'price'] as const).map((option) => (
               <Pressable
                 key={option}
                 style={[styles.sortOption, sortBy === option && styles.sortOptionSelected]}
                 onPress={() => setSortBy(option)}
               >
-                <Text style={[
-                  styles.sortOptionText,
-                  sortBy === option && styles.sortOptionTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.sortOptionText,
+                    sortBy === option && styles.sortOptionTextSelected,
+                  ]}
+                >
                   {option.charAt(0).toUpperCase() + option.slice(1)}
                 </Text>
                 {sortBy === option && <Check size={16} color={colors.primary} />}
@@ -418,10 +455,18 @@ export default function CarRentalScreen() {
 
           <Text style={styles.filterSectionTitle}>Price Range (per day)</Text>
           <View style={styles.priceRangeDisplay}>
-            <Text style={styles.priceRangeText}>${priceRange[0]} - ${priceRange[1]}+</Text>
+            <Text style={styles.priceRangeText}>
+              ${priceRange[0]} - ${priceRange[1]}+
+            </Text>
           </View>
           <View style={styles.priceButtons}>
-            {[[0, 50], [50, 100], [100, 200], [200, 350], [350, 500]].map(([min, max]) => (
+            {[
+              [0, 50],
+              [50, 100],
+              [100, 200],
+              [200, 350],
+              [350, 500],
+            ].map(([min, max]) => (
               <Pressable
                 key={`${min}-${max}`}
                 style={[
@@ -430,10 +475,14 @@ export default function CarRentalScreen() {
                 ]}
                 onPress={() => setPriceRange([min, max])}
               >
-                <Text style={[
-                  styles.priceButtonText,
-                  priceRange[0] === min && priceRange[1] === max && styles.priceButtonTextSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.priceButtonText,
+                    priceRange[0] === min &&
+                      priceRange[1] === max &&
+                      styles.priceButtonTextSelected,
+                  ]}
+                >
                   ${min}-${max === 500 ? '500+' : `$${max}`}
                 </Text>
               </Pressable>
@@ -441,10 +490,7 @@ export default function CarRentalScreen() {
           </View>
 
           <Text style={styles.filterSectionTitle}>Additional Options</Text>
-          <Pressable
-            style={styles.toggleOption}
-            onPress={() => setElectricOnly(!electricOnly)}
-          >
+          <Pressable style={styles.toggleOption} onPress={() => setElectricOnly(!electricOnly)}>
             <View style={styles.toggleInfo}>
               <Leaf size={20} color={colors.success} />
               <View>
@@ -489,13 +535,8 @@ export default function CarRentalScreen() {
           >
             <Text style={styles.clearButtonText}>Clear All</Text>
           </Pressable>
-          <Pressable
-            style={styles.applyButton}
-            onPress={() => setShowFilters(false)}
-          >
-            <Text style={styles.applyButtonText}>
-              Show {filteredCars.length} Cars
-            </Text>
+          <Pressable style={styles.applyButton} onPress={() => setShowFilters(false)}>
+            <Text style={styles.applyButtonText}>Show {filteredCars.length} Cars</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -532,7 +573,9 @@ export default function CarRentalScreen() {
               />
               <View style={styles.bookingCarInfo}>
                 <Text style={styles.bookingCarName}>{selectedCar.name}</Text>
-                <Text style={styles.bookingCarDetails}>{selectedCar.brand} {selectedCar.model} • {selectedCar.year}</Text>
+                <Text style={styles.bookingCarDetails}>
+                  {selectedCar.brand} {selectedCar.model} • {selectedCar.year}
+                </Text>
                 <View style={styles.bookingCarSpecs}>
                   <View style={styles.specItem}>
                     <Users size={12} color={colors.textSecondary} />
@@ -574,7 +617,9 @@ export default function CarRentalScreen() {
             <View style={styles.durationCard}>
               <View style={styles.durationInfo}>
                 <Calendar size={20} color={colors.primary} />
-                <Text style={styles.durationText}>{rentalDays} {rentalDays === 1 ? 'day' : 'days'}</Text>
+                <Text style={styles.durationText}>
+                  {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
+                </Text>
               </View>
               <View style={styles.stepper}>
                 <Pressable
@@ -594,7 +639,7 @@ export default function CarRentalScreen() {
             </View>
 
             <Text style={styles.bookingSectionTitle}>Protection Plan</Text>
-            {insuranceOptions.map(insurance => (
+            {insuranceOptions.map((insurance) => (
               <Pressable
                 key={insurance.id}
                 style={[
@@ -623,11 +668,15 @@ export default function CarRentalScreen() {
                     </View>
                   ))}
                 </View>
-                <View style={[
-                  styles.radioButton,
-                  selectedInsurance?.id === insurance.id && styles.radioButtonSelected,
-                ]}>
-                  {selectedInsurance?.id === insurance.id && <Check size={14} color={colors.textLight} />}
+                <View
+                  style={[
+                    styles.radioButton,
+                    selectedInsurance?.id === insurance.id && styles.radioButtonSelected,
+                  ]}
+                >
+                  {selectedInsurance?.id === insurance.id && (
+                    <Check size={14} color={colors.textLight} />
+                  )}
                 </View>
               </Pressable>
             ))}
@@ -645,17 +694,14 @@ export default function CarRentalScreen() {
                 <Text style={styles.insurancePrice}>$0/day</Text>
               </View>
               <Text style={styles.insuranceDescription}>I'll take the risk - not recommended</Text>
-              <View style={[
-                styles.radioButton,
-                !selectedInsurance && styles.radioButtonSelected,
-              ]}>
+              <View style={[styles.radioButton, !selectedInsurance && styles.radioButtonSelected]}>
                 {!selectedInsurance && <Check size={14} color={colors.textLight} />}
               </View>
             </Pressable>
 
             <Text style={styles.bookingSectionTitle}>Extras</Text>
-            {carExtras.map(extra => {
-              const selected = selectedExtras.find(e => e.extra.id === extra.id);
+            {carExtras.map((extra) => {
+              const selected = selectedExtras.find((e) => e.extra.id === extra.id);
               return (
                 <Pressable
                   key={extra.id}
@@ -726,12 +772,16 @@ export default function CarRentalScreen() {
             <View style={styles.policyInfo}>
               <View style={styles.policyItem}>
                 <Clock size={16} color={colors.textSecondary} />
-                <Text style={styles.policyText}>Pick-up: {selectedCar.pickupLocation.hours.weekday}</Text>
+                <Text style={styles.policyText}>
+                  Pick-up: {selectedCar.pickupLocation.hours.weekday}
+                </Text>
               </View>
               {selectedCar.freeCancellation && (
                 <View style={styles.policyItem}>
                   <Shield size={16} color={colors.success} />
-                  <Text style={styles.policyText}>Free cancellation {selectedCar.cancellationDeadline}</Text>
+                  <Text style={styles.policyText}>
+                    Free cancellation {selectedCar.cancellationDeadline}
+                  </Text>
                 </View>
               )}
               <View style={styles.policyItem}>
@@ -792,7 +842,7 @@ export default function CarRentalScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoriesScroll}
         >
-          {CAR_CATEGORIES.slice(0, 6).map(cat => {
+          {CAR_CATEGORIES.slice(0, 6).map((cat) => {
             const isSelected = selectedCategories.includes(cat.id);
             const CatIcon = cat.icon;
             return (
@@ -802,7 +852,9 @@ export default function CarRentalScreen() {
                 onPress={() => toggleCategory(cat.id)}
               >
                 <CatIcon size={16} color={isSelected ? colors.textLight : colors.text} />
-                <Text style={[styles.categoryChipText, isSelected && styles.categoryChipTextSelected]}>
+                <Text
+                  style={[styles.categoryChipText, isSelected && styles.categoryChipTextSelected]}
+                >
                   {cat.label}
                 </Text>
               </Pressable>
@@ -811,9 +863,7 @@ export default function CarRentalScreen() {
         </ScrollView>
 
         <View style={styles.resultsHeader}>
-          <Text style={styles.resultsCount}>
-            {filteredCars.length} cars available
-          </Text>
+          <Text style={styles.resultsCount}>{filteredCars.length} cars available</Text>
           <Pressable style={styles.sortButton} onPress={() => setShowFilters(true)}>
             <Text style={styles.sortButtonText}>Sort: {sortBy}</Text>
             <ChevronDown size={16} color={colors.primary} />
@@ -823,16 +873,14 @@ export default function CarRentalScreen() {
         <FlatList
           data={filteredCars}
           renderItem={renderCarCard}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Car size={48} color={colors.textTertiary} />
               <Text style={styles.emptyTitle}>No Cars Found</Text>
-              <Text style={styles.emptyText}>
-                Try adjusting your filters or search criteria
-              </Text>
+              <Text style={styles.emptyText}>Try adjusting your filters or search criteria</Text>
             </View>
           }
         />

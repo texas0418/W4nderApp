@@ -29,20 +29,15 @@ const TYPE_FILTER_OPTIONS: { value: AnniversaryType | 'all'; label: string; icon
 ];
 
 export const AnniversaryListScreen: React.FC<AnniversaryListScreenProps> = ({ navigation }) => {
-  const {
-    upcomingAnniversaries,
-    stats,
-    unreadReminders,
-    isLoading,
-    loadUpcoming,
-    refresh,
-  } = useAnniversary();
+  const { upcomingAnniversaries, stats, unreadReminders, isLoading, loadUpcoming, refresh } =
+    useAnniversary();
 
   const [selectedType, setSelectedType] = useState<AnniversaryType | 'all'>('all');
 
-  const filteredAnniversaries = selectedType === 'all'
-    ? upcomingAnniversaries
-    : upcomingAnniversaries.filter(ua => ua.anniversary.type === selectedType);
+  const filteredAnniversaries =
+    selectedType === 'all'
+      ? upcomingAnniversaries
+      : upcomingAnniversaries.filter((ua) => ua.anniversary.type === selectedType);
 
   const handleRefresh = useCallback(async () => {
     await refresh();
@@ -81,24 +76,30 @@ export const AnniversaryListScreen: React.FC<AnniversaryListScreenProps> = ({ na
         {stats.nextMilestone && (
           <TouchableOpacity
             style={styles.nextMilestoneCard}
-            onPress={() => navigation.navigate('AnniversaryDetail', {
-              anniversaryId: stats.nextMilestone!.anniversary.id,
-            })}
+            onPress={() =>
+              navigation.navigate('AnniversaryDetail', {
+                anniversaryId: stats.nextMilestone!.anniversary.id,
+              })
+            }
           >
             <View style={styles.nextMilestoneIcon}>
               <Text style={styles.milestoneEmoji}>
-                {stats.nextMilestone.milestone.level === 'diamond' ? '💎' :
-                 stats.nextMilestone.milestone.level === 'platinum' ? '✨' :
-                 stats.nextMilestone.milestone.level === 'gold' ? '🏆' : '🎊'}
+                {stats.nextMilestone.milestone.level === 'diamond'
+                  ? '💎'
+                  : stats.nextMilestone.milestone.level === 'platinum'
+                    ? '✨'
+                    : stats.nextMilestone.milestone.level === 'gold'
+                      ? '🏆'
+                      : '🎊'}
               </Text>
             </View>
             <View style={styles.nextMilestoneContent}>
               <Text style={styles.nextMilestoneLabel}>Next Milestone</Text>
-              <Text style={styles.nextMilestoneName}>
-                {stats.nextMilestone.milestone.name}
-              </Text>
+              <Text style={styles.nextMilestoneName}>{stats.nextMilestone.milestone.name}</Text>
               <Text style={styles.nextMilestoneDays}>
-                {stats.nextMilestone.daysUntil === 0 ? 'Today!' : `In ${stats.nextMilestone.daysUntil} days`}
+                {stats.nextMilestone.daysUntil === 0
+                  ? 'Today!'
+                  : `In ${stats.nextMilestone.daysUntil} days`}
               </Text>
             </View>
             <Text style={styles.nextMilestoneArrow}>→</Text>
@@ -117,17 +118,13 @@ export const AnniversaryListScreen: React.FC<AnniversaryListScreenProps> = ({ na
       contentContainerStyle={styles.filterContainer}
       renderItem={({ item }) => (
         <TouchableOpacity
-          style={[
-            styles.filterPill,
-            selectedType === item.value && styles.filterPillActive,
-          ]}
+          style={[styles.filterPill, selectedType === item.value && styles.filterPillActive]}
           onPress={() => setSelectedType(item.value)}
         >
           <Text style={styles.filterIcon}>{item.icon}</Text>
-          <Text style={[
-            styles.filterLabel,
-            selectedType === item.value && styles.filterLabelActive,
-          ]}>
+          <Text
+            style={[styles.filterLabel, selectedType === item.value && styles.filterLabelActive]}
+          >
             {item.label}
           </Text>
         </TouchableOpacity>
@@ -150,9 +147,7 @@ export const AnniversaryListScreen: React.FC<AnniversaryListScreenProps> = ({ na
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyIcon}>💝</Text>
       <Text style={styles.emptyTitle}>No Anniversaries Yet</Text>
-      <Text style={styles.emptySubtitle}>
-        Start tracking special dates with your loved one
-      </Text>
+      <Text style={styles.emptySubtitle}>Start tracking special dates with your loved one</Text>
       <TouchableOpacity
         style={styles.emptyButton}
         onPress={() => navigation.navigate('AddAnniversary')}
@@ -165,7 +160,7 @@ export const AnniversaryListScreen: React.FC<AnniversaryListScreenProps> = ({ na
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -192,9 +187,7 @@ export const AnniversaryListScreen: React.FC<AnniversaryListScreenProps> = ({ na
         )}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={upcomingAnniversaries.length === 0 ? renderEmptyState : null}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />

@@ -5,35 +5,35 @@
 export interface SharedItinerary {
   id: string;
   itineraryId: string;
-  
+
   // Share settings
   shareCode: string; // 6-character code for easy sharing
   shareUrl: string;
   createdAt: string;
   expiresAt?: string;
-  
+
   // Access control
   accessLevel: ShareAccessLevel;
   password?: string; // Optional password protection
   maxViews?: number;
   viewCount: number;
-  
+
   // Surprise mode
   surpriseMode: SurpriseMode;
   surpriseActivities: string[]; // Activity IDs to hide
-  
+
   // Partner info
   partnerName?: string;
   partnerViewed: boolean;
   lastViewedAt?: string;
-  
+
   // Permissions
   canSeeLocation: boolean;
   canSeeCost: boolean;
   canSeeNotes: boolean;
   canAddToCalendar: boolean;
   canSuggestChanges: boolean;
-  
+
   // Status
   isActive: boolean;
   revokedAt?: string;
@@ -48,12 +48,12 @@ export interface SurpriseMode {
   teaseLevel: TeaseLevel;
 }
 
-export type TeaseLevel = 
-  | 'full_mystery'    // Shows only "Surprise Activity" 
-  | 'category_hint'   // Shows "Surprise Dinner 🍽️"
-  | 'time_only'       // Shows time and duration, nothing else
-  | 'neighborhood'    // Shows general area but not exact location
-  | 'custom';         // Custom reveal per activity
+export type TeaseLevel =
+  | 'full_mystery' // Shows only "Surprise Activity"
+  | 'category_hint' // Shows "Surprise Dinner 🍽️"
+  | 'time_only' // Shows time and duration, nothing else
+  | 'neighborhood' // Shows general area but not exact location
+  | 'custom'; // Custom reveal per activity
 
 export interface SurpriseActivity {
   activityId: string;
@@ -65,13 +65,13 @@ export interface SurpriseActivity {
 
 export interface SharedViewActivity {
   id: string;
-  
+
   // Always visible
   startTime: string;
   endTime?: string;
   duration?: number;
   order: number;
-  
+
   // Conditionally visible based on surprise mode
   name: string | null;
   type: string | null;
@@ -80,12 +80,12 @@ export interface SharedViewActivity {
   estimatedCost: string | null;
   notes: string | null;
   imageUrl: string | null;
-  
+
   // Surprise info
   isSurprise: boolean;
   surpriseHint?: string;
   teaseLevel?: TeaseLevel;
-  
+
   // Travel info (may be hidden)
   travelTime?: number | null;
   travelMode?: string | null;
@@ -105,25 +105,25 @@ export interface SharedItineraryView {
   id: string;
   name: string;
   date: string;
-  
+
   // Partner greeting
   greeting?: string;
   partnerName: string;
   creatorName: string;
-  
+
   // Summary (respects surprise mode)
   activityCount: number;
   surpriseCount: number;
   totalDuration?: number;
-  
+
   // Activities
   activities: SharedViewActivity[];
-  
+
   // Permissions
   canSeeLocation: boolean;
   canSeeCost: boolean;
   canAddToCalendar: boolean;
-  
+
   // Metadata
   lastUpdated: string;
   shareSettings: {
@@ -143,11 +143,11 @@ export interface PartnerSuggestion {
   id: string;
   sharedItineraryId: string;
   activityId?: string;
-  
+
   type: 'time_change' | 'activity_swap' | 'add_activity' | 'note' | 'question';
   message: string;
   suggestedValue?: any;
-  
+
   status: 'pending' | 'accepted' | 'declined';
   createdAt: string;
   respondedAt?: string;
@@ -192,7 +192,7 @@ export function getActivityDisplayInfo(
 ): SharedViewActivity {
   const isSurprise = surpriseActivity && !surpriseActivity.isRevealed;
   const teaseLevel = surpriseActivity?.teaseLevel || surpriseMode?.teaseLevel || 'full_mystery';
-  
+
   // Always visible
   const baseInfo: SharedViewActivity = {
     id: activity.id,
@@ -203,7 +203,7 @@ export function getActivityDisplayInfo(
     isSurprise: !!isSurprise,
     teaseLevel: isSurprise ? teaseLevel : undefined,
     surpriseHint: surpriseActivity?.customHint,
-    
+
     // Default to null, will be filled based on tease level
     name: null,
     type: null,
@@ -215,19 +215,21 @@ export function getActivityDisplayInfo(
     travelTime: null,
     travelMode: null,
   };
-  
+
   if (!isSurprise) {
     // Not a surprise - show everything
     return {
       ...baseInfo,
       name: activity.name,
       type: activity.type,
-      location: activity.location ? {
-        name: activity.location.name,
-        address: activity.location.address,
-        neighborhood: activity.location.neighborhood,
-        coordinates: activity.location.coordinates,
-      } : null,
+      location: activity.location
+        ? {
+            name: activity.location.name,
+            address: activity.location.address,
+            neighborhood: activity.location.neighborhood,
+            coordinates: activity.location.coordinates,
+          }
+        : null,
       description: activity.description,
       estimatedCost: activity.estimatedCost,
       notes: activity.notes,
@@ -236,7 +238,7 @@ export function getActivityDisplayInfo(
       travelMode: activity.travelMode,
     };
   }
-  
+
   // Handle surprise tease levels
   switch (teaseLevel) {
     case 'full_mystery':
@@ -244,7 +246,7 @@ export function getActivityDisplayInfo(
         ...baseInfo,
         name: '✨ Surprise Activity',
       };
-      
+
     case 'category_hint':
       const categoryEmoji = getCategoryEmoji(activity.type);
       return {
@@ -252,33 +254,35 @@ export function getActivityDisplayInfo(
         name: `Surprise ${getCategoryLabel(activity.type)} ${categoryEmoji}`,
         type: activity.type,
       };
-      
+
     case 'time_only':
       return {
         ...baseInfo,
         name: '🎁 Something Special',
         travelTime: activity.travelTime,
       };
-      
+
     case 'neighborhood':
       return {
         ...baseInfo,
         name: `Surprise in ${activity.location?.neighborhood || 'a special spot'}`,
         type: activity.type,
-        location: activity.location ? {
-          name: null,
-          address: null,
-          neighborhood: activity.location.neighborhood,
-          coordinates: null,
-        } : null,
+        location: activity.location
+          ? {
+              name: null,
+              address: null,
+              neighborhood: activity.location.neighborhood,
+              coordinates: null,
+            }
+          : null,
       };
-      
+
     case 'custom':
       return {
         ...baseInfo,
         name: surpriseActivity?.customHint || '✨ Surprise Activity',
       };
-      
+
     default:
       return baseInfo;
   }

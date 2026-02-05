@@ -50,10 +50,10 @@ import {
 import colors from '@/constants/colors';
 import { useDateNight } from '@/contexts/DateNightContext';
 import { useExpenseTracker, useSavingsGoals } from '@/hooks/useExpenseTracker';
-import { 
-  ExpenseCategory, 
-  EXPENSE_CATEGORIES, 
-  getCategoryConfig, 
+import {
+  ExpenseCategory,
+  EXPENSE_CATEGORIES,
+  getCategoryConfig,
   PAYMENT_APPS,
   SUPPORTED_CURRENCIES,
   getCurrencyByCode,
@@ -92,12 +92,10 @@ export default function DateNightExpenseTrackerScreen() {
   const router = useRouter();
   const { id: itineraryId } = useLocalSearchParams<{ id: string }>();
   const { currentItinerary, itineraries } = useDateNight();
-  
+
   // Find the itinerary
-  const itinerary = itineraryId 
-    ? itineraries.find(i => i.id === itineraryId) 
-    : currentItinerary;
-  
+  const itinerary = itineraryId ? itineraries.find((i) => i.id === itineraryId) : currentItinerary;
+
   // State
   const [activeTab, setActiveTab] = useState<TabType>('expenses');
   const [showAddExpense, setShowAddExpense] = useState(false);
@@ -105,22 +103,32 @@ export default function DateNightExpenseTrackerScreen() {
   const [showEditExpense, setShowEditExpense] = useState(false);
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  
+
   // Mock participants (would come from itinerary in real app)
-  const participants = useMemo(() => [
-    { id: 'user-1', name: 'You', paymentInfo: { venmo: 'yourvenmo' } },
-    { id: 'partner-1', name: itinerary?.partnerName || 'Partner', paymentInfo: { venmo: 'partnervenmo' } },
-  ], [itinerary?.partnerName]);
-  
+  const participants = useMemo(
+    () => [
+      { id: 'user-1', name: 'You', paymentInfo: { venmo: 'yourvenmo' } },
+      {
+        id: 'partner-1',
+        name: itinerary?.partnerName || 'Partner',
+        paymentInfo: { venmo: 'partnervenmo' },
+      },
+    ],
+    [itinerary?.partnerName]
+  );
+
   // Convert activities
-  const activities = useMemo(() => 
-    itinerary?.activities.map(a => ({
-      id: a.id,
-      name: a.name,
-      estimatedCost: a.estimatedCost,
-      category: a.type as ExpenseCategory,
-    })) || [], [itinerary?.activities]);
-  
+  const activities = useMemo(
+    () =>
+      itinerary?.activities.map((a) => ({
+        id: a.id,
+        name: a.name,
+        estimatedCost: a.estimatedCost,
+        category: a.type as ExpenseCategory,
+      })) || [],
+    [itinerary?.activities]
+  );
+
   // Initialize hooks
   const {
     expenses,
@@ -152,16 +160,10 @@ export default function DateNightExpenseTrackerScreen() {
     currency: 'USD',
     baseCurrency: 'USD',
   });
-  
-  const {
-    goals,
-    activeGoals,
-    createGoal,
-    addContribution,
-    deleteGoal,
-    totalSaved,
-  } = useSavingsGoals();
-  
+
+  const { goals, activeGoals, createGoal, addContribution, deleteGoal, totalSaved } =
+    useSavingsGoals();
+
   // Handle share
   const handleShare = useCallback(async () => {
     try {
@@ -172,7 +174,7 @@ export default function DateNightExpenseTrackerScreen() {
       console.error('Share error:', error);
     }
   }, [exportSummary]);
-  
+
   // Error state
   if (!itinerary) {
     return (
@@ -227,16 +229,12 @@ export default function DateNightExpenseTrackerScreen() {
       <View style={styles.summaryCard}>
         <View style={styles.summaryMain}>
           <Text style={styles.summaryLabel}>Total Spent</Text>
-          <Text style={styles.summaryAmount}>
-            ${totalSpent.toFixed(2)}
-          </Text>
+          <Text style={styles.summaryAmount}>${totalSpent.toFixed(2)}</Text>
           <View style={styles.summaryMeta}>
             {isOverBudget ? (
               <>
                 <TrendingUp size={14} color={colors.error} />
-                <Text style={[styles.summaryMetaText, { color: colors.error }]}>
-                  Over budget
-                </Text>
+                <Text style={[styles.summaryMetaText, { color: colors.error }]}>Over budget</Text>
               </>
             ) : (
               <>
@@ -255,11 +253,7 @@ export default function DateNightExpenseTrackerScreen() {
 
       {/* Quick Actions - Receipt Scanning */}
       <View style={styles.quickActions}>
-        <Pressable 
-          style={styles.quickActionBtn} 
-          onPress={handleScanReceipt}
-          disabled={isScanning}
-        >
+        <Pressable style={styles.quickActionBtn} onPress={handleScanReceipt} disabled={isScanning}>
           {isScanning ? (
             <ActivityIndicator size="small" color={colors.primary} />
           ) : (
@@ -267,16 +261,12 @@ export default function DateNightExpenseTrackerScreen() {
           )}
           <Text style={styles.quickActionText}>Scan Receipt</Text>
         </Pressable>
-        <Pressable 
-          style={styles.quickActionBtn} 
-          onPress={handlePickReceipt}
-          disabled={isScanning}
-        >
+        <Pressable style={styles.quickActionBtn} onPress={handlePickReceipt} disabled={isScanning}>
           <ImageIcon size={18} color={colors.primary} />
           <Text style={styles.quickActionText}>From Gallery</Text>
         </Pressable>
       </View>
-      
+
       {/* Expenses List */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Recent Expenses</Text>
@@ -285,13 +275,13 @@ export default function DateNightExpenseTrackerScreen() {
             {expenses.map((expense) => {
               const Icon = categoryIcons[expense.category] || MoreHorizontal;
               const config = getCategoryConfig(expense.category);
-              const currencyInfo = expense.originalCurrency 
+              const currencyInfo = expense.originalCurrency
                 ? getCurrencyByCode(expense.originalCurrency)
                 : null;
-              
+
               return (
-                <Pressable 
-                  key={expense.id} 
+                <Pressable
+                  key={expense.id}
                   style={styles.expenseCard}
                   onPress={() => handleEditExpense(expense)}
                   onLongPress={() => deleteExpense(expense.id)}
@@ -306,7 +296,8 @@ export default function DateNightExpenseTrackerScreen() {
                     </Text>
                     {expense.originalCurrency && expense.originalCurrency !== baseCurrency && (
                       <Text style={styles.expenseOriginal}>
-                        {currencyInfo?.flag} {formatCurrency(expense.originalAmount || 0, expense.originalCurrency)}
+                        {currencyInfo?.flag}{' '}
+                        {formatCurrency(expense.originalAmount || 0, expense.originalCurrency)}
                       </Text>
                     )}
                   </View>
@@ -322,10 +313,7 @@ export default function DateNightExpenseTrackerScreen() {
           <View style={styles.emptyState}>
             <Receipt size={40} color={colors.textTertiary} />
             <Text style={styles.emptyText}>No expenses yet</Text>
-            <Pressable 
-              style={styles.emptyButton}
-              onPress={() => setShowAddExpense(true)}
-            >
+            <Pressable style={styles.emptyButton} onPress={() => setShowAddExpense(true)}>
               <Plus size={16} color="#fff" />
               <Text style={styles.emptyButtonText}>Add First Expense</Text>
             </Pressable>
@@ -346,42 +334,44 @@ export default function DateNightExpenseTrackerScreen() {
         <View style={styles.budgetRow}>
           <View style={styles.budgetItem}>
             <Text style={styles.budgetItemLabel}>Estimated</Text>
-            <Text style={styles.budgetItemValue}>
-              ${budgetSummary.totalEstimated.toFixed(2)}
-            </Text>
+            <Text style={styles.budgetItemValue}>${budgetSummary.totalEstimated.toFixed(2)}</Text>
           </View>
           <View style={styles.budgetDivider} />
           <View style={styles.budgetItem}>
             <Text style={styles.budgetItemLabel}>Actual</Text>
-            <Text style={styles.budgetItemValue}>
-              ${budgetSummary.totalActual.toFixed(2)}
-            </Text>
+            <Text style={styles.budgetItemValue}>${budgetSummary.totalActual.toFixed(2)}</Text>
           </View>
           <View style={styles.budgetDivider} />
           <View style={styles.budgetItem}>
             <Text style={styles.budgetItemLabel}>Difference</Text>
-            <Text style={[
-              styles.budgetItemValue,
-              { color: budgetSummary.totalDifference > 0 ? colors.error : colors.success }
-            ]}>
-              {budgetSummary.totalDifference >= 0 ? '+' : ''}
-              ${budgetSummary.totalDifference.toFixed(2)}
+            <Text
+              style={[
+                styles.budgetItemValue,
+                { color: budgetSummary.totalDifference > 0 ? colors.error : colors.success },
+              ]}
+            >
+              {budgetSummary.totalDifference >= 0 ? '+' : ''}$
+              {budgetSummary.totalDifference.toFixed(2)}
             </Text>
           </View>
         </View>
-        
+
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View 
+            <View
               style={[
                 styles.progressFill,
-                { 
+                {
                   width: `${Math.min(budgetSummary.percentageUsed, 100)}%`,
-                  backgroundColor: budgetSummary.percentageUsed > 100 ? colors.error : 
-                    budgetSummary.percentageUsed > 80 ? colors.warning : colors.success,
+                  backgroundColor:
+                    budgetSummary.percentageUsed > 100
+                      ? colors.error
+                      : budgetSummary.percentageUsed > 80
+                        ? colors.warning
+                        : colors.success,
                 },
-              ]} 
+              ]}
             />
           </View>
           <Text style={styles.progressText}>
@@ -389,7 +379,7 @@ export default function DateNightExpenseTrackerScreen() {
           </Text>
         </View>
       </View>
-      
+
       {/* By Activity */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>By Activity</Text>
@@ -397,7 +387,7 @@ export default function DateNightExpenseTrackerScreen() {
           {budgetSummary.byActivity.map((item) => {
             const Icon = categoryIcons[item.category] || MoreHorizontal;
             const config = getCategoryConfig(item.category);
-            
+
             return (
               <View key={item.activityId || item.activityName} style={styles.activityCard}>
                 <View style={styles.activityHeader}>
@@ -407,25 +397,41 @@ export default function DateNightExpenseTrackerScreen() {
                   <Text style={styles.activityName} numberOfLines={1}>
                     {item.activityName}
                   </Text>
-                  <View style={[
-                    styles.statusBadge,
-                    { backgroundColor: 
-                      item.status === 'over' ? colors.error + '20' :
-                      item.status === 'under' ? colors.success + '20' : colors.primary + '20'
-                    }
-                  ]}>
-                    <Text style={[
-                      styles.statusText,
-                      { color: 
-                        item.status === 'over' ? colors.error :
-                        item.status === 'under' ? colors.success : colors.primary
-                      }
-                    ]}>
-                      {item.status === 'over' ? 'Over' : item.status === 'under' ? 'Under' : 'On Track'}
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      {
+                        backgroundColor:
+                          item.status === 'over'
+                            ? colors.error + '20'
+                            : item.status === 'under'
+                              ? colors.success + '20'
+                              : colors.primary + '20',
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusText,
+                        {
+                          color:
+                            item.status === 'over'
+                              ? colors.error
+                              : item.status === 'under'
+                                ? colors.success
+                                : colors.primary,
+                        },
+                      ]}
+                    >
+                      {item.status === 'over'
+                        ? 'Over'
+                        : item.status === 'under'
+                          ? 'Under'
+                          : 'On Track'}
                     </Text>
                   </View>
                 </View>
-                
+
                 <View style={styles.activityComparison}>
                   <View style={styles.comparisonItem}>
                     <Text style={styles.comparisonLabel}>Est.</Text>
@@ -434,19 +440,23 @@ export default function DateNightExpenseTrackerScreen() {
                   <ChevronRight size={16} color={colors.textTertiary} />
                   <View style={styles.comparisonItem}>
                     <Text style={styles.comparisonLabel}>Actual</Text>
-                    <Text style={[
-                      styles.comparisonValue,
-                      { color: item.actual > 0 ? colors.text : colors.textTertiary }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.comparisonValue,
+                        { color: item.actual > 0 ? colors.text : colors.textTertiary },
+                      ]}
+                    >
                       ${item.actual.toFixed(0)}
                     </Text>
                   </View>
                   <View style={styles.comparisonItem}>
                     <Text style={styles.comparisonLabel}>Diff</Text>
-                    <Text style={[
-                      styles.comparisonValue,
-                      { color: item.difference > 0 ? colors.error : colors.success }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.comparisonValue,
+                        { color: item.difference > 0 ? colors.error : colors.success },
+                      ]}
+                    >
                       {item.difference >= 0 ? '+' : ''}${item.difference.toFixed(0)}
                     </Text>
                   </View>
@@ -479,7 +489,7 @@ export default function DateNightExpenseTrackerScreen() {
                 </View>
                 <Text style={styles.balanceName}>{participant.name}</Text>
               </View>
-              
+
               <View style={styles.balanceDetails}>
                 <View style={styles.balanceRow}>
                   <Text style={styles.balanceLabel}>Paid</Text>
@@ -491,10 +501,12 @@ export default function DateNightExpenseTrackerScreen() {
                 </View>
                 <View style={[styles.balanceRow, styles.balanceNet]}>
                   <Text style={styles.balanceLabel}>Net</Text>
-                  <Text style={[
-                    styles.balanceNetValue,
-                    { color: participant.netBalance >= 0 ? colors.success : colors.error }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.balanceNetValue,
+                      { color: participant.netBalance >= 0 ? colors.success : colors.error },
+                    ]}
+                  >
                     {participant.netBalance >= 0 ? '+' : ''}${participant.netBalance.toFixed(2)}
                   </Text>
                 </View>
@@ -503,7 +515,7 @@ export default function DateNightExpenseTrackerScreen() {
           ))}
         </View>
       </View>
-      
+
       {/* Settlements */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Settle Up</Text>
@@ -517,23 +529,23 @@ export default function DateNightExpenseTrackerScreen() {
                     {' owes '}
                     <Text style={styles.settlementName}>{settlement.to.name}</Text>
                   </Text>
-                  <Text style={styles.settlementAmount}>
-                    ${settlement.amount.toFixed(2)}
-                  </Text>
+                  <Text style={styles.settlementAmount}>${settlement.amount.toFixed(2)}</Text>
                 </View>
-                
+
                 <View style={styles.paymentOptions}>
-                  {PAYMENT_APPS.filter(app => app.supportsSend).slice(0, 3).map((app) => (
-                    <Pressable
-                      key={app.id}
-                      style={[styles.paymentButton, { backgroundColor: app.color + '20' }]}
-                      onPress={() => settleUp(settlement)}
-                    >
-                      <Text style={[styles.paymentButtonText, { color: app.color }]}>
-                        {app.name}
-                      </Text>
-                    </Pressable>
-                  ))}
+                  {PAYMENT_APPS.filter((app) => app.supportsSend)
+                    .slice(0, 3)
+                    .map((app) => (
+                      <Pressable
+                        key={app.id}
+                        style={[styles.paymentButton, { backgroundColor: app.color + '20' }]}
+                        onPress={() => settleUp(settlement)}
+                      >
+                        <Text style={[styles.paymentButtonText, { color: app.color }]}>
+                          {app.name}
+                        </Text>
+                      </Pressable>
+                    ))}
                 </View>
               </View>
             ))}
@@ -565,7 +577,7 @@ export default function DateNightExpenseTrackerScreen() {
           <Plus size={18} color={colors.primary} />
         </Pressable>
       </View>
-      
+
       {/* Goals */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Savings Goals</Text>
@@ -577,21 +589,21 @@ export default function DateNightExpenseTrackerScreen() {
                   <Text style={styles.goalName}>{goal.name}</Text>
                   <Text style={styles.goalPercent}>{goal.percentComplete.toFixed(0)}%</Text>
                 </View>
-                
+
                 <View style={styles.goalProgress}>
                   <View style={styles.goalProgressBar}>
-                    <View 
+                    <View
                       style={[
                         styles.goalProgressFill,
-                        { 
+                        {
                           width: `${goal.percentComplete}%`,
                           backgroundColor: goal.color || colors.primary,
                         },
-                      ]} 
+                      ]}
                     />
                   </View>
                 </View>
-                
+
                 <View style={styles.goalDetails}>
                   <Text style={styles.goalAmount}>
                     ${goal.currentAmount.toFixed(0)} / ${goal.targetAmount.toFixed(0)}
@@ -602,9 +614,9 @@ export default function DateNightExpenseTrackerScreen() {
                     </Text>
                   )}
                 </View>
-                
+
                 <View style={styles.goalActions}>
-                  <Pressable 
+                  <Pressable
                     style={styles.contributeButton}
                     onPress={() => {
                       Alert.prompt(
@@ -638,13 +650,8 @@ export default function DateNightExpenseTrackerScreen() {
           <View style={styles.emptyState}>
             <Target size={40} color={colors.textTertiary} />
             <Text style={styles.emptyText}>No savings goals</Text>
-            <Text style={styles.emptySubtext}>
-              Start saving for your next adventure!
-            </Text>
-            <Pressable 
-              style={styles.emptyButton}
-              onPress={() => setShowAddSavings(true)}
-            >
+            <Text style={styles.emptySubtext}>Start saving for your next adventure!</Text>
+            <Pressable style={styles.emptyButton} onPress={() => setShowAddSavings(true)}>
               <Plus size={16} color="#fff" />
               <Text style={styles.emptyButtonText}>Create Goal</Text>
             </Pressable>
@@ -673,7 +680,7 @@ export default function DateNightExpenseTrackerScreen() {
     const result = await scanReceipt();
     if (result) {
       // Pre-fill form with scanned data
-      setNewExpense(prev => ({
+      setNewExpense((prev) => ({
         ...prev,
         description: result.merchantName || '',
         amount: result.total?.toString() || '',
@@ -681,7 +688,7 @@ export default function DateNightExpenseTrackerScreen() {
       }));
       Alert.alert(
         'Receipt Scanned',
-        result.total 
+        result.total
           ? `Found: ${result.merchantName || 'Receipt'} - ${formatCurrency(result.total, result.currency || 'USD')}`
           : 'Could not extract amount automatically. Please enter manually.',
         [{ text: 'OK' }]
@@ -692,7 +699,7 @@ export default function DateNightExpenseTrackerScreen() {
   const handlePickReceipt = useCallback(async () => {
     const result = await pickReceiptFromGallery();
     if (result) {
-      setNewExpense(prev => ({
+      setNewExpense((prev) => ({
         ...prev,
         description: result.merchantName || prev.description,
         amount: result.total?.toString() || prev.amount,
@@ -702,30 +709,34 @@ export default function DateNightExpenseTrackerScreen() {
   }, [pickReceiptFromGallery]);
 
   // Edit expense handler
-  const handleEditExpense = useCallback((expense: Expense) => {
-    setNewExpense({
-      description: expense.description,
-      amount: (expense.originalAmount || expense.amount).toString(),
-      category: expense.category,
-      activityId: expense.activityId || '',
-      paidById: expense.paidBy,
-      splitType: expense.splitType as 'equal' | 'paid_by_one',
-      expenseCurrency: expense.originalCurrency || baseCurrency,
-    });
-    startEditingExpense(expense);
-    setShowEditExpense(true);
-  }, [baseCurrency, startEditingExpense]);
+  const handleEditExpense = useCallback(
+    (expense: Expense) => {
+      setNewExpense({
+        description: expense.description,
+        amount: (expense.originalAmount || expense.amount).toString(),
+        category: expense.category,
+        activityId: expense.activityId || '',
+        paidById: expense.paidBy,
+        splitType: expense.splitType as 'equal' | 'paid_by_one',
+        expenseCurrency: expense.originalCurrency || baseCurrency,
+      });
+      startEditingExpense(expense);
+      setShowEditExpense(true);
+    },
+    [baseCurrency, startEditingExpense]
+  );
 
   const handleSaveEdit = useCallback(() => {
     if (!editingExpense) return;
-    
+
     if (!newExpense.amount || parseFloat(newExpense.amount) <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid amount');
       return;
     }
 
     editExpense(editingExpense.id, {
-      description: newExpense.description || `${getCategoryConfig(newExpense.category).label} expense`,
+      description:
+        newExpense.description || `${getCategoryConfig(newExpense.category).label} expense`,
       amount: parseFloat(newExpense.amount),
       expenseCurrency: newExpense.expenseCurrency,
       category: newExpense.category,
@@ -751,9 +762,10 @@ export default function DateNightExpenseTrackerScreen() {
       Alert.alert('Invalid Amount', 'Please enter a valid amount');
       return;
     }
-    
+
     addExpense({
-      description: newExpense.description || `${getCategoryConfig(newExpense.category).label} expense`,
+      description:
+        newExpense.description || `${getCategoryConfig(newExpense.category).label} expense`,
       amount: parseFloat(newExpense.amount),
       expenseCurrency: newExpense.expenseCurrency,
       category: newExpense.category,
@@ -761,7 +773,7 @@ export default function DateNightExpenseTrackerScreen() {
       paidById: newExpense.paidById,
       splitType: newExpense.splitType,
     });
-    
+
     setShowAddExpense(false);
     setNewExpense({
       description: '',
@@ -791,13 +803,13 @@ export default function DateNightExpenseTrackerScreen() {
             <Check size={24} color={colors.primary} />
           </Pressable>
         </View>
-        
+
         <ScrollView style={styles.modalContent}>
           {/* Amount with Currency */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Amount</Text>
             <View style={styles.amountRow}>
-              <Pressable 
+              <Pressable
                 style={styles.currencySelector}
                 onPress={() => setShowCurrencyPicker(true)}
               >
@@ -823,23 +835,29 @@ export default function DateNightExpenseTrackerScreen() {
             </View>
             {newExpense.expenseCurrency !== baseCurrency && newExpense.amount && (
               <Text style={styles.conversionNote}>
-                ≈ ${convertCurrency(parseFloat(newExpense.amount) || 0, newExpense.expenseCurrency, baseCurrency).convertedAmount.toFixed(2)} {baseCurrency}
+                ≈ $
+                {convertCurrency(
+                  parseFloat(newExpense.amount) || 0,
+                  newExpense.expenseCurrency,
+                  baseCurrency
+                ).convertedAmount.toFixed(2)}{' '}
+                {baseCurrency}
               </Text>
             )}
           </View>
-          
+
           {/* Category */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Category</Text>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.categoryOptions}
             >
               {EXPENSE_CATEGORIES.map((cat) => {
                 const Icon = categoryIcons[cat.id];
                 const isSelected = newExpense.category === cat.id;
-                
+
                 return (
                   <Pressable
                     key={cat.id}
@@ -850,10 +868,7 @@ export default function DateNightExpenseTrackerScreen() {
                     onPress={() => setNewExpense({ ...newExpense, category: cat.id })}
                   >
                     <Icon size={18} color={isSelected ? '#fff' : cat.color} />
-                    <Text style={[
-                      styles.categoryOptionText,
-                      isSelected && { color: '#fff' },
-                    ]}>
+                    <Text style={[styles.categoryOptionText, isSelected && { color: '#fff' }]}>
                       {cat.label}
                     </Text>
                   </Pressable>
@@ -861,13 +876,13 @@ export default function DateNightExpenseTrackerScreen() {
               })}
             </ScrollView>
           </View>
-          
+
           {/* Activity */}
           {activities.length > 0 && (
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Activity (Optional)</Text>
-              <ScrollView 
-                horizontal 
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.activityOptions}
               >
@@ -878,10 +893,12 @@ export default function DateNightExpenseTrackerScreen() {
                   ]}
                   onPress={() => setNewExpense({ ...newExpense, activityId: '' })}
                 >
-                  <Text style={[
-                    styles.activityOptionText,
-                    !newExpense.activityId && styles.activityOptionTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.activityOptionText,
+                      !newExpense.activityId && styles.activityOptionTextSelected,
+                    ]}
+                  >
                     None
                   </Text>
                 </Pressable>
@@ -894,10 +911,13 @@ export default function DateNightExpenseTrackerScreen() {
                     ]}
                     onPress={() => setNewExpense({ ...newExpense, activityId: activity.id })}
                   >
-                    <Text style={[
-                      styles.activityOptionText,
-                      newExpense.activityId === activity.id && styles.activityOptionTextSelected,
-                    ]} numberOfLines={1}>
+                    <Text
+                      style={[
+                        styles.activityOptionText,
+                        newExpense.activityId === activity.id && styles.activityOptionTextSelected,
+                      ]}
+                      numberOfLines={1}
+                    >
                       {activity.name}
                     </Text>
                   </Pressable>
@@ -905,7 +925,7 @@ export default function DateNightExpenseTrackerScreen() {
               </ScrollView>
             </View>
           )}
-          
+
           {/* Paid By */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Paid By</Text>
@@ -920,24 +940,22 @@ export default function DateNightExpenseTrackerScreen() {
                   onPress={() => setNewExpense({ ...newExpense, paidById: p.id })}
                 >
                   <View style={styles.paidByAvatar}>
-                    <Text style={styles.paidByAvatarText}>
-                      {p.name.charAt(0).toUpperCase()}
-                    </Text>
+                    <Text style={styles.paidByAvatarText}>{p.name.charAt(0).toUpperCase()}</Text>
                   </View>
-                  <Text style={[
-                    styles.paidByName,
-                    newExpense.paidById === p.id && styles.paidByNameSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.paidByName,
+                      newExpense.paidById === p.id && styles.paidByNameSelected,
+                    ]}
+                  >
                     {p.name}
                   </Text>
-                  {newExpense.paidById === p.id && (
-                    <Check size={16} color={colors.primary} />
-                  )}
+                  {newExpense.paidById === p.id && <Check size={16} color={colors.primary} />}
                 </Pressable>
               ))}
             </View>
           </View>
-          
+
           {/* Split Type */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Split</Text>
@@ -954,17 +972,19 @@ export default function DateNightExpenseTrackerScreen() {
                   ]}
                   onPress={() => setNewExpense({ ...newExpense, splitType: option.id as any })}
                 >
-                  <Text style={[
-                    styles.splitOptionText,
-                    newExpense.splitType === option.id && styles.splitOptionTextSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.splitOptionText,
+                      newExpense.splitType === option.id && styles.splitOptionTextSelected,
+                    ]}
+                  >
                     {option.label}
                   </Text>
                 </Pressable>
               ))}
             </View>
           </View>
-          
+
           {/* Description */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Description (Optional)</Text>
@@ -994,10 +1014,12 @@ export default function DateNightExpenseTrackerScreen() {
     >
       <SafeAreaView style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <Pressable onPress={() => {
-            setShowEditExpense(false);
-            cancelEditing();
-          }}>
+          <Pressable
+            onPress={() => {
+              setShowEditExpense(false);
+              cancelEditing();
+            }}
+          >
             <X size={24} color={colors.text} />
           </Pressable>
           <Text style={styles.modalTitle}>Edit Expense</Text>
@@ -1005,13 +1027,13 @@ export default function DateNightExpenseTrackerScreen() {
             <Check size={24} color={colors.primary} />
           </Pressable>
         </View>
-        
+
         <ScrollView style={styles.modalContent}>
           {/* Amount with Currency */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Amount</Text>
             <View style={styles.amountRow}>
-              <Pressable 
+              <Pressable
                 style={styles.currencySelector}
                 onPress={() => setShowCurrencyPicker(true)}
               >
@@ -1037,23 +1059,29 @@ export default function DateNightExpenseTrackerScreen() {
             </View>
             {newExpense.expenseCurrency !== baseCurrency && newExpense.amount && (
               <Text style={styles.conversionNote}>
-                ≈ ${convertCurrency(parseFloat(newExpense.amount) || 0, newExpense.expenseCurrency, baseCurrency).convertedAmount.toFixed(2)} {baseCurrency}
+                ≈ $
+                {convertCurrency(
+                  parseFloat(newExpense.amount) || 0,
+                  newExpense.expenseCurrency,
+                  baseCurrency
+                ).convertedAmount.toFixed(2)}{' '}
+                {baseCurrency}
               </Text>
             )}
           </View>
-          
+
           {/* Category */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Category</Text>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.categoryOptions}
             >
               {EXPENSE_CATEGORIES.map((cat) => {
                 const Icon = categoryIcons[cat.id];
                 const isSelected = newExpense.category === cat.id;
-                
+
                 return (
                   <Pressable
                     key={cat.id}
@@ -1064,10 +1092,7 @@ export default function DateNightExpenseTrackerScreen() {
                     onPress={() => setNewExpense({ ...newExpense, category: cat.id })}
                   >
                     <Icon size={18} color={isSelected ? '#fff' : cat.color} />
-                    <Text style={[
-                      styles.categoryOptionText,
-                      isSelected && { color: '#fff' },
-                    ]}>
+                    <Text style={[styles.categoryOptionText, isSelected && { color: '#fff' }]}>
                       {cat.label}
                     </Text>
                   </Pressable>
@@ -1075,7 +1100,7 @@ export default function DateNightExpenseTrackerScreen() {
               })}
             </ScrollView>
           </View>
-          
+
           {/* Paid By */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Paid By</Text>
@@ -1090,24 +1115,22 @@ export default function DateNightExpenseTrackerScreen() {
                   onPress={() => setNewExpense({ ...newExpense, paidById: p.id })}
                 >
                   <View style={styles.paidByAvatar}>
-                    <Text style={styles.paidByAvatarText}>
-                      {p.name.charAt(0).toUpperCase()}
-                    </Text>
+                    <Text style={styles.paidByAvatarText}>{p.name.charAt(0).toUpperCase()}</Text>
                   </View>
-                  <Text style={[
-                    styles.paidByName,
-                    newExpense.paidById === p.id && styles.paidByNameSelected,
-                  ]}>
+                  <Text
+                    style={[
+                      styles.paidByName,
+                      newExpense.paidById === p.id && styles.paidByNameSelected,
+                    ]}
+                  >
                     {p.name}
                   </Text>
-                  {newExpense.paidById === p.id && (
-                    <Check size={16} color={colors.primary} />
-                  )}
+                  {newExpense.paidById === p.id && <Check size={16} color={colors.primary} />}
                 </Pressable>
               ))}
             </View>
           </View>
-          
+
           {/* Description */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Description</Text>
@@ -1122,25 +1145,21 @@ export default function DateNightExpenseTrackerScreen() {
 
           {/* Delete Button */}
           {editingExpense && (
-            <Pressable 
+            <Pressable
               style={styles.deleteExpenseBtn}
               onPress={() => {
-                Alert.alert(
-                  'Delete Expense',
-                  'Are you sure you want to delete this expense?',
-                  [
-                    { text: 'Cancel', style: 'cancel' },
-                    { 
-                      text: 'Delete', 
-                      style: 'destructive',
-                      onPress: () => {
-                        deleteExpense(editingExpense.id);
-                        setShowEditExpense(false);
-                        cancelEditing();
-                      }
+                Alert.alert('Delete Expense', 'Are you sure you want to delete this expense?', [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: () => {
+                      deleteExpense(editingExpense.id);
+                      setShowEditExpense(false);
+                      cancelEditing();
                     },
-                  ]
-                );
+                  },
+                ]);
               }}
             >
               <Text style={styles.deleteExpenseBtnText}>Delete Expense</Text>
@@ -1217,17 +1236,17 @@ export default function DateNightExpenseTrackerScreen() {
             <Share2 size={20} color={colors.text} />
           </Pressable>
         </View>
-        
+
         {/* Tabs */}
         {renderTabs()}
-        
+
         {/* Tab Content */}
         {activeTab === 'expenses' && renderExpensesTab()}
         {activeTab === 'budget' && renderBudgetTab()}
         {activeTab === 'split' && renderSplitTab()}
         {activeTab === 'savings' && renderSavingsTab()}
       </SafeAreaView>
-      
+
       {/* Modals */}
       {renderAddExpenseModal()}
       {renderEditExpenseModal()}
@@ -1303,7 +1322,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
-  
+
   // Tabs
   tabContainer: {
     flexDirection: 'row',
@@ -1333,7 +1352,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
   },
-  
+
   // Summary Card
   summaryCard: {
     flexDirection: 'row',
@@ -1373,7 +1392,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   // Section
   section: {
     marginBottom: 24,
@@ -1384,7 +1403,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 12,
   },
-  
+
   // Expenses List
   expensesList: {
     backgroundColor: colors.card,
@@ -1455,7 +1474,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.primary,
   },
-  
+
   // Empty State
   emptyState: {
     alignItems: 'center',
@@ -1490,7 +1509,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#fff',
   },
-  
+
   // Budget
   budgetOverview: {
     backgroundColor: colors.card,
@@ -1540,7 +1559,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-  
+
   // Activity List
   activityList: {
     gap: 10,
@@ -1597,7 +1616,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
   },
-  
+
   // Split / Balances
   balanceCards: {
     flexDirection: 'row',
@@ -1659,7 +1678,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-  
+
   // Settlements
   settlementsList: {
     gap: 12,
@@ -1713,7 +1732,7 @@ const styles = StyleSheet.create({
     color: colors.success,
     marginTop: 8,
   },
-  
+
   // Savings
   savingsOverview: {
     flexDirection: 'row',
@@ -1812,7 +1831,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.primary,
   },
-  
+
   // Modal
   modalContainer: {
     flex: 1,

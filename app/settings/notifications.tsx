@@ -50,9 +50,9 @@ export default function NotificationSettingsScreen() {
   const toggleReminderTiming = (timing: ReminderTiming) => {
     const currentTimings = preferences.activityReminders.defaultTimings;
     const newTimings = currentTimings.includes(timing)
-      ? currentTimings.filter(t => t !== timing)
+      ? currentTimings.filter((t) => t !== timing)
       : [...currentTimings, timing];
-    
+
     updatePreferences({
       activityReminders: {
         ...preferences.activityReminders,
@@ -62,46 +62,39 @@ export default function NotificationSettingsScreen() {
   };
 
   const handleTestNotification = async () => {
-    Alert.alert(
-      'Test Notification',
-      'A test notification will be sent in 5 seconds.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Send',
-          onPress: async () => {
-            // Schedule a test notification
-            const testActivity = {
-              id: 'test-1',
-              name: 'Test Dinner',
-              type: 'dining',
-              startTime: new Date(Date.now() + 35 * 60000), // 35 min from now
-              location: {
-                name: 'Test Restaurant',
-                address: '123 Test St',
-              },
-            };
-            
-            await notificationService.scheduleActivityReminder(testActivity, ['30min']);
-            Alert.alert('Scheduled', 'Test notification will appear in about 5 minutes.');
-          },
+    Alert.alert('Test Notification', 'A test notification will be sent in 5 seconds.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Send',
+        onPress: async () => {
+          // Schedule a test notification
+          const testActivity = {
+            id: 'test-1',
+            name: 'Test Dinner',
+            type: 'dining',
+            startTime: new Date(Date.now() + 35 * 60000), // 35 min from now
+            location: {
+              name: 'Test Restaurant',
+              address: '123 Test St',
+            },
+          };
+
+          await notificationService.scheduleActivityReminder(testActivity, ['30min']);
+          Alert.alert('Scheduled', 'Test notification will appear in about 5 minutes.');
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
@@ -167,21 +160,21 @@ export default function NotificationSettingsScreen() {
                 <Bell size={18} color={colors.primary} />
                 <Text style={styles.sectionTitle}>Activity Reminders</Text>
               </View>
-              <Text style={styles.sectionDescription}>
-                "Dinner at La Bella in 30 minutes"
-              </Text>
-              
+              <Text style={styles.sectionDescription}>"Dinner at La Bella in 30 minutes"</Text>
+
               <View style={styles.card}>
                 <View style={styles.settingRow}>
                   <Text style={styles.settingLabel}>Enable Reminders</Text>
                   <Switch
                     value={preferences.activityReminders.enabled}
-                    onValueChange={(value) => updatePreferences({
-                      activityReminders: {
-                        ...preferences.activityReminders,
-                        enabled: value,
-                      },
-                    })}
+                    onValueChange={(value) =>
+                      updatePreferences({
+                        activityReminders: {
+                          ...preferences.activityReminders,
+                          enabled: value,
+                        },
+                      })
+                    }
                     trackColor={{ false: colors.border, true: colors.primary }}
                   />
                 </View>
@@ -191,7 +184,9 @@ export default function NotificationSettingsScreen() {
                     <View style={styles.settingDivider} />
                     <Text style={styles.subSectionTitle}>Remind me:</Text>
                     <View style={styles.timingOptions}>
-                      {(['5min', '15min', '30min', '1hour', '2hours', '1day'] as ReminderTiming[]).map((timing) => (
+                      {(
+                        ['5min', '15min', '30min', '1hour', '2hours', '1day'] as ReminderTiming[]
+                      ).map((timing) => (
                         <TouchableOpacity
                           key={timing}
                           style={[
@@ -219,12 +214,14 @@ export default function NotificationSettingsScreen() {
                       <Text style={styles.settingLabel}>Include directions</Text>
                       <Switch
                         value={preferences.activityReminders.includeDirectionsDefault}
-                        onValueChange={(value) => updatePreferences({
-                          activityReminders: {
-                            ...preferences.activityReminders,
-                            includeDirectionsDefault: value,
-                          },
-                        })}
+                        onValueChange={(value) =>
+                          updatePreferences({
+                            activityReminders: {
+                              ...preferences.activityReminders,
+                              includeDirectionsDefault: value,
+                            },
+                          })
+                        }
                         trackColor={{ false: colors.border, true: colors.primary }}
                       />
                     </View>
@@ -242,18 +239,20 @@ export default function NotificationSettingsScreen() {
               <Text style={styles.sectionDescription}>
                 "Leave now to arrive on time" based on traffic
               </Text>
-              
+
               <View style={styles.card}>
                 <View style={styles.settingRow}>
                   <Text style={styles.settingLabel}>Enable Travel Alerts</Text>
                   <Switch
                     value={preferences.travelAlerts.enabled}
-                    onValueChange={(value) => updatePreferences({
-                      travelAlerts: {
-                        ...preferences.travelAlerts,
-                        enabled: value,
-                      },
-                    })}
+                    onValueChange={(value) =>
+                      updatePreferences({
+                        travelAlerts: {
+                          ...preferences.travelAlerts,
+                          enabled: value,
+                        },
+                      })
+                    }
                     trackColor={{ false: colors.border, true: colors.primary }}
                   />
                 </View>
@@ -287,12 +286,14 @@ export default function NotificationSettingsScreen() {
                       <Text style={styles.settingLabel}>Show alternative routes</Text>
                       <Switch
                         value={preferences.travelAlerts.showAlternativeRoutes}
-                        onValueChange={(value) => updatePreferences({
-                          travelAlerts: {
-                            ...preferences.travelAlerts,
-                            showAlternativeRoutes: value,
-                          },
-                        })}
+                        onValueChange={(value) =>
+                          updatePreferences({
+                            travelAlerts: {
+                              ...preferences.travelAlerts,
+                              showAlternativeRoutes: value,
+                            },
+                          })
+                        }
                         trackColor={{ false: colors.border, true: colors.primary }}
                       />
                     </View>
@@ -307,21 +308,21 @@ export default function NotificationSettingsScreen() {
                 <Users size={18} color={colors.secondary} />
                 <Text style={styles.sectionTitle}>Partner Notifications</Text>
               </View>
-              <Text style={styles.sectionDescription}>
-                Notify partner when itinerary is shared
-              </Text>
-              
+              <Text style={styles.sectionDescription}>Notify partner when itinerary is shared</Text>
+
               <View style={styles.card}>
                 <View style={styles.settingRow}>
                   <Text style={styles.settingLabel}>Enable Partner Notifications</Text>
                   <Switch
                     value={preferences.partnerNotifications.enabled}
-                    onValueChange={(value) => updatePreferences({
-                      partnerNotifications: {
-                        ...preferences.partnerNotifications,
-                        enabled: value,
-                      },
-                    })}
+                    onValueChange={(value) =>
+                      updatePreferences({
+                        partnerNotifications: {
+                          ...preferences.partnerNotifications,
+                          enabled: value,
+                        },
+                      })
+                    }
                     trackColor={{ false: colors.border, true: colors.primary }}
                   />
                 </View>
@@ -333,12 +334,14 @@ export default function NotificationSettingsScreen() {
                       <Text style={styles.settingLabel}>When itinerary shared</Text>
                       <Switch
                         value={preferences.partnerNotifications.notifyOnShare}
-                        onValueChange={(value) => updatePreferences({
-                          partnerNotifications: {
-                            ...preferences.partnerNotifications,
-                            notifyOnShare: value,
-                          },
-                        })}
+                        onValueChange={(value) =>
+                          updatePreferences({
+                            partnerNotifications: {
+                              ...preferences.partnerNotifications,
+                              notifyOnShare: value,
+                            },
+                          })
+                        }
                         trackColor={{ false: colors.border, true: colors.primary }}
                       />
                     </View>
@@ -348,12 +351,14 @@ export default function NotificationSettingsScreen() {
                       <Text style={styles.settingLabel}>When itinerary updated</Text>
                       <Switch
                         value={preferences.partnerNotifications.notifyOnUpdate}
-                        onValueChange={(value) => updatePreferences({
-                          partnerNotifications: {
-                            ...preferences.partnerNotifications,
-                            notifyOnUpdate: value,
-                          },
-                        })}
+                        onValueChange={(value) =>
+                          updatePreferences({
+                            partnerNotifications: {
+                              ...preferences.partnerNotifications,
+                              notifyOnUpdate: value,
+                            },
+                          })
+                        }
                         trackColor={{ false: colors.border, true: colors.primary }}
                       />
                     </View>
@@ -363,12 +368,14 @@ export default function NotificationSettingsScreen() {
                       <Text style={styles.settingLabel}>When booking confirmed</Text>
                       <Switch
                         value={preferences.partnerNotifications.notifyOnBooking}
-                        onValueChange={(value) => updatePreferences({
-                          partnerNotifications: {
-                            ...preferences.partnerNotifications,
-                            notifyOnBooking: value,
-                          },
-                        })}
+                        onValueChange={(value) =>
+                          updatePreferences({
+                            partnerNotifications: {
+                              ...preferences.partnerNotifications,
+                              notifyOnBooking: value,
+                            },
+                          })
+                        }
                         trackColor={{ false: colors.border, true: colors.primary }}
                       />
                     </View>
@@ -383,21 +390,24 @@ export default function NotificationSettingsScreen() {
                   <Text style={styles.surpriseTitle}>Surprise Mode</Text>
                 </View>
                 <Text style={styles.surpriseDescription}>
-                  Planning a surprise? Enable this to prevent notifications from being sent to your partner for specific itineraries.
+                  Planning a surprise? Enable this to prevent notifications from being sent to your
+                  partner for specific itineraries.
                 </Text>
                 <View style={styles.settingRow}>
                   <Text style={styles.settingLabel}>Enable Surprise Mode</Text>
                   <Switch
                     value={preferences.partnerNotifications.surpriseMode.enabled}
-                    onValueChange={(value) => updatePreferences({
-                      partnerNotifications: {
-                        ...preferences.partnerNotifications,
-                        surpriseMode: {
-                          ...preferences.partnerNotifications.surpriseMode,
-                          enabled: value,
+                    onValueChange={(value) =>
+                      updatePreferences({
+                        partnerNotifications: {
+                          ...preferences.partnerNotifications,
+                          surpriseMode: {
+                            ...preferences.partnerNotifications.surpriseMode,
+                            enabled: value,
+                          },
                         },
-                      },
-                    })}
+                      })
+                    }
                     trackColor={{ false: colors.border, true: colors.secondary }}
                   />
                 </View>
@@ -410,18 +420,20 @@ export default function NotificationSettingsScreen() {
                 <Moon size={18} color={colors.textSecondary} />
                 <Text style={styles.sectionTitle}>Quiet Hours</Text>
               </View>
-              
+
               <View style={styles.card}>
                 <View style={styles.settingRow}>
                   <Text style={styles.settingLabel}>Enable Quiet Hours</Text>
                   <Switch
                     value={preferences.quietHours.enabled}
-                    onValueChange={(value) => updatePreferences({
-                      quietHours: {
-                        ...preferences.quietHours,
-                        enabled: value,
-                      },
-                    })}
+                    onValueChange={(value) =>
+                      updatePreferences({
+                        quietHours: {
+                          ...preferences.quietHours,
+                          enabled: value,
+                        },
+                      })
+                    }
                     trackColor={{ false: colors.border, true: colors.primary }}
                   />
                 </View>
@@ -455,12 +467,14 @@ export default function NotificationSettingsScreen() {
                       <Text style={styles.settingLabel}>Allow critical alerts</Text>
                       <Switch
                         value={preferences.quietHours.allowCritical}
-                        onValueChange={(value) => updatePreferences({
-                          quietHours: {
-                            ...preferences.quietHours,
-                            allowCritical: value,
-                          },
-                        })}
+                        onValueChange={(value) =>
+                          updatePreferences({
+                            quietHours: {
+                              ...preferences.quietHours,
+                              allowCritical: value,
+                            },
+                          })
+                        }
                         trackColor={{ false: colors.border, true: colors.primary }}
                       />
                     </View>
@@ -471,10 +485,7 @@ export default function NotificationSettingsScreen() {
 
             {/* Test Notification */}
             <View style={styles.section}>
-              <TouchableOpacity
-                style={styles.testButton}
-                onPress={handleTestNotification}
-              >
+              <TouchableOpacity style={styles.testButton} onPress={handleTestNotification}>
                 <Info size={18} color={colors.primary} />
                 <Text style={styles.testButtonText}>Send Test Notification</Text>
               </TouchableOpacity>

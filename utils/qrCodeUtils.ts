@@ -38,7 +38,7 @@ import {
  */
 export function generateQRValue(content: ShareableContent): string {
   const { payload } = content;
-  
+
   switch (payload.type) {
     case 'trip':
       return generateTripQRValue(payload);
@@ -91,14 +91,14 @@ function generateActivityQRValue(payload: ActivitySharePayload): string {
   if (payload.bookingUrl) {
     return payload.bookingUrl;
   }
-  
+
   // If there are coordinates, generate a maps URL
   if (payload.coordinates) {
     const { lat, lng } = payload.coordinates;
     const label = encodeURIComponent(payload.name);
     return `https://maps.google.com/?q=${lat},${lng}&label=${label}`;
   }
-  
+
   // Deep link to activity
   return `w4nder://activity/${payload.activityId}`;
 }
@@ -108,7 +108,7 @@ function generateConfirmationQRValue(payload: ConfirmationSharePayload): string 
   if (payload.ticketCode) {
     return payload.ticketCode;
   }
-  
+
   // Otherwise, create a structured value
   const data = {
     type: 'confirmation',
@@ -119,18 +119,18 @@ function generateConfirmationQRValue(payload: ConfirmationSharePayload): string 
     time: payload.time,
     location: payload.location,
   };
-  
+
   return JSON.stringify(data);
 }
 
 function generateLocationQRValue(payload: LocationSharePayload): string {
   const { coordinates, name, address } = payload;
-  
+
   // If there's a maps URL, use it
   if (payload.mapsUrl) {
     return payload.mapsUrl;
   }
-  
+
   // Generate a geo URI with label
   const label = encodeURIComponent(name);
   return `geo:${coordinates.lat},${coordinates.lng}?q=${coordinates.lat},${coordinates.lng}(${label})`;
@@ -148,7 +148,7 @@ function generateContactQRValue(payload: ContactSharePayload): string {
     website: payload.website,
     note: payload.notes,
   });
-  
+
   return vcard;
 }
 
@@ -169,7 +169,7 @@ function generateCustomQRValue(payload: CustomSharePayload): string {
       return JSON.stringify({ data: payload.data });
     }
   }
-  
+
   return payload.data;
 }
 
@@ -186,46 +186,50 @@ export function generateVCard(data: VCardData): string {
     `VERSION:${data.version}`,
     `FN:${escapeVCardValue(data.formattedName)}`,
   ];
-  
+
   if (data.firstName || data.lastName) {
-    lines.push(`N:${escapeVCardValue(data.lastName || '')};${escapeVCardValue(data.firstName || '')};;;`);
+    lines.push(
+      `N:${escapeVCardValue(data.lastName || '')};${escapeVCardValue(data.firstName || '')};;;`
+    );
   }
-  
+
   if (data.organization) {
     lines.push(`ORG:${escapeVCardValue(data.organization)}`);
   }
-  
+
   if (data.title) {
     lines.push(`TITLE:${escapeVCardValue(data.title)}`);
   }
-  
+
   if (data.email) {
-    data.email.forEach(email => {
+    data.email.forEach((email) => {
       lines.push(`EMAIL:${email}`);
     });
   }
-  
+
   if (data.phone) {
-    data.phone.forEach(phone => {
+    data.phone.forEach((phone) => {
       lines.push(`TEL;TYPE=${phone.type}:${phone.number}`);
     });
   }
-  
+
   if (data.address) {
     const addr = data.address;
-    lines.push(`ADR:;;${escapeVCardValue(addr.street || '')};${escapeVCardValue(addr.city || '')};${escapeVCardValue(addr.region || '')};${escapeVCardValue(addr.postalCode || '')};${escapeVCardValue(addr.country || '')}`);
+    lines.push(
+      `ADR:;;${escapeVCardValue(addr.street || '')};${escapeVCardValue(addr.city || '')};${escapeVCardValue(addr.region || '')};${escapeVCardValue(addr.postalCode || '')};${escapeVCardValue(addr.country || '')}`
+    );
   }
-  
+
   if (data.website) {
     lines.push(`URL:${data.website}`);
   }
-  
+
   if (data.note) {
     lines.push(`NOTE:${escapeVCardValue(data.note)}`);
   }
-  
+
   lines.push('END:VCARD');
-  
+
   return lines.join('\r\n');
 }
 
@@ -263,7 +267,7 @@ export function generateShareUrl(
 ): string {
   // In production, use your actual domain
   const baseUrl = 'https://w4nder.app';
-  
+
   switch (type) {
     case 'trip':
       return `${baseUrl}/trip/${shareCode}`;
@@ -295,15 +299,15 @@ export async function generateQRCodeDataUrl(
   // For now, we'll use a QR code generation API as a fallback
   const encodedValue = encodeURIComponent(value);
   const { size, foregroundColor, backgroundColor } = options;
-  
+
   // Using QR Server API for generation (free, no API key needed)
   const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodedValue}&color=${foregroundColor.replace('#', '')}&bgcolor=${backgroundColor.replace('#', '')}`;
-  
+
   try {
     // Fetch the image and convert to base64
     const response = await fetch(apiUrl);
     const blob = await response.blob();
-    
+
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
@@ -326,7 +330,7 @@ export async function generateQRCode(
   const mergedOptions = { ...DEFAULT_QR_OPTIONS, ...options };
   const encodedValue = generateQRValue(content);
   const qrDataUrl = await generateQRCodeDataUrl(encodedValue, mergedOptions);
-  
+
   return {
     id: `qr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     content,
@@ -349,7 +353,7 @@ export async function copyShareLink(content: ShareableContent): Promise<ShareRes
   try {
     const value = generateQRValue(content);
     await Clipboard.setStringAsync(value);
-    
+
     return {
       success: true,
       action: 'copy_link',
@@ -373,19 +377,19 @@ export async function shareNative(
   try {
     const value = generateQRValue(content);
     const config = CONTENT_TYPE_CONFIG[content.type];
-    
+
     const shareContent: { message: string; title?: string; url?: string } = {
       message: `${config.icon} ${content.title}\n\n${value}`,
       title: content.title,
     };
-    
+
     // If it's a URL, add it separately
     if (value.startsWith('http')) {
       shareContent.url = value;
     }
-    
+
     await Share.share(shareContent);
-    
+
     return {
       success: true,
       action: 'share_native',
@@ -410,34 +414,31 @@ export async function saveQRCodeToGallery(
     // Request permissions
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert(
-        'Permission Required',
-        'Please allow access to save images to your gallery.'
-      );
+      Alert.alert('Permission Required', 'Please allow access to save images to your gallery.');
       return {
         success: false,
         action: 'save_image',
         error: 'Permission denied',
       };
     }
-    
+
     // Convert base64 to file
     const base64Data = qrDataUrl.replace(/^data:image\/\w+;base64,/, '');
     const fileName = filename || `w4nder_qr_${Date.now()}.png`;
     const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
-    
+
     await FileSystem.writeAsStringAsync(fileUri, base64Data, {
       encoding: FileSystem.EncodingType.Base64,
     });
-    
+
     // Save to gallery
     const asset = await MediaLibrary.createAssetAsync(fileUri);
-    
+
     // Clean up temp file
     await FileSystem.deleteAsync(fileUri, { idempotent: true });
-    
+
     Alert.alert('Saved!', 'QR code saved to your photos.');
-    
+
     return {
       success: true,
       action: 'save_image',
@@ -456,23 +457,20 @@ export async function saveQRCodeToGallery(
 /**
  * Share QR code image
  */
-export async function shareQRCodeImage(
-  qrDataUrl: string,
-  title: string
-): Promise<ShareResult> {
+export async function shareQRCodeImage(qrDataUrl: string, title: string): Promise<ShareResult> {
   try {
     // Convert base64 to file
     const base64Data = qrDataUrl.replace(/^data:image\/\w+;base64,/, '');
     const fileName = `w4nder_qr_${Date.now()}.png`;
     const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
-    
+
     await FileSystem.writeAsStringAsync(fileUri, base64Data, {
       encoding: FileSystem.EncodingType.Base64,
     });
-    
+
     // Check if sharing is available
     const isAvailable = await Sharing.isAvailableAsync();
-    
+
     if (isAvailable) {
       await Sharing.shareAsync(fileUri, {
         mimeType: 'image/png',
@@ -485,10 +483,10 @@ export async function shareQRCodeImage(
         url: fileUri,
       });
     }
-    
+
     // Clean up
     await FileSystem.deleteAsync(fileUri, { idempotent: true });
-    
+
     return {
       success: true,
       action: 'share_image',
@@ -512,17 +510,13 @@ export async function shareViaSMS(
   try {
     const value = generateQRValue(content);
     const config = CONTENT_TYPE_CONFIG[content.type];
-    const message = encodeURIComponent(
-      `${config.icon} ${content.title}\n\n${value}`
-    );
-    
-    const smsUrl = phoneNumber
-      ? `sms:${phoneNumber}&body=${message}`
-      : `sms:&body=${message}`;
-    
+    const message = encodeURIComponent(`${config.icon} ${content.title}\n\n${value}`);
+
+    const smsUrl = phoneNumber ? `sms:${phoneNumber}&body=${message}` : `sms:&body=${message}`;
+
     const { Linking } = require('react-native');
     await Linking.openURL(smsUrl);
-    
+
     return {
       success: true,
       action: 'send_sms',
@@ -546,19 +540,19 @@ export async function shareViaEmail(
   try {
     const value = generateQRValue(content);
     const config = CONTENT_TYPE_CONFIG[content.type];
-    
+
     const subject = encodeURIComponent(`${content.title} - W4nder`);
     const body = encodeURIComponent(
       `${config.icon} ${content.title}\n\n${content.description || ''}\n\n${value}\n\nShared via W4nder`
     );
-    
+
     const emailUrl = emailAddress
       ? `mailto:${emailAddress}?subject=${subject}&body=${body}`
       : `mailto:?subject=${subject}&body=${body}`;
-    
+
     const { Linking } = require('react-native');
     await Linking.openURL(emailUrl);
-    
+
     return {
       success: true,
       action: 'send_email',
@@ -587,15 +581,13 @@ export function createTripShareContent(
 ): ShareableContent {
   const shareCode = generateShareCode();
   const shareUrl = generateShareUrl('trip', tripId, shareCode);
-  
+
   return {
     type: 'trip',
     id: tripId,
     title: tripName,
     subtitle: destination,
-    description: dates
-      ? `${formatDate(dates.start)} - ${formatDate(dates.end)}`
-      : undefined,
+    description: dates ? `${formatDate(dates.start)} - ${formatDate(dates.end)}` : undefined,
     payload: {
       type: 'trip',
       tripId,
@@ -619,7 +611,7 @@ export function createDateNightShareContent(
 ): ShareableContent {
   const shareCode = generateShareCode();
   const shareUrl = generateShareUrl('date_night', itineraryId, shareCode);
-  
+
   return {
     type: 'date_night',
     id: itineraryId,
@@ -712,18 +704,14 @@ export function isValidShareCode(code: string): boolean {
  * Extract share code from URL
  */
 export function extractShareCode(url: string): string | null {
-  const patterns = [
-    /w4nder\.app\/\w+\/([A-Z0-9]{6})/i,
-    /code=([A-Z0-9]{6})/i,
-    /\/([A-Z0-9]{6})$/i,
-  ];
-  
+  const patterns = [/w4nder\.app\/\w+\/([A-Z0-9]{6})/i, /code=([A-Z0-9]{6})/i, /\/([A-Z0-9]{6})$/i];
+
   for (const pattern of patterns) {
     const match = url.match(pattern);
     if (match) {
       return match[1].toUpperCase();
     }
   }
-  
+
   return null;
 }
