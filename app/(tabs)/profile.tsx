@@ -239,7 +239,7 @@ export default function ProfileScreen() {
           </Pressable>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Wanderlust v1.0.0</Text>
+            <Text style={styles.footerText}>W4nder v1.0.0</Text>
           </View>
         </ScrollView>
       </SafeAreaView>

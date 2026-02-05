@@ -48,7 +48,7 @@ interface DownloadProgress {
   status: 'downloading' | 'completed' | 'failed';
 }
 
-const OFFLINE_STORAGE_KEY = 'wanderlust_offline_trips';
+const OFFLINE_STORAGE_KEY = 'w4nder_offline_trips';
 
 export default function OfflineModeScreen() {
   const router = useRouter();

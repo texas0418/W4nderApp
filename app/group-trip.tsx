@@ -437,7 +437,7 @@ export default function GroupTripScreen() {
   const [newExpenseSplitWith, setNewExpenseSplitWith] = useState<string[]>(['1', '2', '3']);
 
   const shareCode = 'TRIP-PAR-2024';
-  const shareLink = 'https://wanderlust.app/join/abc123xyz';
+  const shareLink = 'https://w4nder.app/join/abc123xyz';
 
   const handleCopyLink = async () => {
     await Clipboard.setStringAsync(shareLink);
@@ -454,7 +454,7 @@ export default function GroupTripScreen() {
   const handleNativeShare = async () => {
     try {
       await Share.share({
-        message: `Join my trip on Wanderlust! Use code: ${shareCode} or click: ${shareLink}`,
+        message: `Join my trip on W4nder! Use code: ${shareCode} or click: ${shareLink}`,
         title: 'Join My Trip',
       });
     } catch (error) {

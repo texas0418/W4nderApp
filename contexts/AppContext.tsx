@@ -18,12 +18,12 @@ import {
 import { trips as mockTrips } from '@/mocks/trips';
 import { mockBookings, mockNotifications, mockRewards } from '@/mocks/appData';
 
-const ONBOARDING_KEY = 'wanderlust_onboarding';
-const USER_KEY = 'wanderlust_user';
-const TRIPS_KEY = 'wanderlust_trips';
-const BOOKINGS_KEY = 'wanderlust_bookings';
-const NOTIFICATIONS_KEY = 'wanderlust_notifications';
-const BUCKET_LIST_KEY = 'wanderlust_bucket_list';
+const ONBOARDING_KEY = 'w4nder_onboarding';
+const USER_KEY = 'w4nder_user';
+const TRIPS_KEY = 'w4nder_trips';
+const BOOKINGS_KEY = 'w4nder_bookings';
+const NOTIFICATIONS_KEY = 'w4nder_notifications';
+const BUCKET_LIST_KEY = 'w4nder_bucket_list';
 
 const defaultUser: UserProfile = {
   id: '1',

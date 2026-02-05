@@ -212,7 +212,7 @@ export default function EmergencyScreen() {
               <View style={styles.supportHeader}>
                 <MessageSquare size={24} color={colors.primary} />
                 <View style={styles.supportInfo}>
-                  <Text style={styles.supportTitle}>Wanderlust Support</Text>
+                  <Text style={styles.supportTitle}>W4nder Support</Text>
                   <Text style={styles.supportAvailable}>Available 24/7</Text>
                 </View>
               </View>

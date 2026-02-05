@@ -155,7 +155,7 @@ export default function OnboardingScreen() {
       <View style={styles.welcomeContent}>
         <Text style={styles.welcomeTitle}>W4nder</Text>
         <Text style={styles.welcomeSubtitle}>
-          Your personal AI travel companion. Let us create unforgettable journeys together.
+          Your AI-powered travel companion. Smarter trips, unforgettable journeys.
         </Text>
         <View style={styles.welcomeFeatures}>
           <View style={styles.featureItem}>
