@@ -76,6 +76,7 @@ function RootLayoutNav() {
       <Stack.Screen name="trip-templates" options={defaultCardOptions} />
       <Stack.Screen name="local-experiences" options={defaultCardOptions} />
       <Stack.Screen name="weather-itinerary" options={defaultCardOptions} />
+      <Stack.Screen name="nearby-services" options={defaultCardOptions} />
 
       {/* ===== AI & Smart Features ===== */}
       <Stack.Screen name="ai-assistant" options={defaultCardOptions} />
@@ -110,6 +111,7 @@ function RootLayoutNav() {
       {/* ===== Documents & Wallet ===== */}
       <Stack.Screen name="document-wallet" options={defaultCardOptions} />
       <Stack.Screen name="packing-list" options={defaultCardOptions} />
+      <Stack.Screen name="wallet" options={defaultCardOptions} />
 
       {/* ===== Dining ===== */}
       <Stack.Screen name="restaurants" options={defaultCardOptions} />
@@ -119,7 +121,8 @@ function RootLayoutNav() {
       <Stack.Screen name="loyalty-programs" options={defaultCardOptions} />
       <Stack.Screen name="achievements" options={defaultCardOptions} />
 
-      {/* ===== Settings & Preferences ===== */}
+      {/* ===== Settings ===== */}
+      <Stack.Screen name="settings" options={defaultCardOptions} />
       <Stack.Screen name="accessibility" options={defaultCardOptions} />
       <Stack.Screen name="offline-mode" options={defaultCardOptions} />
       <Stack.Screen name="bucket-list" options={defaultCardOptions} />
