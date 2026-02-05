@@ -38,6 +38,7 @@ import {
   ShieldCheck,
   Hotel,
   Car,
+  Plane,
   Train,
   LayoutTemplate,
   Accessibility,
@@ -194,12 +195,12 @@ export default function HomeScreen() {
               </Pressable>
               <Pressable 
                 style={styles.quickAction}
-                onPress={() => router.push('/public-transit')}
+                onPress={() => router.push('/flight-search')}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: `${colors.accentDark}15` }]}>
-                  <Train size={22} color={colors.accentDark} />
+                <View style={[styles.quickActionIcon, { backgroundColor: `${colors.primary}15` }]}>
+                  <Plane size={22} color={colors.primary} />
                 </View>
-                <Text style={styles.quickActionText}>Transit</Text>
+                <Text style={styles.quickActionText}>Flights</Text>
               </Pressable>
               <Pressable 
                 style={styles.quickAction}

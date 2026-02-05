@@ -188,6 +188,13 @@ function RootLayoutNav() {
         }} 
       />
       <Stack.Screen 
+        name="flight-search" 
+        options={{ 
+          headerShown: false,
+          presentation: "card",
+        }} 
+      />
+      <Stack.Screen 
         name="live-sharing" 
         options={{ 
           headerShown: false,
