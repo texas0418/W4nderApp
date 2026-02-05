@@ -12,6 +12,17 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+// Default screen options for consistent transitions
+const defaultCardOptions = {
+  headerShown: false,
+  presentation: "card" as const,
+};
+
+const defaultModalOptions = {
+  headerShown: false,
+  presentation: "modal" as const,
+};
+
 function RootLayoutNav() {
   const { isOnboarded, isLoading } = useApp();
   const segments = useSegments();
@@ -39,182 +50,126 @@ function RootLayoutNav() {
 
   return (
     <Stack screenOptions={{ headerBackTitle: "Back" }}>
+      {/* ===== Core Navigation ===== */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-      <Stack.Screen 
-        name="trip/[id]" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="destination/[id]" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="plan-trip" 
-        options={{ 
-          headerShown: false,
-          presentation: "modal",
-        }} 
-      />
-      <Stack.Screen 
-        name="booking/[id]" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="date-plan" 
-        options={{ 
-          headerShown: false,
-          presentation: "modal",
-        }} 
-      />
-      <Stack.Screen 
-        name="date-night" 
-        options={{ 
-          headerShown: false,
-        }} 
-      />
-      <Stack.Screen 
-        name="group-trip" 
-        options={{ 
-          headerShown: false,
-          presentation: "modal",
-        }} 
-      />
-      <Stack.Screen 
-        name="budget-tracker" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="rewards" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="emergency" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="subscription" 
-        options={{ 
-          headerShown: false,
-          presentation: "modal",
-        }} 
-      />
-      <Stack.Screen 
-        name="surprise-trip" 
-        options={{ 
-          headerShown: false,
-          presentation: "modal",
-        }} 
-      />
-      <Stack.Screen 
-        name="ai-assistant" 
-        options={{ 
-          headerShown: true,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="offline-mode" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="local-experiences" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="photo-journal" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="safety-alerts" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="translation" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="health-requirements" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="ride-services" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="lodging" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="flight-search" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="live-sharing" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="trip-templates" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
-      <Stack.Screen 
-        name="accessibility" 
-        options={{ 
-          headerShown: false,
-          presentation: "card",
-        }} 
-      />
+
+      {/* ===== Dynamic Routes ===== */}
+      <Stack.Screen name="trip/[id]" options={defaultCardOptions} />
+      <Stack.Screen name="destination/[id]" options={defaultCardOptions} />
+      <Stack.Screen name="booking/[id]" options={defaultCardOptions} />
+
+      {/* ===== Modal Flows (creation/planning) ===== */}
+      <Stack.Screen name="plan-trip" options={defaultModalOptions} />
+      <Stack.Screen name="date-plan" options={defaultModalOptions} />
+      <Stack.Screen name="group-trip" options={defaultModalOptions} />
+      <Stack.Screen name="surprise-trip" options={defaultModalOptions} />
+      <Stack.Screen name="subscription" options={defaultModalOptions} />
+
+      {/* ===== Travel Planning ===== */}
+      <Stack.Screen name="flight-search" options={defaultCardOptions} />
+      <Stack.Screen name="lodging" options={defaultCardOptions} />
+      <Stack.Screen name="car-rental" options={defaultCardOptions} />
+      <Stack.Screen name="ride-services" options={defaultCardOptions} />
+      <Stack.Screen name="public-transit" options={defaultCardOptions} />
+      <Stack.Screen name="parking-finder" options={defaultCardOptions} />
+      <Stack.Screen name="trip-templates" options={defaultCardOptions} />
+      <Stack.Screen name="local-experiences" options={defaultCardOptions} />
+      <Stack.Screen name="weather-itinerary" options={defaultCardOptions} />
+
+      {/* ===== AI & Smart Features ===== */}
+      <Stack.Screen name="ai-assistant" options={defaultCardOptions} />
+      <Stack.Screen name="ar-city-guide" options={defaultCardOptions} />
+
+      {/* ===== Money & Budget ===== */}
+      <Stack.Screen name="budget-tracker" options={defaultCardOptions} />
+      <Stack.Screen name="currency-converter" options={defaultCardOptions} />
+      <Stack.Screen name="savings-goals" options={defaultCardOptions} />
+      <Stack.Screen name="price-alerts" options={defaultCardOptions} />
+      <Stack.Screen name="price-comparison" options={defaultCardOptions} />
+      <Stack.Screen name="insurance" options={defaultCardOptions} />
+
+      {/* ===== Date Night ===== */}
+      <Stack.Screen name="date-night" options={{ headerShown: false }} />
+      <Stack.Screen name="anniversaries" options={defaultCardOptions} />
+
+      {/* ===== Social & Sharing ===== */}
+      <Stack.Screen name="live-sharing" options={defaultCardOptions} />
+      <Stack.Screen name="travel-feed" options={defaultCardOptions} />
+      <Stack.Screen name="photo-journal" options={defaultCardOptions} />
+      <Stack.Screen name="blog-export" options={defaultCardOptions} />
+
+      {/* ===== Safety & Info ===== */}
+      <Stack.Screen name="safety-alerts" options={defaultCardOptions} />
+      <Stack.Screen name="emergency" options={defaultCardOptions} />
+      <Stack.Screen name="health-requirements" options={defaultCardOptions} />
+      <Stack.Screen name="visa-requirements" options={defaultCardOptions} />
+      <Stack.Screen name="translation" options={defaultCardOptions} />
+      <Stack.Screen name="time-zone-manager" options={defaultCardOptions} />
+
+      {/* ===== Documents & Wallet ===== */}
+      <Stack.Screen name="document-wallet" options={defaultCardOptions} />
+      <Stack.Screen name="packing-list" options={defaultCardOptions} />
+
+      {/* ===== Dining ===== */}
+      <Stack.Screen name="restaurants" options={defaultCardOptions} />
+
+      {/* ===== Rewards & Loyalty ===== */}
+      <Stack.Screen name="rewards" options={defaultCardOptions} />
+      <Stack.Screen name="loyalty-programs" options={defaultCardOptions} />
+      <Stack.Screen name="achievements" options={defaultCardOptions} />
+
+      {/* ===== Settings & Preferences ===== */}
+      <Stack.Screen name="accessibility" options={defaultCardOptions} />
+      <Stack.Screen name="offline-mode" options={defaultCardOptions} />
+      <Stack.Screen name="bucket-list" options={defaultCardOptions} />
+
+      {/* ===== Weather ===== */}
+      <Stack.Screen name="WeatherAwareActivitiesScreen" options={defaultCardOptions} />
+      <Stack.Screen name="WeatherForecastScreen" options={defaultCardOptions} />
+
+      {/* ===== Route & Activity Management ===== */}
+      <Stack.Screen name="RouteOptimizerScreen" options={defaultCardOptions} />
+      <Stack.Screen name="RouteSettingsScreen" options={defaultCardOptions} />
+      <Stack.Screen name="ActivityAdjustmentScreen" options={defaultCardOptions} />
+      <Stack.Screen name="ChangeApprovalScreen" options={defaultCardOptions} />
+      <Stack.Screen name="SuggestionsScreen" options={defaultCardOptions} />
+      <Stack.Screen name="SuggestionSettingsScreen" options={defaultCardOptions} />
+
+      {/* ===== Anniversary & Celebrations ===== */}
+      <Stack.Screen name="AddAnniversaryScreen" options={defaultCardOptions} />
+      <Stack.Screen name="AnniversaryDetailScreen" options={defaultCardOptions} />
+      <Stack.Screen name="AnniversaryListScreen" options={defaultCardOptions} />
+      <Stack.Screen name="CelebrationPlannerScreen" options={defaultCardOptions} />
+      <Stack.Screen name="MilestoneDetailScreen" options={defaultCardOptions} />
+
+      {/* ===== Companion & Preferences ===== */}
+      <Stack.Screen name="CompanionMergeScreen" options={defaultCardOptions} />
+      <Stack.Screen name="PreferenceEditorScreen" options={defaultCardOptions} />
+      <Stack.Screen name="PreferenceSyncScreen" options={defaultCardOptions} />
+
+      {/* ===== Expenses & Receipts ===== */}
+      <Stack.Screen name="ExpenseTrackerScreen" options={defaultCardOptions} />
+      <Stack.Screen name="ExpenseEditScreen" options={defaultCardOptions} />
+      <Stack.Screen name="CategoryBudgetScreen" options={defaultCardOptions} />
+      <Stack.Screen name="ReceiptCaptureScreen" options={defaultCardOptions} />
+      <Stack.Screen name="ReceiptListScreen" options={defaultCardOptions} />
+      <Stack.Screen name="ReceiptReviewScreen" options={defaultCardOptions} />
+
+      {/* ===== Currency ===== */}
+      <Stack.Screen name="CurrencyConverterScreen" options={defaultCardOptions} />
+      <Stack.Screen name="CurrencySettingsScreen" options={defaultCardOptions} />
+
+      {/* ===== Wallet & Cash ===== */}
+      <Stack.Screen name="CashWalletScreen" options={defaultCardOptions} />
+
+      {/* ===== Places ===== */}
+      <Stack.Screen name="FavoritePlacesScreen" options={defaultCardOptions} />
+      <Stack.Screen name="AddPlaceScreen" options={defaultCardOptions} />
+      <Stack.Screen name="PlaceDetailScreen" options={defaultCardOptions} />
+
+      {/* ===== Packing ===== */}
+      <Stack.Screen name="PackingListScreen" options={defaultCardOptions} />
     </Stack>
   );
 }

@@ -1,4 +1,4 @@
-# TravelGenie - Local Development Setup
+# W4nder - Local Development Setup
 
 This project has been converted from a Rork AI app to a standard Expo React Native project that you can edit locally and run in Xcode.
 
@@ -18,7 +18,7 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 # Navigate to the project directory
-cd TravelGenie-Xcode
+cd W4nder-Xcode
 
 # Install Node.js dependencies
 npm install
@@ -45,7 +45,7 @@ cd ..
 
 ```bash
 # Option 1: Open from terminal
-open ios/TravelGenie.xcworkspace
+open ios/W4nder.xcworkspace
 
 # Option 2: Open Xcode, then File > Open > select ios/TravelGenie.xcworkspace
 ```
@@ -55,10 +55,12 @@ open ios/TravelGenie.xcworkspace
 ### 5. Run the App
 
 In Xcode:
+
 1. Select your target device/simulator from the dropdown
 2. Click the Play button (▶) or press `Cmd + R`
 
 Or from terminal:
+
 ```bash
 npx expo run:ios
 ```
@@ -102,7 +104,7 @@ npx expo run:ios
 ## Project Structure
 
 ```
-TravelGenie-Xcode/
+W4nder-Xcode/
 ├── app/                    # App screens (file-based routing)
 │   ├── (tabs)/            # Tab navigation screens
 │   ├── _layout.tsx        # Root layout
@@ -123,6 +125,7 @@ TravelGenie-Xcode/
 ### Changing the App Name
 
 Edit `app.json`:
+
 ```json
 {
   "expo": {
@@ -135,6 +138,7 @@ Edit `app.json`:
 ### Changing the Bundle Identifier
 
 Edit `app.json`:
+
 ```json
 {
   "expo": {
@@ -155,7 +159,7 @@ After changes, run `npx expo prebuild --clean`.
 
 ## AI Assistant Integration
 
-The AI Assistant feature (`app/ai-assistant.tsx`) has been modified to work without the Rork SDK. 
+The AI Assistant feature (`app/ai-assistant.tsx`) has been modified to work without the Rork SDK.
 
 To add your own AI service:
 
@@ -168,10 +172,10 @@ npm install openai
 Then edit `app/ai-assistant.tsx`:
 
 ```typescript
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
-const openai = new OpenAI({ 
-  apiKey: 'YOUR_API_KEY' // Use environment variables in production!
+const openai = new OpenAI({
+  apiKey: "YOUR_API_KEY", // Use environment variables in production!
 });
 
 async function sendMessageToAI(message, history, userContext) {
@@ -179,8 +183,8 @@ async function sendMessageToAI(message, history, userContext) {
     model: "gpt-4",
     messages: [
       { role: "system", content: `You are a travel assistant.` },
-      ...history.map(m => ({ role: m.role, content: m.content })),
-      { role: "user", content: message }
+      ...history.map((m) => ({ role: m.role, content: m.content })),
+      { role: "user", content: message },
     ],
   });
   return response.choices[0].message.content;
@@ -200,12 +204,14 @@ Create an API endpoint and update `sendMessageToAI` to call it.
 ## Troubleshooting
 
 ### "No bundle URL present" error
+
 ```bash
 # Clear Metro cache
 npx expo start --clear
 ```
 
 ### Pod install fails
+
 ```bash
 cd ios
 pod repo update
@@ -214,6 +220,7 @@ cd ..
 ```
 
 ### Build fails after dependency changes
+
 ```bash
 # Clean everything and rebuild
 rm -rf ios
@@ -225,6 +232,7 @@ npx expo run:ios
 ```
 
 ### Xcode signing issues
+
 1. Open `ios/TravelGenie.xcworkspace` in Xcode
 2. Select the project in the navigator
 3. Go to "Signing & Capabilities"
@@ -233,14 +241,14 @@ npx expo run:ios
 
 ## Scripts Reference
 
-| Command | Description |
-|---------|-------------|
-| `npm start` | Start Metro bundler |
-| `npx expo run:ios` | Build and run on iOS |
-| `npx expo run:android` | Build and run on Android |
-| `npx expo prebuild` | Generate native projects |
+| Command                     | Description                      |
+| --------------------------- | -------------------------------- |
+| `npm start`                 | Start Metro bundler              |
+| `npx expo run:ios`          | Build and run on iOS             |
+| `npx expo run:android`      | Build and run on Android         |
+| `npx expo prebuild`         | Generate native projects         |
 | `npx expo prebuild --clean` | Clean regenerate native projects |
-| `npm run lint` | Run ESLint |
+| `npm run lint`              | Run ESLint                       |
 
 ## Building for Production
 

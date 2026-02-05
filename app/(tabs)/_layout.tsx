@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Compass, Ticket, Bell, User, Heart, CalendarDays } from 'lucide-react-native';
+import { Home, Compass, Ticket, Bell, User } from 'lucide-react-native';
 import { View, Text, StyleSheet } from 'react-native';
 import colors from '@/constants/colors';
 import { useApp } from '@/contexts/AppContext';
@@ -41,23 +41,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="calendar"
+        name="trips"
         options={{
-          title: 'Calendar',
-          tabBarIcon: ({ color, size }) => <CalendarDays size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="date-night"
-        options={{
-          title: 'Date Night',
-          tabBarIcon: ({ color, size }) => <Heart size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="bookings"
-        options={{
-          title: 'Bookings',
+          title: 'Trips',
           tabBarIcon: ({ color, size }) => <Ticket size={size} color={color} />,
         }}
       />
@@ -84,6 +70,26 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+        }}
+      />
+
+      {/* ===== Hidden tabs (still exist as files but not shown in tab bar) ===== */}
+      <Tabs.Screen
+        name="calendar"
+        options={{
+          href: null, // Hides from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="date-night"
+        options={{
+          href: null, // Moved to Home quick actions
+        }}
+      />
+      <Tabs.Screen
+        name="bookings"
+        options={{
+          href: null, // Merged into "trips" tab
         }}
       />
     </Tabs>

@@ -153,7 +153,7 @@ export default function OnboardingScreen() {
         style={styles.welcomeGradient}
       />
       <View style={styles.welcomeContent}>
-        <Text style={styles.welcomeTitle}>Wanderlust</Text>
+        <Text style={styles.welcomeTitle}>W4nder</Text>
         <Text style={styles.welcomeSubtitle}>
           Your personal AI travel companion. Let us create unforgettable journeys together.
         </Text>
