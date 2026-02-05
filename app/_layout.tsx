@@ -128,51 +128,51 @@ function RootLayoutNav() {
       <Stack.Screen name="bucket-list" options={defaultCardOptions} />
 
       {/* ===== Weather ===== */}
-      <Stack.Screen name="WeatherAwareActivitiesScreen" options={defaultCardOptions} />
-      <Stack.Screen name="WeatherForecastScreen" options={defaultCardOptions} />
+      <Stack.Screen name="weather-activities" options={defaultCardOptions} />
+      <Stack.Screen name="weather-forecast" options={defaultCardOptions} />
 
       {/* ===== Route & Activity Management ===== */}
-      <Stack.Screen name="RouteOptimizerScreen" options={defaultCardOptions} />
-      <Stack.Screen name="RouteSettingsScreen" options={defaultCardOptions} />
-      <Stack.Screen name="ActivityAdjustmentScreen" options={defaultCardOptions} />
-      <Stack.Screen name="ChangeApprovalScreen" options={defaultCardOptions} />
-      <Stack.Screen name="SuggestionsScreen" options={defaultCardOptions} />
-      <Stack.Screen name="SuggestionSettingsScreen" options={defaultCardOptions} />
+      <Stack.Screen name="route-optimizer" options={defaultCardOptions} />
+      <Stack.Screen name="route-settings" options={defaultCardOptions} />
+      <Stack.Screen name="activity-adjustment" options={defaultCardOptions} />
+      <Stack.Screen name="change-approval" options={defaultCardOptions} />
+      <Stack.Screen name="suggestions-screen" options={defaultCardOptions} />
+      <Stack.Screen name="suggestion-settings" options={defaultCardOptions} />
 
       {/* ===== Anniversary & Celebrations ===== */}
-      <Stack.Screen name="AddAnniversaryScreen" options={defaultCardOptions} />
-      <Stack.Screen name="AnniversaryDetailScreen" options={defaultCardOptions} />
-      <Stack.Screen name="AnniversaryListScreen" options={defaultCardOptions} />
-      <Stack.Screen name="CelebrationPlannerScreen" options={defaultCardOptions} />
-      <Stack.Screen name="MilestoneDetailScreen" options={defaultCardOptions} />
+      <Stack.Screen name="add-anniversary" options={defaultCardOptions} />
+      <Stack.Screen name="anniversary-detail" options={defaultCardOptions} />
+      <Stack.Screen name="anniversary-list" options={defaultCardOptions} />
+      <Stack.Screen name="celebration-planner" options={defaultCardOptions} />
+      <Stack.Screen name="milestone-detail" options={defaultCardOptions} />
 
       {/* ===== Companion & Preferences ===== */}
-      <Stack.Screen name="CompanionMergeScreen" options={defaultCardOptions} />
-      <Stack.Screen name="PreferenceEditorScreen" options={defaultCardOptions} />
-      <Stack.Screen name="PreferenceSyncScreen" options={defaultCardOptions} />
+      <Stack.Screen name="companion-merge" options={defaultCardOptions} />
+      <Stack.Screen name="preference-editor" options={defaultCardOptions} />
+      <Stack.Screen name="preference-sync" options={defaultCardOptions} />
 
       {/* ===== Expenses & Receipts ===== */}
-      <Stack.Screen name="ExpenseTrackerScreen" options={defaultCardOptions} />
-      <Stack.Screen name="ExpenseEditScreen" options={defaultCardOptions} />
-      <Stack.Screen name="CategoryBudgetScreen" options={defaultCardOptions} />
-      <Stack.Screen name="ReceiptCaptureScreen" options={defaultCardOptions} />
-      <Stack.Screen name="ReceiptListScreen" options={defaultCardOptions} />
-      <Stack.Screen name="ReceiptReviewScreen" options={defaultCardOptions} />
+      <Stack.Screen name="expense-tracker" options={defaultCardOptions} />
+      <Stack.Screen name="expense-edit" options={defaultCardOptions} />
+      <Stack.Screen name="category-budget" options={defaultCardOptions} />
+      <Stack.Screen name="receipt-capture" options={defaultCardOptions} />
+      <Stack.Screen name="receipt-list" options={defaultCardOptions} />
+      <Stack.Screen name="receipt-review" options={defaultCardOptions} />
 
       {/* ===== Currency ===== */}
-      <Stack.Screen name="CurrencyConverterScreen" options={defaultCardOptions} />
-      <Stack.Screen name="CurrencySettingsScreen" options={defaultCardOptions} />
+      <Stack.Screen name="currency-converter-detail" options={defaultCardOptions} />
+      <Stack.Screen name="currency-settings" options={defaultCardOptions} />
 
       {/* ===== Wallet & Cash ===== */}
-      <Stack.Screen name="CashWalletScreen" options={defaultCardOptions} />
+      <Stack.Screen name="cash-wallet" options={defaultCardOptions} />
 
       {/* ===== Places ===== */}
-      <Stack.Screen name="FavoritePlacesScreen" options={defaultCardOptions} />
-      <Stack.Screen name="AddPlaceScreen" options={defaultCardOptions} />
-      <Stack.Screen name="PlaceDetailScreen" options={defaultCardOptions} />
+      <Stack.Screen name="favorite-places" options={defaultCardOptions} />
+      <Stack.Screen name="add-place" options={defaultCardOptions} />
+      <Stack.Screen name="place-detail" options={defaultCardOptions} />
 
       {/* ===== Packing ===== */}
-      <Stack.Screen name="PackingListScreen" options={defaultCardOptions} />
+      <Stack.Screen name="packing-list-detail" options={defaultCardOptions} />
     </Stack>
   );
 }
