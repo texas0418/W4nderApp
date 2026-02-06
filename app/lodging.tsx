@@ -970,12 +970,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // FIXED: Changed from paddingHorizontal to separate left/right padding
+  // FIXED: Added vertical padding to prevent clipping
   typesScroll: {
     paddingLeft: 16,
     paddingRight: 32,
+    paddingVertical: 4,
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   typeChip: {
     flexDirection: 'row',
