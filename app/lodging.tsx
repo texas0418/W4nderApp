@@ -848,6 +848,7 @@ export default function LodgingScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          style={styles.typesScrollContainer}
           contentContainerStyle={styles.typesScroll}
         >
           {LODGING_TYPES.map((type) => {
@@ -970,20 +971,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  // FIXED: Added vertical padding to prevent clipping
+  // FIXED: Container style for ScrollView to set height
+  typesScrollContainer: {
+    height: 56,
+    marginBottom: 12,
+  },
+  // FIXED: Content container style
   typesScroll: {
     paddingLeft: 16,
     paddingRight: 32,
-    paddingVertical: 4,
     gap: 8,
-    marginBottom: 8,
+    alignItems: 'center',
   },
   typeChip: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 12,
     backgroundColor: colors.surface,
     borderRadius: 20,
   },
