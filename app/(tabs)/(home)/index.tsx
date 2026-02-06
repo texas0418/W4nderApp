@@ -61,7 +61,9 @@ export default function HomeScreen() {
     setTimeout(() => setRefreshing(false), 1000);
   }, []);
 
-  const upcomingTrips = trips.filter((t) => t.status === 'upcoming' || t.status === 'planning');
+  const upcomingTrips = trips.filter(
+    (t) => t.status === 'upcoming' || t.status === 'planning'
+  );
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -104,7 +106,9 @@ export default function HomeScreen() {
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
           <View style={styles.header}>
             <View style={styles.headerTop}>
@@ -117,11 +121,16 @@ export default function HomeScreen() {
                 onPress={() => router.push('/notifications')}
               >
                 <Bell size={22} color={colors.textLight} />
-                {unreadNotificationsCount > 0 && <View style={styles.notificationBadge} />}
+                {unreadNotificationsCount > 0 && (
+                  <View style={styles.notificationBadge} />
+                )}
               </Pressable>
             </View>
 
-            <Pressable style={styles.aiCard} onPress={() => router.push('/plan-trip')}>
+            <Pressable
+              style={styles.aiCard}
+              onPress={() => router.push('/plan-trip')}
+            >
               <LinearGradient
                 colors={[colors.secondary, colors.secondaryLight]}
                 start={{ x: 0, y: 0 }}
@@ -134,7 +143,9 @@ export default function HomeScreen() {
                   </View>
                   <View style={styles.aiTextContainer}>
                     <Text style={styles.aiTitle}>Plan with AI</Text>
-                    <Text style={styles.aiSubtitle}>Create your perfect itinerary in seconds</Text>
+                    <Text style={styles.aiSubtitle}>
+                      Create your perfect itinerary in seconds
+                    </Text>
                   </View>
                   <ChevronRight size={20} color={colors.textLight} />
                 </View>
@@ -144,30 +155,58 @@ export default function HomeScreen() {
 
           <View style={styles.content}>
             <View style={styles.quickActions}>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/packing-list')}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/packing-list')}
+              >
                 <View
-                  style={[styles.quickActionIcon, { backgroundColor: `${colors.secondary}15` }]}
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.secondary}15` },
+                  ]}
                 >
                   <Briefcase size={22} color={colors.secondary} />
                 </View>
                 <Text style={styles.quickActionText}>Packing</Text>
               </Pressable>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/restaurants')}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/restaurants')}
+              >
                 <View
-                  style={[styles.quickActionIcon, { backgroundColor: `${colors.accentDark}15` }]}
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.accentDark}15` },
+                  ]}
                 >
                   <UtensilsCrossed size={22} color={colors.accentDark} />
                 </View>
                 <Text style={styles.quickActionText}>Dining</Text>
               </Pressable>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/group-trip')}>
-                <View style={[styles.quickActionIcon, { backgroundColor: `${colors.primary}15` }]}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/group-trip')}
+              >
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.primary}15` },
+                  ]}
+                >
                   <Users size={22} color={colors.primary} />
                 </View>
                 <Text style={styles.quickActionText}>Group</Text>
               </Pressable>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/lodging')}>
-                <View style={[styles.quickActionIcon, { backgroundColor: `${colors.success}15` }]}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/lodging')}
+              >
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.success}15` },
+                  ]}
+                >
                   <Hotel size={22} color={colors.success} />
                 </View>
                 <Text style={styles.quickActionText}>Lodging</Text>
@@ -175,33 +214,62 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.quickActions}>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/car-rental')}>
-                <View style={[styles.quickActionIcon, { backgroundColor: `${colors.warning}15` }]}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/car-rental')}
+              >
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.warning}15` },
+                  ]}
+                >
                   <Car size={22} color={colors.warning} />
                 </View>
                 <Text style={styles.quickActionText}>Car Rental</Text>
               </Pressable>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/flight-search')}>
-                <View style={[styles.quickActionIcon, { backgroundColor: `${colors.primary}15` }]}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/flight-search')}
+              >
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.primary}15` },
+                  ]}
+                >
                   <Plane size={22} color={colors.primary} />
                 </View>
                 <Text style={styles.quickActionText}>Flights</Text>
               </Pressable>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/trip-templates')}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/trip-templates')}
+              >
                 <View
-                  style={[styles.quickActionIcon, { backgroundColor: `${colors.secondary}15` }]}
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.secondary}15` },
+                  ]}
                 >
                   <LayoutTemplate size={22} color={colors.secondary} />
                 </View>
                 <Text style={styles.quickActionText}>Templates</Text>
               </Pressable>
-              <Pressable style={styles.quickAction} onPress={() => router.push('/accessibility')}>
+              {/* CHANGED: Access -> Date Night */}
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/date-night')}
+              >
                 <View
-                  style={[styles.quickActionIcon, { backgroundColor: `${colors.primaryLight}15` }]}
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: `${colors.secondary}15` },
+                  ]}
                 >
-                  <Accessibility size={22} color={colors.primaryLight} />
+                  <Heart size={22} color={colors.secondary} />
                 </View>
-                <Text style={styles.quickActionText}>Access</Text>
+                <Text style={styles.quickActionText}>Date Night</Text>
               </Pressable>
             </View>
 
@@ -231,7 +299,9 @@ export default function HomeScreen() {
                         <Text style={styles.bookingName} numberOfLines={1}>
                           {booking.name}
                         </Text>
-                        <Text style={styles.bookingDate}>{formatDate(booking.startDate)}</Text>
+                        <Text style={styles.bookingDate}>
+                          {formatDate(booking.startDate)}
+                        </Text>
                       </View>
                       <ChevronRight size={18} color={colors.textTertiary} />
                     </Pressable>
@@ -243,7 +313,10 @@ export default function HomeScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Your Trips</Text>
-                <Pressable style={styles.addButton} onPress={() => router.push('/plan-trip')}>
+                <Pressable
+                  style={styles.addButton}
+                  onPress={() => router.push('/plan-trip')}
+                >
                   <Plus size={18} color={colors.primary} />
                   <Text style={styles.addButtonText}>New</Text>
                 </Pressable>
@@ -279,20 +352,29 @@ export default function HomeScreen() {
                             { backgroundColor: getStatusColor(trip.status) },
                           ]}
                         >
-                          <Text style={styles.statusText}>{getStatusLabel(trip.status)}</Text>
+                          <Text style={styles.statusText}>
+                            {getStatusLabel(trip.status)}
+                          </Text>
                         </View>
-                        <Text style={styles.tripName}>{trip.destination.name}</Text>
-                        <Text style={styles.tripCountry}>{trip.destination.country}</Text>
+                        <Text style={styles.tripName}>
+                          {trip.destination.name}
+                        </Text>
+                        <Text style={styles.tripCountry}>
+                          {trip.destination.country}
+                        </Text>
                         <View style={styles.tripDetails}>
                           <View style={styles.tripDetail}>
                             <Calendar size={14} color={colors.textLight} />
                             <Text style={styles.tripDetailText}>
-                              {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                              {formatDate(trip.startDate)} -{' '}
+                              {formatDate(trip.endDate)}
                             </Text>
                           </View>
                           <View style={styles.tripDetail}>
                             <Users size={14} color={colors.textLight} />
-                            <Text style={styles.tripDetailText}>{trip.travelers} travelers</Text>
+                            <Text style={styles.tripDetailText}>
+                              {trip.travelers} travelers
+                            </Text>
                           </View>
                         </View>
                       </View>
@@ -302,8 +384,13 @@ export default function HomeScreen() {
               ) : (
                 <View style={styles.emptyTrips}>
                   <Text style={styles.emptyText}>No trips planned yet</Text>
-                  <Pressable style={styles.planButton} onPress={() => router.push('/plan-trip')}>
-                    <Text style={styles.planButtonText}>Plan Your First Trip</Text>
+                  <Pressable
+                    style={styles.planButton}
+                    onPress={() => router.push('/plan-trip')}
+                  >
+                    <Text style={styles.planButtonText}>
+                      Plan Your First Trip
+                    </Text>
                   </Pressable>
                 </View>
               )}
@@ -316,11 +403,15 @@ export default function HomeScreen() {
                   <Text style={styles.seeAll}>See all</Text>
                 </Pressable>
               </View>
+
               <View style={styles.destinationsGrid}>
                 {trendingDestinations.map((dest, index) => (
                   <Pressable
                     key={dest.id}
-                    style={[styles.destCard, index === 0 && styles.destCardLarge]}
+                    style={[
+                      styles.destCard,
+                      index === 0 && styles.destCardLarge,
+                    ]}
                     onPress={() => router.push(`/destination/${dest.id}`)}
                   >
                     <Image
@@ -356,7 +447,9 @@ export default function HomeScreen() {
                   <Text style={styles.rewardsPromoTitle}>
                     You have {user.rewardPoints.toLocaleString()} points!
                   </Text>
-                  <Text style={styles.rewardsPromoSubtitle}>Redeem for exclusive rewards</Text>
+                  <Text style={styles.rewardsPromoSubtitle}>
+                    Redeem for exclusive rewards
+                  </Text>
                 </View>
                 <Pressable
                   style={styles.rewardsPromoButton}

@@ -87,7 +87,9 @@ export default function LodgingScreen() {
   const [guests, setGuests] = useState({ adults: 2, children: 0 });
   const [nights, setNights] = useState(3);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
-  const [sortBy, setSortBy] = useState<'price' | 'rating' | 'popularity'>('popularity');
+  const [sortBy, setSortBy] = useState<'price' | 'rating' | 'popularity'>(
+    'popularity'
+  );
   const [instantBookOnly, setInstantBookOnly] = useState(false);
   const [freeCancellationOnly, setFreeCancellationOnly] = useState(false);
 
@@ -112,7 +114,9 @@ export default function LodgingScreen() {
       results = results.filter((l) => l.provider.name === selectedProvider);
     }
 
-    results = results.filter((l) => l.minPrice >= priceRange[0] && l.minPrice <= priceRange[1]);
+    results = results.filter(
+      (l) => l.minPrice >= priceRange[0] && l.minPrice <= priceRange[1]
+    );
 
     if (instantBookOnly) {
       results = results.filter((l) => l.instantBook);
@@ -120,7 +124,9 @@ export default function LodgingScreen() {
 
     if (freeCancellationOnly) {
       results = results.filter(
-        (l) => l.policies.cancellation === 'free' || l.policies.cancellation === 'flexible'
+        (l) =>
+          l.policies.cancellation === 'free' ||
+          l.policies.cancellation === 'flexible'
       );
     }
 
@@ -148,7 +154,9 @@ export default function LodgingScreen() {
   ]);
 
   const toggleFavorite = useCallback((id: string) => {
-    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    );
   }, []);
 
   const toggleType = useCallback((type: LodgingType) => {
@@ -203,12 +211,19 @@ export default function LodgingScreen() {
       return (
         <Pressable style={styles.lodgingCard} onPress={() => openBooking(item)}>
           <View style={styles.cardImageContainer}>
-            <Image source={{ uri: item.image }} style={styles.cardImage} contentFit="cover" />
+            <Image
+              source={{ uri: item.image }}
+              style={styles.cardImage}
+              contentFit="cover"
+            />
             <LinearGradient
               colors={['transparent', 'rgba(0,0,0,0.4)']}
               style={styles.cardGradient}
             />
-            <Pressable style={styles.favoriteButton} onPress={() => toggleFavorite(item.id)}>
+            <Pressable
+              style={styles.favoriteButton}
+              onPress={() => toggleFavorite(item.id)}
+            >
               <Heart
                 size={20}
                 color={isFavorite ? colors.secondary : colors.textLight}
@@ -261,7 +276,9 @@ export default function LodgingScreen() {
             <View style={styles.locationRow}>
               <MapPin size={14} color={colors.textSecondary} />
               <Text style={styles.locationText} numberOfLines={1}>
-                {item.location.neighborhood ? `${item.location.neighborhood}, ` : ''}
+                {item.location.neighborhood
+                  ? `${item.location.neighborhood}, `
+                  : ''}
                 {item.location.city}
               </Text>
             </View>
@@ -285,7 +302,9 @@ export default function LodgingScreen() {
             <View style={styles.cardFooter}>
               <View style={styles.priceContainer}>
                 {item.rooms[0]?.originalPrice && (
-                  <Text style={styles.originalPrice}>${item.rooms[0].originalPrice}</Text>
+                  <Text style={styles.originalPrice}>
+                    ${item.rooms[0].originalPrice}
+                  </Text>
                 )}
                 <Text style={styles.price}>
                   ${item.minPrice}
@@ -299,7 +318,10 @@ export default function LodgingScreen() {
                     <Text style={styles.instantText}>Instant</Text>
                   </View>
                 )}
-                <Pressable style={styles.bookButton} onPress={() => openBooking(item)}>
+                <Pressable
+                  style={styles.bookButton}
+                  onPress={() => openBooking(item)}
+                >
                   <Text style={styles.bookButtonText}>View</Text>
                 </Pressable>
               </View>
@@ -326,7 +348,10 @@ export default function LodgingScreen() {
           </Pressable>
         </View>
 
-        <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.modalContent}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.filterSectionTitle}>Property Type</Text>
           <View style={styles.typeGrid}>
             {LODGING_TYPES.map((type) => {
@@ -335,12 +360,21 @@ export default function LodgingScreen() {
               return (
                 <Pressable
                   key={type.id}
-                  style={[styles.typeButton, isSelected && styles.typeButtonSelected]}
+                  style={[
+                    styles.typeButton,
+                    isSelected && styles.typeButtonSelected,
+                  ]}
                   onPress={() => toggleType(type.id)}
                 >
-                  <TypeIcon size={20} color={isSelected ? colors.textLight : colors.text} />
+                  <TypeIcon
+                    size={20}
+                    color={isSelected ? colors.textLight : colors.text}
+                  />
                   <Text
-                    style={[styles.typeButtonText, isSelected && styles.typeButtonTextSelected]}
+                    style={[
+                      styles.typeButtonText,
+                      isSelected && styles.typeButtonTextSelected,
+                    ]}
                   >
                     {type.label}
                   </Text>
@@ -367,7 +401,8 @@ export default function LodgingScreen() {
                 <Text
                   style={[
                     styles.providerChipText,
-                    selectedProvider === provider && styles.providerChipTextSelected,
+                    selectedProvider === provider &&
+                      styles.providerChipTextSelected,
                   ]}
                 >
                   {provider}
@@ -381,7 +416,10 @@ export default function LodgingScreen() {
             {(['popularity', 'rating', 'price'] as const).map((option) => (
               <Pressable
                 key={option}
-                style={[styles.sortOption, sortBy === option && styles.sortOptionSelected]}
+                style={[
+                  styles.sortOption,
+                  sortBy === option && styles.sortOptionSelected,
+                ]}
                 onPress={() => setSortBy(option)}
               >
                 <Text
@@ -392,7 +430,9 @@ export default function LodgingScreen() {
                 >
                   {option.charAt(0).toUpperCase() + option.slice(1)}
                 </Text>
-                {sortBy === option && <Check size={16} color={colors.primary} />}
+                {sortBy === option && (
+                  <Check size={16} color={colors.primary} />
+                )}
               </Pressable>
             ))}
           </View>
@@ -415,7 +455,9 @@ export default function LodgingScreen() {
                 key={`${min}-${max}`}
                 style={[
                   styles.priceButton,
-                  priceRange[0] === min && priceRange[1] === max && styles.priceButtonSelected,
+                  priceRange[0] === min &&
+                    priceRange[1] === max &&
+                    styles.priceButtonSelected,
                 ]}
                 onPress={() => setPriceRange([min, max])}
               >
@@ -442,11 +484,17 @@ export default function LodgingScreen() {
               <Zap size={20} color={colors.success} />
               <View>
                 <Text style={styles.toggleLabel}>Instant Book</Text>
-                <Text style={styles.toggleDescription}>Book without waiting for approval</Text>
+                <Text style={styles.toggleDescription}>
+                  Book without waiting for approval
+                </Text>
               </View>
             </View>
-            <View style={[styles.toggle, instantBookOnly && styles.toggleActive]}>
-              {instantBookOnly && <Check size={14} color={colors.textLight} />}
+            <View
+              style={[styles.toggle, instantBookOnly && styles.toggleActive]}
+            >
+              {instantBookOnly && (
+                <Check size={14} color={colors.textLight} />
+              )}
             </View>
           </Pressable>
 
@@ -458,11 +506,20 @@ export default function LodgingScreen() {
               <Calendar size={20} color={colors.primary} />
               <View>
                 <Text style={styles.toggleLabel}>Free Cancellation</Text>
-                <Text style={styles.toggleDescription}>Flexible or free cancellation policy</Text>
+                <Text style={styles.toggleDescription}>
+                  Flexible or free cancellation policy
+                </Text>
               </View>
             </View>
-            <View style={[styles.toggle, freeCancellationOnly && styles.toggleActive]}>
-              {freeCancellationOnly && <Check size={14} color={colors.textLight} />}
+            <View
+              style={[
+                styles.toggle,
+                freeCancellationOnly && styles.toggleActive,
+              ]}
+            >
+              {freeCancellationOnly && (
+                <Check size={14} color={colors.textLight} />
+              )}
             </View>
           </Pressable>
         </ScrollView>
@@ -481,8 +538,13 @@ export default function LodgingScreen() {
           >
             <Text style={styles.clearButtonText}>Clear All</Text>
           </Pressable>
-          <Pressable style={styles.applyButton} onPress={() => setShowFilters(false)}>
-            <Text style={styles.applyButtonText}>Show {filteredLodgings.length} Results</Text>
+          <Pressable
+            style={styles.applyButton}
+            onPress={() => setShowFilters(false)}
+          >
+            <Text style={styles.applyButtonText}>
+              Show {filteredLodgings.length} Results
+            </Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -513,7 +575,10 @@ export default function LodgingScreen() {
             <View style={{ width: 24 }} />
           </View>
 
-          <ScrollView style={styles.bookingContent} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.bookingContent}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.bookingHotelCard}>
               <Image
                 source={{ uri: selectedLodging.image }}
@@ -521,17 +586,21 @@ export default function LodgingScreen() {
                 contentFit="cover"
               />
               <View style={styles.bookingHotelInfo}>
-                <Text style={styles.bookingHotelName}>{selectedLodging.name}</Text>
+                <Text style={styles.bookingHotelName}>
+                  {selectedLodging.name}
+                </Text>
                 <View style={styles.bookingHotelLocation}>
                   <MapPin size={14} color={colors.textSecondary} />
                   <Text style={styles.bookingHotelLocationText}>
-                    {selectedLodging.location.city}, {selectedLodging.location.country}
+                    {selectedLodging.location.city},{' '}
+                    {selectedLodging.location.country}
                   </Text>
                 </View>
                 <View style={styles.bookingHotelRating}>
                   <Star size={14} color={colors.warning} fill={colors.warning} />
                   <Text style={styles.bookingRatingText}>
-                    {selectedLodging.rating} ({selectedLodging.reviewCount} reviews)
+                    {selectedLodging.rating} ({selectedLodging.reviewCount}{' '}
+                    reviews)
                   </Text>
                 </View>
               </View>
@@ -567,9 +636,13 @@ export default function LodgingScreen() {
                   </View>
                   <View style={styles.roomPriceRow}>
                     {room.originalPrice && (
-                      <Text style={styles.roomOriginalPrice}>${room.originalPrice}</Text>
+                      <Text style={styles.roomOriginalPrice}>
+                        ${room.originalPrice}
+                      </Text>
                     )}
-                    <Text style={styles.roomPrice}>${room.pricePerNight}/night</Text>
+                    <Text style={styles.roomPrice}>
+                      ${room.pricePerNight}/night
+                    </Text>
                   </View>
                 </View>
                 <View
@@ -578,7 +651,9 @@ export default function LodgingScreen() {
                     selectedRoom?.id === room.id && styles.radioButtonSelected,
                   ]}
                 >
-                  {selectedRoom?.id === room.id && <Check size={14} color={colors.textLight} />}
+                  {selectedRoom?.id === room.id && (
+                    <Check size={14} color={colors.textLight} />
+                  )}
                 </View>
               </Pressable>
             ))}
@@ -598,7 +673,10 @@ export default function LodgingScreen() {
                     <Text style={styles.stepperButtonText}>-</Text>
                   </Pressable>
                   <Text style={styles.stepperValue}>{nights}</Text>
-                  <Pressable style={styles.stepperButton} onPress={() => setNights(nights + 1)}>
+                  <Pressable
+                    style={styles.stepperButton}
+                    onPress={() => setNights(nights + 1)}
+                  >
                     <Text style={styles.stepperButtonText}>+</Text>
                   </Pressable>
                 </View>
@@ -612,14 +690,21 @@ export default function LodgingScreen() {
                 <View style={styles.stepper}>
                   <Pressable
                     style={styles.stepperButton}
-                    onPress={() => setGuests({ ...guests, adults: Math.max(1, guests.adults - 1) })}
+                    onPress={() =>
+                      setGuests({
+                        ...guests,
+                        adults: Math.max(1, guests.adults - 1),
+                      })
+                    }
                   >
                     <Text style={styles.stepperButtonText}>-</Text>
                   </Pressable>
                   <Text style={styles.stepperValue}>{guests.adults}</Text>
                   <Pressable
                     style={styles.stepperButton}
-                    onPress={() => setGuests({ ...guests, adults: guests.adults + 1 })}
+                    onPress={() =>
+                      setGuests({ ...guests, adults: guests.adults + 1 })
+                    }
                   >
                     <Text style={styles.stepperButtonText}>+</Text>
                   </Pressable>
@@ -635,7 +720,10 @@ export default function LodgingScreen() {
                   <Pressable
                     style={styles.stepperButton}
                     onPress={() =>
-                      setGuests({ ...guests, children: Math.max(0, guests.children - 1) })
+                      setGuests({
+                        ...guests,
+                        children: Math.max(0, guests.children - 1),
+                      })
                     }
                   >
                     <Text style={styles.stepperButtonText}>-</Text>
@@ -643,7 +731,9 @@ export default function LodgingScreen() {
                   <Text style={styles.stepperValue}>{guests.children}</Text>
                   <Pressable
                     style={styles.stepperButton}
-                    onPress={() => setGuests({ ...guests, children: guests.children + 1 })}
+                    onPress={() =>
+                      setGuests({ ...guests, children: guests.children + 1 })
+                    }
                   >
                     <Text style={styles.stepperButtonText}>+</Text>
                   </Pressable>
@@ -689,7 +779,9 @@ export default function LodgingScreen() {
                   contentFit="cover"
                 />
                 <View style={styles.hostDetails}>
-                  <Text style={styles.hostName}>Hosted by {selectedLodging.host.name}</Text>
+                  <Text style={styles.hostName}>
+                    Hosted by {selectedLodging.host.name}
+                  </Text>
                   {selectedLodging.host.isSuperhost && (
                     <View style={styles.superhostBadge}>
                       <Sparkles size={12} color={colors.warning} />
@@ -745,7 +837,10 @@ export default function LodgingScreen() {
               </Pressable>
             )}
           </View>
-          <Pressable style={styles.filterButton} onPress={() => setShowFilters(true)}>
+          <Pressable
+            style={styles.filterButton}
+            onPress={() => setShowFilters(true)}
+          >
             <SlidersHorizontal size={20} color={colors.primary} />
           </Pressable>
         </View>
@@ -764,8 +859,16 @@ export default function LodgingScreen() {
                 style={[styles.typeChip, isSelected && styles.typeChipSelected]}
                 onPress={() => toggleType(type.id)}
               >
-                <TypeIcon size={16} color={isSelected ? colors.textLight : colors.text} />
-                <Text style={[styles.typeChipText, isSelected && styles.typeChipTextSelected]}>
+                <TypeIcon
+                  size={16}
+                  color={isSelected ? colors.textLight : colors.text}
+                />
+                <Text
+                  style={[
+                    styles.typeChipText,
+                    isSelected && styles.typeChipTextSelected,
+                  ]}
+                >
                   {type.label}
                 </Text>
               </Pressable>
@@ -774,8 +877,13 @@ export default function LodgingScreen() {
         </ScrollView>
 
         <View style={styles.resultsHeader}>
-          <Text style={styles.resultsCount}>{filteredLodgings.length} properties found</Text>
-          <Pressable style={styles.sortButton} onPress={() => setShowFilters(true)}>
+          <Text style={styles.resultsCount}>
+            {filteredLodgings.length} properties found
+          </Text>
+          <Pressable
+            style={styles.sortButton}
+            onPress={() => setShowFilters(true)}
+          >
             <Text style={styles.sortButtonText}>Sort: {sortBy}</Text>
             <ChevronDown size={16} color={colors.primary} />
           </Pressable>
@@ -791,7 +899,9 @@ export default function LodgingScreen() {
             <View style={styles.emptyState}>
               <Hotel size={48} color={colors.textTertiary} />
               <Text style={styles.emptyTitle}>No Properties Found</Text>
-              <Text style={styles.emptyText}>Try adjusting your filters or search criteria</Text>
+              <Text style={styles.emptyText}>
+                Try adjusting your filters or search criteria
+              </Text>
             </View>
           }
         />
@@ -860,8 +970,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // FIXED: Changed from paddingHorizontal to separate left/right padding
   typesScroll: {
-    paddingHorizontal: 16,
+    paddingLeft: 16,
+    paddingRight: 32,
     gap: 8,
     marginBottom: 12,
   },
