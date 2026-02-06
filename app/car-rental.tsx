@@ -840,6 +840,7 @@ export default function CarRentalScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          style={styles.categoriesScrollContainer}
           contentContainerStyle={styles.categoriesScroll}
         >
           {CAR_CATEGORIES.slice(0, 6).map((cat) => {
@@ -949,20 +950,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  categoriesScroll: {
-    paddingHorizontal: 16,
-    gap: 8,
+  // FIXED: Container style for ScrollView to set height
+  categoriesScrollContainer: {
+    height: 56,
     marginBottom: 12,
+  },
+  // FIXED: Content container style
+  categoriesScroll: {
+    paddingLeft: 16,
+    paddingRight: 32,
+    gap: 8,
+    alignItems: 'center',
   },
   categoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 12,
     backgroundColor: colors.surface,
     borderRadius: 20,
-    marginRight: 8,
   },
   categoryChipSelected: {
     backgroundColor: colors.primary,
