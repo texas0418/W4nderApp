@@ -1,12 +1,28 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Dimensions } from 'react-native';
+// app/(tabs)/explore.tsx
+import React, { useState, useCallback, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  TextInput,
+  Dimensions,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Search, MapPin, Star, X } from 'lucide-react-native';
 import colors from '@/constants/colors';
-import { destinations } from '@/mocks/destinations';
+import {
+  getDestinations,
+  searchDestinations,
+  getDestinationsByTag,
+} from '@/services';
+import { Destination } from '@/types';
 
 const { width } = Dimensions.get('window');
 
@@ -23,27 +39,63 @@ export default function ExploreScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const filteredDestinations = useCallback(() => {
-    let filtered = destinations;
+  // Fetch destinations from Supabase
+  const fetchDestinations = useCallback(async () => {
+    try {
+      let data: Destination[];
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (d) => d.name.toLowerCase().includes(query) || d.country.toLowerCase().includes(query)
-      );
+      if (searchQuery) {
+        // Search by name or country
+        data = await searchDestinations(searchQuery);
+      } else if (selectedCategory !== 'all') {
+        // Filter by tag/category
+        data = await getDestinationsByTag(selectedCategory);
+      } else {
+        // Get all destinations
+        data = await getDestinations();
+      }
+
+      setDestinations(data);
+    } catch (error) {
+      console.error('Error fetching destinations:', error);
+    } finally {
+      setLoading(false);
     }
-
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter((d) =>
-        d.tags.some((tag) => tag.toLowerCase() === selectedCategory.toLowerCase())
-      );
-    }
-
-    return filtered;
   }, [searchQuery, selectedCategory]);
 
-  const results = filteredDestinations();
+  // Initial load
+  useEffect(() => {
+    fetchDestinations();
+  }, [fetchDestinations]);
+
+  // Debounced search
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!loading) {
+        fetchDestinations();
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
+
+  // Category change
+  useEffect(() => {
+    if (!loading) {
+      setLoading(true);
+      fetchDestinations();
+    }
+  }, [selectedCategory]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchDestinations();
+    setRefreshing(false);
+  }, [fetchDestinations]);
 
   return (
     <View style={styles.container}>
@@ -96,49 +148,73 @@ export default function ExploreScreen() {
           </ScrollView>
         </View>
 
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <Text style={styles.resultsCount}>
-            {results.length} destination{results.length !== 1 ? 's' : ''} found
-          </Text>
-
-          <View style={styles.grid}>
-            {results.map((dest) => (
-              <Pressable
-                key={dest.id}
-                style={styles.destCard}
-                onPress={() => router.push(`/destination/${dest.id}`)}
-              >
-                <Image source={{ uri: dest.image }} style={styles.destImage} contentFit="cover" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.8)']}
-                  style={styles.destGradient}
-                />
-                <View style={styles.destContent}>
-                  <View style={styles.ratingBadge}>
-                    <Star size={12} color={colors.warning} fill={colors.warning} />
-                    <Text style={styles.ratingText}>{dest.rating}</Text>
-                  </View>
-                  <Text style={styles.destName}>{dest.name}</Text>
-                  <View style={styles.destLocation}>
-                    <MapPin size={12} color={colors.textLight} />
-                    <Text style={styles.destCountry}>{dest.country}</Text>
-                  </View>
-                  <View style={styles.priceRow}>
-                    <Text style={styles.priceLabel}>From</Text>
-                    <Text style={styles.price}>
-                      ${dest.avgPrice}
-                      <Text style={styles.priceUnit}>/day</Text>
-                    </Text>
-                  </View>
-                </View>
-              </Pressable>
-            ))}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
-        </ScrollView>
+        ) : (
+          <ScrollView
+            style={styles.content}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            <Text style={styles.resultsCount}>
+              {destinations.length} destination{destinations.length !== 1 ? 's' : ''} found
+            </Text>
+
+            {destinations.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>No destinations found</Text>
+                <Text style={styles.emptySubtext}>
+                  {searchQuery
+                    ? 'Try a different search term'
+                    : 'Check back later for new destinations'}
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.grid}>
+                {destinations.map((dest) => (
+                  <Pressable
+                    key={dest.id}
+                    style={styles.destCard}
+                    onPress={() => router.push(`/destination/${dest.id}`)}
+                  >
+                    <Image
+                      source={{ uri: dest.image }}
+                      style={styles.destImage}
+                      contentFit="cover"
+                    />
+                    <LinearGradient
+                      colors={['transparent', 'rgba(0,0,0,0.8)']}
+                      style={styles.destGradient}
+                    />
+                    <View style={styles.destContent}>
+                      <View style={styles.ratingBadge}>
+                        <Star size={12} color={colors.warning} fill={colors.warning} />
+                        <Text style={styles.ratingText}>{dest.rating.toFixed(1)}</Text>
+                      </View>
+                      <Text style={styles.destName}>{dest.name}</Text>
+                      <View style={styles.destLocation}>
+                        <MapPin size={12} color={colors.textLight} />
+                        <Text style={styles.destCountry}>{dest.country}</Text>
+                      </View>
+                      <View style={styles.priceRow}>
+                        <Text style={styles.priceLabel}>From</Text>
+                        <Text style={styles.price}>
+                          ${dest.avgPrice}
+                          <Text style={styles.priceUnit}>/day</Text>
+                        </Text>
+                      </View>
+                    </View>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </ScrollView>
+        )}
       </SafeAreaView>
     </View>
   );
@@ -211,6 +287,11 @@ const styles = StyleSheet.create({
   categoryTextActive: {
     color: colors.textLight,
   },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   content: {
     flex: 1,
   },
@@ -221,6 +302,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     marginBottom: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: 8,
   },
   grid: {
     flexDirection: 'row',

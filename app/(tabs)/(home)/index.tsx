@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+// app/(tabs)/(home)/index.tsx
+import { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +8,7 @@ import {
   Pressable,
   RefreshControl,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -44,25 +46,65 @@ import {
   Accessibility,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
+import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
-import { trendingDestinations } from '@/mocks/destinations';
-import { Trip } from '@/types';
+import {
+  getTrips,
+  getUpcomingBookings,
+  getTrendingDestinations,
+  Booking,
+} from '@/services';
+import { Trip, Destination } from '@/types';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 48;
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user, trips, upcomingBookings, unreadNotificationsCount } = useApp();
+  const { user: authUser } = useAuth();
+  const { user: appUser, unreadNotificationsCount } = useApp();
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+  // Real data from Supabase
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+
+  // Get display name - prefer auth user's name, fall back to app user
+  const displayName = authUser?.fullName || appUser.name || 'Traveler';
+
+  // Fetch data from Supabase
+  const fetchData = useCallback(async () => {
+    try {
+      const [tripsData, bookingsData, destinationsData] = await Promise.all([
+        getTrips(),
+        getUpcomingBookings(),
+        getTrendingDestinations(5),
+      ]);
+
+      setTrips(tripsData);
+      setBookings(bookingsData);
+      setDestinations(destinationsData);
+    } catch (error) {
+      console.error('Error fetching home data:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
+
   const upcomingTrips = trips.filter(
-    (t) => t.status === 'upcoming' || t.status === 'planning'
+    (t) => t.status === 'upcoming' || t.status === 'planning' || t.status === 'booked'
   );
 
   const formatDate = (dateStr: string) => {
@@ -73,10 +115,12 @@ export default function HomeScreen() {
   const getStatusColor = (status: Trip['status']) => {
     switch (status) {
       case 'upcoming':
+      case 'booked':
         return colors.success;
       case 'planning':
         return colors.warning;
       case 'ongoing':
+      case 'in_progress':
         return colors.secondary;
       default:
         return colors.textTertiary;
@@ -86,15 +130,40 @@ export default function HomeScreen() {
   const getStatusLabel = (status: Trip['status']) => {
     switch (status) {
       case 'upcoming':
+      case 'booked':
         return 'Confirmed';
       case 'planning':
         return 'Planning';
       case 'ongoing':
+      case 'in_progress':
         return 'In Progress';
       default:
         return 'Completed';
     }
   };
+
+  const getBookingIcon = (type: Booking['type']) => {
+    switch (type) {
+      case 'flight':
+        return Plane;
+      case 'hotel':
+        return Hotel;
+      case 'car':
+        return Car;
+      case 'restaurant':
+        return UtensilsCrossed;
+      default:
+        return Ticket;
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -114,7 +183,7 @@ export default function HomeScreen() {
             <View style={styles.headerTop}>
               <View>
                 <Text style={styles.greeting}>Welcome back,</Text>
-                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.userName}>{displayName}</Text>
               </View>
               <Pressable
                 style={styles.notificationButton}
@@ -256,7 +325,6 @@ export default function HomeScreen() {
                 </View>
                 <Text style={styles.quickActionText}>Templates</Text>
               </Pressable>
-              {/* CHANGED: Access -> Date Night */}
               <Pressable
                 style={styles.quickAction}
                 onPress={() => router.push('/date-night')}
@@ -273,7 +341,8 @@ export default function HomeScreen() {
               </Pressable>
             </View>
 
-            {upcomingBookings.length > 0 && (
+            {/* Upcoming Bookings - from Supabase */}
+            {bookings.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
                   <Text style={styles.sectionTitle}>Upcoming Bookings</Text>
@@ -286,30 +355,34 @@ export default function HomeScreen() {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.bookingsScroll}
                 >
-                  {upcomingBookings.slice(0, 3).map((booking) => (
-                    <Pressable
-                      key={booking.id}
-                      style={styles.bookingCard}
-                      onPress={() => router.push(`/booking/${booking.id}`)}
-                    >
-                      <View style={styles.bookingIcon}>
-                        <Ticket size={20} color={colors.primary} />
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingName} numberOfLines={1}>
-                          {booking.name}
-                        </Text>
-                        <Text style={styles.bookingDate}>
-                          {formatDate(booking.startDate)}
-                        </Text>
-                      </View>
-                      <ChevronRight size={18} color={colors.textTertiary} />
-                    </Pressable>
-                  ))}
+                  {bookings.slice(0, 5).map((booking) => {
+                    const IconComponent = getBookingIcon(booking.type);
+                    return (
+                      <Pressable
+                        key={booking.id}
+                        style={styles.bookingCard}
+                        onPress={() => router.push(`/booking/${booking.id}`)}
+                      >
+                        <View style={styles.bookingIcon}>
+                          <IconComponent size={20} color={colors.primary} />
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.bookingName} numberOfLines={1}>
+                            {booking.name}
+                          </Text>
+                          <Text style={styles.bookingDate}>
+                            {formatDate(booking.startDate)}
+                          </Text>
+                        </View>
+                        <ChevronRight size={18} color={colors.textTertiary} />
+                      </Pressable>
+                    );
+                  })}
                 </ScrollView>
               </View>
             )}
 
+            {/* Your Trips - from Supabase */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Your Trips</Text>
@@ -337,7 +410,7 @@ export default function HomeScreen() {
                       onPress={() => router.push(`/trip/${trip.id}`)}
                     >
                       <Image
-                        source={{ uri: trip.coverImage }}
+                        source={{ uri: trip.coverImage || trip.destination?.image || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800' }}
                         style={styles.tripImage}
                         contentFit="cover"
                       />
@@ -357,10 +430,10 @@ export default function HomeScreen() {
                           </Text>
                         </View>
                         <Text style={styles.tripName}>
-                          {trip.destination.name}
+                          {trip.destination?.name || 'Trip'}
                         </Text>
                         <Text style={styles.tripCountry}>
-                          {trip.destination.country}
+                          {trip.destination?.country || ''}
                         </Text>
                         <View style={styles.tripDetails}>
                           <View style={styles.tripDetail}>
@@ -373,7 +446,7 @@ export default function HomeScreen() {
                           <View style={styles.tripDetail}>
                             <Users size={14} color={colors.textLight} />
                             <Text style={styles.tripDetailText}>
-                              {trip.travelers} travelers
+                              {trip.travelers || 1} traveler{trip.travelers !== 1 ? 's' : ''}
                             </Text>
                           </View>
                         </View>
@@ -396,6 +469,7 @@ export default function HomeScreen() {
               )}
             </View>
 
+            {/* Trending Destinations - from Supabase */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Trending Destinations</Text>
@@ -405,7 +479,7 @@ export default function HomeScreen() {
               </View>
 
               <View style={styles.destinationsGrid}>
-                {trendingDestinations.map((dest, index) => (
+                {destinations.map((dest, index) => (
                   <Pressable
                     key={dest.id}
                     style={[
@@ -435,6 +509,7 @@ export default function HomeScreen() {
               </View>
             </View>
 
+            {/* Rewards Promo */}
             <View style={styles.rewardsPromo}>
               <LinearGradient
                 colors={[colors.warning, '#F59E0B']}
@@ -445,10 +520,10 @@ export default function HomeScreen() {
                 <Gift size={32} color={colors.textLight} />
                 <View style={styles.rewardsPromoContent}>
                   <Text style={styles.rewardsPromoTitle}>
-                    You have {user.rewardPoints.toLocaleString()} points!
+                    Earn rewards on every trip!
                   </Text>
                   <Text style={styles.rewardsPromoSubtitle}>
-                    Redeem for exclusive rewards
+                    Redeem for exclusive perks
                   </Text>
                 </View>
                 <Pressable
@@ -469,6 +544,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.background,
   },
   headerGradient: {

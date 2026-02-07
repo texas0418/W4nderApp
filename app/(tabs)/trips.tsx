@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
+// app/(tabs)/trips.tsx
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
   RefreshControl,
   Alert,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -40,9 +42,14 @@ import {
   Plus,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
-import { useApp } from '@/contexts/AppContext';
 import { useDateNight } from '@/contexts/DateNightContext';
-import { Booking } from '@/types';
+import {
+  getTrips,
+  getBookings,
+  cancelBooking as cancelBookingService,
+  Booking,
+} from '@/services';
+import { Trip } from '@/types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DAY_WIDTH = (SCREEN_WIDTH - 40 - 12) / 7;
@@ -61,10 +68,6 @@ const MONTHS = [
   'November',
   'December',
 ];
-
-// ============================================================================
-// Types
-// ============================================================================
 
 type ViewMode = 'list' | 'calendar';
 type FilterType = 'all' | 'upcoming' | 'completed' | 'cancelled';
@@ -89,18 +92,16 @@ interface CalendarDay {
   itineraries: GenericItinerary[];
 }
 
-// ============================================================================
-// Constants
-// ============================================================================
-
 const bookingTypeIcons: Record<string, typeof Plane> = {
   flight: Plane,
   hotel: Building2,
   restaurant: Utensils,
   transport: Car,
+  car: Car,
   activity: Ticket,
   insurance: Shield,
   event: Music,
+  other: Ticket,
 };
 
 const bookingTypeColors: Record<string, string> = {
@@ -108,35 +109,56 @@ const bookingTypeColors: Record<string, string> = {
   hotel: colors.secondary,
   restaurant: colors.warning,
   transport: colors.success,
+  car: colors.success,
   activity: colors.primaryLight,
   insurance: colors.accentDark,
   event: '#E91E63',
+  other: colors.textSecondary,
 };
-
-// ============================================================================
-// Main Component
-// ============================================================================
 
 export default function TripsScreen() {
   const router = useRouter();
-  const { bookings, trips, cancelBooking } = useApp();
   const { itineraries: dateNightItineraries } = useDateNight();
 
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+
+  // Data from Supabase
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
 
   // Calendar state
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
-  // ========== List View Logic ==========
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+  // Fetch data from Supabase
+  const fetchData = useCallback(async () => {
+    try {
+      const [bookingsData, tripsData] = await Promise.all([
+        getBookings(),
+        getTrips(),
+      ]);
+      setBookings(bookingsData);
+      setTrips(tripsData);
+    } catch (error) {
+      console.error('Error fetching trips data:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
@@ -178,8 +200,6 @@ export default function TripsScreen() {
         return Clock;
       case 'cancelled':
         return XCircle;
-      case 'completed':
-        return CheckCircle;
       default:
         return AlertCircle;
     }
@@ -193,8 +213,6 @@ export default function TripsScreen() {
         return colors.warning;
       case 'cancelled':
         return colors.error;
-      case 'completed':
-        return colors.textSecondary;
       default:
         return colors.textTertiary;
     }
@@ -221,14 +239,15 @@ export default function TripsScreen() {
         {
           text: 'Cancel',
           style: 'destructive',
-          onPress: () => {
-            cancelBooking(booking.id);
+          onPress: async () => {
+            await cancelBookingService(booking.id);
             setSelectedBookingId(null);
+            fetchData(); // Refresh data
           },
         },
       ]);
     },
-    [cancelBooking]
+    [fetchData]
   );
 
   const handleBookingPress = useCallback(
@@ -245,8 +264,7 @@ export default function TripsScreen() {
     [selectedBookingId]
   );
 
-  // ========== Calendar View Logic ==========
-
+  // Calendar View Logic
   const allItineraries = useMemo((): GenericItinerary[] => {
     const dateNights: GenericItinerary[] = dateNightItineraries.map((i) => ({
       id: i.id,
@@ -260,8 +278,20 @@ export default function TripsScreen() {
       isSurprise: i.isSurprise,
       totalEstimatedCost: i.totalEstimatedCost,
     }));
-    return [...dateNights];
-  }, [dateNightItineraries]);
+
+    // Add trips as itineraries
+    const tripItineraries: GenericItinerary[] = trips.map((t) => ({
+      id: t.id,
+      name: t.destination?.name || 'Trip',
+      date: t.startDate,
+      type: 'trip' as const,
+      status: t.status === 'completed' ? 'completed' : t.status === 'cancelled' ? 'cancelled' : 'planned',
+      destination: t.destination?.country,
+      activitiesCount: t.itinerary?.length || 0,
+    }));
+
+    return [...dateNights, ...tripItineraries];
+  }, [dateNightItineraries, trips]);
 
   const getItinerariesForDate = useCallback(
     (date: Date): GenericItinerary[] => {
@@ -402,11 +432,12 @@ export default function TripsScreen() {
   const handleItineraryPress = (itinerary: GenericItinerary) => {
     if (itinerary.type === 'date-night') {
       router.push(`/date-night/edit-itinerary?id=${itinerary.id}`);
+    } else if (itinerary.type === 'trip') {
+      router.push(`/trip/${itinerary.id}`);
     }
   };
 
-  // ========== Render Helpers ==========
-
+  // Render booking card
   const renderBookingCard = (booking: Booking) => {
     const IconComponent = bookingTypeIcons[booking.type] || Ticket;
     const typeColor = bookingTypeColors[booking.type] || colors.primary;
@@ -458,19 +489,15 @@ export default function TripsScreen() {
                 <CalendarIcon size={14} color={colors.textSecondary} />
                 <Text style={styles.detailText}>{formatDate(booking.startDate)}</Text>
               </View>
-              {booking.time && (
-                <View style={styles.detailItem}>
-                  <Clock size={14} color={colors.textSecondary} />
-                  <Text style={styles.detailText}>{booking.time}</Text>
-                </View>
-              )}
             </View>
-            <View style={styles.locationRow}>
-              <MapPin size={14} color={colors.textSecondary} />
-              <Text style={styles.locationText} numberOfLines={1}>
-                {booking.location}
-              </Text>
-            </View>
+            {booking.location && (
+              <View style={styles.locationRow}>
+                <MapPin size={14} color={colors.textSecondary} />
+                <Text style={styles.locationText} numberOfLines={1}>
+                  {booking.location}
+                </Text>
+              </View>
+            )}
             <View style={styles.bookingFooter}>
               <View style={styles.priceContainer}>
                 <Text style={styles.priceLabel}>Total</Text>
@@ -478,18 +505,15 @@ export default function TripsScreen() {
                   {booking.currency} {booking.price.toLocaleString()}
                 </Text>
               </View>
-              {booking.confirmationCode && (
+              {booking.confirmationNumber && (
                 <View style={styles.confirmationContainer}>
                   <Text style={styles.confirmationLabel}>Confirmation</Text>
-                  <Text style={styles.confirmationValue}>{booking.confirmationCode}</Text>
+                  <Text style={styles.confirmationValue}>{booking.confirmationNumber}</Text>
                 </View>
               )}
               <ChevronRight size={20} color={colors.textTertiary} />
             </View>
           </View>
-          {booking.image && (
-            <Image source={{ uri: booking.image }} style={styles.bookingImage} contentFit="cover" />
-          )}
         </Pressable>
         {isSelected && canCancel && (
           <View style={styles.quickActions}>
@@ -507,17 +531,6 @@ export default function TripsScreen() {
             <Pressable style={styles.quickActionButton} onPress={() => handleQuickCancel(booking)}>
               <Trash2 size={16} color={colors.error} />
               <Text style={[styles.quickActionText, { color: colors.error }]}>Cancel</Text>
-            </Pressable>
-            <View style={styles.quickActionDivider} />
-            <Pressable
-              style={styles.quickActionButton}
-              onPress={() => {
-                setSelectedBookingId(null);
-                router.push(`/booking/${booking.id}`);
-              }}
-            >
-              <ExternalLink size={16} color={colors.textSecondary} />
-              <Text style={styles.quickActionText}>Details</Text>
             </Pressable>
           </View>
         )}
@@ -571,6 +584,7 @@ export default function TripsScreen() {
             </Text>
             {filter === 'all' && (
               <Pressable style={styles.emptyButton} onPress={() => router.push('/plan-trip')}>
+                <Plus size={18} color={colors.textLight} />
                 <Text style={styles.emptyButtonText}>Plan a Trip</Text>
               </Pressable>
             )}
@@ -665,7 +679,7 @@ export default function TripsScreen() {
               <Text style={styles.emptyDescription}>Nothing scheduled for this day</Text>
               <Pressable
                 style={styles.emptyButton}
-                onPress={() => router.push('/date-night/generate-plan')}
+                onPress={() => router.push('/plan-trip')}
               >
                 <Plus size={18} color={colors.textLight} />
                 <Text style={styles.emptyButtonText}>Add Plans</Text>
@@ -720,10 +734,6 @@ export default function TripsScreen() {
                         <Text style={styles.metaText}>{itinerary.partnerName}</Text>
                       </View>
                     )}
-                    <View style={styles.metaItem}>
-                      <Clock size={14} color={colors.textSecondary} />
-                      <Text style={styles.metaText}>{itinerary.activitiesCount} activities</Text>
-                    </View>
                     {itinerary.destination && (
                       <View style={styles.metaItem}>
                         <MapPin size={14} color={colors.textSecondary} />
@@ -740,7 +750,13 @@ export default function TripsScreen() {
     </View>
   );
 
-  // ========== Main Render ==========
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -754,7 +770,7 @@ export default function TripsScreen() {
           <View>
             <Text style={styles.title}>My Trips</Text>
             <Text style={styles.subtitle}>
-              {filteredBookings.length} {filteredBookings.length === 1 ? 'booking' : 'bookings'}
+              {trips.length} trip{trips.length !== 1 ? 's' : ''} • {bookings.length} booking{bookings.length !== 1 ? 's' : ''}
             </Text>
           </View>
 
@@ -787,13 +803,15 @@ export default function TripsScreen() {
   );
 }
 
-// ============================================================================
-// Styles
-// ============================================================================
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.background,
   },
   headerGradient: {
@@ -845,21 +863,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     overflow: 'hidden',
   },
-
-  // ===== List View Styles =====
   filterScroll: {
-    maxHeight: 50,
+    flexGrow: 0,
   },
   filterContent: {
     paddingHorizontal: 16,
     gap: 8,
-    paddingVertical: 12,
+    paddingVertical: 16,
   },
   filterChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -894,16 +910,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   bookingCard: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     marginBottom: 12,
     overflow: 'hidden',
     flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   bookingCardSelected: {
     borderWidth: 2,
@@ -911,8 +922,6 @@ const styles = StyleSheet.create({
   },
   typeIndicator: {
     width: 4,
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
   },
   bookingContent: {
     flex: 1,
@@ -932,14 +941,15 @@ const styles = StyleSheet.create({
   typeIcon: {
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   bookingType: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: '600',
     color: colors.textSecondary,
+    textTransform: 'uppercase',
   },
   bookingActions: {
     flexDirection: 'row',
@@ -1025,25 +1035,16 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontFamily: 'monospace',
   },
-  bookingImage: {
-    width: 100,
-    height: '100%',
-  },
   quickActions: {
     flexDirection: 'row',
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginTop: -8,
     marginBottom: 12,
-    marginHorizontal: 16,
+    marginHorizontal: 4,
     padding: 8,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   quickActionButton: {
     flex: 1,
@@ -1063,8 +1064,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
     marginVertical: 4,
   },
-
-  // ===== Empty States =====
   emptyState: {
     flex: 1,
     alignItems: 'center',
@@ -1103,8 +1102,6 @@ const styles = StyleSheet.create({
   bottomSpacer: {
     height: 32,
   },
-
-  // ===== Calendar View Styles =====
   calendarContainer: {
     flex: 1,
     paddingTop: 16,

@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { DateNightProvider } from '@/contexts/DateNightContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import colors from '@/constants/colors';
 
@@ -24,23 +25,38 @@ const defaultModalOptions = {
 };
 
 function RootLayoutNav() {
-  const { isOnboarded, isLoading } = useApp();
+  const { isOnboarded, isLoading: isAppLoading } = useApp();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isAppLoading || isAuthLoading) return;
 
     const inOnboarding = segments[0] === 'onboarding';
+    const inAuth = segments[0] === '(auth)';
 
-    if (!isOnboarded && !inOnboarding) {
+    // First check: is user authenticated?
+    if (!user && !inAuth && !inOnboarding) {
+      // Not logged in, go to login
+      router.replace('/(auth)/login');
+    } else if (user && inAuth) {
+      // Logged in but in auth screens, check onboarding
+      if (!isOnboarded) {
+        router.replace('/onboarding');
+      } else {
+        router.replace('/');
+      }
+    } else if (user && !isOnboarded && !inOnboarding) {
+      // Logged in but not onboarded
       router.replace('/onboarding');
-    } else if (isOnboarded && inOnboarding) {
+    } else if (user && isOnboarded && inOnboarding) {
+      // Logged in and onboarded but still in onboarding
       router.replace('/');
     }
-  }, [isOnboarded, isLoading, segments, router]);
+  }, [user, isOnboarded, isAppLoading, isAuthLoading, segments, router]);
 
-  if (isLoading) {
+  if (isAppLoading || isAuthLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -50,6 +66,9 @@ function RootLayoutNav() {
 
   return (
     <Stack screenOptions={{ headerBackTitle: 'Back' }}>
+      {/* ===== Auth Screens ===== */}
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+
       {/* ===== Core Navigation ===== */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false }} />
@@ -185,11 +204,13 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <AppProvider>
-          <DateNightProvider>
-            <RootLayoutNav />
-          </DateNightProvider>
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            <DateNightProvider>
+              <RootLayoutNav />
+            </DateNightProvider>
+          </AppProvider>
+        </AuthProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>
   );

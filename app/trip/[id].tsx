@@ -1,288 +1,501 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+// app/trip/[id].tsx
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Dimensions,
+  ActivityIndicator,
+  Share,
+  Alert,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import {
   ArrowLeft,
-  Calendar,
-  Users,
-  MapPin,
-  Clock,
-  DollarSign,
-  Check,
-  ChevronRight,
-  PieChart,
   Share2,
-  Ticket,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Users,
+  Clock,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+  Edit3,
+  MoreVertical,
+  CheckCircle,
+  Circle,
+  Utensils,
+  Plane,
+  Building2,
+  Camera,
+  ShoppingBag,
+  Music,
+  Sparkles,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
-import { useApp } from '@/contexts/AppContext';
+import { getTripById, updateTrip, deleteTrip } from '@/services';
+import { Trip, DayItinerary, Activity } from '@/types';
 
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
+const { width } = Dimensions.get('window');
+const HEADER_HEIGHT = 280;
+
+const activityIcons: Record<string, typeof Utensils> = {
+  food: Utensils,
+  restaurant: Utensils,
+  flight: Plane,
+  hotel: Building2,
+  accommodation: Building2,
+  sightseeing: Camera,
+  shopping: ShoppingBag,
+  entertainment: Music,
+  activity: Sparkles,
 };
 
-export default function TripDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function TripDetailScreen() {
   const router = useRouter();
-  const { trips, bookings } = useApp();
-  const [selectedDay, setSelectedDay] = useState(0);
+  const { id } = useLocalSearchParams<{ id: string }>();
 
-  const trip = trips.find((t) => t.id === id);
-  const tripBookings = bookings.filter((b) => b.tripId === id);
-  const budgetProgress = trip ? (trip.spentBudget / trip.totalBudget) * 100 : 0;
-  const currentDayItinerary = trip?.itinerary[selectedDay];
+  const [trip, setTrip] = useState<Trip | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [expandedDays, setExpandedDays] = useState<number[]>([1]);
 
-  if (!trip) {
+  const fetchTrip = useCallback(async () => {
+    if (!id) return;
+
+    try {
+      const data = await getTripById(id);
+      setTrip(data);
+      // Expand first day by default
+      if (data?.itinerary?.length > 0) {
+        setExpandedDays([data.itinerary[0].day]);
+      }
+    } catch (error) {
+      console.error('Error fetching trip:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchTrip();
+  }, [fetchTrip]);
+
+  const handleShare = async () => {
+    if (!trip) return;
+
+    try {
+      await Share.share({
+        message: `Check out my trip to ${trip.destination?.name}! ${trip.startDate} - ${trip.endDate}`,
+        title: trip.destination?.name || 'My Trip',
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const handleMoreOptions = () => {
+    Alert.alert(
+      'Trip Options',
+      '',
+      [
+        {
+          text: 'Edit Trip',
+          onPress: () => router.push(`/edit-trip?id=${id}`),
+        },
+        {
+          text: 'Delete Trip',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Delete Trip',
+              'Are you sure you want to delete this trip? This cannot be undone.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async () => {
+                    await deleteTrip(id!);
+                    router.replace('/(tabs)/trips');
+                  },
+                },
+              ]
+            );
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const toggleDayExpanded = (day: number) => {
+    setExpandedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const formatDateRange = (start: string, end: string) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const startMonth = startDate.toLocaleDateString('en-US', { month: 'short' });
+    const endMonth = endDate.toLocaleDateString('en-US', { month: 'short' });
+    
+    if (startMonth === endMonth) {
+      return `${startMonth} ${startDate.getDate()} - ${endDate.getDate()}, ${startDate.getFullYear()}`;
+    }
+    return `${startMonth} ${startDate.getDate()} - ${endMonth} ${endDate.getDate()}, ${startDate.getFullYear()}`;
+  };
+
+  const getDaysCount = () => {
+    if (!trip) return 0;
+    const start = new Date(trip.startDate);
+    const end = new Date(trip.endDate);
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'planning':
+        return colors.warning;
+      case 'booked':
+        return colors.primary;
+      case 'in_progress':
+        return colors.success;
+      case 'completed':
+        return colors.textSecondary;
+      case 'cancelled':
+        return colors.error;
+      default:
+        return colors.textTertiary;
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'planning':
+        return 'Planning';
+      case 'booked':
+        return 'Booked';
+      case 'in_progress':
+        return 'In Progress';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  };
+
+  const getActivityIcon = (type: string) => {
+    return activityIcons[type?.toLowerCase()] || Sparkles;
+  };
+
+  const renderActivityItem = (activity: Activity, isLast: boolean) => {
+    const IconComponent = getActivityIcon(activity.category);
+
     return (
-      <View style={styles.container}>
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.header}>
-            <Pressable style={styles.backButton} onPress={() => router.back()}>
-              <ArrowLeft size={22} color={colors.text} />
-            </Pressable>
+      <View key={activity.id} style={styles.activityItem}>
+        <View style={styles.activityTimeline}>
+          <View style={styles.activityDot}>
+            <IconComponent size={14} color={colors.primary} />
           </View>
-          <Text style={styles.errorText}>Trip not found</Text>
-        </SafeAreaView>
+          {!isLast && <View style={styles.activityLine} />}
+        </View>
+        <View style={styles.activityContent}>
+          <View style={styles.activityHeader}>
+            {activity.time && (
+              <Text style={styles.activityTime}>{activity.time}</Text>
+            )}
+            {activity.isBooked && (
+              <View style={styles.bookedBadge}>
+                <CheckCircle size={12} color={colors.success} />
+                <Text style={styles.bookedText}>Booked</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.activityName}>{activity.name}</Text>
+          {activity.location && (
+            <View style={styles.activityLocation}>
+              <MapPin size={12} color={colors.textTertiary} />
+              <Text style={styles.activityLocationText}>{activity.location}</Text>
+            </View>
+          )}
+          {activity.price > 0 && (
+            <Text style={styles.activityPrice}>
+              ${activity.price} {activity.currency}
+            </Text>
+          )}
+        </View>
       </View>
     );
-  }
+  };
 
-  return (
-    <View style={styles.container}>
-      <Image source={{ uri: trip.coverImage }} style={styles.coverImage} contentFit="cover" />
-      <LinearGradient
-        colors={['rgba(0,0,0,0.4)', 'transparent', 'rgba(0,0,0,0.8)']}
-        style={styles.coverGradient}
-      />
+  const renderDaySection = (day: DayItinerary) => {
+    const isExpanded = expandedDays.includes(day.day);
 
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={() => router.back()}>
-            <ArrowLeft size={22} color={colors.textLight} />
-          </Pressable>
-          <Pressable style={styles.shareButton}>
-            <Share2 size={20} color={colors.textLight} />
-          </Pressable>
-        </View>
-
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.heroSection}>
-            <Text style={styles.destination}>{trip.destination.name}</Text>
-            <View style={styles.locationRow}>
-              <MapPin size={16} color={colors.textLight} />
-              <Text style={styles.country}>{trip.destination.country}</Text>
-            </View>
+    return (
+      <View key={day.day} style={styles.daySection}>
+        <Pressable
+          style={styles.dayHeader}
+          onPress={() => toggleDayExpanded(day.day)}
+        >
+          <View style={styles.dayBadge}>
+            <Text style={styles.dayNumber}>{day.day}</Text>
           </View>
-
-          <View style={styles.mainContent}>
-            <View style={styles.infoCards}>
-              <View style={styles.infoCard}>
-                <Calendar size={20} color={colors.primary} />
-                <Text style={styles.infoLabel}>Dates</Text>
-                <Text style={styles.infoValue}>
-                  {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
-                </Text>
-              </View>
-              <View style={styles.infoCard}>
-                <Users size={20} color={colors.primary} />
-                <Text style={styles.infoLabel}>Travelers</Text>
-                <Text style={styles.infoValue}>{trip.travelers} people</Text>
-              </View>
-            </View>
-
-            <Pressable
-              style={styles.budgetSection}
-              onPress={() =>
-                router.push({ pathname: '/budget-tracker', params: { tripId: trip.id } })
-              }
-            >
-              <View style={styles.budgetHeader}>
-                <View style={styles.budgetTitleRow}>
-                  <PieChart size={20} color={colors.primary} />
-                  <Text style={styles.sectionTitle}>Budget</Text>
-                </View>
-                <View style={styles.budgetRight}>
-                  <Text style={styles.budgetAmount}>
-                    {trip.currency} {trip.spentBudget.toLocaleString()} /{' '}
-                    {trip.totalBudget.toLocaleString()}
-                  </Text>
-                  <ChevronRight size={18} color={colors.textTertiary} />
-                </View>
-              </View>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    {
-                      width: `${Math.min(budgetProgress, 100)}%`,
-                      backgroundColor:
-                        budgetProgress > 90
-                          ? colors.error
-                          : budgetProgress > 70
-                            ? colors.warning
-                            : colors.success,
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={styles.budgetRemaining}>
-                {trip.currency} {(trip.totalBudget - trip.spentBudget).toLocaleString()} remaining
-              </Text>
-            </Pressable>
-
-            {tripBookings.length > 0 && (
-              <View style={styles.bookingsSection}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Bookings</Text>
-                  <Pressable onPress={() => router.push('/bookings')}>
-                    <Text style={styles.seeAll}>See all</Text>
-                  </Pressable>
-                </View>
-                <View style={styles.bookingsList}>
-                  {tripBookings.slice(0, 3).map((booking) => (
-                    <Pressable
-                      key={booking.id}
-                      style={styles.bookingItem}
-                      onPress={() => router.push(`/booking/${booking.id}`)}
-                    >
-                      <View style={styles.bookingIcon}>
-                        <Ticket size={18} color={colors.primary} />
-                      </View>
-                      <View style={styles.bookingInfo}>
-                        <Text style={styles.bookingName}>{booking.name}</Text>
-                        <Text style={styles.bookingDate}>{formatDate(booking.startDate)}</Text>
-                      </View>
-                      <View
-                        style={[
-                          styles.bookingStatus,
-                          {
-                            backgroundColor:
-                              booking.status === 'confirmed'
-                                ? `${colors.success}15`
-                                : `${colors.warning}15`,
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.bookingStatusText,
-                            {
-                              color:
-                                booking.status === 'confirmed' ? colors.success : colors.warning,
-                            },
-                          ]}
-                        >
-                          {booking.status}
-                        </Text>
-                      </View>
-                    </Pressable>
-                  ))}
-                </View>
-              </View>
+          <View style={styles.dayInfo}>
+            <Text style={styles.dayTitle}>{day.title || `Day ${day.day}`}</Text>
+            <Text style={styles.dayDate}>{formatDate(day.date)}</Text>
+          </View>
+          <View style={styles.dayMeta}>
+            <Text style={styles.dayActivitiesCount}>
+              {day.activities.length} {day.activities.length === 1 ? 'activity' : 'activities'}
+            </Text>
+            {isExpanded ? (
+              <ChevronUp size={20} color={colors.textSecondary} />
+            ) : (
+              <ChevronDown size={20} color={colors.textSecondary} />
             )}
+          </View>
+        </Pressable>
 
-            {trip.itinerary.length > 0 && (
-              <View style={styles.itinerarySection}>
-                <Text style={styles.sectionTitle}>Itinerary</Text>
-
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  style={styles.daysScroll}
-                  contentContainerStyle={styles.daysContent}
+        {isExpanded && (
+          <View style={styles.dayContent}>
+            {day.activities.length > 0 ? (
+              day.activities.map((activity, index) =>
+                renderActivityItem(activity, index === day.activities.length - 1)
+              )
+            ) : (
+              <View style={styles.emptyDay}>
+                <Text style={styles.emptyDayText}>No activities planned</Text>
+                <Pressable
+                  style={styles.addActivityButton}
+                  onPress={() => router.push(`/add-activity?tripId=${id}&day=${day.day}`)}
                 >
-                  {trip.itinerary.map((day, index) => (
-                    <Pressable
-                      key={day.day}
-                      style={[styles.dayTab, selectedDay === index && styles.dayTabActive]}
-                      onPress={() => setSelectedDay(index)}
-                    >
-                      <Text
-                        style={[styles.dayNumber, selectedDay === index && styles.dayNumberActive]}
-                      >
-                        Day {day.day}
-                      </Text>
-                      <Text
-                        style={[styles.dayTitle, selectedDay === index && styles.dayTitleActive]}
-                        numberOfLines={1}
-                      >
-                        {day.title}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-
-                {currentDayItinerary && (
-                  <View style={styles.activitiesList}>
-                    {currentDayItinerary.activities.map((activity, index) => (
-                      <View key={activity.id} style={styles.activityCard}>
-                        <View style={styles.timelineContainer}>
-                          <View style={styles.timelineDot}>
-                            {activity.isBooked && <Check size={12} color={colors.textLight} />}
-                          </View>
-                          {index < currentDayItinerary.activities.length - 1 && (
-                            <View style={styles.timelineLine} />
-                          )}
-                        </View>
-                        <View style={styles.activityContent}>
-                          <View style={styles.activityHeader}>
-                            <Text style={styles.activityTime}>{activity.time}</Text>
-                            <View style={styles.activityDuration}>
-                              <Clock size={12} color={colors.textSecondary} />
-                              <Text style={styles.durationText}>{activity.duration}</Text>
-                            </View>
-                          </View>
-                          <Text style={styles.activityName}>{activity.name}</Text>
-                          <View style={styles.activityLocation}>
-                            <MapPin size={12} color={colors.textSecondary} />
-                            <Text style={styles.locationText}>{activity.location}</Text>
-                          </View>
-                          {activity.price > 0 && (
-                            <View style={styles.activityPrice}>
-                              <DollarSign size={12} color={colors.success} />
-                              <Text style={styles.priceText}>
-                                {trip.currency} {activity.price}
-                              </Text>
-                            </View>
-                          )}
-                        </View>
-                        <Image
-                          source={{ uri: activity.image }}
-                          style={styles.activityImage}
-                          contentFit="cover"
-                        />
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            )}
-
-            {trip.itinerary.length === 0 && (
-              <View style={styles.emptyItinerary}>
-                <Text style={styles.emptyTitle}>No itinerary yet</Text>
-                <Text style={styles.emptySubtitle}>
-                  Start planning your trip with AI assistance
-                </Text>
-                <Pressable style={styles.planButton}>
-                  <Text style={styles.planButtonText}>Generate Itinerary</Text>
-                  <ChevronRight size={18} color={colors.textLight} />
+                  <Plus size={16} color={colors.primary} />
+                  <Text style={styles.addActivityText}>Add Activity</Text>
                 </Pressable>
               </View>
             )}
 
-            <View style={styles.bottomSpacer} />
+            {day.activities.length > 0 && (
+              <Pressable
+                style={styles.addMoreButton}
+                onPress={() => router.push(`/add-activity?tripId=${id}&day=${day.day}`)}
+              >
+                <Plus size={16} color={colors.primary} />
+                <Text style={styles.addMoreText}>Add more</Text>
+              </Pressable>
+            )}
           </View>
-        </ScrollView>
-      </SafeAreaView>
+        )}
+      </View>
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!trip) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Trip not found</Text>
+        <Pressable style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backButtonText}>Go Back</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const heroImage = trip.coverImage || trip.destination?.image;
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        {/* Hero Section */}
+        <View style={styles.heroContainer}>
+          {heroImage ? (
+            <Image
+              source={{ uri: heroImage }}
+              style={styles.heroImage}
+              contentFit="cover"
+            />
+          ) : (
+            <View style={[styles.heroImage, styles.heroPlaceholder]}>
+              <MapPin size={48} color={colors.textTertiary} />
+            </View>
+          )}
+          <LinearGradient
+            colors={['rgba(0,0,0,0.4)', 'transparent', 'rgba(0,0,0,0.7)']}
+            locations={[0, 0.3, 1]}
+            style={styles.heroGradient}
+          />
+
+          {/* Header Actions */}
+          <SafeAreaView style={styles.headerActions} edges={['top']}>
+            <Pressable style={styles.iconButton} onPress={() => router.back()}>
+              <ArrowLeft size={22} color={colors.textLight} />
+            </Pressable>
+            <View style={styles.headerRight}>
+              <Pressable style={styles.iconButton} onPress={handleShare}>
+                <Share2 size={22} color={colors.textLight} />
+              </Pressable>
+              <Pressable style={styles.iconButton} onPress={handleMoreOptions}>
+                <MoreVertical size={22} color={colors.textLight} />
+              </Pressable>
+            </View>
+          </SafeAreaView>
+
+          {/* Hero Content */}
+          <View style={styles.heroContent}>
+            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(trip.status) }]}>
+              <Text style={styles.statusText}>{getStatusLabel(trip.status)}</Text>
+            </View>
+            <Text style={styles.tripName}>
+              {trip.destination?.name || 'My Trip'}
+            </Text>
+            {trip.destination?.country && (
+              <View style={styles.locationRow}>
+                <MapPin size={16} color={colors.textLight} />
+                <Text style={styles.locationText}>{trip.destination.country}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* Content */}
+        <View style={styles.content}>
+          {/* Quick Stats */}
+          <View style={styles.statsCard}>
+            <View style={styles.statItem}>
+              <Calendar size={20} color={colors.primary} />
+              <View style={styles.statContent}>
+                <Text style={styles.statValue}>{formatDateRange(trip.startDate, trip.endDate)}</Text>
+                <Text style={styles.statLabel}>{getDaysCount()} days</Text>
+              </View>
+            </View>
+
+            <View style={styles.statDivider} />
+
+            <View style={styles.statItem}>
+              <DollarSign size={20} color={colors.success} />
+              <View style={styles.statContent}>
+                <Text style={styles.statValue}>
+                  ${trip.spentBudget.toLocaleString()} / ${trip.totalBudget.toLocaleString()}
+                </Text>
+                <Text style={styles.statLabel}>Budget ({trip.currency})</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* AI Planning Card */}
+          <Pressable
+            style={styles.aiCard}
+            onPress={() => router.push(`/ai-planner?tripId=${id}`)}
+          >
+            <LinearGradient
+              colors={[colors.secondary, colors.secondaryLight]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.aiCardGradient}
+            >
+              <View style={styles.aiIconContainer}>
+                <Sparkles size={24} color={colors.textLight} />
+              </View>
+              <View style={styles.aiTextContainer}>
+                <Text style={styles.aiTitle}>AI Trip Assistant</Text>
+                <Text style={styles.aiSubtitle}>
+                  Get personalized recommendations
+                </Text>
+              </View>
+              <ChevronRight size={20} color={colors.textLight} />
+            </LinearGradient>
+          </Pressable>
+
+          {/* Itinerary Section */}
+          <View style={styles.itinerarySection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Itinerary</Text>
+              <Pressable onPress={() => setExpandedDays(trip.itinerary.map((d) => d.day))}>
+                <Text style={styles.expandAll}>Expand all</Text>
+              </Pressable>
+            </View>
+
+            {trip.itinerary.length > 0 ? (
+              trip.itinerary.map(renderDaySection)
+            ) : (
+              <View style={styles.emptyItinerary}>
+                <Calendar size={48} color={colors.textTertiary} />
+                <Text style={styles.emptyTitle}>No itinerary yet</Text>
+                <Text style={styles.emptyText}>
+                  Start adding activities to plan your trip
+                </Text>
+                <Pressable
+                  style={styles.emptyButton}
+                  onPress={() => router.push(`/add-activity?tripId=${id}&day=1`)}
+                >
+                  <Plus size={18} color={colors.textLight} />
+                  <Text style={styles.emptyButtonText}>Add First Activity</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+
+          {/* Bottom Spacer */}
+          <View style={styles.bottomSpacer} />
+        </View>
+      </ScrollView>
+
+      {/* Bottom Action Bar */}
+      <View style={styles.bottomBar}>
+        <Pressable
+          style={styles.bottomButton}
+          onPress={() => router.push(`/trip/${id}/bookings`)}
+        >
+          <Building2 size={20} color={colors.text} />
+          <Text style={styles.bottomButtonText}>Bookings</Text>
+        </Pressable>
+        <View style={styles.bottomDivider} />
+        <Pressable
+          style={styles.bottomButton}
+          onPress={() => router.push(`/trip/${id}/expenses`)}
+        >
+          <DollarSign size={20} color={colors.text} />
+          <Text style={styles.bottomButtonText}>Expenses</Text>
+        </Pressable>
+        <View style={styles.bottomDivider} />
+        <Pressable
+          style={[styles.bottomButton, styles.primaryButton]}
+          onPress={() => router.push(`/add-activity?tripId=${id}`)}
+        >
+          <Plus size={20} color={colors.textLight} />
+          <Text style={styles.primaryButtonText}>Add</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -292,368 +505,438 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  coverImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 320,
-  },
-  coverGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 320,
-  },
-  safeArea: {
+  loadingContainer: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    justifyContent: 'center',
+    backgroundColor: colors.background,
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.background,
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: colors.textSecondary,
+    marginBottom: 20,
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
   },
-  shareButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  backButtonText: {
+    color: colors.textLight,
+    fontSize: 16,
+    fontWeight: '600',
   },
-  content: {
+  scrollView: {
     flex: 1,
   },
-  heroSection: {
-    paddingHorizontal: 20,
-    paddingTop: 80,
-    paddingBottom: 32,
+  heroContainer: {
+    height: HEADER_HEIGHT,
+    position: 'relative',
   },
-  destination: {
-    fontSize: 36,
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroPlaceholder: {
+    backgroundColor: colors.surfaceSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  headerActions: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroContent: {
+    position: 'absolute',
+    bottom: 24,
+    left: 20,
+    right: 20,
+  },
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textLight,
+  },
+  tripName: {
+    fontSize: 28,
     fontWeight: '700',
     color: colors.textLight,
+    marginBottom: 8,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 8,
   },
-  country: {
+  locationText: {
     fontSize: 16,
     color: colors.textLight,
     opacity: 0.9,
   },
-  mainContent: {
+  content: {
     backgroundColor: colors.background,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
+    marginTop: -24,
     paddingTop: 24,
-    minHeight: 500,
-  },
-  infoCards: {
-    flexDirection: 'row',
-    gap: 12,
     paddingHorizontal: 20,
   },
-  infoCard: {
+  statsCard: {
+    flexDirection: 'row',
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+  },
+  statItem: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    gap: 8,
-  },
-  infoLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  budgetSection: {
-    marginTop: 24,
-    marginHorizontal: 20,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-  },
-  budgetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  budgetTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
+  statContent: {
+    flex: 1,
   },
-  budgetRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  budgetAmount: {
+  statValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.text,
   },
-  progressBar: {
-    height: 8,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  budgetRemaining: {
-    fontSize: 13,
+  statLabel: {
+    fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 8,
+    marginTop: 2,
   },
-  bookingsSection: {
-    marginTop: 24,
-    paddingHorizontal: 20,
+  statDivider: {
+    width: 1,
+    backgroundColor: colors.border,
+    marginHorizontal: 12,
+  },
+  aiCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 24,
+  },
+  aiCardGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  aiIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aiTextContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  aiTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textLight,
+  },
+  aiSubtitle: {
+    fontSize: 13,
+    color: colors.textLight,
+    opacity: 0.85,
+    marginTop: 2,
+  },
+  itinerarySection: {
+    marginBottom: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  seeAll: {
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  expandAll: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
     color: colors.primary,
   },
-  bookingsList: {
-    gap: 10,
+  daySection: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    marginBottom: 12,
+    overflow: 'hidden',
   },
-  bookingItem: {
+  dayHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 14,
-    padding: 14,
+    padding: 16,
   },
-  bookingIcon: {
-    width: 40,
-    height: 40,
+  dayBadge: {
+    width: 36,
+    height: 36,
     borderRadius: 10,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bookingInfo: {
+  dayNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.textLight,
+  },
+  dayInfo: {
     flex: 1,
     marginLeft: 12,
   },
-  bookingName: {
-    fontSize: 15,
+  dayTitle: {
+    fontSize: 16,
     fontWeight: '600',
     color: colors.text,
   },
-  bookingDate: {
+  dayDate: {
     fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
   },
-  bookingStatus: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
+  dayMeta: {
+    alignItems: 'flex-end',
   },
-  bookingStatusText: {
+  dayActivitiesCount: {
     fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'capitalize',
+    color: colors.textTertiary,
+    marginBottom: 4,
   },
-  itinerarySection: {
-    marginTop: 24,
-  },
-  daysScroll: {
-    marginTop: 12,
-  },
-  daysContent: {
-    paddingHorizontal: 20,
-    gap: 8,
-  },
-  dayTab: {
+  dayContent: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    marginRight: 8,
-    minWidth: 100,
+    paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
   },
-  dayTabActive: {
-    backgroundColor: colors.primary,
-  },
-  dayNumber: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
-  dayNumberActive: {
-    color: colors.accent,
-  },
-  dayTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text,
-    maxWidth: 100,
-  },
-  dayTitleActive: {
-    color: colors.textLight,
-  },
-  activitiesList: {
-    paddingHorizontal: 20,
-    marginTop: 20,
-    gap: 16,
-  },
-  activityCard: {
+  activityItem: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  timelineContainer: {
-    width: 40,
-    alignItems: 'center',
     paddingTop: 16,
   },
-  timelineDot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
+  activityTimeline: {
+    width: 32,
+    alignItems: 'center',
+  },
+  activityDot: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timelineLine: {
-    width: 2,
+  activityLine: {
     flex: 1,
-    backgroundColor: colors.accent,
-    marginTop: 8,
+    width: 2,
+    backgroundColor: colors.borderLight,
+    marginVertical: 4,
   },
   activityContent: {
     flex: 1,
-    padding: 16,
-    paddingLeft: 4,
+    marginLeft: 12,
+    paddingBottom: 16,
   },
   activityHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    gap: 8,
+    marginBottom: 4,
   },
   activityTime: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: colors.primary,
   },
-  activityDuration: {
+  bookedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    backgroundColor: `${colors.success}15`,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
   },
-  durationText: {
-    fontSize: 12,
-    color: colors.textSecondary,
+  bookedText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: colors.success,
   },
   activityName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: colors.text,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   activityLocation: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  locationText: {
+  activityLocationText: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
   },
   activityPrice: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.success,
+    marginTop: 4,
+  },
+  emptyDay: {
+    alignItems: 'center',
+    paddingVertical: 24,
+  },
+  emptyDayText: {
+    fontSize: 14,
+    color: colors.textTertiary,
+    marginBottom: 12,
+  },
+  addActivityButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
+    backgroundColor: colors.accent,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  addActivityText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.primary,
+  },
+  addMoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
     marginTop: 8,
   },
-  priceText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.success,
-  },
-  activityImage: {
-    width: 80,
-    height: '100%',
+  addMoreText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.primary,
   },
   emptyItinerary: {
-    marginHorizontal: 20,
-    marginTop: 24,
-    padding: 32,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: 20,
     alignItems: 'center',
+    paddingVertical: 40,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: colors.text,
+    marginTop: 16,
     marginBottom: 8,
   },
-  emptySubtitle: {
+  emptyText: {
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: 20,
   },
-  planButton: {
+  emptyButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     backgroundColor: colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
   },
-  planButtonText: {
+  emptyButtonText: {
     fontSize: 15,
     fontWeight: '600',
     color: colors.textLight,
   },
   bottomSpacer: {
-    height: 40,
+    height: 100,
   },
-  errorText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: 100,
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: 32,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+  },
+  bottomButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+  },
+  bottomButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text,
+  },
+  bottomDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: colors.border,
+  },
+  primaryButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    marginLeft: 12,
+  },
+  primaryButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textLight,
   },
 });

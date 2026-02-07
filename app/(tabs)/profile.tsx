@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Switch, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -24,10 +24,13 @@ import {
   WifiOff,
   Target,
   Award,
+  User,
 } from 'lucide-react-native';
 import colors from '@/constants/colors';
+import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
 import { travelStyles, budgetRanges } from '@/mocks/preferences';
+import { signOut } from '@/services';
 
 const menuItems = [
   {
@@ -87,13 +90,19 @@ const menuItems = [
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, resetOnboarding, toggleCarbonOffset, bucketListCount } = useApp();
+  const { user: authUser } = useAuth();
+  const { user: appUser, resetOnboarding, toggleCarbonOffset, bucketListCount } = useApp();
 
-  const travelStyle = travelStyles.find((s) => s.id === user.travelStyle);
-  const budget = budgetRanges.find((b) => b.id === user.budgetRange);
+  // Use auth user data when available, fall back to app user
+  const displayName = authUser?.fullName || appUser.name || 'Traveler';
+  const displayEmail = authUser?.email || appUser.email || '';
+  const avatarUrl = authUser?.avatarUrl || appUser.avatar;
+
+  const travelStyle = travelStyles.find((s) => s.id === appUser.travelStyle);
+  const budget = budgetRanges.find((b) => b.id === appUser.budgetRange);
 
   const getTierBadge = () => {
-    switch (user.subscriptionTier) {
+    switch (appUser.subscriptionTier) {
       case 'premium':
         return { label: 'Premium', color: '#8B5CF6' };
       case 'standard':
@@ -107,6 +116,34 @@ export default function ProfileScreen() {
 
   const tierBadge = getTierBadge();
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            await signOut();
+            // The auth state change will trigger navigation to login
+          },
+        },
+      ]
+    );
+  };
+
+  // Get initials for avatar fallback
+  const getInitials = () => {
+    if (!displayName) return 'U';
+    const names = displayName.split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return displayName[0].toUpperCase();
+  };
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -119,13 +156,19 @@ export default function ProfileScreen() {
 
           <View style={styles.profileSection}>
             <View style={styles.avatarContainer}>
-              <Image source={{ uri: user.avatar }} style={styles.avatar} contentFit="cover" />
+              {avatarUrl ? (
+                <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
+              ) : (
+                <View style={[styles.avatar, styles.avatarFallback]}>
+                  <Text style={styles.avatarInitials}>{getInitials()}</Text>
+                </View>
+              )}
               <View style={styles.editBadge}>
                 <Text style={styles.editBadgeText}>Edit</Text>
               </View>
             </View>
             <View style={styles.nameRow}>
-              <Text style={styles.userName}>{user.name}</Text>
+              <Text style={styles.userName}>{displayName}</Text>
               {tierBadge && (
                 <View style={[styles.tierBadge, { backgroundColor: tierBadge.color }]}>
                   <Crown size={12} color={colors.textLight} />
@@ -133,14 +176,14 @@ export default function ProfileScreen() {
                 </View>
               )}
             </View>
-            <Text style={styles.userEmail}>{user.email}</Text>
+            <Text style={styles.userEmail}>{displayEmail}</Text>
 
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
                 <View style={styles.statIconContainer}>
                   <Plane size={18} color={colors.primary} />
                 </View>
-                <Text style={styles.statValue}>{user.tripsCompleted}</Text>
+                <Text style={styles.statValue}>{appUser.tripsCompleted}</Text>
                 <Text style={styles.statLabel}>Trips</Text>
               </View>
               <View style={styles.statDivider} />
@@ -148,7 +191,7 @@ export default function ProfileScreen() {
                 <View style={styles.statIconContainer}>
                   <Globe size={18} color={colors.primary} />
                 </View>
-                <Text style={styles.statValue}>{user.countriesVisited}</Text>
+                <Text style={styles.statValue}>{appUser.countriesVisited}</Text>
                 <Text style={styles.statLabel}>Countries</Text>
               </View>
               <View style={styles.statDivider} />
@@ -156,7 +199,7 @@ export default function ProfileScreen() {
                 <View style={styles.statIconContainer}>
                   <Gift size={18} color={colors.warning} />
                 </View>
-                <Text style={styles.statValue}>{user.rewardPoints.toLocaleString()}</Text>
+                <Text style={styles.statValue}>{appUser.rewardPoints.toLocaleString()}</Text>
                 <Text style={styles.statLabel}>Points</Text>
               </View>
             </View>
@@ -206,7 +249,7 @@ export default function ProfileScreen() {
               <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
                 <Text style={styles.infoLabel}>Interests</Text>
                 <Text style={styles.infoValue}>
-                  {user.preferences.length > 0 ? `${user.preferences.length} selected` : 'None'}
+                  {appUser.preferences.length > 0 ? `${appUser.preferences.length} selected` : 'None'}
                 </Text>
               </View>
             </View>
@@ -226,7 +269,7 @@ export default function ProfileScreen() {
                 </View>
               </View>
               <Switch
-                value={user.carbonOffsetEnabled}
+                value={appUser.carbonOffsetEnabled}
                 onValueChange={toggleCarbonOffset}
                 trackColor={{ false: colors.border, true: colors.success }}
                 thumbColor={colors.textLight}
@@ -253,9 +296,9 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <Pressable style={styles.logoutButton} onPress={resetOnboarding}>
+          <Pressable style={styles.logoutButton} onPress={handleLogout}>
             <LogOut size={20} color={colors.error} />
-            <Text style={styles.logoutText}>Reset Onboarding</Text>
+            <Text style={styles.logoutText}>Sign Out</Text>
           </Pressable>
 
           <View style={styles.footer}>
@@ -304,6 +347,16 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 4,
     borderColor: colors.surface,
+  },
+  avatarFallback: {
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitials: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: colors.textLight,
   },
   editBadge: {
     position: 'absolute',

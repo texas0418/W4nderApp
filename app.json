@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.w4nder",
+      "bundleIdentifier": "com.w4nderapp.w4nder",
       "infoPlist": {
         "NSCalendarsUsageDescription": "W4nder needs calendar access to find free times for date nights and sync availability with your partner.",
         "NSLocationWhenInUseUsageDescription": "W4nder uses your location to provide directions, travel time estimates, and nearby recommendations.",
@@ -32,7 +32,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#1B4965"
       },
-      "package": "com.yourcompany.w4nder",
+      "package": "com.w4nderapp.w4nder",
       "permissions": [
         "android.permission.READ_CALENDAR",
         "android.permission.WRITE_CALENDAR",
