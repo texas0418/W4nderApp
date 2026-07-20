@@ -50,7 +50,13 @@ import {
   PlanProgress,
 } from '@/types/planner';
 import { getTasteProfile } from '@/services/tasteProfileService';
-import { generatePlans, savePlan, suggestDestinations } from '@/services/datePlanService';
+import {
+  generatePlans,
+  getPlanQuota,
+  PlanQuota,
+  savePlan,
+  suggestDestinations,
+} from '@/services/datePlanService';
 
 type Phase = 'form' | 'loading' | 'results' | 'destinations';
 
@@ -175,6 +181,16 @@ export default function PlanDateScreen() {
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [progress, setProgress] = useState<PlanProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [quota, setQuota] = useState<PlanQuota | null>(null);
+
+  // Refresh the quota line whenever the form is (re)shown — each generation
+  // consumes one, so the count changes after every round trip.
+  useEffect(() => {
+    if (phase !== 'form') return;
+    getPlanQuota()
+      .then(setQuota)
+      .catch(() => setQuota(null));
+  }, [phase]);
 
   useEffect(() => {
     getTasteProfile()
@@ -235,11 +251,21 @@ export default function PlanDateScreen() {
       setDestinations(result);
       setPhase('destinations');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
-      setPhase('form');
+      showGenerationError(e);
     } finally {
       setSuggesting(false);
     }
+  };
+
+  // Limit/error messages used to render at the bottom of the form, below the
+  // fold — surface them as a popup so they're impossible to miss.
+  const showGenerationError = (e: unknown) => {
+    const message = e instanceof Error ? e.message : 'Something went wrong. Please try again.';
+    setError(message);
+    setPhase('form');
+    const isLimit =
+      message.toLowerCase().includes('limit') || message.toLowerCase().includes('premium');
+    Alert.alert(isLimit ? 'Limit reached' : "Couldn't generate plans", message);
   };
 
   const handleGenerate = async (cityOverride?: string) => {
@@ -282,8 +308,7 @@ export default function PlanDateScreen() {
         JSON.stringify({ plans: result, planMode, savedAt: Date.now() })
       ).catch(() => {});
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
-      setPhase('form');
+      showGenerationError(e);
     }
   };
 
@@ -382,6 +407,23 @@ export default function PlanDateScreen() {
     </View>
   );
 
+  const monthlyLeft = quota ? Math.max(0, quota.monthlyLimit - quota.monthlyUsed) : null;
+  const dailyLeft = quota ? Math.max(0, quota.dailyLimit - quota.dailyUsed) : null;
+  const quotaExhausted = monthlyLeft === 0 || dailyLeft === 0;
+
+  const renderQuotaLine = () => {
+    if (!quota || monthlyLeft === null || dailyLeft === null) return null;
+    const text =
+      monthlyLeft === 0
+        ? `Monthly limit reached (${quota.monthlyLimit} plans${quota.isPaid ? '' : ' on the free plan'}) — resets on the 1st`
+        : dailyLeft === 0
+          ? `Daily limit reached (${quota.dailyLimit} plans) — more tomorrow`
+          : `${monthlyLeft} of ${quota.monthlyLimit} plans left this month`;
+    return (
+      <Text style={[styles.quotaLine, quotaExhausted && styles.quotaLineExhausted]}>{text}</Text>
+    );
+  };
+
   const renderForm = () => (
     <ScrollView
       style={styles.formScroll}
@@ -390,6 +432,7 @@ export default function PlanDateScreen() {
       showsVerticalScrollIndicator={false}
       automaticallyAdjustKeyboardInsets
     >
+      {renderQuotaLine()}
       <View style={styles.modeRow}>
         {(
           [
@@ -1017,6 +1060,16 @@ const createStyles = (colors: ThemeColors) =>
     fontSize: 14,
     marginBottom: 12,
     textAlign: 'center',
+  },
+  quotaLine: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 14,
+  },
+  quotaLineExhausted: {
+    color: colors.warning,
+    fontWeight: '600',
   },
   generateButton: {
     backgroundColor: colors.secondary,

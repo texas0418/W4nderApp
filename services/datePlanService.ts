@@ -276,3 +276,61 @@ export async function deletePlan(id: string): Promise<void> {
   const { error } = await supabase.from('date_plans').delete().eq('id', id);
   if (error) throw new Error(`Failed to delete plan: ${error.message}`);
 }
+
+export interface PlanQuota {
+  isPaid: boolean;
+  monthlyUsed: number;
+  monthlyLimit: number;
+  dailyUsed: number;
+  dailyLimit: number;
+}
+
+/**
+ * Mirrors the server-side caps in the generate-date-plan edge function
+ * (keep the two in sync). Counts full plan generations only — quick
+ * searches and swaps have their own server-side bucket.
+ */
+export async function getPlanQuota(): Promise<PlanQuota> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not signed in');
+
+  const { data: profileRow } = await supabase
+    .from('profiles')
+    .select('subscription_tier')
+    .eq('id', user.id)
+    .maybeSingle();
+  const isPaid = !!profileRow && profileRow.subscription_tier !== 'free';
+  const limits = isPaid ? { monthly: 15, daily: 5 } : { monthly: 3, daily: 3 };
+
+  const now = new Date();
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  const dayStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  ).toISOString();
+
+  const countSince = async (since: string) => {
+    const { count } = await supabase
+      .from('plan_jobs')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .neq('status', 'error')
+      .gte('created_at', since)
+      .in('request->>mode', ['plan_for_me', 'single', 'vacation']);
+    return count ?? 0;
+  };
+
+  const [monthlyUsed, dailyUsed] = await Promise.all([
+    countSince(monthStart),
+    countSince(dayStart),
+  ]);
+
+  return {
+    isPaid,
+    monthlyUsed,
+    monthlyLimit: limits.monthly,
+    dailyUsed,
+    dailyLimit: limits.daily,
+  };
+}
