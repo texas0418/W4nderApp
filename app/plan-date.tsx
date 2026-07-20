@@ -669,8 +669,11 @@ export default function PlanDateScreen() {
         showsVerticalScrollIndicator={false}
       >
         {plans.length > 1 && (
-          <Pressable style={styles.remixToggle} onPress={() => setRemixMode(!remixMode)}>
-            <Shuffle size={16} color={remixMode ? colors.textLight : colors.primary} />
+          <Pressable
+            style={[styles.remixToggle, remixMode && styles.remixToggleActive]}
+            onPress={() => setRemixMode(!remixMode)}
+          >
+            <Shuffle size={20} color={remixMode ? colors.textLight : colors.primary} />
             <Text style={[styles.remixToggleText, remixMode && { color: colors.textLight }]}>
               {remixMode ? 'Picking stops — tap stops you like' : 'Mix & match stops from each plan'}
             </Text>
@@ -1070,15 +1073,21 @@ const createStyles = (colors: ThemeColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     backgroundColor: colors.accent,
     borderRadius: 14,
-    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+    paddingVertical: 16,
     marginBottom: 16,
   },
+  remixToggleActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
   remixToggleText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: colors.primary,
   },
   planCard: {
