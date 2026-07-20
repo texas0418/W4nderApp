@@ -34,7 +34,6 @@ import {
 } from 'lucide-react-native';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
-import { fonts } from '@/constants/typography';
 import { DatePlan, PlanStop } from '@/types/planner';
 import {
   getPlan,
@@ -430,7 +429,7 @@ const createStyles = (colors: ThemeColors) =>
   },
   headerTitle: {
     fontSize: 18,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.textLight,
     flex: 1,
     textAlign: 'center',
@@ -495,7 +494,7 @@ const createStyles = (colors: ThemeColors) =>
     paddingVertical: 10,
   },
   dayHeader: {
-    fontFamily: fonts.display,
+    fontWeight: '700',
     fontSize: 16,
     color: colors.primaryLight,
     marginTop: 10,

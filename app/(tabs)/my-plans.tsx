@@ -14,7 +14,6 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { CalendarHeart, MapPin, DollarSign, Sparkles, ChevronRight } from 'lucide-react-native';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
-import { fonts } from '@/constants/typography';
 import { DatePlan } from '@/types/planner';
 import { listPlans } from '@/services/datePlanService';
 
@@ -141,7 +140,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.textLight,
   },
   headerSubtitle: {
@@ -212,7 +211,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.text,
     marginTop: 8,
   },

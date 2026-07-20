@@ -136,6 +136,8 @@ Date parameters:
 - Duration: about ${body.durationHours || 5} hours
 - Total budget: $${body.budget} USD (hard cap per plan)
 - Extra notes from the user: ${body.notes || 'none'}
+${(body.vibes as string[] | undefined)?.length ? `- Desired vibe: ${(body.vibes as string[]).join(', ')} — match the tone of every stop to this.` : ''}
+${(body.mustInclude as string[] | undefined)?.length ? `- The plan MUST include: ${(body.mustInclude as string[]).join(', ')} — these are hard requirements, one stop each at minimum.` : ''}
 
 Taste profile:
 - Planning for: ${profile.planFor || 'a couple'}
@@ -740,6 +742,8 @@ async function dispatchVacationDays(
         startTime: dayNumber === 1 ? (body.startTime ?? '14:00') : '10:00',
         durationHours: dayNumber === 1 || dayNumber === days ? 6 : 10,
         notes: body.notes,
+        vibes: body.vibes ?? [],
+        mustInclude: body.mustInclude ?? [],
         profile: body.profile,
       }),
     }).catch((err) => console.error(`failed to dispatch day ${dayNumber}:`, err));
@@ -813,6 +817,8 @@ async function dispatchPlanAngles(
         startTime: body.startTime,
         durationHours: body.durationHours,
         notes: body.notes,
+        vibes: body.vibes ?? [],
+        mustInclude: body.mustInclude ?? [],
         profile: body.profile,
       }),
     }).catch((err) => console.error(`failed to dispatch plan ${i + 1}:`, err));

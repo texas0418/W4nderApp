@@ -31,7 +31,6 @@ import {
 import type { LucideProps } from 'lucide-react-native';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
-import { fonts } from '@/constants/typography';
 import { travelStyles, foodPreferences } from '@/mocks/preferences';
 import {
   activityOptions,
@@ -569,7 +568,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   welcomeTitle: {
     fontSize: 38,
-    fontFamily: fonts.displayBold,
+    fontWeight: '800',
     color: colors.textLight,
     marginBottom: 12,
   },
@@ -605,7 +604,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   stepTitle: {
     fontSize: 24,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.text,
     marginBottom: 8,
   },

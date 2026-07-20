@@ -39,7 +39,6 @@ import type { LucideProps } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
-import { fonts } from '@/constants/typography';
 import {
   TasteProfile,
   emptyTasteProfile,
@@ -80,6 +79,20 @@ const dayCountChips = [
   { id: 7, label: '1 week' },
   { id: 10, label: '10 days' },
 ];
+
+// Optional steering chips: the more users say upfront, the less they need to
+// regenerate (each generation costs quota).
+const vibeChips = [
+  'Romantic',
+  'Adventurous',
+  'Chill & cozy',
+  'Fancy',
+  'Casual',
+  'First date',
+  'Anniversary',
+];
+
+const mustIncludeChips = ['Dinner', 'Drinks', 'Live music', 'Activity', 'Dessert', 'Outdoors'];
 
 type PlanMode = 'plan_for_me' | 'single' | 'vacation';
 
@@ -137,7 +150,13 @@ export default function PlanDateScreen() {
   const [budget, setBudget] = useState(150);
   const [tripBudget, setTripBudget] = useState(1000);
   const [notes, setNotes] = useState('');
+  const [vibes, setVibes] = useState<string[]>([]);
+  const [mustInclude, setMustInclude] = useState<string[]>([]);
   const isVacation = planMode === 'vacation';
+
+  const toggleIn = (list: string[], set: (v: string[]) => void, value: string) => {
+    set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
+  };
 
   const [plans, setPlans] = useState<GeneratedPlan[]>([]);
   const [destinations, setDestinations] = useState<DestinationSuggestion[]>([]);
@@ -217,13 +236,16 @@ export default function PlanDateScreen() {
           durationHours: duration,
           budget: isVacation ? tripBudget : budget,
           notes: notes.trim() || undefined,
+          vibes: vibes.length ? vibes : undefined,
+          mustInclude: mustInclude.length ? mustInclude : undefined,
           profile,
         },
         setProgress
       );
       if (!result.length) throw new Error('No plans were generated. Please try again.');
       setPlans(result);
-      setExpandedPlan(0);
+      // Multiple plans start collapsed so the choice reads as clean headers.
+      setExpandedPlan(result.length === 1 ? 0 : null);
       setRemixMode(false);
       setSelectedStops(new Set());
       setPhase('results');
@@ -307,12 +329,34 @@ export default function PlanDateScreen() {
     </View>
   );
 
+  const renderMultiChipRow = (
+    options: string[],
+    selected: string[],
+    onToggle: (value: string) => void
+  ) => (
+    <View style={styles.chipRow}>
+      {options.map((option) => {
+        const isSelected = selected.includes(option);
+        return (
+          <Pressable
+            key={option}
+            style={[styles.chip, isSelected && styles.chipSelected]}
+            onPress={() => onToggle(option)}
+          >
+            <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>{option}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+
   const renderForm = () => (
     <ScrollView
       style={styles.formScroll}
       contentContainerStyle={styles.formContent}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
+      automaticallyAdjustKeyboardInsets
     >
       <View style={styles.modeRow}>
         {(
@@ -386,6 +430,14 @@ export default function PlanDateScreen() {
         maximumTrackTintColor={colors.border}
         thumbTintColor={colors.primary}
       />
+
+      <Text style={styles.fieldLabel}>The vibe (optional)</Text>
+      {renderMultiChipRow(vibeChips, vibes, (v) => toggleIn(vibes, setVibes, v))}
+
+      <Text style={styles.fieldLabel}>Must include (optional)</Text>
+      {renderMultiChipRow(mustIncludeChips, mustInclude, (v) =>
+        toggleIn(mustInclude, setMustInclude, v)
+      )}
 
       <Text style={styles.fieldLabel}>Anything special? (optional)</Text>
       <TextInput
@@ -721,7 +773,7 @@ const createStyles = (colors: ThemeColors) =>
   },
   headerTitle: {
     fontSize: 18,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.textLight,
   },
   formScroll: {
@@ -763,7 +815,7 @@ const createStyles = (colors: ThemeColors) =>
     lineHeight: 15,
   },
   dayHeader: {
-    fontFamily: fonts.display,
+    fontWeight: '700',
     fontSize: 16,
     color: colors.primaryLight,
     marginTop: 10,
@@ -809,7 +861,7 @@ const createStyles = (colors: ThemeColors) =>
   },
   destCity: {
     fontSize: 17,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.text,
   },
   destPitch: {
@@ -937,7 +989,7 @@ const createStyles = (colors: ThemeColors) =>
   },
   loadingTitle: {
     fontSize: 20,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.text,
     marginTop: 12,
     textAlign: 'center',
@@ -995,7 +1047,7 @@ const createStyles = (colors: ThemeColors) =>
   },
   planTitle: {
     fontSize: 19,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.text,
   },
   planVibe: {

@@ -92,6 +92,8 @@ export interface GeneratePlanRequest {
   durationHours?: number;
   budget: number; // total budget (whole trip for vacations)
   notes?: string;
+  vibes?: string[]; // e.g. "Romantic", "First date" — steers tone in one shot
+  mustInclude?: string[]; // e.g. "Dinner", "Live music" — hard requirements
   profile: TasteProfile;
   // Taste memory, gathered from past plans and injected automatically:
   avoidVenues?: string[];

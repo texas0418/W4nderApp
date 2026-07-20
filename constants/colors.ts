@@ -1,7 +1,7 @@
-// W4nder theme — warm & moody.
-// Wine + terracotta + champagne. Light and dark palettes share token names so
-// components written against one work in both. Use hooks/useTheme to get the
-// active palette; the default export is the light palette for legacy screens.
+// W4nder theme — midnight blue + warm amber.
+// Light and dark palettes share token names so components written against one
+// work in both. Use hooks/useTheme to get the active palette; the default
+// export is the light palette for legacy screens.
 
 export interface ThemeColors {
   primary: string;
@@ -37,76 +37,76 @@ export interface ThemeColors {
 }
 
 export const lightColors: ThemeColors = {
-  primary: '#6E2B43', // deep wine
-  primaryLight: '#9C4A66',
-  primaryDark: '#471A2C',
+  primary: '#27567F', // deep steel blue
+  primaryLight: '#4A85B4',
+  primaryDark: '#16344F',
 
-  secondary: '#C96F4A', // terracotta — CTAs
-  secondaryLight: '#E39A6F',
-  secondaryDark: '#A55234',
+  secondary: '#C9853F', // warm amber — CTAs
+  secondaryLight: '#E0A86A',
+  secondaryDark: '#A2691F',
 
-  accent: '#F5E3DA', // blush cream — icon/selection tint
-  accentDark: '#B9808F', // dusty rose — "why it matches" notes
+  accent: '#E3EEF6', // ice blue — icon/selection tint
+  accentDark: '#7FA5C0', // dusty steel — "why it matches" notes
 
-  success: '#4A7C59',
-  successLight: '#6FA07E',
+  success: '#3E7C57',
+  successLight: '#66A07E',
   warning: '#D9A05B',
-  error: '#B93A3A',
+  error: '#C04A3A',
 
-  background: '#FAF3ED', // warm cream
-  surface: '#FFFDFB',
-  surfaceSecondary: '#F3E9E1',
+  background: '#F6F8FA', // cool off-white
+  surface: '#FFFFFF',
+  surfaceSecondary: '#EBF1F6',
 
-  text: '#2B1E23',
-  textSecondary: '#6F5A61',
-  textTertiary: '#A08A90',
-  textLight: '#FFF9F5',
+  text: '#1A2530',
+  textSecondary: '#596877',
+  textTertiary: '#91A0AF',
+  textLight: '#F7FAFC',
 
-  border: '#EADBD2',
-  borderLight: '#F3EAE3',
+  border: '#DDE6ED',
+  borderLight: '#EAF0F5',
 
-  overlay: 'rgba(23, 12, 17, 0.5)',
-  overlayLight: 'rgba(23, 12, 17, 0.3)',
+  overlay: 'rgba(11, 21, 30, 0.5)',
+  overlayLight: 'rgba(11, 21, 30, 0.3)',
 
-  cardShadow: 'rgba(110, 43, 67, 0.08)',
+  cardShadow: 'rgba(39, 86, 127, 0.08)',
 
   gradient: {
-    primary: ['#6E2B43', '#9C4A66'],
-    sunset: ['#C96F4A', '#E39A6F'],
-    ocean: ['#B9808F', '#F5E3DA'],
-    night: ['#471A2C', '#6E2B43'],
+    primary: ['#27567F', '#4A85B4'],
+    sunset: ['#C9853F', '#E0A86A'],
+    ocean: ['#7FA5C0', '#E3EEF6'],
+    night: ['#16344F', '#27567F'],
   },
 };
 
 export const darkColors: ThemeColors = {
-  primary: '#A64D68', // rose wine — filled controls on dark
-  primaryLight: '#D98CA4',
+  primary: '#3E76A6', // steel blue — filled controls on dark
+  primaryLight: '#7FB3DA',
   // "dark variant" flips light on dark surfaces (used as text on accent tint)
-  primaryDark: '#F0D4DD',
+  primaryDark: '#D6E7F4',
 
-  secondary: '#C97A52',
-  secondaryLight: '#E3A587',
-  secondaryDark: '#A55234',
+  secondary: '#CE9250',
+  secondaryLight: '#E3AE73',
+  secondaryDark: '#A2691F',
 
-  accent: '#3C2A33', // plum tint — icon/selection bg
-  accentDark: '#D9A5B5',
+  accent: '#1E3242', // deep blue tint — icon/selection bg
+  accentDark: '#8FB8D9',
 
-  success: '#7FB08F',
-  successLight: '#9CC4A8',
+  success: '#6FA886',
+  successLight: '#93C0A4',
   warning: '#E0AC6C',
-  error: '#E06553',
+  error: '#DB6B57',
 
-  background: '#1B1216', // plum black
-  surface: '#251A21',
-  surfaceSecondary: '#2F2229',
+  background: '#0F171F', // midnight
+  surface: '#17222C',
+  surfaceSecondary: '#1F2E3B',
 
-  text: '#F5EAE6',
-  textSecondary: '#C9B4BC',
-  textTertiary: '#93808A',
-  textLight: '#FFF9F5',
+  text: '#EDF3F8',
+  textSecondary: '#A9BBCA',
+  textTertiary: '#71869A',
+  textLight: '#F7FAFC',
 
-  border: '#3D2D36',
-  borderLight: '#332631',
+  border: '#2A3C4C',
+  borderLight: '#223342',
 
   overlay: 'rgba(0, 0, 0, 0.6)',
   overlayLight: 'rgba(0, 0, 0, 0.4)',
@@ -114,10 +114,10 @@ export const darkColors: ThemeColors = {
   cardShadow: 'rgba(0, 0, 0, 0.4)',
 
   gradient: {
-    primary: ['#471A2C', '#8E3B55'],
-    sunset: ['#A55234', '#C97A52'],
-    ocean: ['#3C2A33', '#5C3F4D'],
-    night: ['#12090D', '#471A2C'],
+    primary: ['#16344F', '#2F6394'],
+    sunset: ['#A2691F', '#CE9250'],
+    ocean: ['#1E3242', '#33526B'],
+    night: ['#0A1620', '#16344F'],
   },
 };
 

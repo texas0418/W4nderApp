@@ -16,7 +16,6 @@ import { ArrowLeft, MapPin, Check, Home, Trees, Blend } from 'lucide-react-nativ
 import Slider from '@react-native-community/slider';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
-import { fonts } from '@/constants/typography';
 import { foodPreferences } from '@/mocks/preferences';
 import {
   TasteProfile,
@@ -244,7 +243,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.textLight,
   },
   center: {
@@ -261,7 +260,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.text,
     marginBottom: 12,
   },

@@ -23,7 +23,6 @@ import {
 } from 'lucide-react-native';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
-import { fonts } from '@/constants/typography';
 import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/services';
 import { supabase } from '@/lib/supabase';
@@ -245,12 +244,12 @@ const createStyles = (colors: ThemeColors) =>
     },
     avatarText: {
       fontSize: 26,
-      fontFamily: fonts.display,
+      fontWeight: '700',
       color: colors.textLight,
     },
     name: {
       fontSize: 22,
-      fontFamily: fonts.display,
+      fontWeight: '700',
       color: colors.textLight,
     },
     email: {
@@ -278,7 +277,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     statNumber: {
       fontSize: 24,
-      fontFamily: fonts.display,
+      fontWeight: '700',
       color: colors.primaryLight,
     },
     statLabel: {

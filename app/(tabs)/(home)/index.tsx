@@ -16,7 +16,6 @@ import {
 } from 'lucide-react-native';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
-import { fonts } from '@/constants/typography';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DatePlan } from '@/types/planner';
@@ -183,7 +182,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   greeting: {
     fontSize: 26,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.textLight,
   },
   tagline: {
@@ -212,7 +211,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   heroTitle: {
     fontSize: 18,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.textLight,
   },
   heroSubtitle: {
@@ -265,7 +264,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: fonts.display,
+    fontWeight: '700',
     color: colors.text,
   },
   seeAll: {

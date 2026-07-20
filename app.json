@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#471A2C"
+      "backgroundColor": "#16344F"
     },
     "ios": {
       "supportsTablet": true,
@@ -30,7 +30,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#471A2C"
+        "backgroundColor": "#16344F"
       },
       "package": "com.w4nderapp.w4nder",
       "permissions": [
@@ -61,7 +61,7 @@
       [
         "expo-notifications",
         {
-          "color": "#6E2B43"
+          "color": "#27567F"
         }
       ],
       [
