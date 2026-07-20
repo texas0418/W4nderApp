@@ -13,6 +13,45 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 
 declare const EdgeRuntime: { waitUntil(promise: Promise<unknown>): void };
 
+/**
+ * Wraps an Anthropic client so every messages.create() logs its token/search
+ * usage to the api_usage table (insert-only telemetry; aggregate with SQL to
+ * get real per-generation cost). Logging failures never break generation.
+ */
+function trackedAnthropic(
+  apiKey: string,
+  // deno-lint-ignore no-explicit-any
+  supabase: any,
+  jobId: string | null
+): Anthropic {
+  const client = new Anthropic({ apiKey });
+  const rawCreate = client.messages.create.bind(client.messages);
+  // deno-lint-ignore no-explicit-any
+  (client.messages as any).create = async (params: any) => {
+    const response = await rawCreate(params);
+    try {
+      // deno-lint-ignore no-explicit-any
+      const usage = (response as any)?.usage;
+      if (usage) {
+        const { error } = await supabase.from('api_usage').insert({
+          job_id: jobId,
+          model: String(params.model),
+          input_tokens: usage.input_tokens ?? 0,
+          output_tokens: usage.output_tokens ?? 0,
+          cache_read_input_tokens: usage.cache_read_input_tokens ?? 0,
+          cache_creation_input_tokens: usage.cache_creation_input_tokens ?? 0,
+          web_search_requests: usage.server_tool_use?.web_search_requests ?? 0,
+        });
+        if (error) console.error('usage log failed:', error.message);
+      }
+    } catch (e) {
+      console.error('usage log failed:', e);
+    }
+    return response;
+  };
+  return client;
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -309,8 +348,10 @@ Build the plan around these venues (pick 2-3 of them that make the best schedule
   // Agentic loop: web_search runs server-side at Anthropic; we only need to
   // resume on pause_turn and capture the submit_plans tool call.
   for (let i = 0; i < 6; i++) {
+    // Sonnet 5: plan assembly from a pre-researched shortlist doesn't need
+    // Opus, and it cuts the per-generation cost by more than half.
     const response = await client.messages.create({
-      model: 'claude-opus-4-8',
+      model: 'claude-sonnet-5',
       max_tokens: 16000,
       system,
       thinking: { type: 'adaptive' },
@@ -419,7 +460,7 @@ ${historyAndWeatherNotes(body)}
 The replacement must be a REAL, currently-operating venue. Verify with 1-2 quick searches. Keep the same "order" value (${stop.order}) and roughly the same time. Then call submit_stop once.`;
 
   const response = await client.messages.create({
-    model: 'claude-opus-4-8',
+    model: 'claude-sonnet-5',
     max_tokens: 6000,
     system:
       "You are W4nder's date planner swapping one stop. Real venues only. The submit_stop tool call is the only output that matters.",
@@ -837,7 +878,7 @@ async function runPlanUnit(
   const jobId = String(body.jobId);
   const slot = Number(body.slot);
   const total = Number(body.total);
-  const client = new Anthropic({ apiKey });
+  const client = trackedAnthropic(apiKey, supabase, jobId);
 
   let plan: GeneratedPlanShape | null = null;
   try {
@@ -909,7 +950,7 @@ async function runVacationDay(
   const day = Number(body.day);
   const totalDays = Number(body.totalDays);
   const city = String(body.city);
-  const client = new Anthropic({ apiKey });
+  const client = trackedAnthropic(apiKey, supabase, jobId);
 
   let plan: GeneratedPlanShape | null = null;
   try {
@@ -971,9 +1012,14 @@ async function runVacationDay(
 async function generatePlans(
   apiKey: string,
   body: Record<string, unknown>,
-  report?: ProgressReporter
+  report?: ProgressReporter,
+  // deno-lint-ignore no-explicit-any
+  supabase?: any,
+  jobId?: string | null
 ): Promise<unknown> {
-  const client = new Anthropic({ apiKey });
+  const client = supabase
+    ? trackedAnthropic(apiKey, supabase, jobId ?? null)
+    : new Anthropic({ apiKey });
 
   if (body.mode === 'suggest_destinations') {
     // Runs alone in its isolate, so it can use most of the 400s wall clock.
@@ -1119,7 +1165,25 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
     const pushToken = (profileRow?.push_token as string | null) ?? null;
     const isPaid = !!profileRow && profileRow.subscription_tier !== 'free';
-    const limits = isPaid ? { monthly: 25, daily: 5 } : { monthly: 3, daily: 3 };
+    // Caps sized against measured API cost (~$0.40-0.50/generation on Sonnet 5
+    // builders): premium median usage ~5/mo stays high-margin, worst case ~15
+    // stays profitable at $9.99/mo after the App Store cut.
+    // The monthly cap is the cost ceiling; the daily cap only spreads usage out.
+    const limits = isPaid ? { monthly: 15, daily: 5 } : { monthly: 3, daily: 3 };
+
+    // Vacation mode fans out one generation per day — a 10-day trip costs
+    // dollars, not cents. Premium only. (Destination browsing stays free as
+    // an upsell funnel.)
+    if (body.mode === 'vacation' && !isPaid) {
+      return new Response(
+        JSON.stringify({
+          error: 'Multi-day trip planning is a Premium feature. Upgrade to plan vacations.',
+          limitReached: true,
+          premiumRequired: true,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const now = new Date();
     const monthStart = new Date(
@@ -1183,14 +1247,14 @@ Deno.serve(async (req: Request) => {
       const dispatch =
         body.mode === 'vacation'
           ? dispatchVacationDays(
-              new Anthropic({ apiKey }),
+              trackedAnthropic(apiKey, supabase, job.id),
               { ...body, pushToken },
               job.id,
               authHeader,
               supabase
             )
           : dispatchPlanAngles(
-              new Anthropic({ apiKey }),
+              trackedAnthropic(apiKey, supabase, job.id),
               { ...body, pushToken },
               job.id,
               authHeader,
@@ -1210,7 +1274,7 @@ Deno.serve(async (req: Request) => {
       );
     } else {
       EdgeRuntime.waitUntil(
-        generatePlans(apiKey, body, report)
+        generatePlans(apiKey, body, report, supabase, job.id)
           .then(async (plans) => {
             await supabase
               .from('plan_jobs')
