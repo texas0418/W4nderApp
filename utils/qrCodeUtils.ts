@@ -4,7 +4,7 @@
 
 import { Share, Alert, Platform } from 'react-native';
 // eslint-disable-next-line import/no-unresolved -- tracked in #3
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 // eslint-disable-next-line import/no-unresolved -- tracked in #3
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
