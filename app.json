@@ -18,7 +18,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.paintthetown",
+      "bundleIdentifier": "app.paintthetown.com",
       "infoPlist": {
         "NSCalendarsUsageDescription": "Paint the Town needs calendar access to find free times for date nights and sync availability with your partner.",
         "NSLocationWhenInUseUsageDescription": "Paint the Town uses your location to provide directions, travel time estimates, and nearby recommendations.",
@@ -27,7 +27,8 @@
           "location",
           "fetch",
           "remote-notification"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -35,7 +36,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#16344F"
       },
-      "package": "app.paintthetown",
+      "package": "app.paintthetown.com",
       "permissions": [
         "android.permission.READ_CALENDAR",
         "android.permission.WRITE_CALENDAR",
