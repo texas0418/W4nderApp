@@ -10,6 +10,7 @@
 
 import Anthropic from 'npm:@anthropic-ai/sdk';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { bucketForMode, checkQuota, isPaidTier, windowStarts } from './quota.ts';
 
 declare const EdgeRuntime: { waitUntil(promise: Promise<unknown>): void };
 
@@ -1156,13 +1157,9 @@ Deno.serve(async (req: Request) => {
     }
 
     // ---- Usage limits (failed jobs don't count) ----
-    // Cheap calls (destination search, stop swap) share their own bucket,
-    // separate from full plan generations.
-    const PLAN_MODES = ['plan_for_me', 'single', 'vacation'];
-    const LIGHT_MODES = ['suggest_destinations', 'replace_stop'];
-    const isSuggestion = LIGHT_MODES.includes(String(body.mode));
-    const modeFilter = isSuggestion ? LIGHT_MODES : PLAN_MODES;
-    const label = isSuggestion ? 'quick searches' : 'plans';
+    // Pure verdict logic lives in quota.ts; this block only fetches the
+    // tier and the two job counts, then enforces whatever it says.
+    const { modeFilter, isSuggestion } = bucketForMode(body.mode);
 
     const { data: profileRow } = await supabase
       .from('profiles')
@@ -1170,34 +1167,9 @@ Deno.serve(async (req: Request) => {
       .eq('id', user.id)
       .maybeSingle();
     const pushToken = (profileRow?.push_token as string | null) ?? null;
-    const isPaid = !!profileRow && profileRow.subscription_tier !== 'free';
-    // Caps sized against measured API cost (~$0.40-0.50/generation on Sonnet 5
-    // builders): premium median usage ~5/mo stays high-margin, worst case ~15
-    // stays profitable at $9.99/mo after the App Store cut.
-    // The monthly cap is the cost ceiling; the daily cap only spreads usage out.
-    const limits = isPaid ? { monthly: 15, daily: 5 } : { monthly: 3, daily: 3 };
+    const isPaid = isPaidTier(profileRow);
 
-    // Vacation mode fans out one generation per day — a 10-day trip costs
-    // dollars, not cents. Premium only. (Destination browsing stays free as
-    // an upsell funnel.)
-    if (body.mode === 'vacation' && !isPaid) {
-      return new Response(
-        JSON.stringify({
-          error: 'Multi-day trip planning is a Premium feature. Upgrade to plan vacations.',
-          limitReached: true,
-          premiumRequired: true,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const now = new Date();
-    const monthStart = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)
-    ).toISOString();
-    const dayStart = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-    ).toISOString();
+    const { monthStart, dayStart } = windowStarts(new Date());
 
     const countJobs = async (since: string) => {
       const { count } = await supabase
@@ -1210,20 +1182,18 @@ Deno.serve(async (req: Request) => {
       return count ?? 0;
     };
 
-    if ((await countJobs(monthStart)) >= limits.monthly) {
+    const verdict = checkQuota({
+      mode: body.mode,
+      isPaid,
+      monthlyUsed: await countJobs(monthStart),
+      dailyUsed: await countJobs(dayStart),
+    });
+    if (!verdict.allowed) {
       return new Response(
         JSON.stringify({
-          error: `You've used all ${limits.monthly} ${label} for this month${isPaid ? '' : ' on the free plan'}. Your limit resets on the 1st.`,
+          error: verdict.error,
           limitReached: true,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    if ((await countJobs(dayStart)) >= limits.daily) {
-      return new Response(
-        JSON.stringify({
-          error: `Daily limit reached (${limits.daily} ${label}). Try again tomorrow.`,
-          limitReached: true,
+          ...(verdict.premiumRequired ? { premiumRequired: true } : {}),
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
