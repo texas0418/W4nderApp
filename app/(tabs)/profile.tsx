@@ -174,7 +174,11 @@ export default function ProfileScreen() {
             <ChevronRight size={18} color={colors.textTertiary} />
           </Pressable>
 
-          <Pressable style={styles.row} onPress={() => router.push('/(tabs)/my-plans')}>
+          <Pressable
+            style={styles.row}
+            // Stack-pushed variant of the My Plans tab, so it gets a back button.
+            onPress={() => router.push('/plans' as never)}
+          >
             <View style={styles.rowIcon}>
               <CalendarHeart size={20} color={colors.primaryLight} />
             </View>

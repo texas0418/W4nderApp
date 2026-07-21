@@ -11,7 +11,14 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { CalendarHeart, MapPin, DollarSign, Sparkles, ChevronRight } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  CalendarHeart,
+  MapPin,
+  DollarSign,
+  Sparkles,
+  ChevronRight,
+} from 'lucide-react-native';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
 import { DatePlan } from '@/types/planner';
@@ -24,7 +31,9 @@ const getStatusColors = (colors: ThemeColors): Record<DatePlan['status'], string
   cancelled: colors.textTertiary,
 });
 
-export default function MyPlansScreen() {
+// Shared between the My Plans tab (no back button) and the stack route
+// pushed from the profile screen (with back button) — see app/plans.tsx.
+export function PlansContent({ showBack }: { showBack?: boolean }) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const statusColors = useMemo(() => getStatusColors(colors), [colors]);
@@ -81,6 +90,11 @@ export default function MyPlansScreen() {
       <LinearGradient colors={colors.gradient.primary} style={styles.headerGradient}>
         <SafeAreaView edges={['top']}>
           <View style={styles.headerContent}>
+            {showBack && (
+              <Pressable onPress={() => router.back()} style={styles.backBtn}>
+                <ArrowLeft size={24} color={colors.textLight} />
+              </Pressable>
+            )}
             <Text style={styles.headerTitle}>My Plans</Text>
             <Text style={styles.headerSubtitle}>Your saved dates and outings</Text>
           </View>
@@ -126,6 +140,10 @@ export default function MyPlansScreen() {
   );
 }
 
+export default function MyPlansScreen() {
+  return <PlansContent />;
+}
+
 const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
@@ -133,6 +151,14 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   headerGradient: {
     paddingBottom: 20,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: -10,
+    marginBottom: 2,
   },
   headerContent: {
     paddingHorizontal: 20,
