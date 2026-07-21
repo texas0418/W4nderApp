@@ -224,10 +224,27 @@ export default function SavedPlanScreen() {
     setDraft(next);
   };
 
+  const shiftTime = (time: string, deltaMin: number): string => {
+    const [h, m] = time.split(':').map(Number);
+    // Wrap within a 24h clock so a late stop that spills past midnight still
+    // shows a valid HH:MM rather than "25:15".
+    const total = ((((h || 0) * 60 + (m || 0) + deltaMin) % 1440) + 1440) % 1440;
+    return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+  };
+
   const nudgeDuration = (index: number, delta: number) => {
-    const next = draft.slice();
-    const current = next[index].durationMinutes || 60;
-    next[index] = { ...next[index], durationMinutes: Math.max(15, current + delta) };
+    const current = draft[index].durationMinutes || 60;
+    const newDuration = Math.max(15, current + delta);
+    const applied = newDuration - current; // 0 when clamped at the 15-min floor
+    // Stretching a stop pushes everything after it later by the same amount,
+    // so the schedule stays consistent instead of overlapping.
+    const next = draft.map((s, i) =>
+      i < index
+        ? s
+        : i === index
+          ? { ...s, durationMinutes: newDuration }
+          : { ...s, time: shiftTime(s.time, applied) }
+    );
     setDraft(next);
   };
 
