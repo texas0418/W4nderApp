@@ -151,6 +151,7 @@ export type Database = {
           id: string
           items: Json
           plan_date: string | null
+          shared_with_partner: boolean
           source: string
           start_time: string | null
           status: string
@@ -167,6 +168,7 @@ export type Database = {
           id?: string
           items?: Json
           plan_date?: string | null
+          shared_with_partner?: boolean
           source?: string
           start_time?: string | null
           status?: string
@@ -183,6 +185,7 @@ export type Database = {
           id?: string
           items?: Json
           plan_date?: string | null
+          shared_with_partner?: boolean
           source?: string
           start_time?: string | null
           status?: string

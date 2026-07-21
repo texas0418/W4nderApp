@@ -35,6 +35,7 @@ import {
   Gift,
   CalendarPlus,
   BookHeart,
+  HeartHandshake,
 } from 'lucide-react-native';
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
@@ -44,8 +45,10 @@ import {
   updatePlanStatus,
   deletePlan,
   updatePlanStops,
+  updatePlanSharing,
   replaceStop,
 } from '@/services/datePlanService';
+import { PartnerState, getPartnerState } from '@/services/partnerService';
 import { getTasteProfile } from '@/services/tasteProfileService';
 import { JournalEntry, getEntryForPlan } from '@/services/dateJournalService';
 import { buildShareUrl, getSurpriseShareToken } from '@/services/planShareService';
@@ -90,8 +93,10 @@ export default function SavedPlanScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [plan, setPlan] = useState<DatePlan | null>(null);
   const [journalEntry, setJournalEntry] = useState<JournalEntry | null>(null);
+  const [partner, setPartner] = useState<PartnerState | null>(null);
   const [loading, setLoading] = useState(true);
   const [swappingOrder, setSwappingOrder] = useState<number | null>(null);
+  const [sharingBusy, setSharingBusy] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -103,8 +108,30 @@ export default function SavedPlanScreen() {
       getEntryForPlan(id)
         .then(setJournalEntry)
         .catch(() => {});
+      getPartnerState()
+        .then(setPartner)
+        .catch(() => {});
     }, [id])
   );
+
+  // RLS only ever serves my plans or my partner's shared ones, so ownership
+  // reduces to "is this the linked partner's plan".
+  const isPartnersPlan =
+    !!plan && partner?.status === 'linked' && plan.ownerId === partner.partnerId;
+  const partnerLinked = partner?.status === 'linked';
+
+  const handleToggleSharing = async () => {
+    if (!plan || sharingBusy) return;
+    setSharingBusy(true);
+    try {
+      await updatePlanSharing(plan.id, !plan.sharedWithPartner);
+      setPlan({ ...plan, sharedWithPartner: !plan.sharedWithPartner });
+    } catch (e) {
+      Alert.alert('Could not update sharing', e instanceof Error ? e.message : 'Please try again.');
+    } finally {
+      setSharingBusy(false);
+    }
+  };
 
   const setStatus = async (status: DatePlan['status']): Promise<boolean> => {
     if (!plan) return false;
@@ -282,9 +309,13 @@ export default function SavedPlanScreen() {
               <ArrowLeft size={24} color={colors.textLight} />
             </Pressable>
             <Text style={styles.headerTitle}>{plan ? plan.title : 'Date plan'}</Text>
-            <Pressable onPress={handleDelete} style={styles.backBtn}>
-              <Trash2 size={20} color={colors.textLight} />
-            </Pressable>
+            {isPartnersPlan ? (
+              <View style={styles.backBtn} />
+            ) : (
+              <Pressable onPress={handleDelete} style={styles.backBtn}>
+                <Trash2 size={20} color={colors.textLight} />
+              </Pressable>
+            )}
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -381,6 +412,7 @@ export default function SavedPlanScreen() {
                     <Navigation size={14} color={colors.primaryLight} />
                     <Text style={styles.stopActionText}>Directions</Text>
                   </Pressable>
+                  {!isPartnersPlan && (
                   <Pressable
                     style={styles.stopActionBtn}
                     onPress={() => handleSwap(stop)}
@@ -395,6 +427,8 @@ export default function SavedPlanScreen() {
                       {swappingOrder === stop.order ? 'Swapping…' : 'Swap'}
                     </Text>
                   </Pressable>
+                  )}
+                  {!isPartnersPlan && (
                   <View style={styles.feedbackGroup}>
                     <Pressable
                       style={[
@@ -421,6 +455,7 @@ export default function SavedPlanScreen() {
                       />
                     </Pressable>
                   </View>
+                  )}
                 </View>
               </View>
             </View>
@@ -429,13 +464,21 @@ export default function SavedPlanScreen() {
           })}
 
           <View style={styles.actions}>
-            {plan.status === 'saved' && (
+            {isPartnersPlan && (
+              <View style={styles.partnerNote}>
+                <HeartHandshake size={16} color={colors.secondary} />
+                <Text style={styles.partnerNoteText}>
+                  Planned by {partner?.status === 'linked' ? partner.partnerName : 'your partner'}
+                </Text>
+              </View>
+            )}
+            {!isPartnersPlan && plan.status === 'saved' && (
               <Pressable style={styles.primaryAction} onPress={() => setStatus('scheduled')}>
                 <CalendarCheck size={18} color={colors.textLight} />
                 <Text style={styles.primaryActionText}>Mark as scheduled</Text>
               </Pressable>
             )}
-            {plan.status === 'scheduled' && (
+            {!isPartnersPlan && plan.status === 'scheduled' && (
               <Pressable
                 style={styles.primaryAction}
                 onPress={async () => {
@@ -449,7 +492,7 @@ export default function SavedPlanScreen() {
                 <Text style={styles.primaryActionText}>We did it! Mark completed</Text>
               </Pressable>
             )}
-            {plan.status === 'completed' && (
+            {!isPartnersPlan && plan.status === 'completed' && (
               <Pressable
                 style={styles.journalAction}
                 onPress={() => router.push(`/rate-date?planId=${plan.id}` as never)}
@@ -472,12 +515,40 @@ export default function SavedPlanScreen() {
                 <Text style={styles.secondaryActionText}>Share plan</Text>
               </Pressable>
             </View>
-            <Pressable style={styles.surpriseAction} onPress={handleSurpriseShare}>
-              <Gift size={16} color={colors.secondary} />
-              <Text style={styles.surpriseActionText}>
-                Share as a surprise — no spoilers, just when to be ready
-              </Text>
-            </Pressable>
+            {!isPartnersPlan && partnerLinked && (
+              <Pressable
+                style={styles.journalAction}
+                onPress={handleToggleSharing}
+                disabled={sharingBusy}
+              >
+                {sharingBusy ? (
+                  <ActivityIndicator size="small" color={colors.primaryLight} />
+                ) : (
+                  <HeartHandshake
+                    size={17}
+                    color={plan.sharedWithPartner ? colors.secondary : colors.primaryLight}
+                  />
+                )}
+                <Text
+                  style={[
+                    styles.journalActionText,
+                    plan.sharedWithPartner && { color: colors.secondary },
+                  ]}
+                >
+                  {plan.sharedWithPartner
+                    ? `Shared with ${partner?.status === 'linked' ? partner.partnerName : 'partner'} — tap to unshare`
+                    : 'Show this plan to your partner'}
+                </Text>
+              </Pressable>
+            )}
+            {!isPartnersPlan && (
+              <Pressable style={styles.surpriseAction} onPress={handleSurpriseShare}>
+                <Gift size={16} color={colors.secondary} />
+                <Text style={styles.surpriseActionText}>
+                  Share as a surprise — no spoilers, just when to be ready
+                </Text>
+              </Pressable>
+            )}
           </View>
         </ScrollView>
       )}
@@ -674,6 +745,18 @@ const createStyles = (colors: ThemeColors) =>
     borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: 13,
+  },
+  partnerNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    paddingVertical: 4,
+  },
+  partnerNoteText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
   journalActionText: {
     fontSize: 14,

@@ -14,6 +14,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import {
   ArrowLeft,
   CalendarHeart,
+  HeartHandshake,
   MapPin,
   DollarSign,
   Sparkles,
@@ -22,7 +23,8 @@ import {
 import { ThemeColors } from '@/constants/colors';
 import { useTheme } from '@/hooks/useTheme';
 import { DatePlan } from '@/types/planner';
-import { listPlans } from '@/services/datePlanService';
+import { listPartnerPlans, listPlans } from '@/services/datePlanService';
+import { getPartnerState } from '@/services/partnerService';
 
 const getStatusColors = (colors: ThemeColors): Record<DatePlan['status'], string> => ({
   saved: colors.accentDark,
@@ -39,12 +41,27 @@ export function PlansContent({ showBack }: { showBack?: boolean }) {
   const statusColors = useMemo(() => getStatusColors(colors), [colors]);
   const router = useRouter();
   const [plans, setPlans] = useState<DatePlan[]>([]);
+  const [partnerPlans, setPartnerPlans] = useState<DatePlan[]>([]);
+  const [partnerName, setPartnerName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
       setPlans(await listPlans());
+      // Partner's shared plans ride along quietly; failures never block the list.
+      try {
+        const partner = await getPartnerState();
+        if (partner.status === 'linked') {
+          setPartnerName(partner.partnerName);
+          setPartnerPlans(await listPartnerPlans(partner.partnerId));
+        } else {
+          setPartnerName(null);
+          setPartnerPlans([]);
+        }
+      } catch {
+        setPartnerPlans([]);
+      }
     } catch (e) {
       console.error('Failed to load plans:', e);
     } finally {
@@ -121,6 +138,19 @@ export function PlansContent({ showBack }: { showBack?: boolean }) {
               tintColor={colors.primary}
             />
           }
+          ListFooterComponent={
+            partnerPlans.length > 0 ? (
+              <View>
+                <View style={styles.partnerHeader}>
+                  <HeartHandshake size={16} color={colors.secondary} />
+                  <Text style={styles.partnerHeaderText}>From {partnerName ?? 'your partner'}</Text>
+                </View>
+                {partnerPlans.map((item) => (
+                  <View key={item.id}>{renderPlan({ item })}</View>
+                ))}
+              </View>
+            ) : null
+          }
           ListEmptyComponent={
             <View style={styles.empty}>
               <CalendarHeart size={48} color={colors.textTertiary} />
@@ -195,6 +225,18 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     borderColor: colors.border,
     padding: 16,
     marginBottom: 12,
+  },
+  partnerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 10,
+    marginBottom: 12,
+  },
+  partnerHeaderText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.text,
   },
   statusDot: {
     width: 10,

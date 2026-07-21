@@ -20,6 +20,7 @@ import {
 
 interface DatePlanRow {
   id: string;
+  user_id: string;
   title: string;
   city: string;
   plan_date: string | null;
@@ -31,11 +32,13 @@ interface DatePlanRow {
   vibe: string | null;
   items: Json;
   created_at: string;
+  shared_with_partner: boolean;
 }
 
 function rowToPlan(row: DatePlanRow): DatePlan {
   return {
     id: row.id,
+    ownerId: row.user_id,
     title: row.title,
     city: row.city,
     planDate: row.plan_date,
@@ -47,6 +50,7 @@ function rowToPlan(row: DatePlanRow): DatePlan {
     vibe: row.vibe,
     stops: Array.isArray(row.items) ? (row.items as unknown as PlanStop[]) : [],
     createdAt: row.created_at,
+    sharedWithPartner: row.shared_with_partner,
   };
 }
 
@@ -227,6 +231,26 @@ export async function getPlan(id: string): Promise<DatePlan | null> {
 export async function updatePlanStatus(id: string, status: DatePlan['status']): Promise<void> {
   const { error } = await supabase.from('date_plans').update({ status }).eq('id', id);
   if (error) throw new Error(`Failed to update plan: ${error.message}`);
+}
+
+/** Per-plan opt-in partner sharing (default off, so surprises stay secret). */
+export async function updatePlanSharing(id: string, shared: boolean): Promise<void> {
+  const { error } = await supabase
+    .from('date_plans')
+    .update({ shared_with_partner: shared })
+    .eq('id', id);
+  if (error) throw new Error(`Failed to update sharing: ${error.message}`);
+}
+
+/** Plans the linked partner has shared (RLS returns only shared ones). */
+export async function listPartnerPlans(partnerId: string): Promise<DatePlan[]> {
+  const { data, error } = await supabase
+    .from('date_plans')
+    .select('*')
+    .eq('user_id', partnerId)
+    .order('created_at', { ascending: false });
+  if (error) throw new Error(`Failed to load partner plans: ${error.message}`);
+  return ((data ?? []) as DatePlanRow[]).map(rowToPlan);
 }
 
 /** Persist edited stops (swaps, feedback) and refresh the estimated cost. */

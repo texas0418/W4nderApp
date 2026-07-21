@@ -70,10 +70,15 @@ export interface DatePlan {
   vibe: string | null; // one-line description, e.g. "Art, pasta & live rock"
   stops: PlanStop[];
   createdAt?: string;
+  ownerId?: string; // absent on generated plans; used to detect partner-owned plans
+  sharedWithPartner?: boolean;
 }
 
 /** A plan as returned by the AI, before it is saved. */
-export type GeneratedPlan = Omit<DatePlan, 'id' | 'status' | 'createdAt'>;
+export type GeneratedPlan = Omit<
+  DatePlan,
+  'id' | 'status' | 'createdAt' | 'ownerId' | 'sharedWithPartner'
+>;
 
 export interface DestinationSuggestion {
   city: string;
