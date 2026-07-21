@@ -28,7 +28,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { signOut } from '@/services';
 import { supabase } from '@/lib/supabase';
-import { listPlans } from '@/services/datePlanService';
+import { PlanQuota, getPlanQuota, listPlans } from '@/services/datePlanService';
 import {
   ReminderSettings,
   describeReminder,
@@ -45,6 +45,7 @@ export default function ProfileScreen() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [reminder, setReminder] = useState<ReminderSettings | null>(null);
+  const [quota, setQuota] = useState<PlanQuota | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -53,6 +54,9 @@ export default function ProfileScreen() {
         .catch((e) => console.error('Failed to load plans:', e));
       getReminderSettings()
         .then(setReminder)
+        .catch(() => {});
+      getPlanQuota()
+        .then(setQuota)
         .catch(() => {});
       supabase.auth.getUser().then(({ data: { user: authUser } }) => {
         if (!authUser) return;
@@ -220,15 +224,20 @@ export default function ProfileScreen() {
             <ChevronRight size={18} color={colors.textTertiary} />
           </Pressable>
 
-          <View style={styles.row}>
+          <Pressable style={styles.row} onPress={() => router.push('/membership' as never)}>
             <View style={styles.rowIcon}>
               <Crown size={20} color={colors.secondary} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.rowTitle}>Membership</Text>
-              <Text style={styles.rowDesc}>Free plan · 3 AI plans per month</Text>
+              <Text style={styles.rowDesc}>
+                {quota
+                  ? `${quota.isPaid ? 'Premium' : 'Free'} · ${Math.max(0, quota.monthlyLimit - quota.monthlyUsed)} of ${quota.monthlyLimit} plans left this month`
+                  : 'Plans and limits'}
+              </Text>
             </View>
-          </View>
+            <ChevronRight size={18} color={colors.textTertiary} />
+          </Pressable>
 
           <Pressable style={styles.signOutRow} onPress={handleSignOut}>
             <LogOut size={18} color={colors.error} />
