@@ -414,20 +414,15 @@ export default function SavedPlanScreen() {
               <Text style={styles.headerTitle}>{plan ? plan.title : 'Date plan'}</Text>
             </Pressable>
             {isPartnersPlan ? (
-              <View style={styles.headerBtnRow} />
+              <View style={styles.backBtn} />
             ) : editing ? (
               <Pressable onPress={cancelEditing} style={styles.backBtn}>
                 <X size={20} color={colors.textLight} />
               </Pressable>
             ) : (
-              <View style={styles.headerBtnRow}>
-                <Pressable onPress={startEditing} style={styles.backBtn}>
-                  <Pencil size={18} color={colors.textLight} />
-                </Pressable>
-                <Pressable onPress={handleDelete} style={styles.backBtn}>
-                  <Trash2 size={20} color={colors.textLight} />
-                </Pressable>
-              </View>
+              <Pressable onPress={handleDelete} style={styles.backBtn}>
+                <Trash2 size={20} color={colors.textLight} />
+              </Pressable>
             )}
           </View>
         </SafeAreaView>
@@ -474,7 +469,22 @@ export default function SavedPlanScreen() {
             {showDayHeader && <Text style={styles.dayHeader}>Day {stop.day}</Text>}
             <View style={styles.stopRow}>
               <View style={styles.stopTimeCol}>
-                <Text style={styles.stopTime} maxFontSizeMultiplier={1}>{stop.time}</Text>
+                {/* Tapping a time is a second door into edit mode, opened
+                    right at this stop's picker. */}
+                <Pressable
+                  disabled={editing || isPartnersPlan}
+                  onPress={() => {
+                    startEditing();
+                    setTimePickerFor(stop.order);
+                  }}
+                >
+                  <Text
+                    style={[styles.stopTime, !editing && !isPartnersPlan && styles.stopTimeTappable]}
+                    maxFontSizeMultiplier={1}
+                  >
+                    {stop.time.slice(0, 5)}
+                  </Text>
+                </Pressable>
                 <View style={styles.stopMedallion}>
                   <CategoryIcon size={16} color={colors.primaryLight} />
                 </View>
@@ -691,6 +701,14 @@ export default function SavedPlanScreen() {
                 </Text>
               </Pressable>
             )}
+            {!isPartnersPlan && (
+              <Pressable style={styles.journalAction} onPress={startEditing}>
+                <Pencil size={16} color={colors.primaryLight} />
+                <Text style={styles.journalActionText}>
+                  Edit times & order — or just tap any stop's time
+                </Text>
+              </Pressable>
+            )}
             <View style={styles.secondaryRow}>
               <Pressable style={styles.secondaryAction} onPress={handleAddToCalendar}>
                 <CalendarPlus size={17} color={colors.primaryLight} />
@@ -848,6 +866,10 @@ const createStyles = (colors: ThemeColors) =>
     color: colors.primaryLight,
     marginBottom: 6,
     fontVariant: ['tabular-nums'],
+  },
+  stopTimeTappable: {
+    textDecorationLine: 'underline',
+    textDecorationStyle: 'dotted',
   },
   stopMedallion: {
     width: 32,
