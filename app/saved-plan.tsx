@@ -48,6 +48,7 @@ import {
 } from '@/services/datePlanService';
 import { getTasteProfile } from '@/services/tasteProfileService';
 import { JournalEntry, getEntryForPlan } from '@/services/dateJournalService';
+import { buildShareUrl, getSurpriseShareToken } from '@/services/planShareService';
 import { categoryIcons } from '@/app/plan-date';
 import { MapPin as MapPinIcon } from 'lucide-react-native';
 
@@ -138,12 +139,17 @@ export default function SavedPlanScreen() {
       : 'Soon';
     const time = plan.startTime ? plan.startTime.slice(0, 5) : 'evening';
     const stops = plan.stops.length;
+    // Receive-the-date link: a spoiler-free card page the recipient can open
+    // without the app. Falls back to the plain site if minting a token fails.
+    const url = await getSurpriseShareToken(plan.id)
+      .then(buildShareUrl)
+      .catch(() => 'https://texas0418.github.io/W4nderApp/');
     try {
       await Share.share({
         message: [
           `${when}. Be ready at ${time}.`,
           `${stops} stops. All planned. That's all you get to know.`,
-          '— planned with W4nder · https://texas0418.github.io/W4nderApp/',
+          `See your date card → ${url}`,
         ].join('\n'),
       });
     } catch {

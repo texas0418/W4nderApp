@@ -114,6 +114,7 @@ function RootLayoutNav() {
       <Stack.Screen name="plan-date" options={defaultModalOptions} />
       <Stack.Screen name="plans" options={defaultCardOptions} />
       <Stack.Screen name="saved-plan" options={defaultCardOptions} />
+      <Stack.Screen name="receive-date" options={defaultCardOptions} />
       <Stack.Screen name="rate-date" options={defaultCardOptions} />
       <Stack.Screen name="date-journal" options={defaultCardOptions} />
       <Stack.Screen name="taste-profile" options={defaultCardOptions} />

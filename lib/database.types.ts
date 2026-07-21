@@ -260,6 +260,41 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_shares: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          plan_id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          plan_id: string
+          token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          plan_id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_shares_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "date_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -395,6 +430,7 @@ export type Database = {
     }
     Functions: {
       append_partial: { Args: { item: Json; job_id: string }; Returns: number }
+      get_shared_plan: { Args: { share_token: string }; Returns: Json }
       redeem_partner_code: { Args: { p_code: string }; Returns: Json }
     }
     Enums: {
