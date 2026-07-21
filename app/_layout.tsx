@@ -150,6 +150,7 @@ function RootLayoutNav() {
       {/* ===== Date Night ===== */}
       <Stack.Screen name="date-night" options={{ headerShown: false }} />
       <Stack.Screen name="date-night-reminder" options={defaultCardOptions} />
+      <Stack.Screen name="partner" options={defaultCardOptions} />
       <Stack.Screen name="anniversaries" options={defaultCardOptions} />
 
       {/* ===== Social & Sharing ===== */}

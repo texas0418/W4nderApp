@@ -150,6 +150,33 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_links: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          invitee: string | null
+          inviter: string
+          status: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          invitee?: string | null
+          inviter: string
+          status?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          invitee?: string | null
+          inviter?: string
+          status?: string
+        }
+        Relationships: []
+      }
       plan_jobs: {
         Row: {
           created_at: string
@@ -324,6 +351,7 @@ export type Database = {
     }
     Functions: {
       append_partial: { Args: { item: Json; job_id: string }; Returns: number }
+      redeem_partner_code: { Args: { p_code: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

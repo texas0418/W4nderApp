@@ -51,6 +51,7 @@ import {
   PlanProgress,
 } from '@/types/planner';
 import { getTasteProfile } from '@/services/tasteProfileService';
+import { getPartnerTasteProfile, mergeTasteProfiles } from '@/services/partnerService';
 import { buildReservationUrl, isReservable } from '@/utils/reservations';
 import {
   generatePlans,
@@ -197,6 +198,8 @@ export default function PlanDateScreen() {
       .catch(() => setQuota(null));
   }, [phase]);
 
+  const [partnerLinked, setPartnerLinked] = useState(false);
+
   useEffect(() => {
     getTasteProfile()
       .then((p) => {
@@ -205,6 +208,14 @@ export default function PlanDateScreen() {
         if (p.dateBudget) setBudget(p.dateBudget);
       })
       .catch((e) => console.error('Failed to load taste profile:', e));
+    // Partner mode: merge the linked partner's tastes so plans suit both.
+    getPartnerTasteProfile()
+      .then((partner) => {
+        if (!partner) return;
+        setPartnerLinked(true);
+        setProfile((mine) => mergeTasteProfiles(mine, partner));
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -445,6 +456,9 @@ export default function PlanDateScreen() {
       automaticallyAdjustKeyboardInsets
     >
       {renderQuotaLine()}
+      {partnerLinked && (
+        <Text style={styles.quotaLine}>Partner linked — plans will match both your tastes</Text>
+      )}
       <View style={styles.modeRow}>
         {(
           [
