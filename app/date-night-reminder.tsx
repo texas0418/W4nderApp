@@ -140,7 +140,12 @@ export default function DateNightReminderScreen() {
         </SafeAreaView>
       </LinearGradient>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
+      >
         <View style={styles.card}>
           <View style={styles.toggleRow}>
             <View style={styles.toggleIcon}>

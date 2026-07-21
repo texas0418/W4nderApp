@@ -129,6 +129,7 @@ export default function TasteProfileScreen() {
             contentContainerStyle={styles.content}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets
           >
             {renderChips('Activities I love', activityOptions, 'activityLoves')}
             {renderChips('Cuisines I love', foodPreferences, 'foodLoves')}
