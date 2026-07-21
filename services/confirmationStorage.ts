@@ -3,7 +3,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // eslint-disable-next-line import/no-unresolved -- tracked in #3
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { Share, Platform } from 'react-native';
 import {
   Confirmation,

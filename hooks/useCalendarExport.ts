@@ -6,7 +6,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Alert, Platform, Share } from 'react-native';
 // eslint-disable-next-line import/no-unresolved -- tracked in #3
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import {
   DeviceCalendar,
