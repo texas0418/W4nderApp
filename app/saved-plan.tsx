@@ -143,7 +143,7 @@ export default function SavedPlanScreen() {
     // without the app. Falls back to the plain site if minting a token fails.
     const url = await getSurpriseShareToken(plan.id)
       .then(buildShareUrl)
-      .catch(() => 'https://texas0418.github.io/W4nderApp/');
+      .catch(() => 'https://texas0418.github.io/paint-the-town/');
     try {
       await Share.share({
         message: [

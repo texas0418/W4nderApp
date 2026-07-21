@@ -24,6 +24,18 @@
         "docs"
       ],
       "port": 4173
+    },
+    {
+      "name": "scratch-icon",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4174",
+        "-d",
+        "/private/tmp/claude-501/-Users-myfuckingmacbookair-Documents-GitHub-W4nderApp/833bd5b2-e358-4d1d-bd5f-abf4ba02f3a0/scratchpad/icon"
+      ],
+      "port": 4174
     }
   ]
 }

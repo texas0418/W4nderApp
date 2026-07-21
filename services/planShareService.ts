@@ -8,7 +8,7 @@
 
 import { supabase } from '@/lib/supabase';
 
-export const SHARE_PAGE_BASE = 'https://texas0418.github.io/W4nderApp/date.html';
+export const SHARE_PAGE_BASE = 'https://texas0418.github.io/paint-the-town/date.html';
 
 export interface SharedPlanCard {
   plannerName: string;

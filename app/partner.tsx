@@ -109,7 +109,7 @@ export default function PartnerScreen() {
               disabled={busy}
               onPress={() =>
                 Share.share({
-                  message: `Link with me on Paint the Town so our date plans match both of us — my code is ${state.code}. Don't have Paint the Town yet? https://texas0418.github.io/W4nderApp/`,
+                  message: `Link with me on Paint the Town so our date plans match both of us — my code is ${state.code}. Don't have Paint the Town yet? https://texas0418.github.io/paint-the-town/`,
                 }).catch(() => {})
               }
             >
